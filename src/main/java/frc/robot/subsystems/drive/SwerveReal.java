@@ -5,16 +5,16 @@ import edu.wpi.first.math.geometry.Rotation2d;
 /**
  * DrivetrainReal
  */
-public class DrivetrainReal implements DrivetrainIO {
+public class SwerveReal implements SwerveIO {
 
 
     /**
      * Drivetrain Real
      */
-    public DrivetrainReal() {}
+    public SwerveReal() {}
 
     @Override
-    public void updateInputs(DrivetrainIOInputs inputs) {
+    public void updateInputs(SwerveInputs inputs) {
         inputs.gyroYaw = Rotation2d.fromDegrees(0);
     }
 

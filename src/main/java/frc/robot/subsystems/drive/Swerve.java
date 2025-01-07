@@ -7,14 +7,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * Drivetrain subsystem.
  */
 
-public class Drivetrain extends SubsystemBase {
-    private DrivetrainIO io;
-    private DrivetrainIOInputsAutoLogged inputs = new DrivetrainIOInputsAutoLogged();
+public class Swerve extends SubsystemBase {
+    private SwerveIO io;
+    private SwerveInputsAutoLogged inputs = new SwerveInputsAutoLogged();
 
     /**
      * Create Wrist Intake Subsystem
      */
-    public Drivetrain(DrivetrainIO io) {
+    public Swerve(SwerveIO io) {
         this.io = io;
     }
 
