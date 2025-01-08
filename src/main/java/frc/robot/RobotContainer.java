@@ -9,9 +9,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Robot.RobotRunType;
-import frc.robot.subsystems.drive.Swerve;
-import frc.robot.subsystems.drive.SwerveIO;
-import frc.robot.subsystems.drive.SwerveReal;
+import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.swerve.SwerveIO;
+import frc.robot.subsystems.swerve.SwerveReal;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
