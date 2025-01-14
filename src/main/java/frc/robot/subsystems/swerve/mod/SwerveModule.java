@@ -85,6 +85,9 @@ public final class SwerveModule {
      * Periodic function. Run while the odometryLock is not held.
      */
     public void periodic() {
+        Logger.recordOutput(this.driveKey, driveInputs.odometryDrivePositionsMeters.length);
+        Logger.recordOutput(this.driveKey, driveInputs.odometryTimestamps.length);
+        Logger.recordOutput(this.angleKey, angleInputs.odometryTurnPositions.length);
         // Update tunable numbers
         if (drivekS.hasChanged(hashCode()) || drivekV.hasChanged(hashCode())) {
             ffModel = new SimpleMotorFeedforward(drivekS.get(), drivekV.get());

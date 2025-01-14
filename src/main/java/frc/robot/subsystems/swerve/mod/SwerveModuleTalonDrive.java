@@ -1,7 +1,10 @@
 
 package frc.robot.subsystems.swerve.mod;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Seconds;
 import java.util.Queue;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -46,13 +49,9 @@ public class SwerveModuleTalonDrive implements SwerveModuleDriveIO {
         driveMotorAppliedVolts = driveMotor.getMotorVoltage();
         driveMotorCurrent = driveMotor.getStatorCurrent();
 
-        BaseStatusSignal.setUpdateFrequencyForAll(
-            Constants.Swerve.odometryFrequency,
+        BaseStatusSignal.setUpdateFrequencyForAll(Constants.Swerve.odometryFrequency,
             driveMotorPosition);
-        BaseStatusSignal.setUpdateFrequencyForAll(
-            50.0,
-            driveMotorVelocity,
-            driveMotorAppliedVolts,
+        BaseStatusSignal.setUpdateFrequencyForAll(50.0, driveMotorVelocity, driveMotorAppliedVolts,
             driveMotorCurrent);
         ParentDevice.optimizeBusUtilizationForAll(driveMotor);
 
@@ -93,8 +92,9 @@ public class SwerveModuleTalonDrive implements SwerveModuleDriveIO {
             timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
         inputs.odometryDrivePositionsMeters =
             driveMotorPositionQueue.stream().mapToDouble(Units::rotationsToRadians)
-                .map((x) -> x * Constants.Swerve.ModuleConstants.wheelRadius.in(Meters))
-                .toArray();
+                .map((x) -> x * Constants.Swerve.ModuleConstants.wheelRadius.in(Meters)).toArray();
+        driveMotorPositionQueue.clear();
+        timestampQueue.clear();
     }
 
     @Override
