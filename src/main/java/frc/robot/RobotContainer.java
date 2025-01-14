@@ -3,15 +3,13 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Robot.RobotRunType;
-import frc.robot.subsystems.swerve.Swerve;
-import frc.robot.subsystems.swerve.SwerveIO;
-import frc.robot.subsystems.swerve.SwerveReal;
+import frc.robot.subsystems.swerve.drive.Swerve;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -28,27 +26,36 @@ public class RobotContainer {
     private final SendableChooser<String> autoChooser = new SendableChooser<>();
 
     /* Subsystems */
-    private Swerve swerve;
+    private Swerve s_Swerve;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
-    public RobotContainer(RobotRunType runtimeType) {
-        SmartDashboard.putData("Choose Auto: ", autoChooser);
-        autoChooser.setDefaultOption("Wait 1 Second", "wait");
+   public RobotContainer(RobotRunType runtimeType) {
+        // if (runtimeType == RobotRunType.kSimulation) {
+        //     SimulatedArena.overrideSimulationTimings(Units.Seconds.of(0.02), 5);
+        // }
+
         switch (runtimeType) {
             case kReal:
-                swerve = new Swerve(new SwerveReal());
+                s_Swerve = new Swerve(new SwerveBoron(), SwerveModuleTalonAngle::new,
+                    SwerveModuleTalonDrive::new);
                 break;
-            case kSimulation:
-                // swerve = new Swerve(new DrivetrainSim() {});
-                break;
+            // case kSimulation:
+            //     driveSimulation =
+            //         new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
+            //             new Pose2d(3, 3, Rotation2d.kZero));
+            //     SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
+            //     s_Swerve = new Swerve(new SwerveSim(driveSimulation),
+            //         (i, config) -> {
+            //             var sim = new SwerveModuleSim(config, driveSimulation.getModules()[i]);
+            //             return Pair.of(sim, sim);
+            //         });
+            //     break;
             default:
-                swerve = new Swerve(new SwerveIO() {});
-        }
-        // Configure the button bindings
-        configureButtonBindings();
-    }
+                // s_Swerve = new Swerve(new SwerveIO();
+
+
 
     /**
      * Use this method to define your button->command mappings. Buttons can be created by
