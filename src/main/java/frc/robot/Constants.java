@@ -38,11 +38,11 @@ public final class Constants {
     /**
      * Driver ID
      */
-    public static final int driverID = 0;
+    public static final int driverId = 0;
     /**
      * Operator ID
      */
-    public static final int operatorID = 1;
+    public static final int operatorId = 1;
 
     public static final boolean tuningMode = false;
 
@@ -105,7 +105,8 @@ public final class Constants {
                 .angleMotorInverted(false).build();
         public static final ModuleConfig backLeft =
             ModuleConfig.builder().moduleNumber(2).driveId(3).angleId(7).absoluteEncoderId(3)
-                .absoluteEncoderOffset(Rotation2d.fromRotations(0.172119))).angleMotorInverted(false).build();
+                .absoluteEncoderOffset(Rotation2d.fromRotations(0.172119)).angleMotorInverted(false)
+                .build();
         public static final ModuleConfig backRight =
             ModuleConfig.builder().moduleNumber(3).driveId(4).angleId(8).absoluteEncoderId(4)
                 .absoluteEncoderOffset(Rotation2d.fromRotations(0.177734)).angleMotorInverted(false)
@@ -166,11 +167,5 @@ public final class Constants {
             }
         }
     }
-    /**
-     * Pneumatics CAN id constants.
-     */
-    public static final class Pneumatics {
-    }
-
 
 }
