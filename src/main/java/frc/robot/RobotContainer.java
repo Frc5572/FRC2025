@@ -1,28 +1,17 @@
 package frc.robot;
 
-import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoral;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralAlgaeStack;
-import org.littletonrobotics.junction.Logger;
-import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.lib.util.Deadzone;
+import frc.lib.sim.SimulatedArena;
+import frc.lib.viz.RobotViz;
 import frc.robot.Robot.RobotRunType;
-import frc.robot.subsystems.swerve.drive.Swerve;
-import frc.robot.subsystems.swerve.drive.SwerveNavX;
-import frc.robot.subsystems.swerve.drive.SwerveSim;
-import frc.robot.subsystems.swerve.mod.SwerveModuleSim;
-import frc.robot.subsystems.swerve.mod.SwerveModuleTalonAngle;
-import frc.robot.subsystems.swerve.mod.SwerveModuleTalonDrive;
+import frc.robot.commands.TeleopSwerve;
+import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.swerve.SwerveIO;
+import frc.robot.subsystems.swerve.SwerveReal;
 
 
 /**
@@ -41,49 +30,37 @@ public class RobotContainer {
     /* Subsystems */
     private Swerve s_Swerve;
 
+    /** Viz */
+    private final RobotViz viz;
+
+    /** Simulation */
+    private final SimulatedArena arena;
+
     /**
      */
     public RobotContainer(RobotRunType runtimeType) {
         if (runtimeType == RobotRunType.kSimulation) {
-            SimulatedArena.overrideSimulationTimings(Units.Seconds.of(0.02), 5);
+            arena = new SimulatedArena();
+        } else {
+            arena = null;
         }
-
         switch (runtimeType) {
             case kReal:
-                s_Swerve = new Swerve(new SwerveNavX(), SwerveModuleTalonAngle::new,
-                    SwerveModuleTalonDrive::new);
+                viz = new RobotViz("Viz", null);
+                s_Swerve = new Swerve(new SwerveReal(), viz);
                 break;
-            case kSimulation:
-                driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
-                    new Pose2d(3, 3, Rotation2d.kZero));
-                SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
-                s_Swerve = new Swerve(new SwerveSim(driveSimulation), (i, config) -> {
-                    var sim = new SwerveModuleSim(config, driveSimulation.getModules()[i]);
-                    return Pair.of(sim, sim);
-                });
-                break;
+            // case kSimulation:
+            // SimulatedRobot robot = arena.newRobot();
+            // s_Swerve = new Swerve(new SwerveSim(robot), viz);
+            // break;
             default:
-                // s_Swerve = new Swerve(new SwerveIO() {}, cameras, viz);
+                viz = new RobotViz("Viz", null);
+                s_Swerve = new Swerve(new SwerveIO() {}, viz);
         }
 
-        double maxSpeed = Constants.Swerve.maxLinearSpeed.in(Units.MetersPerSecond);
 
-        s_Swerve.setDefaultCommand(s_Swerve.drive(() -> {
-            double forwardNormalized = -driver.getLeftY();
-            double leftNormalized = -driver.getLeftX();
-            double turnNormalized = -driver.getRightX();
-
-            double forwardDeadband = Deadzone.applyDeadzone(forwardNormalized);
-            double leftDeadband = Deadzone.applyDeadzone(leftNormalized);
-            double turnDeadband = Deadzone.applyDeadzone(turnNormalized);
-
-            double forward =
-                forwardDeadband * forwardDeadband * Math.signum(forwardDeadband) * maxSpeed;
-            double left = leftDeadband * leftDeadband * Math.signum(leftDeadband) * maxSpeed;
-            double turn = turnDeadband * turnDeadband * Math.signum(turnDeadband) * maxSpeed;
-
-            return new ChassisSpeeds(forward, left, turn);
-        }, true, true));
+        s_Swerve.setDefaultCommand(new TeleopSwerve(s_Swerve, driver,
+            Constants.Swerve.isFieldRelative, Constants.Swerve.isOpenLoop));
 
         configureButtonBindings(runtimeType);
     }
@@ -94,14 +71,7 @@ public class RobotContainer {
      * {@link XboxController}), and then passing it to a
      * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
-    private void configureButtonBindings(RobotRunType runtimeType) {
-        if (runtimeType == RobotRunType.kSimulation) {
-            driver.a().onTrue(new InstantCommand(() -> {
-                SimulatedArena.getInstance()
-                    .addGamePiece(new ReefscapeCoral(new Pose2d(2, 2, Rotation2d.kZero)));
-            }));
-        }
-    }
+    private void configureButtonBindings(RobotRunType runtimeType) {}
 
     /**
      * Gets the user's selected autonomous command.
@@ -122,7 +92,6 @@ public class RobotContainer {
     /** Start simulation */
     public void startSimulation() {
         if (driveSimulation != null) {
-            SimulatedArena.getInstance().resetFieldForAuto();
         }
     }
 
@@ -130,18 +99,7 @@ public class RobotContainer {
      * Update simulation
      */
     public void updateSimulation() {
-        if (driveSimulation != null) {
-            SimulatedArena.getInstance().simulationPeriodic();
-            Logger.recordOutput("simulatedPose", driveSimulation.getSimulatedDriveTrainPose());
-            Logger.recordOutput("FieldSimulation/Algae",
-                SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
-            Logger.recordOutput("FieldSimulation/Coral",
-                SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
-            Logger.recordOutput("FieldSimulation/StackedAlgae",
-                ReefscapeCoralAlgaeStack.getStackedAlgaePoses().get(0));
-            Logger.recordOutput("FieldSimulation/StackedCoral",
-                ReefscapeCoralAlgaeStack.getStackedCoralPoses().get(0));
-        }
+
     }
 
 }

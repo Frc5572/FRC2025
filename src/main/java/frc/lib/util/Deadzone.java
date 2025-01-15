@@ -7,8 +7,8 @@ public class Deadzone {
 
     /** Make deadzone for an input axis, with proper scaling. */
     public static double applyDeadzone(double input) {
-        return (Math.abs(input) < Constants.stickDeadband) ? 0
-            : (input - Constants.stickDeadband) / (1.0 - Constants.stickDeadband);
+        return (Math.abs(input) < Constants.STICK_DEADBAND) ? 0
+            : (input - Constants.STICK_DEADBAND) / (1.0 - Constants.STICK_DEADBAND);
     }
 
 }
