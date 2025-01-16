@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.FieldConstants;
 import frc.lib.util.swerve.SwerveModule;
-import frc.lib.viz.RobotViz;
 import frc.robot.Constants;
 
 /**
@@ -40,14 +39,12 @@ public class Swerve extends SubsystemBase {
     // .withProperties(Map.of("Color when true", "green", "Color when false", "red"))
     // .withPosition(11, 0).withSize(2, 2).getEntry();
 
-    private final RobotViz viz;
 
     /**
      * Swerve Subsystem
      */
-    public Swerve(SwerveIO swerveIO, RobotViz viz) {
+    public Swerve(SwerveIO swerveIO) {
         this.swerveIO = swerveIO;
-        this.viz = viz;
         swerveMods = swerveIO.createModules();
         fieldOffset = getGyroYaw().getDegrees();
 

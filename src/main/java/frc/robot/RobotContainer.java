@@ -5,8 +5,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.lib.sim.SimulatedArena;
-import frc.lib.viz.RobotViz;
 import frc.robot.Robot.RobotRunType;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.swerve.Swerve;
@@ -30,32 +28,19 @@ public class RobotContainer {
     /* Subsystems */
     private Swerve s_Swerve;
 
-    /** Viz */
-    private final RobotViz viz;
-
-    /** Simulation */
-    private final SimulatedArena arena;
-
     /**
      */
     public RobotContainer(RobotRunType runtimeType) {
-        if (runtimeType == RobotRunType.kSimulation) {
-            arena = new SimulatedArena();
-        } else {
-            arena = null;
-        }
         switch (runtimeType) {
             case kReal:
-                viz = new RobotViz("Viz", null);
-                s_Swerve = new Swerve(new SwerveReal(), viz);
+                s_Swerve = new Swerve(new SwerveReal());
                 break;
             // case kSimulation:
             // SimulatedRobot robot = arena.newRobot();
             // s_Swerve = new Swerve(new SwerveSim(robot), viz);
             // break;
             default:
-                viz = new RobotViz("Viz", null);
-                s_Swerve = new Swerve(new SwerveIO() {}, viz);
+                s_Swerve = new Swerve(new SwerveIO() {});
         }
 
 
