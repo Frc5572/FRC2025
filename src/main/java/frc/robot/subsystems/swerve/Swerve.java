@@ -119,6 +119,7 @@ public class Swerve extends SubsystemBase {
      *
      * @return Array of Swerve Module States
      */
+    @AutoLogOutput(key = "Swerve/ModuleStates")
     public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
         for (SwerveModule mod : swerveMods) {
@@ -175,9 +176,9 @@ public class Swerve extends SubsystemBase {
      * @return Current rotation/yaw of gyro as {@link Rotation2d}
      */
     public Rotation2d getGyroYaw() {
-        float yaw = inputs.yaw;
-        return (Constants.Swerve.invertGyro) ? Rotation2d.fromDegrees(-yaw)
-            : Rotation2d.fromDegrees(yaw);
+        double yaw = inputs.yaw;
+        return (Constants.Swerve.invertGyro) ? Rotation2d.fromRotations(-yaw)
+            : Rotation2d.fromRotations(yaw);
     }
 
     /**

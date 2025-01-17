@@ -48,13 +48,13 @@ public final class Constants {
         public static final double AUTO_ROTATION_KD = 0.0;
 
         public static final NavXComType navXID = NavXComType.kMXP_SPI;
-        public static final boolean invertGyro = true;
+        public static final boolean invertGyro = false;
         public static final boolean isFieldRelative = true;
         public static final boolean isOpenLoop = false;
 
         /* Drivetrain Constants */
-        public static final double trackWidth = Units.inchesToMeters(23.75);
-        public static final double wheelBase = Units.inchesToMeters(17.75);
+        public static final double trackWidth = Units.inchesToMeters(24.229);
+        public static final double wheelBase = Units.inchesToMeters(24.229);
         public static final Distance wheelDiameter = Inches.of(3.8);
         public static final Distance wheelCircumference = wheelDiameter.times(Math.PI);
         public static final Translation2d MOD0_MODOFFSET =
@@ -137,7 +137,7 @@ public final class Constants {
             public static final int driveMotorID = 1;
             public static final int angleMotorID = 5;
             public static final int canCoderID = 1;
-            public static final Rotation2d angleOffset = Rotation2d.fromRotations(0.421631);
+            public static final Rotation2d angleOffset = Rotation2d.fromRotations(0.008789);
 
         }
 
@@ -148,7 +148,7 @@ public final class Constants {
             public static final int driveMotorID = 2;
             public static final int angleMotorID = 6;
             public static final int canCoderID = 2;
-            public static final Rotation2d angleOffset = Rotation2d.fromRotations(-0.083984);
+            public static final Rotation2d angleOffset = Rotation2d.fromRotations(-0.298096);
 
         }
 
@@ -159,7 +159,7 @@ public final class Constants {
             public static final int driveMotorID = 4;
             public static final int angleMotorID = 8;
             public static final int canCoderID = 4;
-            public static final Rotation2d angleOffset = Rotation2d.fromRotations(0.172119);
+            public static final Rotation2d angleOffset = Rotation2d.fromRotations(-0.451172);
 
         }
 
@@ -170,7 +170,7 @@ public final class Constants {
             public static final int driveMotorID = 3;
             public static final int angleMotorID = 7;
             public static final int canCoderID = 3;
-            public static final Rotation2d angleOffset = Rotation2d.fromRotations(0.177734);
+            public static final Rotation2d angleOffset = Rotation2d.fromRotations(-0.178223 + 0.5);
         }
 
 

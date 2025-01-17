@@ -12,9 +12,9 @@ public interface SwerveIO {
 
     @AutoLog
     public static class SwerveInputs {
-        public float yaw;
-        public float roll;
-        public float pitch;
+        public double yaw;
+        public double roll;
+        public double pitch;
     }
 
     public default void updateInputs(SwerveInputs inputs) {}

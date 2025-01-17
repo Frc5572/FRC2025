@@ -1,7 +1,7 @@
 package frc.robot.subsystems.swerve;
 
 
-import com.studica.frc.AHRS;
+import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.lib.util.swerve.SwerveModule;
 import frc.lib.util.swerve.SwerveModuleReal;
@@ -10,7 +10,8 @@ import frc.robot.Constants;
 /** Real Class for Swerve */
 public class SwerveReal implements SwerveIO {
 
-    private AHRS gyro = new AHRS(Constants.Swerve.navXID);
+    private Canandgyro gyro = new Canandgyro(1);
+    // private AHRS gyro = new AHRS(Constants.Swerve.navXID);
 
     /** Real Swerve Initializer */
     public SwerveReal() {}

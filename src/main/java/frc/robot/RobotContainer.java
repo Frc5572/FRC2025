@@ -4,6 +4,7 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Robot.RobotRunType;
 import frc.robot.commands.TeleopSwerve;
@@ -56,7 +57,9 @@ public class RobotContainer {
      * {@link XboxController}), and then passing it to a
      * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
-    private void configureButtonBindings(RobotRunType runtimeType) {}
+    private void configureButtonBindings(RobotRunType runtimeType) {
+        driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
+    }
 
     /**
      * Gets the user's selected autonomous command.
