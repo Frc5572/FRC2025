@@ -240,9 +240,11 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Runs the drive at the desired velocity.
+     * Creates a command for driving the swerve drive during tele-op
      *
-     * @param speeds Speeds in meters/sec
+     * @param controller The driver controller
+     * @param fieldRelative Whether the movement is relative to the field or absolute
+     * @param openLoop Open or closed loop system
      */
     public Command drive(CommandXboxController controller, boolean fieldRelative,
         boolean openLoop) {
@@ -251,7 +253,6 @@ public class Swerve extends SubsystemBase {
             double yaxis = -controller.getLeftY() * speedMultiplier;
             double xaxis = -controller.getLeftX() * speedMultiplier;
             double raxis = -controller.getRightX() * speedMultiplier;
-
             /* Deadbands */
             yaxis = (Math.abs(yaxis) < Constants.STICK_DEADBAND) ? 0
                 : (yaxis - Constants.STICK_DEADBAND) / (1.0 - Constants.STICK_DEADBAND);
