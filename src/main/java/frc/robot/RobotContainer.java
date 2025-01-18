@@ -39,8 +39,8 @@ public class RobotContainer {
             default:
                 s_Swerve = new Swerve(new SwerveIO() {});
         }
-        s_Swerve.setDefaultCommand(
-            s_Swerve.drive(driver, Constants.Swerve.isFieldRelative, Constants.Swerve.isOpenLoop));
+        s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
+            Constants.Swerve.isOpenLoop));
         configureButtonBindings(runtimeType);
     }
 

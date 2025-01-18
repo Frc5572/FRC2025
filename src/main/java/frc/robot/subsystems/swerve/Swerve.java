@@ -246,7 +246,7 @@ public class Swerve extends SubsystemBase {
      * @param fieldRelative Whether the movement is relative to the field or absolute
      * @param openLoop Open or closed loop system
      */
-    public Command drive(CommandXboxController controller, boolean fieldRelative,
+    public Command teleOpDrive(CommandXboxController controller, boolean fieldRelative,
         boolean openLoop) {
         return this.run(() -> {
             double speedMultiplier = 1;
@@ -267,5 +267,4 @@ public class Swerve extends SubsystemBase {
             this.drive(translation, rotation, fieldRelative, openLoop);
         });
     }
-
 }
