@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-import { serialize, deserialize } from "./msgpack.js";
+import { deserialize, serialize } from "./msgpack.js";
 const typestrIdxLookup = {
   boolean: 0,
   double: 1,
@@ -334,10 +334,10 @@ export class NT4_Client {
     this.serverTimeOffset_us = serverTimeAtRx - rxTime;
     console.log(
       "[NT4] New server time: " +
-        (this.getServerTime_us() / 1000000.0).toString() +
-        "s with " +
-        (this.networkLatency_us / 1000.0).toString() +
-        "ms latency"
+      (this.getServerTime_us() / 1000000.0).toString() +
+      "s with " +
+      (this.networkLatency_us / 1000.0).toString() +
+      "ms latency"
     );
   }
   //////////////////////////////////////////////////////////////
@@ -443,13 +443,13 @@ export class NT4_Client {
         let params = msg["params"];
         if (typeof method !== "string") {
           console.warn(
-            '[NT4] Ignoring text message, JSON parsing found "method", but it wasn\'t a string.'
+            "[NT4] Ignoring text message, JSON parsing found \"method\", but it wasn't a string."
           );
           return;
         }
         if (typeof params !== "object") {
           console.warn(
-            '[NT4] Ignoring text message, JSON parsing found "params", but it wasn\'t an object.'
+            "[NT4] Ignoring text message, JSON parsing found \"params\", but it wasn't an object."
           );
           return;
         }
@@ -514,7 +514,7 @@ export class NT4_Client {
           if (!topic) {
             console.warn(
               "[NT4] Ignoring binary data - unknown topic ID " +
-                topicID.toString()
+              topicID.toString()
             );
             return;
           }
@@ -524,7 +524,7 @@ export class NT4_Client {
         } else {
           console.warn(
             "[NT4] Ignoring binary data - invalid topic ID " +
-              topicID.toString()
+            topicID.toString()
           );
         }
       });
