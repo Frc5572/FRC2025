@@ -1,7 +1,9 @@
 package frc.lib.math;
 
 import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 
@@ -37,8 +39,8 @@ public class Conversions {
      * @param circumference Wheel Circumference: (in Meters)
      * @return Wheel Distance: (in Meters)
      */
-    public static double rotationsToMeters(AngularVelocity wheelRotations, Distance circumference) {
-        double wheelMeters = wheelRotations.in(RotationsPerSecond) * circumference.in(Meter);
+    public static double rotationsToMeters(Angle wheelRotations, Distance circumference) {
+        double wheelMeters = wheelRotations.in(Rotations) * circumference.in(Meter);
         return wheelMeters;
     }
 

@@ -107,7 +107,7 @@ public class SwerveModule {
      */
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
-            Conversions.rotationsToMeters(inputs.driveMotorSelectedSensorVelocity,
+            Conversions.rotationsToMeters(inputs.driveMotorSelectedPosition,
                 Constants.Swerve.wheelCircumference),
             Rotation2d.fromRotations(inputs.angleMotorSelectedPosition.in(Rotations)));
     }
