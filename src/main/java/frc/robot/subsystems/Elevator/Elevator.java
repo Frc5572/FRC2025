@@ -3,7 +3,6 @@ package frc.robot.subsystems.Elevator;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.swerve.Elevator.ElevatorInputsAutoLogged;
 
 public class Elevator extends SubsystemBase {
     ElevatorIO io;
