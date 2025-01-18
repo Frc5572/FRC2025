@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ElevatorCoral extends SubsystemBase {
     ElevatorCoralIO io;
-    ElevatorAlgaeIOInputsAutoLogged inputs = new ElevatorAlgaeIOInputsAutoLogged();
+    ElevatorCoralIOInputsAutoLogged inputs = new ElevatorCoralIOInputsAutoLogged();
 
     /*
      * Constructor

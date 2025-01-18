@@ -3,19 +3,19 @@ package frc.robot.subsystems.ElevatorAlgae;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.ElevatorCoral.ElevatorAlgaeIOInputsAutoLogged;
 
 public class ElevatorAlgae extends SubsystemBase {
     ElevatorAlgaeIO io;
-    ElevatorAlgaeIOInputsAutoLogged ElevatorAlgaeAutoLogged = new ElevatorAlgaeIOInputsAutoLogged();
+    AlgaeIOInputsAutoLogged inputs = new AlgaeIOInputsAutoLogged();
 
     public ElevatorAlgae(ElevatorAlgaeIO io) {
         this.io = io;
+        io.updateInputs(inputs);
     }
 
     @Override
     public void periodic() {
-        io.updateInputs(ElevatorAlgaeAutoLogged);
+        io.updateInputs(inputs);
     }
 
     public void setAlgaeMotorSpeed(double speed) {
