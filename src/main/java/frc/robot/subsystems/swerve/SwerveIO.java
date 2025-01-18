@@ -1,25 +1,32 @@
 package frc.robot.subsystems.swerve;
 
+import java.util.Optional;
 import org.littletonrobotics.junction.AutoLog;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Pose2d;
+import frc.lib.util.swerve.SwerveModule;
 
-/**
- * DrivetrainIO interface
- */
+/** IO Class for Swerve */
 public interface SwerveIO {
-    /**
-     * Drivetrain IO
-     */
+
+    /** Inputs Class for Swerve */
+
     @AutoLog
     public static class SwerveInputs {
-        public Rotation2d gyroYaw = new Rotation2d();
+        public double yaw;
+        public double roll;
+        public double pitch;
     }
 
-    /** Updates the set of loggable inputs. */
     public default void updateInputs(SwerveInputs inputs) {}
 
-    /** Run the motor at the specified voltage. */
-    public default void setDriveVoltage(double lvolts, double rvolts) {}
+    public default SwerveModule[] createModules() {
+        return new SwerveModule[] {};
+    }
 
+    public default Optional<Pose2d> getInitialPose() {
+        return Optional.empty();
+    }
+
+    public default void setPose(Pose2d pose) {}
 
 }
