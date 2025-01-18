@@ -1,12 +1,13 @@
 package frc.robot.subsystems.ElevatorCoral;
 
+import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ElevatorCoral extends SubsystemBase {
     ElevatorCoralIO io;
-    ElevatorAlgaeIOInputsAutoLogged ElevatorAlgaeAutoLogged = new ElevatorAlgaeIOInputsAutoLogged();
+    ElevatorAlgaeIOInputsAutoLogged inputs = new ElevatorAlgaeIOInputsAutoLogged();
 
     /*
      * Constructor
@@ -15,11 +16,18 @@ public class ElevatorCoral extends SubsystemBase {
         this.io = io;
     }
 
+    @Override
+    public void periodic() {
+        io.updateInputs(inputs);
+        Logger.processInputs("Elevator", inputs);
+    }
+
     public void setFeederMotorSpeed(double speed) {
         io.setFeederMotorSpeed(speed);
     }
 
     public Command runFeederMotorCommand(double speed) {
-        Commands.runEnd(() -> io.setFeederMotorSpeed(speed), () -> io.setFeederMotorSpeed(0), this);
+        return Commands.runEnd(() -> io.setFeederMotorSpeed(speed), () -> io.setFeederMotorSpeed(0),
+            this);
     }
 }
