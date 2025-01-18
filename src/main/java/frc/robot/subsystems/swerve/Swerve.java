@@ -67,7 +67,7 @@ public class Swerve extends SubsystemBase {
     /**
      * Set Swerve Module States
      *
-     * @param desiredStates Array of desired states
+     * @param desiredStates Array desired states
      */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.Swerve.maxSpeed);
