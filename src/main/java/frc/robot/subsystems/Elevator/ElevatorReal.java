@@ -27,7 +27,8 @@ public class ElevatorReal implements ElevatorIO {
         leftElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
 
         // right conf
-        rightElevatorConf.MotorOutput.NeutralMode = Constants.Elevator.RIGHT_BREAK;
+        rightElevatorConf.MotorOutput.NeutralMode = Constants.Elevator.BREAK;
+        leftElevatorConf.MotorOutput.NeutralMode = Constants.Elevator.BREAK;
 
         // PID and feedforward
         rightElevatorConf.Slot0.kP = 0.0;

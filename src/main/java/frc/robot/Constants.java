@@ -180,7 +180,7 @@ public final class Constants {
         public static final int LEFT_ID = 0;
         public static final int LIMIT_ID = 0;
 
-        public static final NeutralModeValue RIGHT_BREAK = NeutralModeValue.Brake;
+        public static final NeutralModeValue BREAK = NeutralModeValue.Brake;
     }
 
 }

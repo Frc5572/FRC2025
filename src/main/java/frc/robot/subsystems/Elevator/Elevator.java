@@ -20,8 +20,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command home() {
-        return runEnd(() -> io.setVoltage(-5), () -> io.setVoltage(0))
-            .until(() -> inputs.limitSwitch);
+        return run(() -> io.setPositon(0));
     }
 
     public Command raise() {
