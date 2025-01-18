@@ -1,5 +1,10 @@
 package frc.lib.math;
 
+import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
+
 /**
  * Mathematical conversions for swerve calculations
  */
@@ -10,8 +15,9 @@ public class Conversions {
      * @param circumference Wheel Circumference: (in Meters)
      * @return Wheel Velocity: (in Meters per Second)
      */
-    public static double rotationPerSecondToMetersPerSecond(double wheelRPS, double circumference) {
-        double wheelMPS = wheelRPS * circumference;
+    public static double rotationPerSecondToMetersPerSecond(AngularVelocity wheelRPS,
+        Distance circumference) {
+        double wheelMPS = wheelRPS.in(RotationsPerSecond) * circumference.in(Meter);
         return wheelMPS;
     }
 
@@ -20,8 +26,9 @@ public class Conversions {
      * @param circumference Wheel Circumference: (in Meters)
      * @return Wheel Velocity: (in Rotations per Second)
      */
-    public static double metersPerSecondToRotationPerSecond(double wheelMPS, double circumference) {
-        double wheelRPS = wheelMPS / circumference;
+    public static double metersPerSecondToRotationPerSecond(double wheelMPS,
+        Distance circumference) {
+        double wheelRPS = wheelMPS / circumference.in(Meter);
         return wheelRPS;
     }
 
@@ -30,8 +37,8 @@ public class Conversions {
      * @param circumference Wheel Circumference: (in Meters)
      * @return Wheel Distance: (in Meters)
      */
-    public static double rotationsToMeters(double wheelRotations, double circumference) {
-        double wheelMeters = wheelRotations * circumference;
+    public static double rotationsToMeters(AngularVelocity wheelRotations, Distance circumference) {
+        double wheelMeters = wheelRotations.in(RotationsPerSecond) * circumference.in(Meter);
         return wheelMeters;
     }
 

@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Robot.RobotRunType;
-import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
 import frc.robot.subsystems.swerve.SwerveReal;
@@ -30,24 +29,18 @@ public class RobotContainer {
     private Swerve s_Swerve;
 
     /**
+     * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer(RobotRunType runtimeType) {
         switch (runtimeType) {
             case kReal:
                 s_Swerve = new Swerve(new SwerveReal());
                 break;
-            // case kSimulation:
-            // SimulatedRobot robot = arena.newRobot();
-            // s_Swerve = new Swerve(new SwerveSim(robot), viz);
-            // break;
             default:
                 s_Swerve = new Swerve(new SwerveIO() {});
         }
-
-
-        s_Swerve.setDefaultCommand(new TeleopSwerve(s_Swerve, driver,
-            Constants.Swerve.isFieldRelative, Constants.Swerve.isOpenLoop));
-
+        s_Swerve.setDefaultCommand(
+            s_Swerve.drive(driver, Constants.Swerve.isFieldRelative, Constants.Swerve.isOpenLoop));
         configureButtonBindings(runtimeType);
     }
 

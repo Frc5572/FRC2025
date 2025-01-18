@@ -170,15 +170,7 @@ public final class Constants {
             public static final int driveMotorID = 3;
             public static final int angleMotorID = 7;
             public static final int canCoderID = 3;
-            public static final Rotation2d angleOffset = Rotation2d.fromRotations(-0.178223 + 0.5);
+            public static final Rotation2d angleOffset = Rotation2d.fromRotations(0.321777);
         }
-
-
-        // public static final HolonomicPathFollowerConfig pathFollowerConfig =
-        // new HolonomicPathFollowerConfig(new PIDConstants(5.0, 0, 0),
-        // new PIDConstants(AUTO_ROTATION_KP, AUTO_ROTATION_KI, AUTO_ROTATION_KD),
-        // // Drive base radius (distance from center to furthest module)
-        // AUTO_MAX_SPEED, MOD0_MODOFFSET.getNorm(), new ReplanningConfig());
     }
-
 }

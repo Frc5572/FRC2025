@@ -1,6 +1,5 @@
 package frc.lib.util.swerve;
 
-import static edu.wpi.first.units.Units.Meter;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -151,7 +150,7 @@ public class SwerveModuleReal implements SwerveModuleIO {
     public void setDriveMotor(double mps) {
         // driveVelocity.FeedForward = feedforward;
         double driveRPS = Conversions.metersPerSecondToRotationPerSecond(mps,
-            Constants.Swerve.wheelCircumference.in(Meter));
+            Constants.Swerve.wheelCircumference);
         driveVelocity.Velocity = driveRPS;
         mDriveMotor.setControl(driveVelocity);
     }

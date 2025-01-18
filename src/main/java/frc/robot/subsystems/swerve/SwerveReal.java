@@ -11,7 +11,6 @@ import frc.robot.Constants;
 public class SwerveReal implements SwerveIO {
 
     private Canandgyro gyro = new Canandgyro(1);
-    // private AHRS gyro = new AHRS(Constants.Swerve.navXID);
 
     /** Real Swerve Initializer */
     public SwerveReal() {}

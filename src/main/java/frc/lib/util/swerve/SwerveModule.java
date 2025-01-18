@@ -1,9 +1,7 @@
 
 package frc.lib.util.swerve;
 
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -18,8 +16,6 @@ import frc.robot.Constants;
 public class SwerveModule {
     public int moduleNumber;
     private Rotation2d angleOffset;
-    // private double lastAngle;
-
     private SwerveModuleIO io;
     private SwerveModuleInputsAutoLogged inputs = new SwerveModuleInputsAutoLogged();
 
@@ -99,9 +95,8 @@ public class SwerveModule {
      */
     public SwerveModuleState getState() {
         return new SwerveModuleState(
-            Conversions.rotationPerSecondToMetersPerSecond(
-                inputs.driveMotorSelectedSensorVelocity.in(RotationsPerSecond),
-                Constants.Swerve.wheelCircumference.in(Meters)),
+            Conversions.rotationPerSecondToMetersPerSecond(inputs.driveMotorSelectedSensorVelocity,
+                Constants.Swerve.wheelCircumference),
             Rotation2d.fromRotations(inputs.angleMotorSelectedPosition.in(Rotations)));
     }
 
@@ -112,9 +107,8 @@ public class SwerveModule {
      */
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
-            Conversions.rotationsToMeters(
-                inputs.driveMotorSelectedSensorVelocity.in(RotationsPerSecond),
-                Constants.Swerve.wheelCircumference.in(Meters)),
+            Conversions.rotationsToMeters(inputs.driveMotorSelectedSensorVelocity,
+                Constants.Swerve.wheelCircumference),
             Rotation2d.fromRotations(inputs.angleMotorSelectedPosition.in(Rotations)));
     }
 }
