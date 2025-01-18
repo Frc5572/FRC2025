@@ -1,6 +1,17 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
+import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -8,8 +19,15 @@ import com.studica.frc.AHRS.NavXComType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.MomentOfInertia;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.units.measure.Voltage;
 
 /**
  * Constants file.
@@ -53,22 +71,26 @@ public final class Constants {
         public static final boolean isOpenLoop = false;
 
         /* Drivetrain Constants */
-        public static final double trackWidth = Units.inchesToMeters(24.229);
-        public static final double wheelBase = Units.inchesToMeters(24.229);
+        public static final Distance trackWidth = Inches.of(24.229);
+        public static final Distance wheelBase = Inches.of(24.229);
         public static final Distance wheelDiameter = Inches.of(3.8);
         public static final Distance wheelCircumference = wheelDiameter.times(Math.PI);
-        public static final Translation2d MOD0_MODOFFSET =
-            new Translation2d(wheelBase / 2.0, trackWidth / 2.0);
+
+        /** Get translations of each module. */
+        public static Translation2d[] getModuleTranslations() {
+            return new Translation2d[] {
+                new Translation2d(wheelBase.in(Meters) / 2, trackWidth.in(Meters) / 2),
+                new Translation2d(wheelBase.in(Meters) / 2, -trackWidth.in(Meters) / 2),
+                new Translation2d(-wheelBase.in(Meters) / 2, trackWidth.in(Meters) / 2),
+                new Translation2d(-wheelBase.in(Meters) / 2, -trackWidth.in(Meters) / 2)};
+        }
 
         /*
          * Swerve Kinematics No need to ever change this unless you are not doing a traditional
          * rectangular/square 4 module swerve
          */
         public static final SwerveDriveKinematics swerveKinematics =
-            new SwerveDriveKinematics(new Translation2d(wheelBase / 2.0, trackWidth / 2.0),
-                new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
-                new Translation2d(-wheelBase / 2.0, trackWidth / 2.0),
-                new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0));
+            new SwerveDriveKinematics(getModuleTranslations());
 
         /* Module Gear Ratios */
         public static final double driveGearRatio = (8.14 / 1.0); // MK4i L1
@@ -171,6 +193,62 @@ public final class Constants {
             public static final int angleMotorID = 7;
             public static final int canCoderID = 3;
             public static final Rotation2d angleOffset = Rotation2d.fromRotations(0.321777);
+        }
+
+        /** Swerve Module constants shared across all modules. */
+        public static class ModuleConstants {
+
+            public static final DCMotor driveMotor = DCMotor.getKrakenX60(1);
+            public static final DCMotor angleMotor = DCMotor.getFalcon500(1);
+            public static final Voltage driveFrictionVoltage = Volts.of(0);
+            public static final Voltage angleFrictionVoltage = Volts.of(0);
+            public static final double wheelCoeffFriction = 1.0;
+            public static final MomentOfInertia angleMomentOfInertia =
+                KilogramSquareMeters.of(0.02);
+            public static final Distance wheelRadius = Inches.of(1.9);
+            public static final Current slipCurrent = Amps.of(40.0);
+            public static final Current supplyCurrentLimit = Amps.of(35.0);
+            public static final Current supplyCurrentLowerLimit = Amps.of(60.0);
+            public static final Time supplyCurrentLowerTimeThreshold = Seconds.of(0.1);
+
+            public static final AngularVelocity maxSteerRate = RotationsPerSecond.of(4.0);
+            public static final LinearAcceleration maxDriveRate = MetersPerSecondPerSecond.of(50.0);
+
+
+            public static final double ffkS = 0.32;
+            public static final double ffkV = 1.51;
+            public static final double ffkT = 1.0 / driveMotor.KtNMPerAmp;
+            public static final double ffkA = 0.27;
+            public static final double drivekP = 0.12;
+            public static final double drivekD = 0.0;
+            public static final double anglekP = 100.0;
+            public static final double anglekD = 0.0;
+            public static final double driveReduction = Mk4iReductions.L3.reduction;
+            public static final double angleReduction = Mk4iReductions.TURN.reduction;
+        }
+
+        public static final Mass robotMass = Pounds.of(150.0);
+
+        /** Get config for Maple-Sim. */
+        public static DriveTrainSimulationConfig getMapleConfig() {
+            return DriveTrainSimulationConfig.Default().withRobotMass(robotMass)
+                .withGyro(COTS.ofNav2X()).withCustomModuleTranslations(getModuleTranslations())
+                .withSwerveModule(new SwerveModuleSimulationConfig(ModuleConstants.driveMotor,
+                    ModuleConstants.angleMotor, ModuleConstants.driveReduction,
+                    ModuleConstants.angleReduction, ModuleConstants.driveFrictionVoltage,
+                    ModuleConstants.angleFrictionVoltage, ModuleConstants.wheelRadius,
+                    ModuleConstants.angleMomentOfInertia, ModuleConstants.wheelCoeffFriction));
+        }
+
+        private enum Mk4iReductions {
+            L2((50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0)), L3(
+                (50.0 / 14.0) * (16.0 / 28.0) * (45.0 / 15.0)), TURN((150.0 / 7.0));
+
+            final double reduction;
+
+            Mk4iReductions(double reduction) {
+                this.reduction = reduction;
+            }
         }
     }
 }

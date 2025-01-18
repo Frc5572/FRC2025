@@ -1,9 +1,10 @@
 package frc.robot.subsystems.swerve;
 
-import java.util.Optional;
 import org.littletonrobotics.junction.AutoLog;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import frc.lib.util.swerve.SwerveModule;
+import frc.lib.util.swerve.SwerveModuleIO;
 
 /** IO Class for Swerve */
 public interface SwerveIO {
@@ -17,16 +18,33 @@ public interface SwerveIO {
         public double pitch;
     }
 
-    public default void updateInputs(SwerveInputs inputs) {}
+    public void updateInputs(SwerveInputs inputs);
 
-    public default SwerveModule[] createModules() {
-        return new SwerveModule[] {};
+    public SwerveModule[] createModules();
+
+    public void setPose(Pose2d pose);
+
+    public static class Empty implements SwerveIO {
+
+        @Override
+        public void updateInputs(SwerveInputs inputs) {
+            // Intentionally do nothing
+        }
+
+        @Override
+        public SwerveModule[] createModules() {
+            return new SwerveModule[] {
+                new SwerveModule(0, Rotation2d.kZero, new SwerveModuleIO.Empty()),
+                new SwerveModule(1, Rotation2d.kZero, new SwerveModuleIO.Empty()),
+                new SwerveModule(2, Rotation2d.kZero, new SwerveModuleIO.Empty()),
+                new SwerveModule(3, Rotation2d.kZero, new SwerveModuleIO.Empty())};
+        }
+
+        @Override
+        public void setPose(Pose2d pose) {
+            // Intentionally do nothing
+        }
+
     }
-
-    public default Optional<Pose2d> getInitialPose() {
-        return Optional.empty();
-    }
-
-    public default void setPose(Pose2d pose) {}
 
 }

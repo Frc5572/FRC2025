@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 // import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
@@ -37,6 +38,7 @@ public class SwerveModuleReal implements SwerveModuleIO {
     /* drive motor control requests */
     private final DutyCycleOut driveDutyCycle = new DutyCycleOut(0);
     private final VelocityVoltage driveVelocity = new VelocityVoltage(0);
+    private final VoltageOut driveVoltage = new VoltageOut(0.0);
 
     /* angle motor control requests */
     private final PositionVoltage anglePosition = new PositionVoltage(0);
@@ -170,6 +172,11 @@ public class SwerveModuleReal implements SwerveModuleIO {
     @Override
     public void setPositionAngleMotor(double absolutePosition) {
         mAngleMotor.setPosition(absolutePosition);
+    }
+
+    @Override
+    public void setDriveMotorPower(double power) {
+        mDriveMotor.setControl(driveVoltage.withOutput(power));
     }
 
 }
