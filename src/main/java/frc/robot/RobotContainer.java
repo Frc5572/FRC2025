@@ -78,10 +78,7 @@ public class RobotContainer {
     }
 
     /** Start simulation */
-    public void startSimulation() {
-        if (driveSimulation != null) {
-        }
-    }
+    public void startSimulation() {}
 
     /**
      * Update simulation
