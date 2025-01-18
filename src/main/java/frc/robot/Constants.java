@@ -35,6 +35,11 @@ public final class Constants {
      * Motor CAN id's.
      */
     public static final class Motors {
+        public static final class AlgaeMotors {
+            public static final int INTAKE_MOTOR_ID = 0;
+            public static final int FEEDER_MOTOR_ID = 0;
+
+        }
     }
 
 
