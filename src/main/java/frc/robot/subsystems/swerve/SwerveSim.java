@@ -20,7 +20,7 @@ public class SwerveSim implements SwerveIO {
 
     @Override
     public void updateInputs(SwerveInputs inputs) {
-        inputs.yaw = gyroSim.getGyroReading().getDegrees();
+        inputs.yaw = gyroSim.getGyroReading().getRotations();
     }
 
     @Override

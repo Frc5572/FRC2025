@@ -202,11 +202,11 @@ public final class Constants {
             public static final DCMotor angleMotor = DCMotor.getFalcon500(1);
             public static final Voltage driveFrictionVoltage = Volts.of(0);
             public static final Voltage angleFrictionVoltage = Volts.of(0);
-            public static final double wheelCoeffFriction = 1.0;
+            public static final double wheelCoeffFriction = 1.2;
             public static final MomentOfInertia angleMomentOfInertia =
                 KilogramSquareMeters.of(0.02);
             public static final Distance wheelRadius = Inches.of(1.9);
-            public static final Current slipCurrent = Amps.of(40.0);
+            public static final Current slipCurrent = Amps.of(80.0);
             public static final Current supplyCurrentLimit = Amps.of(35.0);
             public static final Current supplyCurrentLowerLimit = Amps.of(60.0);
             public static final Time supplyCurrentLowerTimeThreshold = Seconds.of(0.1);
@@ -223,7 +223,7 @@ public final class Constants {
             public static final double drivekD = 0.0;
             public static final double anglekP = 100.0;
             public static final double anglekD = 0.0;
-            public static final double driveReduction = Mk4iReductions.L3.reduction;
+            public static final double driveReduction = Mk4iReductions.L2.reduction;
             public static final double angleReduction = Mk4iReductions.TURN.reduction;
         }
 
