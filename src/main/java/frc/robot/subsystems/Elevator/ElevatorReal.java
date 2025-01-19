@@ -31,21 +31,21 @@ public class ElevatorReal implements ElevatorIO {
         leftElevatorConf.MotorOutput.NeutralMode = Constants.Elevator.BREAK;
 
         // PID and feedforward
-        rightElevatorConf.Slot0.kP = 0.0;
-        rightElevatorConf.Slot0.kI = 0.0;
-        rightElevatorConf.Slot0.kD = 0.0;
-        rightElevatorConf.Slot0.kS = 0.0;
-        rightElevatorConf.Slot0.kV = 0.0;
-        rightElevatorConf.Slot0.kA = 0.0;
-        rightElevatorConf.Slot0.kG = 0.0;
+        rightElevatorConf.Slot0.kP = Constants.Elevator.RIGHT_KP;
+        rightElevatorConf.Slot0.kI = Constants.Elevator.RIGHT_KI;
+        rightElevatorConf.Slot0.kD = Constants.Elevator.RIGHT_KD;
+        rightElevatorConf.Slot0.kS = Constants.Elevator.RIGHT_KS;
+        rightElevatorConf.Slot0.kV = Constants.Elevator.RIGHT_KV;
+        rightElevatorConf.Slot0.kA = Constants.Elevator.RIGHT_KA;
+        rightElevatorConf.Slot0.kG = Constants.Elevator.RIGHT_KG;
 
-        leftElevatorConf.Slot0.kP = 0.0;
-        leftElevatorConf.Slot0.kI = 0.0;
-        leftElevatorConf.Slot0.kD = 0.0;
-        leftElevatorConf.Slot0.kS = 0.0;
-        leftElevatorConf.Slot0.kV = 0.0;
-        leftElevatorConf.Slot0.kA = 0.0;
-        leftElevatorConf.Slot0.kG = 0.0;
+        leftElevatorConf.Slot0.kP = Constants.Elevator.RIGHT_KP;
+        leftElevatorConf.Slot0.kI = Constants.Elevator.RIGHT_KI;
+        leftElevatorConf.Slot0.kD = Constants.Elevator.RIGHT_KD;
+        leftElevatorConf.Slot0.kS = Constants.Elevator.RIGHT_KS;
+        leftElevatorConf.Slot0.kV = Constants.Elevator.RIGHT_KV;
+        leftElevatorConf.Slot0.kA = Constants.Elevator.RIGHT_KA;
+        leftElevatorConf.Slot0.kG = Constants.Elevator.RIGHT_KG;
 
         rightElevatorMotor.getConfigurator().apply(rightElevatorConf);
         leftElevatorMotor.getConfigurator().apply(leftElevatorConf);

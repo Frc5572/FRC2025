@@ -181,6 +181,25 @@ public final class Constants {
         public static final int LIMIT_ID = 0;
 
         public static final NeutralModeValue BREAK = NeutralModeValue.Brake;
+
+        // right PID and feedforward
+        public static final double RIGHT_KP = 0.0;
+        public static final double RIGHT_KI = 0.0;
+        public static final double RIGHT_KD = 0.0;
+        public static final double RIGHT_KS = 0.0;
+        public static final double RIGHT_KV = 0.0;
+        public static final double RIGHT_KA = 0.0;
+        public static final double RIGHT_KG = 0.0;
+
+        // left PID and feedforward
+
+        public static final double LEFT_KP = 0.0;
+        public static final double LEFT_KI = 0.0;
+        public static final double LEFT_KD = 0.0;
+        public static final double LEFT_KS = 0.0;
+        public static final double LEFT_KV = 0.0;
+        public static final double LEFT_KA = 0.0;
+        public static final double LEFT_KG = 0.0;
     }
 
 }
