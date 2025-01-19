@@ -42,8 +42,13 @@ public class SwerveModuleSim implements SwerveModuleIO {
     @Override
     public void updateInputs(SwerveModuleInputs inputs) {
         if (driveClosedLoop) {
-            driveAppliedVolts = driveFFVolts + driveController
-                .calculate(moduleSimulation.getDriveWheelFinalSpeed().in(Units.RadiansPerSecond));
+            if (Math.abs(driveController.getSetpoint()) < 0.01) {
+                driveAppliedVolts = 0.0;
+                driveController.reset();
+            } else {
+                driveAppliedVolts = driveFFVolts + driveController.calculate(
+                    moduleSimulation.getDriveWheelFinalSpeed().in(Units.RadiansPerSecond));
+            }
         } else {
             driveController.reset();
         }

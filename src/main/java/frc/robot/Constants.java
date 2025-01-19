@@ -141,10 +141,10 @@ public final class Constants {
 
         /* Swerve Profiling Values */
         /** Meters per Second */
-        public static final double maxSpeed = 3.0;
+        public static final double maxSpeed = 4.0;
         public static final double AUTO_MAX_SPEED = 3.0;
         /** Radians per Second */
-        public static final double maxAngularVelocity = 4.0;
+        public static final double maxAngularVelocity = 6.28;
 
         /* Neutral Modes */
         public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Coast;
@@ -206,7 +206,7 @@ public final class Constants {
             public static final MomentOfInertia angleMomentOfInertia =
                 KilogramSquareMeters.of(0.02);
             public static final Distance wheelRadius = Inches.of(1.9);
-            public static final Current slipCurrent = Amps.of(80.0);
+            public static final Current slipCurrent = Amps.of(120.0);
             public static final Current supplyCurrentLimit = Amps.of(35.0);
             public static final Current supplyCurrentLowerLimit = Amps.of(60.0);
             public static final Time supplyCurrentLowerTimeThreshold = Seconds.of(0.1);
@@ -223,11 +223,11 @@ public final class Constants {
             public static final double drivekD = 0.0;
             public static final double anglekP = 100.0;
             public static final double anglekD = 0.0;
-            public static final double driveReduction = Mk4iReductions.L2.reduction;
+            public static final double driveReduction = Mk4iReductions.L1.reduction;
             public static final double angleReduction = Mk4iReductions.TURN.reduction;
         }
 
-        public static final Mass robotMass = Pounds.of(150.0);
+        public static final Mass robotMass = Pounds.of(120.0);
 
         /** Get config for Maple-Sim. */
         public static DriveTrainSimulationConfig getMapleConfig() {
@@ -241,8 +241,7 @@ public final class Constants {
         }
 
         private enum Mk4iReductions {
-            L2((50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0)), L3(
-                (50.0 / 14.0) * (16.0 / 28.0) * (45.0 / 15.0)), TURN((150.0 / 7.0));
+            L1(8.14), L2(6.75), L3(6.12), TURN((150.0 / 7.0));
 
             final double reduction;
 
