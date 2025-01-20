@@ -27,6 +27,7 @@ public interface SwerveModuleIO {
 
     public void setPositionAngleMotor(double absolutePosition);
 
+    /** Empty implementation of a Swerve Module (for replay) */
     public static class Empty implements SwerveModuleIO {
 
         @Override

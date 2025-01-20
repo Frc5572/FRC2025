@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import frc.lib.util.swerve.SwerveModule;
 import frc.lib.util.swerve.SwerveModuleSim;
 
+/** Simulated Swerve Drive */
 public class SwerveSim implements SwerveIO {
 
     private final GyroSimulation gyroSim;

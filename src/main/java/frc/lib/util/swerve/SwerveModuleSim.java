@@ -8,6 +8,7 @@ import edu.wpi.first.units.Units;
 import frc.lib.math.Conversions;
 import frc.robot.Constants;
 
+/** Simulated Swerve Module */
 public class SwerveModuleSim implements SwerveModuleIO {
 
     private final SwerveModuleSimulation moduleSimulation;
@@ -24,6 +25,7 @@ public class SwerveModuleSim implements SwerveModuleIO {
     private double driveAppliedVolts = 0.0;
     private double turnAppliedVolts = 0.0;
 
+    /** Simulated Swerve Module */
     public SwerveModuleSim(int id, SwerveModuleSimulation modSim) {
         this.id = id;
         this.moduleSimulation = modSim;

@@ -24,6 +24,8 @@ public interface SwerveIO {
 
     public void setPose(Pose2d pose);
 
+
+    /** Empty Swerve implementation (for replay) */
     public static class Empty implements SwerveIO {
 
         @Override
