@@ -92,10 +92,6 @@ public final class Constants {
         public static final SwerveDriveKinematics swerveKinematics =
             new SwerveDriveKinematics(getModuleTranslations());
 
-        /* Module Gear Ratios */
-        public static final double driveGearRatio = (8.14 / 1.0); // MK4i L1
-        public static final double angleGearRatio = ((150.0 / 7.0) / 1.0); // (150 / 7) : 1
-
         /* Motor Inverts */
         public static final InvertedValue angleMotorInvert = InvertedValue.Clockwise_Positive;
         public static final InvertedValue driveMotorInvert =
@@ -106,15 +102,7 @@ public final class Constants {
             SensorDirectionValue.CounterClockwise_Positive;
 
         /* Swerve Current Limiting */
-        public static final int angleCurrentLimit = 25;
-        public static final int angleCurrentThreshold = 40;
-        public static final double angleCurrentThresholdTime = 0.1;
-        public static final boolean angleEnableCurrentLimit = true;
 
-        public static final int driveCurrentLimit = 35;
-        public static final int driveCurrentThreshold = 60;
-        public static final double driveCurrentThresholdTime = 0.1;
-        public static final boolean driveEnableCurrentLimit = true;
 
         /*
          * These values are used by the drive falcon to ramp in open loop and closed loop driving.
@@ -122,22 +110,6 @@ public final class Constants {
          */
         public static final double openLoopRamp = 0.25;
         public static final double closedLoopRamp = 0.0;
-
-        /* Angle Motor PID Values */
-        public static final double angleKP = 100.0;
-        public static final double angleKI = 0.0;
-        public static final double angleKD = 0.0;
-
-        /* Drive Motor PID Values */
-        public static final double driveKP = 0.12;
-        public static final double driveKI = 0.0;
-        public static final double driveKD = 0.0;
-        public static final double driveKF = 0.0;
-
-        /* Drive Motor Characterization Values From SYSID */
-        public static final double driveKS = 0.32;
-        public static final double driveKV = 1.51;
-        public static final double driveKA = 0.27;
 
         /* Swerve Profiling Values */
         /** Meters per Second */
@@ -207,9 +179,16 @@ public final class Constants {
                 KilogramSquareMeters.of(0.02);
             public static final Distance wheelRadius = Inches.of(1.9);
             public static final Current slipCurrent = Amps.of(120.0);
-            public static final Current supplyCurrentLimit = Amps.of(35.0);
-            public static final Current supplyCurrentLowerLimit = Amps.of(60.0);
-            public static final Time supplyCurrentLowerTimeThreshold = Seconds.of(0.1);
+
+            public static final Current driveCurrentLimit = Amps.of(35.0);
+            public static final Current driveCurrentLowerLimit = Amps.of(60.0);
+            public static final Time driveCurrentLowerTimeThreshold = Seconds.of(0.1);
+            public static final boolean driveEnableCurrentLimit = true;
+
+            public static final Current angleCurrentLimit = Amps.of(25);
+            public static final Current angleCurrentThreshold = Amps.of(40);
+            public static final Time angleCurrentThresholdTime = Seconds.of(0.1);
+            public static final boolean angleEnableCurrentLimit = true;
 
             public static final AngularVelocity maxSteerRate = RotationsPerSecond.of(4.0);
             public static final LinearAcceleration maxDriveRate = MetersPerSecondPerSecond.of(50.0);
