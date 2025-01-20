@@ -125,8 +125,8 @@ public class FieldConstants {
                             new Rotation3d(0, Units.degreesToRadians(level.pitch),
                                 poseDirection.getRotation().getRadians())));
                 }
-                branchPositions.add((face * 2) + 1, fillRight);
-                branchPositions.add((face * 2) + 2, fillLeft);
+                branchPositions.add((face * 2) + 0, fillRight);
+                branchPositions.add((face * 2) + 1, fillLeft);
             }
         }
     }

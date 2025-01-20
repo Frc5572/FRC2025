@@ -2,22 +2,32 @@
 package frc.robot.subsystems.swerve;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.lib.math.AllianceFlipUtil;
+import frc.lib.math.Circle;
+import frc.lib.math.FieldConstants;
 import frc.lib.util.swerve.SwerveModule;
 import frc.robot.Constants;
 
@@ -266,5 +276,156 @@ public class Swerve extends SubsystemBase {
             double rotation = raxis * Constants.Swerve.maxAngularVelocity;
             this.drive(translation, rotation, fieldRelative, openLoop);
         });
+    }
+
+    public Command moveToPose(Supplier<Pose2d> pose2dSupplier, boolean flipForRed, double tol) {
+        Swerve swerveCopy = this;
+
+        HolonomicDriveController holonomicDriveController = new HolonomicDriveController(
+            new PIDController(Constants.SwerveTransformPID.PID_XKP,
+                Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
+            new PIDController(Constants.SwerveTransformPID.PID_YKP,
+                Constants.SwerveTransformPID.PID_YKI, Constants.SwerveTransformPID.PID_YKD),
+            new ProfiledPIDController(Constants.SwerveTransformPID.PID_TKP,
+                Constants.SwerveTransformPID.PID_TKI, Constants.SwerveTransformPID.PID_TKD,
+                new TrapezoidProfile.Constraints(Constants.SwerveTransformPID.MAX_ANGULAR_VELOCITY,
+                    Constants.SwerveTransformPID.MAX_ANGULAR_ACCELERATION)));
+        holonomicDriveController.setTolerance(new Pose2d(tol, tol, Rotation2d.fromDegrees(1)));
+        Command c = new Command() {
+
+            private Pose2d pose2d;
+            private Swerve swerve = swerveCopy;
+
+            @Override
+            public void initialize() {
+                pose2d = pose2dSupplier.get();
+                if (flipForRed) {
+                    pose2d = AllianceFlipUtil.apply(pose2d);
+                }
+            }
+
+            @Override
+            public void execute() {
+                ChassisSpeeds ctrlEffort = holonomicDriveController.calculate(swerve.getPose(),
+                    pose2d, 0, pose2d.getRotation());
+                swerve.setModuleStates(ctrlEffort);
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                swerve.setMotorsZero();
+            }
+
+            @Override
+            public boolean isFinished() {
+                return holonomicDriveController.atReference();
+            }
+        };
+        c.addRequirements(this);
+        return c;
+    }
+
+    public Command moveAndAvoidReef(Supplier<Pose2d> pose2dSupplier, double tol) {
+        Swerve swerveCopy = this;
+
+        HolonomicDriveController holonomicDriveController = new HolonomicDriveController(
+            new PIDController(Constants.SwerveTransformPID.PID_XKP,
+                Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
+            new PIDController(Constants.SwerveTransformPID.PID_YKP,
+                Constants.SwerveTransformPID.PID_YKI, Constants.SwerveTransformPID.PID_YKD),
+            new ProfiledPIDController(Constants.SwerveTransformPID.PID_TKP,
+                Constants.SwerveTransformPID.PID_TKI, Constants.SwerveTransformPID.PID_TKD,
+                new TrapezoidProfile.Constraints(Constants.SwerveTransformPID.MAX_ANGULAR_VELOCITY,
+                    Constants.SwerveTransformPID.MAX_ANGULAR_ACCELERATION)));
+        holonomicDriveController.setTolerance(new Pose2d(tol, tol, Rotation2d.fromDegrees(1)));
+        Command c = new Command() {
+
+            private Pose2d pose2d;
+            private Swerve swerve = swerveCopy;
+
+            @Override
+            public void initialize() {
+                pose2d = pose2dSupplier.get();
+                pose2d = AllianceFlipUtil.apply(pose2d);
+                Circle.calculateCircleTangents(pose2d.getX(), pose2d.getY(),
+                    FieldConstants.Reef.center.getX(), FieldConstants.Reef.center.getY(),
+                    Units.inchesToMeters(92.6), targetPoseLines);
+            }
+
+            private double[] curPoseLines = new double[6];
+            private double[] targetPoseLines = new double[6];
+            private double[] intersections = new double[8];
+
+            @Override
+            public void execute() {
+                Pose2d curPose = AllianceFlipUtil.apply(swerve.getPose());
+                Pose2d targetPose;
+                double targetSpeed;
+                if (Circle.intersectsCircle(curPose.getX(), curPose.getY(), pose2d.getX(),
+                    pose2d.getY(), FieldConstants.Reef.center.getX(),
+                    FieldConstants.Reef.center.getY(), Units.inchesToMeters(60.0))) {
+                    Logger.recordOutput("Rerouting", true);
+                    Circle.calculateCircleTangents(curPose.getX(), curPose.getY(),
+                        FieldConstants.Reef.center.getX(), FieldConstants.Reef.center.getY(),
+                        Units.inchesToMeters(92.6), curPoseLines);
+                    Circle.tangentIntersections(targetPoseLines, curPoseLines, intersections);
+                    double minDist = Double.MAX_VALUE;
+                    int minOffset = 0;
+                    for (int i = 0; i < 8; i += 2) {
+                        double dx = curPose.getX() - intersections[i];
+                        double dy = curPose.getY() - intersections[i + 1];
+                        double dx2 = pose2d.getX() - intersections[i];
+                        double dy2 = pose2d.getY() - intersections[i + 1];
+                        double distSqr = dx * dx + dy * dy + dx2 * dx2 + dy2 * dy2;
+                        if (distSqr < minDist) {
+                            minDist = distSqr;
+                            minOffset = i;
+                        }
+                    }
+                    Logger.recordOutput("/reef/intersections/0",
+                        new Pose2d(intersections[0], intersections[1], Rotation2d.kZero));
+                    Logger.recordOutput("/reef/intersections/1",
+                        new Pose2d(intersections[2], intersections[3], Rotation2d.kZero));
+                    Logger.recordOutput("/reef/intersections/2",
+                        new Pose2d(intersections[4], intersections[5], Rotation2d.kZero));
+                    Logger.recordOutput("/reef/intersections/3",
+                        new Pose2d(intersections[6], intersections[7], Rotation2d.kZero));
+                    Logger.recordOutput("/reef/target", pose2d);
+                    targetPose = new Pose2d(intersections[minOffset], intersections[minOffset + 1],
+                        pose2d.getRotation());
+                    targetSpeed = Constants.Swerve.maxSpeed;
+                } else {
+                    Logger.recordOutput("Rerouting", false);
+                    Logger.recordOutput("/reef/intersections/0", pose2d);
+                    Logger.recordOutput("/reef/intersections/1", pose2d);
+                    Logger.recordOutput("/reef/intersections/2", pose2d);
+                    Logger.recordOutput("/reef/intersections/3", pose2d);
+                    Logger.recordOutput("/reef/target", pose2d);
+                    targetPose = pose2d;
+                    targetSpeed = 0;
+                }
+
+                targetPose = AllianceFlipUtil.apply(targetPose);
+
+                ChassisSpeeds ctrlEffort = holonomicDriveController.calculate(swerve.getPose(),
+                    targetPose, targetSpeed, pose2d.getRotation());
+                swerve.setModuleStates(ctrlEffort);
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                swerve.setMotorsZero();
+            }
+
+            @Override
+            public boolean isFinished() {
+                Transform2d diff = swerve.getPose().minus(pose2d);
+                double score = diff.getX() * diff.getX() + diff.getY() * diff.getY()
+                    + diff.getRotation().getDegrees() * diff.getRotation().getDegrees();
+                return score < tol;
+            }
+        };
+        c.addRequirements(this);
+        return c;
     }
 }

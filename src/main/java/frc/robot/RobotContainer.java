@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.lib.math.FieldConstants;
 import frc.robot.Robot.RobotRunType;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
@@ -43,7 +44,7 @@ public class RobotContainer {
                 break;
             case kSimulation:
                 driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
-                    new Pose2d(3, 3, Rotation2d.kZero));
+                    new Pose2d(7, 3, Rotation2d.kZero));
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
                 s_Swerve = new Swerve(new SwerveSim(driveSimulation));
                 break;
@@ -71,7 +72,10 @@ public class RobotContainer {
      * @return Returns autonomous command selected.
      */
     public Command getAutonomousCommand() {
-        return null;
+        return s_Swerve
+            .runOnce(() -> s_Swerve.resetOdometry(driveSimulation.getSimulatedDriveTrainPose()))
+            .andThen(
+                s_Swerve.moveAndAvoidReef(() -> FieldConstants.CoralStation.leftCenterFace, 0.01));
     }
 
     /**
