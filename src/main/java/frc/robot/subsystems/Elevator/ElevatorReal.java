@@ -19,7 +19,7 @@ public class ElevatorReal implements ElevatorIO {
     private final TalonFXConfiguration leftElevatorConf = new TalonFXConfiguration();
     private final PositionVoltage positionVoltage = new PositionVoltage(0.0);
 
-    /** Real Elevator Initilizer */
+    /** Real Elevator Initializer */
     public ElevatorReal() {
         configMotors();
     }
