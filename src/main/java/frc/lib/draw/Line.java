@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import frc.lib.draw.DrawingUtils.Drawable;
 import frc.lib.math.FieldConstants;
 
+/** Simple Line Segment Drawable */
 public class Line implements Drawable {
 
     public Translation2d start;
@@ -15,6 +16,7 @@ public class Line implements Drawable {
 
     private final String key;
 
+    /** Simple Line Segment Drawable */
     public Line(String key, Translation2d start, Translation2d end, String color) {
         this.key = key;
         this.start = start;
@@ -22,6 +24,7 @@ public class Line implements Drawable {
         this.color = color;
     }
 
+    /** Use line equation `Ax + By = C` and field bounds to create segment. */
     public void spanField(double a, double b, double c) {
         if (a == 0) {
             // Horizontal Line

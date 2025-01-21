@@ -18,6 +18,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.studica.frc.AHRS.NavXComType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -248,38 +249,53 @@ public final class Constants {
         }
     }
 
+    /** Constants for navigating around the reef */
     public static class ReefNavigation {
+        /**
+         * Radius of reef. Ideally, robot center _never_ enters this circle.
+         */
         public static final Distance reefAvoidCircleRadius = Inches.of(65.0);
+        /**
+         * Radius the center of the robot should roughly follow around the reef
+         */
         public static final Distance reefNavigateAroundCircleRadius = Inches.of(70.0);
+        /**
+         * How far out from {@link reefNavigateAroundCircleRadius} before we're no longer following.
+         */
         public static final Distance reefNavigateAroundCircleMargin = Inches.of(10.0);
+        /**
+         * How far ahead in angle should we set a setpoint for rotating around the reef. Too low,
+         * robot moves slowly. Too fast, we cut a corner and hit the reef.
+         */
         public static final Rotation2d reefNavigateAroundCircleResolution =
             Rotation2d.fromDegrees(25);
 
+        /** Distance to keep away from reef before scoring */
+        public static final Distance safeDistance = Inches.of(40);
+
+        /** Reef branch poses. */
         public static enum ReefBranch {
-            A(new Pose2d(), new Pose2d()), B(new Pose2d(), new Pose2d()), C(new Pose2d(),
-                new Pose2d()), D(new Pose2d(), new Pose2d()), E(
-                    new Pose2d(5.0437912940979, 2.727640151977539,
-                        Rotation2d.fromRadians(2.125103273007716)),
-                    new Pose2d(5.249879837036133, 2.418506622314453,
-                        Rotation2d.fromRadians(2.126289843595172))), F(new Pose2d(),
-                            new Pose2d()), G(new Pose2d(), new Pose2d()), H(new Pose2d(),
-                                new Pose2d()), I(new Pose2d(), new Pose2d()), J(new Pose2d(),
-                                    new Pose2d()), K(new Pose2d(),
-                                        new Pose2d()), L(new Pose2d(), new Pose2d());
+            A(new Pose2d()), B(new Pose2d()), C(new Pose2d()), D(new Pose2d()), E(new Pose2d(
+                5.0437912940979, 2.727640151977539, Rotation2d.fromRadians(2.125103273007716))), F(
+                    new Pose2d()), G(new Pose2d()), H(new Pose2d()), I(
+                        new Pose2d()), J(new Pose2d()), K(new Pose2d()), L(new Pose2d());
 
             public final Pose2d pose;
             public final Pose2d safePose;
 
-            ReefBranch(Pose2d pose, Pose2d safePose) {
+            ReefBranch(Pose2d pose) {
                 this.pose = pose;
-                this.safePose = safePose;
+                this.safePose = pose.plus(new Transform2d(new Translation2d(safeDistance.in(Meters),
+                    pose.getRotation().plus(Rotation2d.k180deg)), Rotation2d.kZero));
             }
         }
 
+        /** Reef branch levels for scoring */
         public static enum ReefLevel {
             L1, L2, L3, L4
         }
 
+        /** Which feeder station (from the POV of a driver) */
         public static enum FeederStation {
             Left, Right
         }

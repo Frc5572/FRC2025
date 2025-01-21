@@ -20,9 +20,8 @@ import edu.wpi.first.math.util.Units;
 public class FieldConstants {
     public static final double fieldLength = Units.inchesToMeters(690.876);
     public static final double fieldWidth = Units.inchesToMeters(317);
-    public static final double startingLineX = Units.inchesToMeters(299.438); // Measured from the
-                                                                              // inside of starting
-                                                                              // line
+    /** Measured from the inside of starting line */
+    public static final double startingLineX = Units.inchesToMeters(299.438);
 
     public static class Processor {
         public static final Pose2d centerFace =
@@ -52,23 +51,17 @@ public class FieldConstants {
     public static class Reef {
         public static final Translation2d center =
             new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
-        public static final double faceToZoneLine = Units.inchesToMeters(12); // Side of the reef to
-                                                                              // the inside of the
-                                                                              // reef zone line
 
-        public static final Pose2d[] centerFaces = new Pose2d[6]; // Starting facing the driver
-                                                                  // station in clockwise order
-        public static final List<Map<ReefHeight, Pose3d>> branchPositions = new ArrayList<>(); // Starting
-                                                                                               // at
-                                                                                               // the
-                                                                                               // right
-                                                                                               // branch
-                                                                                               // facing
-                                                                                               // the
-                                                                                               // driver
-                                                                                               // station
-                                                                                               // in
-                                                                                               // clockwise
+        /** Side of the reef to the inside of the reef zone line */
+        public static final double faceToZoneLine = Units.inchesToMeters(12);
+
+        /** Starting facing the driver station in clockwise order */
+        public static final Pose2d[] centerFaces = new Pose2d[6];
+
+        /**
+         * Starting at the right branch facing the driver station in clockwise
+         */
+        public static final List<Map<ReefHeight, Pose3d>> branchPositions = new ArrayList<>();
 
         static {
             // Initialize faces
@@ -132,7 +125,7 @@ public class FieldConstants {
     }
 
     public static class StagingPositions {
-        // Measured from the center of the ice cream
+        /** Measured from the center of the ice cream */
         public static final Pose2d leftIceCream =
             new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(230.5), new Rotation2d());
         public static final Pose2d middleIceCream =

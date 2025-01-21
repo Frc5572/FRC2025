@@ -13,32 +13,35 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
 import frc.lib.draw.DrawingUtils.Drawable;
 
+/** Drawable Circle */
 public class Circle implements Drawable {
 
     public Translation2d center;
     public Distance radius;
-    public int resoultion;
+    public int resolution;
     public String color;
 
     private final String key;
 
-    public Circle(String key, Translation2d center, Distance radius, String color, int resoultion) {
+    /** Drawable Circle */
+    public Circle(String key, Translation2d center, Distance radius, String color, int resolution) {
         this.key = key;
         this.center = center;
         this.radius = radius;
-        this.resoultion = resoultion;
+        this.resolution = resolution;
         this.color = color;
     }
 
+    /** Drawable Circle */
     public Circle(String key, Translation2d center, Distance radius, String color) {
         this(key, center, radius, color, 20);
     }
 
     @Override
     public void draw() {
-        Translation2d[] res = new Translation2d[resoultion + 1];
-        for (int i = 0; i < resoultion + 1; i++) {
-            double theta = (double) i / (double) resoultion * Math.PI * 2.0;
+        Translation2d[] res = new Translation2d[resolution + 1];
+        for (int i = 0; i < resolution + 1; i++) {
+            double theta = (double) i / (double) resolution * Math.PI * 2.0;
             double x = this.center.getX() + Math.cos(theta) * this.radius.in(Meters);
             double y = this.center.getY() + Math.sin(theta) * this.radius.in(Meters);
             res[i] = new Translation2d(x, y);
@@ -117,6 +120,7 @@ public class Circle implements Drawable {
         return a.getX() * b.getX() + a.getY() * b.getY();
     }
 
+    /** Get angles for points that are tangent to this and colinear with a given point. */
     public Optional<Pair<Rotation2d, Rotation2d>> circleTangentAngles(Translation2d p) {
         Translation2d diff = p.minus(center);
         double d = diff.getNorm();
@@ -133,6 +137,7 @@ public class Circle implements Drawable {
         return Optional.of(Pair.of(diff.getAngle().plus(dAngle), diff.getAngle().minus(dAngle)));
     }
 
+    /** Same as {@link circleTangentAngles} but additionally gets the points. */
     public Optional<Pair<Pair<Rotation2d, Translation2d>, Pair<Rotation2d, Translation2d>>> circleTangentPoints(
         Translation2d p) {
         return circleTangentAngles(p).map(x -> {

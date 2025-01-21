@@ -282,6 +282,7 @@ public class Swerve extends SubsystemBase {
         });
     }
 
+    /** Move to a given {@link Pose2d}. */
     public Command moveToPose(Supplier<Pose2d> pose2dSupplier, boolean flipForRed, double tol) {
         Swerve swerveCopy = this;
 
@@ -346,7 +347,6 @@ public class Swerve extends SubsystemBase {
         private Pose2d pose2d;
         private Rotation2d targetAngle;
         private final Supplier<Pose2d> pose2dSupplier;
-        private final double tol;
 
         private static final Line[] lines;
         private static final Circle circle = new Circle("reef/circle", FieldConstants.Reef.center,
@@ -368,7 +368,6 @@ public class Swerve extends SubsystemBase {
         public MoveAndAvoidReef(Swerve swerve, Supplier<Pose2d> pose2dSupplier, double tol) {
             this.swerve = swerve;
             this.pose2dSupplier = pose2dSupplier;
-            this.tol = tol;
             holonomicDriveController.setTolerance(new Pose2d(tol, tol, Rotation2d.fromDegrees(2)));
             holonomicDriveController.getXController().setIZone(1.0);
             holonomicDriveController.getYController().setIZone(1.0);
@@ -482,6 +481,7 @@ public class Swerve extends SubsystemBase {
 
     }
 
+    /** `moveToPose` but avoid hitting the reef. */
     public Command moveAndAvoidReef(Supplier<Pose2d> pose2dSupplier, double tol) {
         return new MoveAndAvoidReef(this, pose2dSupplier, tol);
     }
@@ -493,6 +493,11 @@ public class Swerve extends SubsystemBase {
     private static Rotation2d feederStationRightAngle = Rotation2d.fromRadians(-0.6350267301978877);
     private static Rotation2d feederStationLeftAngle = Rotation2d.fromRadians(0.6350267301978877);
 
+    /**
+     * Go to a given feeder station. If forward amount is 1.0, go to the furthest from the driver
+     * station point possible while still being able to feed. If the forward amount is 0.0, go to
+     * the closest point on the feeder station to the driver stations.
+     */
     public Command feederStation(FeederStation feederStation, double forwardAmount) {
         Translation2d translation = feederStationBack
             .plus(feederStationFront.minus(feederStationBack).times(forwardAmount));
@@ -506,6 +511,7 @@ public class Swerve extends SubsystemBase {
         return moveAndAvoidReef(() -> target, 0.3);
     }
 
+    /** Go to a given Reef Branch. */
     public Command reef(ReefBranch branch) {
         return moveAndAvoidReef(() -> branch.safePose, 0.3)
             .andThen(moveToPose(() -> branch.pose, true, 0.05))

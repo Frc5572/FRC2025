@@ -46,7 +46,7 @@ public class RobotContainer {
                 break;
             case kSimulation:
                 driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
-                    new Pose2d(10, 3, Rotation2d.kZero));
+                    new Pose2d(7, 3, Rotation2d.kZero));
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
                 s_Swerve = new Swerve(new SwerveSim(driveSimulation));
                 break;

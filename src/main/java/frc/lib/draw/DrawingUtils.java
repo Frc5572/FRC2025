@@ -8,8 +8,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+/** Utilities for drawing in AdvantageScope */
 public class DrawingUtils {
 
+    /** Something that can be drawn */
     public static interface Drawable {
         public void draw();
 
@@ -18,6 +20,7 @@ public class DrawingUtils {
 
     private static Drawable[] drawables = new Drawable[0];
 
+    /** Add drawable to be drawn every loop. */
     public static void addDrawable(Drawable drawable) {
         Drawable[] new_drawables = new Drawable[drawables.length + 1];
         System.arraycopy(drawables, 0, new_drawables, 0, drawables.length);
@@ -25,12 +28,14 @@ public class DrawingUtils {
         drawables = new_drawables;
     }
 
+    /** Draw registered drawables. */
     public static void draw() {
         for (var d : drawables) {
             d.draw();
         }
     }
 
+    /** Create AdvantageScope Layout file */
     public static void layout() {
         ObjectMapper om = new ObjectMapper();
         ObjectNode root = createRoot(om);
