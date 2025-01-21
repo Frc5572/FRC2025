@@ -74,6 +74,7 @@ public class Robot extends LoggedRobot {
         } else {
             String logPath = findReplayLog();
             if (logPath == null) {
+                Logger.addDataReceiver(new WPILOGWriter(""));
                 Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
                 setUseTiming(true);
                 robotRunType = RobotRunType.kSimulation;
@@ -116,6 +117,7 @@ public class Robot extends LoggedRobot {
         // order for
         // anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
+        robotContainer.updateViz();
     }
 
     @Override

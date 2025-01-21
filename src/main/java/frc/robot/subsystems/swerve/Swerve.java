@@ -1,35 +1,39 @@
 
 package frc.robot.subsystems.swerve;
 
+import static edu.wpi.first.units.Units.Meters;
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.lib.draw.DrawingUtils;
+import frc.lib.draw.Line;
 import frc.lib.math.AllianceFlipUtil;
 import frc.lib.math.Circle;
 import frc.lib.math.FieldConstants;
 import frc.lib.util.swerve.SwerveModule;
 import frc.robot.Constants;
+import frc.robot.Constants.ReefNavigation.FeederStation;
+import frc.robot.Constants.ReefNavigation.ReefBranch;
 
 /**
  * Swerve Subsystem
@@ -325,107 +329,186 @@ public class Swerve extends SubsystemBase {
         return c;
     }
 
-    public Command moveAndAvoidReef(Supplier<Pose2d> pose2dSupplier, double tol) {
-        Swerve swerveCopy = this;
+    private static class MoveAndAvoidReef extends Command {
 
-        HolonomicDriveController holonomicDriveController = new HolonomicDriveController(
-            new PIDController(Constants.SwerveTransformPID.PID_XKP,
-                Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
-            new PIDController(Constants.SwerveTransformPID.PID_YKP,
-                Constants.SwerveTransformPID.PID_YKI, Constants.SwerveTransformPID.PID_YKD),
-            new ProfiledPIDController(Constants.SwerveTransformPID.PID_TKP,
-                Constants.SwerveTransformPID.PID_TKI, Constants.SwerveTransformPID.PID_TKD,
-                new TrapezoidProfile.Constraints(Constants.SwerveTransformPID.MAX_ANGULAR_VELOCITY,
-                    Constants.SwerveTransformPID.MAX_ANGULAR_ACCELERATION)));
-        holonomicDriveController.setTolerance(new Pose2d(tol, tol, Rotation2d.fromDegrees(1)));
-        Command c = new Command() {
+        private final Swerve swerve;
+        private final HolonomicDriveController holonomicDriveController =
+            new HolonomicDriveController(
+                new PIDController(Constants.SwerveTransformPID.PID_XKP,
+                    Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
+                new PIDController(Constants.SwerveTransformPID.PID_YKP,
+                    Constants.SwerveTransformPID.PID_YKI, Constants.SwerveTransformPID.PID_YKD),
+                new ProfiledPIDController(Constants.SwerveTransformPID.PID_TKP,
+                    Constants.SwerveTransformPID.PID_TKI, Constants.SwerveTransformPID.PID_TKD,
+                    new TrapezoidProfile.Constraints(
+                        Constants.SwerveTransformPID.MAX_ANGULAR_VELOCITY,
+                        Constants.SwerveTransformPID.MAX_ANGULAR_ACCELERATION)));
+        private Pose2d pose2d;
+        private Rotation2d targetAngle;
+        private final Supplier<Pose2d> pose2dSupplier;
+        private final double tol;
 
-            private Pose2d pose2d;
-            private Swerve swerve = swerveCopy;
+        private static final Line[] lines;
+        private static final Circle circle = new Circle("reef/circle", FieldConstants.Reef.center,
+            Constants.ReefNavigation.reefNavigateAroundCircleRadius, "#00ff00");
+        private static final Circle innerCircle = new Circle("reef/innerCircle",
+            FieldConstants.Reef.center, Constants.ReefNavigation.reefAvoidCircleRadius, "#ff0000");
 
-            @Override
-            public void initialize() {
-                pose2d = pose2dSupplier.get();
-                pose2d = AllianceFlipUtil.apply(pose2d);
-                Circle.calculateCircleTangents(pose2d.getX(), pose2d.getY(),
-                    FieldConstants.Reef.center.getX(), FieldConstants.Reef.center.getY(),
-                    Units.inchesToMeters(92.6), targetPoseLines);
+        static {
+            lines = new Line[3];
+            for (int i = 0; i < 3; i++) {
+                lines[i] =
+                    new Line("reef/line" + i, new Translation2d(), new Translation2d(), "#0000ff");
+                DrawingUtils.addDrawable(lines[i]);
             }
+            DrawingUtils.addDrawable(circle);
+            DrawingUtils.addDrawable(innerCircle);
+        }
 
-            private double[] curPoseLines = new double[6];
-            private double[] targetPoseLines = new double[6];
-            private double[] intersections = new double[8];
+        public MoveAndAvoidReef(Swerve swerve, Supplier<Pose2d> pose2dSupplier, double tol) {
+            this.swerve = swerve;
+            this.pose2dSupplier = pose2dSupplier;
+            this.tol = tol;
+            holonomicDriveController.setTolerance(new Pose2d(tol, tol, Rotation2d.fromDegrees(2)));
+            holonomicDriveController.getXController().setIZone(1.0);
+            holonomicDriveController.getYController().setIZone(1.0);
+            holonomicDriveController.getThetaController().setIZone(1.0);
+            super.addRequirements(swerve);
+        }
 
-            @Override
-            public void execute() {
-                Pose2d curPose = AllianceFlipUtil.apply(swerve.getPose());
-                Pose2d targetPose;
-                double targetSpeed;
-                if (Circle.intersectsCircle(curPose.getX(), curPose.getY(), pose2d.getX(),
-                    pose2d.getY(), FieldConstants.Reef.center.getX(),
-                    FieldConstants.Reef.center.getY(), Units.inchesToMeters(60.0))) {
-                    Logger.recordOutput("Rerouting", true);
-                    Circle.calculateCircleTangents(curPose.getX(), curPose.getY(),
-                        FieldConstants.Reef.center.getX(), FieldConstants.Reef.center.getY(),
-                        Units.inchesToMeters(92.6), curPoseLines);
-                    Circle.tangentIntersections(targetPoseLines, curPoseLines, intersections);
-                    double minDist = Double.MAX_VALUE;
-                    int minOffset = 0;
-                    for (int i = 0; i < 8; i += 2) {
-                        double dx = curPose.getX() - intersections[i];
-                        double dy = curPose.getY() - intersections[i + 1];
-                        double dx2 = pose2d.getX() - intersections[i];
-                        double dy2 = pose2d.getY() - intersections[i + 1];
-                        double distSqr = dx * dx + dy * dy + dx2 * dx2 + dy2 * dy2;
-                        if (distSqr < minDist) {
-                            minDist = distSqr;
-                            minOffset = i;
-                        }
+        private static boolean hasFlipped = false;
+
+        @Override
+        public void initialize() {
+            pose2d = pose2dSupplier.get();
+            pose2d = AllianceFlipUtil.apply(pose2d);
+            Logger.recordOutput("reef/target", pose2d);
+            if (!hasFlipped) {
+                circle.center = AllianceFlipUtil.apply(circle.center);
+                innerCircle.center = AllianceFlipUtil.apply(innerCircle.center);
+            }
+            hasFlipped = true;
+            targetAngle = pose2d.getTranslation().minus(circle.center).getAngle();
+            Logger.recordOutput("reef/targetAngle", targetAngle);
+        }
+
+        @Override
+        public void execute() {
+            Pose2d curPose = swerve.getPose();
+            lines[0].start = curPose.getTranslation();
+            lines[0].end = pose2d.getTranslation();
+            Pose2d targetPose;
+            Translation2d vec = curPose.getTranslation().minus(innerCircle.center);
+            Logger.recordOutput("reef/vec", vec);
+            Rotation2d curAngle = vec.getAngle();
+            Logger.recordOutput("reef/curAngle", curAngle);
+            Rotation2d angleDiff = targetAngle.minus(curAngle);
+            Logger.recordOutput("reef/angleDiff", angleDiff);
+            if (innerCircle.intersectsLine(curPose.getTranslation(), pose2d.getTranslation())
+                && Math.abs(angleDiff.getDegrees()) > 5.0) {
+                double dist = vec.getNorm();
+                if (dist < circle.radius.in(Meters)
+                    + Constants.ReefNavigation.reefNavigateAroundCircleMargin.in(Meters)) {
+                    Logger.recordOutput("reef/avoidState", "In Circle");
+                    while (angleDiff.getRadians() > Rotation2d.k180deg.getRadians()) {
+                        angleDiff = angleDiff.minus(Rotation2d.k180deg);
                     }
-                    Logger.recordOutput("/reef/intersections/0",
-                        new Pose2d(intersections[0], intersections[1], Rotation2d.kZero));
-                    Logger.recordOutput("/reef/intersections/1",
-                        new Pose2d(intersections[2], intersections[3], Rotation2d.kZero));
-                    Logger.recordOutput("/reef/intersections/2",
-                        new Pose2d(intersections[4], intersections[5], Rotation2d.kZero));
-                    Logger.recordOutput("/reef/intersections/3",
-                        new Pose2d(intersections[6], intersections[7], Rotation2d.kZero));
-                    Logger.recordOutput("/reef/target", pose2d);
-                    targetPose = new Pose2d(intersections[minOffset], intersections[minOffset + 1],
+                    while (angleDiff.getRadians() < Rotation2d.k180deg.unaryMinus().getRadians()) {
+                        angleDiff = angleDiff.plus(Rotation2d.k180deg);
+                    }
+                    Rotation2d currentTargetAngle =
+                        curAngle.plus(Rotation2d.fromRadians(Math.signum(angleDiff.getRadians())
+                            * Math.min(Constants.ReefNavigation.reefNavigateAroundCircleResolution
+                                .getRadians(), Math.abs(angleDiff.getRadians()))));
+
+                    targetPose = new Pose2d(
+                        circle.center
+                            .plus(new Translation2d(circle.radius.in(Meters), currentTargetAngle)),
                         pose2d.getRotation());
-                    targetSpeed = Constants.Swerve.maxSpeed;
+
+                    Logger.recordOutput("reef/angleDiff", angleDiff);
+                    Logger.recordOutput("reef/currentTargetAngle", currentTargetAngle);
                 } else {
-                    Logger.recordOutput("Rerouting", false);
-                    Logger.recordOutput("/reef/intersections/0", pose2d);
-                    Logger.recordOutput("/reef/intersections/1", pose2d);
-                    Logger.recordOutput("/reef/intersections/2", pose2d);
-                    Logger.recordOutput("/reef/intersections/3", pose2d);
-                    Logger.recordOutput("/reef/target", pose2d);
-                    targetPose = pose2d;
-                    targetSpeed = 0;
+                    Logger.recordOutput("reef/avoidState", "Out of Circle");
+                    var points = circle.circleTangentPoints(curPose.getTranslation()).get();
+                    lines[1].start = curPose.getTranslation();
+                    lines[2].start = curPose.getTranslation();
+                    lines[1].end = points.getFirst().getSecond();
+                    lines[2].end = points.getSecond().getSecond();
+                    double h1 = heuristic(curPose.getTranslation(), points.getFirst(), "reef/h1");
+                    double h2 = heuristic(curPose.getTranslation(), points.getSecond(), "reef/h2");
+                    Logger.recordOutput("reef/h1/value", h1);
+                    Logger.recordOutput("reef/h2/value", h2);
+                    if (h1 < h2) {
+                        targetPose =
+                            new Pose2d(points.getFirst().getSecond(), pose2d.getRotation());
+                    } else {
+                        targetPose =
+                            new Pose2d(points.getSecond().getSecond(), pose2d.getRotation());
+                    }
                 }
-
-                targetPose = AllianceFlipUtil.apply(targetPose);
-
-                ChassisSpeeds ctrlEffort = holonomicDriveController.calculate(swerve.getPose(),
-                    targetPose, targetSpeed, pose2d.getRotation());
-                swerve.setModuleStates(ctrlEffort);
+            } else {
+                Logger.recordOutput("reef/avoidState", "Straight Ahead");
+                targetPose = pose2d;
             }
+            Logger.recordOutput("reef/intermediateTarget", targetPose);
+            ChassisSpeeds ctrlEffort = holonomicDriveController.calculate(swerve.getPose(),
+                targetPose, 0, pose2d.getRotation());
+            swerve.setModuleStates(ctrlEffort);
+        }
 
-            @Override
-            public void end(boolean interrupted) {
-                swerve.setMotorsZero();
-            }
+        private double heuristic(Translation2d f, Pair<Rotation2d, Translation2d> p,
+            String prefix) {
+            double r = circle.radius.in(Meters);
+            Rotation2d angleDiff = targetAngle.minus(p.getFirst());
+            double circum = angleDiff.getRadians() * r;
+            double dist = f.getDistance(p.getSecond());
+            Logger.recordOutput(prefix + "/angleDiff", angleDiff);
+            Logger.recordOutput(prefix + "/circum", circum);
+            Logger.recordOutput(prefix + "/dist", dist);
+            return dist + circum;
+        }
 
-            @Override
-            public boolean isFinished() {
-                Transform2d diff = swerve.getPose().minus(pose2d);
-                double score = diff.getX() * diff.getX() + diff.getY() * diff.getY()
-                    + diff.getRotation().getDegrees() * diff.getRotation().getDegrees();
-                return score < tol;
-            }
-        };
-        c.addRequirements(this);
-        return c;
+        @Override
+        public void end(boolean interrupted) {
+            // Logger.recordOutput("reef/avoidState", "Done");
+            swerve.setMotorsZero();
+        }
+
+        @Override
+        public boolean isFinished() {
+            return holonomicDriveController.atReference();
+        }
+
+    }
+
+    public Command moveAndAvoidReef(Supplier<Pose2d> pose2dSupplier, double tol) {
+        return new MoveAndAvoidReef(this, pose2dSupplier, tol);
+    }
+
+    private static Translation2d feederStationBack =
+        new Translation2d(0.5716620683670044, 1.3468445539474487);
+    private static Translation2d feederStationFront =
+        new Translation2d(1.643324375152588, 0.5843156576156616);
+    private static Rotation2d feederStationRightAngle = Rotation2d.fromRadians(-0.6350267301978877);
+    private static Rotation2d feederStationLeftAngle = Rotation2d.fromRadians(0.6350267301978877);
+
+    public Command feederStation(FeederStation feederStation, double forwardAmount) {
+        Translation2d translation = feederStationBack
+            .plus(feederStationFront.minus(feederStationBack).times(forwardAmount));
+        Rotation2d rotation = feederStationRightAngle;
+        if (feederStation == FeederStation.Left) {
+            translation = new Translation2d(translation.getX(),
+                FieldConstants.fieldWidth - translation.getY());
+            rotation = feederStationLeftAngle;
+        }
+        Pose2d target = new Pose2d(translation, rotation);
+        return moveAndAvoidReef(() -> target, 0.3);
+    }
+
+    public Command reef(ReefBranch branch) {
+        return moveAndAvoidReef(() -> branch.safePose, 0.3)
+            .andThen(moveToPose(() -> branch.pose, true, 0.05))
+            .andThen(moveToPose(() -> branch.safePose, true, 0.05));
     }
 }

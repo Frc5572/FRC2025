@@ -16,6 +16,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.studica.frc.AHRS.NavXComType;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -59,14 +60,14 @@ public final class Constants {
      * MoveToPos constants.
      */
     public static class SwerveTransformPID {
-        public static final double PID_XKP = 3.5;
-        public static final double PID_XKI = 0.0;
+        public static final double PID_XKP = 5.0;
+        public static final double PID_XKI = 0.1;
         public static final double PID_XKD = 0.0;
         public static final double PID_YKP = 3.5;
-        public static final double PID_YKI = 0.0;
+        public static final double PID_YKI = 0.1;
         public static final double PID_YKD = 0.0;
         public static final double PID_TKP = 3.0;
-        public static final double PID_TKI = 0.0;
+        public static final double PID_TKI = 0.1;
         public static final double PID_TKD = 0.0;
 
         public static final double MAX_ANGULAR_VELOCITY = 9.0;
@@ -244,6 +245,43 @@ public final class Constants {
             Mk4iReductions(double reduction) {
                 this.reduction = reduction;
             }
+        }
+    }
+
+    public static class ReefNavigation {
+        public static final Distance reefAvoidCircleRadius = Inches.of(65.0);
+        public static final Distance reefNavigateAroundCircleRadius = Inches.of(70.0);
+        public static final Distance reefNavigateAroundCircleMargin = Inches.of(10.0);
+        public static final Rotation2d reefNavigateAroundCircleResolution =
+            Rotation2d.fromDegrees(25);
+
+        public static enum ReefBranch {
+            A(new Pose2d(), new Pose2d()), B(new Pose2d(), new Pose2d()), C(new Pose2d(),
+                new Pose2d()), D(new Pose2d(), new Pose2d()), E(
+                    new Pose2d(5.0437912940979, 2.727640151977539,
+                        Rotation2d.fromRadians(2.125103273007716)),
+                    new Pose2d(5.249879837036133, 2.418506622314453,
+                        Rotation2d.fromRadians(2.126289843595172))), F(new Pose2d(),
+                            new Pose2d()), G(new Pose2d(), new Pose2d()), H(new Pose2d(),
+                                new Pose2d()), I(new Pose2d(), new Pose2d()), J(new Pose2d(),
+                                    new Pose2d()), K(new Pose2d(),
+                                        new Pose2d()), L(new Pose2d(), new Pose2d());
+
+            public final Pose2d pose;
+            public final Pose2d safePose;
+
+            ReefBranch(Pose2d pose, Pose2d safePose) {
+                this.pose = pose;
+                this.safePose = safePose;
+            }
+        }
+
+        public static enum ReefLevel {
+            L1, L2, L3, L4
+        }
+
+        public static enum FeederStation {
+            Left, Right
         }
     }
 }
