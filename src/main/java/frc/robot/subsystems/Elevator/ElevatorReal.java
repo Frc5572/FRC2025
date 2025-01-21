@@ -1,4 +1,4 @@
-package frc.robot.subsystems.Elevator;
+package frc.robot.subsystems.elevator;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
@@ -31,6 +31,8 @@ public class ElevatorReal implements ElevatorIO {
         leftElevatorConf.MotorOutput.NeutralMode = Constants.Elevator.BREAK;
 
         // PID and feedforward
+
+        // right
         rightElevatorConf.Slot0.kP = Constants.Elevator.RIGHT_KP;
         rightElevatorConf.Slot0.kI = Constants.Elevator.RIGHT_KI;
         rightElevatorConf.Slot0.kD = Constants.Elevator.RIGHT_KD;
@@ -39,6 +41,7 @@ public class ElevatorReal implements ElevatorIO {
         rightElevatorConf.Slot0.kA = Constants.Elevator.RIGHT_KA;
         rightElevatorConf.Slot0.kG = Constants.Elevator.RIGHT_KG;
 
+        //left
         leftElevatorConf.Slot0.kP = Constants.Elevator.RIGHT_KP;
         leftElevatorConf.Slot0.kI = Constants.Elevator.RIGHT_KI;
         leftElevatorConf.Slot0.kD = Constants.Elevator.RIGHT_KD;
