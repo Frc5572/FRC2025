@@ -8,7 +8,9 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants;
 
-
+/**
+ * Real Class for Elevator
+ */
 public class ElevatorReal implements ElevatorIO {
     private final TalonFX rightElevatorMotor = new TalonFX(Constants.Elevator.RIGHT_ID);
     private final TalonFX leftElevatorMotor = new TalonFX(Constants.Elevator.LEFT_ID);
@@ -17,7 +19,10 @@ public class ElevatorReal implements ElevatorIO {
     private final TalonFXConfiguration leftElevatorConf = new TalonFXConfiguration();
     private final PositionVoltage positionVoltage = new PositionVoltage(0.0);
 
-    public ElevatorReal() {}
+    /** Real Elevator Initilizer */
+    public ElevatorReal() {
+        configMotors();
+    }
 
     private void configMotors() {
         // left conf
@@ -41,7 +46,7 @@ public class ElevatorReal implements ElevatorIO {
         rightElevatorConf.Slot0.kA = Constants.Elevator.RIGHT_KA;
         rightElevatorConf.Slot0.kG = Constants.Elevator.RIGHT_KG;
 
-        //left
+        // left
         leftElevatorConf.Slot0.kP = Constants.Elevator.RIGHT_KP;
         leftElevatorConf.Slot0.kI = Constants.Elevator.RIGHT_KI;
         leftElevatorConf.Slot0.kD = Constants.Elevator.RIGHT_KD;

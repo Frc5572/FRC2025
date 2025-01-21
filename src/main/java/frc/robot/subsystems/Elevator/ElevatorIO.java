@@ -2,7 +2,15 @@ package frc.robot.subsystems.elevator;
 
 import org.littletonrobotics.junction.AutoLog;
 
+/**
+ * Elevator IO Class for Elevator
+ */
 public interface ElevatorIO {
+
+    /**
+     * Inputs Class for Elevator
+     */
+
     @AutoLog
     public class ElevatorInputs {
         public boolean limitSwitch;

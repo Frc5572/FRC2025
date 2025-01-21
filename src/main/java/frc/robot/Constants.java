@@ -174,6 +174,9 @@ public final class Constants {
         }
     }
 
+    /**
+     * Elevator Constants
+     */
 
     public static final class Elevator {
         public static final int RIGHT_ID = 0;
