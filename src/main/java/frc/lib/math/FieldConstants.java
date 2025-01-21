@@ -23,11 +23,13 @@ public class FieldConstants {
     /** Measured from the inside of starting line */
     public static final double startingLineX = Units.inchesToMeters(299.438);
 
+    /** Processor */
     public static class Processor {
         public static final Pose2d centerFace =
             new Pose2d(Units.inchesToMeters(235.726), 0, Rotation2d.fromDegrees(90));
     }
 
+    /** Barge */
     public static class Barge {
         public static final Translation2d farCage =
             new Translation2d(Units.inchesToMeters(345.428), Units.inchesToMeters(286.779));
@@ -41,6 +43,7 @@ public class FieldConstants {
         public static final double shallowHeight = Units.inchesToMeters(30.125);
     }
 
+    /** Feeder Station */
     public static class CoralStation {
         public static final Pose2d leftCenterFace = new Pose2d(Units.inchesToMeters(33.526),
             Units.inchesToMeters(291.176), Rotation2d.fromDegrees(90 - 144.011));
@@ -48,6 +51,7 @@ public class FieldConstants {
             Units.inchesToMeters(25.824), Rotation2d.fromDegrees(144.011 - 90));
     }
 
+    /** Reef */
     public static class Reef {
         public static final Translation2d center =
             new Translation2d(Units.inchesToMeters(176.746), Units.inchesToMeters(158.501));
@@ -124,6 +128,7 @@ public class FieldConstants {
         }
     }
 
+    /** Game Pieces already on the field */
     public static class StagingPositions {
         /** Measured from the center of the ice cream */
         public static final Pose2d leftIceCream =
@@ -134,6 +139,7 @@ public class FieldConstants {
             new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(86.5), new Rotation2d());
     }
 
+    /** Reef Branch Heights */
     public enum ReefHeight {
         L4(Units.inchesToMeters(72), -90), L3(Units.inchesToMeters(47.625),
             -35), L2(Units.inchesToMeters(31.875), -35), L1(Units.inchesToMeters(18), 0);
