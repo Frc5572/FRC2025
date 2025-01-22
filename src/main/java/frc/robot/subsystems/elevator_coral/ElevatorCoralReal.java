@@ -4,7 +4,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import frc.robot.Constants;
 
-/*
+/**
  * Elevator Coral real class
  */
 public class ElevatorCoralReal implements ElevatorCoralIO { // elevator Real class

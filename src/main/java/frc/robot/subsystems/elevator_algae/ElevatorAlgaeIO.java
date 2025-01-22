@@ -2,12 +2,12 @@ package frc.robot.subsystems.elevator_algae;
 
 import org.littletonrobotics.junction.AutoLog;
 
-/*
- * IO layer
+/**
+ * elevator algae io class
  */
 public interface ElevatorAlgaeIO {
-    /*
-     * ` Elevator Algae inputs
+    /**
+     * Elevator Algae inputs
      */
     @AutoLog
     public class AlgaeIOInputs {

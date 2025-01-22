@@ -4,7 +4,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import frc.robot.Constants;
 
-/*
+/**
  * Algae Real Class
  */
 public class ElevatorAlgaeReal implements ElevatorAlgaeIO {
