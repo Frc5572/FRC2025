@@ -37,7 +37,7 @@ public class RobotContainer {
      * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
-        driver.y().onTrue(new InstantCommand(() -> climb.runClimberMotor(50)));
+        driver.y().onTrue(new InstantCommand(() -> climb.runClimberMotor(50))); // moves the motors.
     }
 
     /**
