@@ -11,6 +11,9 @@ public class ElevatorAlgae extends SubsystemBase {
     ElevatorAlgaeIO io;
     AlgaeIOInputsAutoLogged inputs = new AlgaeIOInputsAutoLogged();
 
+    /*
+     * Constructor for Elevator Algae class
+     */
     public ElevatorAlgae(ElevatorAlgaeIO io) {
         this.io = io;
         io.updateInputs(inputs);
@@ -21,10 +24,16 @@ public class ElevatorAlgae extends SubsystemBase {
         io.updateInputs(inputs);
     }
 
+    /*
+     * Set motor speed
+     */
     public void setAlgaeMotorSpeed(double speed) {
         io.setAlgaeMotorSpeed(speed);
     }
 
+    /*
+     * Set motor speed command
+     */
     public Command runMotorCommand(double speed) {
         return Commands.runEnd(() -> setAlgaeMotorSpeed(speed), () -> setAlgaeMotorSpeed(0), this);
     }

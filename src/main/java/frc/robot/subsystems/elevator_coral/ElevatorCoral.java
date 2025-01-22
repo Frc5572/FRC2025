@@ -13,7 +13,7 @@ public class ElevatorCoral extends SubsystemBase {
     ElevatorCoralIOInputsAutoLogged inputs = new ElevatorCoralIOInputsAutoLogged();
 
     /*
-     * Constructor
+     * Constructor for Elevator Coral class
      */
     public ElevatorCoral(ElevatorCoralIO io) {
         this.io = io;
@@ -25,10 +25,16 @@ public class ElevatorCoral extends SubsystemBase {
         Logger.processInputs("Elevator", inputs);
     }
 
+    /*
+     * Set motor speed
+     */
     public void setFeederMotorSpeed(double speed) {
         io.setFeederMotorSpeed(speed);
     }
 
+    /*
+     * Set motor speed command
+     */
     public Command runFeederMotorCommand(double speed) {
         return Commands.runEnd(() -> io.setFeederMotorSpeed(speed), () -> io.setFeederMotorSpeed(0),
             this);

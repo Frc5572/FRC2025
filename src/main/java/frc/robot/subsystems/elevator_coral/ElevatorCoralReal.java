@@ -4,6 +4,9 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import frc.robot.Constants;
 
+/*
+ * Elevator Coral real class
+ */
 public class ElevatorCoralReal implements ElevatorCoralIO {
 
     private final SparkMax feederMotor =
