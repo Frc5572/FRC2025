@@ -7,17 +7,15 @@ import edu.wpi.first.wpilibj.DigitalInput;
 
 
 
-public class ClimberReal implements ClimberIO {
+public class ClimberReal implements ClimberIO { // test
     private final TalonFX climberMotorLeft = new TalonFX(1, "Left"); // Kraken Motor
-    private final TalonFX climberMotorRight = new TalonFX(2, "Right");// Kraken Motor
-    private final TalonFXConfiguration rightConfig = new TalonFXConfiguration();// Kraken Motor
-                                                                                // Configuration
-    private final TalonFXConfiguration leftConfig = new TalonFXConfiguration();// Kraken Motor
-                                                                               // Configuration
+    private final TalonFX climberMotorRight = new TalonFX(2, "Right"); // Kraken Motor
+    private final TalonFXConfiguration rightConfig = new TalonFXConfiguration(); // Kraken Motor
+    private final TalonFXConfiguration leftConfig = new TalonFXConfiguration(); // Kraken Motor
     private final DigitalInput climberTouchSensor = new DigitalInput(5); // Touch Sensor
     private final VelocityVoltage climberVelocity = new VelocityVoltage(0); // velocity
 
-    public ClimberReal() {
+    public ClimberReal() { // test
         leftConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         leftConfig.CurrentLimits.SupplyCurrentLimit = 40;
         rightConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -25,7 +23,7 @@ public class ClimberReal implements ClimberIO {
         climberTouchSensor.get();
     }
 
-    public void setClimbMotor() {
+    public void setClimbMotor() { // test
         climberMotorLeft.setControl(climberVelocity);
         climberMotorRight.setControl(climberVelocity);
 

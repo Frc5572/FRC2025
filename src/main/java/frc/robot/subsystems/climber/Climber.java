@@ -34,7 +34,7 @@ public class Climber extends SubsystemBase {
 
 
 
-    public Command runClimberMotor(double climberSpeed) {
+    public Command runClimberMotor(double climberSpeed) { // test
         return Commands.startEnd(() -> {
             setClimberMotor(climberSpeed);
 
