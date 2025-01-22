@@ -35,6 +35,9 @@ public final class Constants {
      * Motor CAN id's.
      */
     public static final class Motors {
+        public static final class PrimaryCoralScoring {
+            public static final int Coral_Scoring_NEO_ID = 11;
+        }
     }
 
 
@@ -173,4 +176,16 @@ public final class Constants {
             public static final Rotation2d angleOffset = Rotation2d.fromRotations(0.321777);
         }
     }
+
+    /*
+     * Primary Coral Scoring Constants
+     */
+    public static final class CoralScoringConstants {
+        public static final double Scoring_Motor = 0;
+        public static final double Scoring_Motor_Backward = -0;
+        public static final double Scoring_Motor_Stop = 0;
+
+        public static final int Scoring_Beam_Brake_DIO_Port = 1;
+    }
+
 }
