@@ -2,25 +2,21 @@ package frc.robot.subsystems.climber;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public class ClimberIO {
 
-
-    /**
-     * Intake Inputs to Log
-     */
+public interface ClimberIO {
     @AutoLog
     public static class ClimberInputs {
-
         public double climberRPM;
         public double indexerRPM;
-        public boolean indexerBeamBrake;
-        public boolean intakeBeamBrake;
+        public boolean climberBeamBrake;
+
+
+
     }
 
-    public default void updateInputs() {}
+    public default void ClimberInputsAutoLogged(ClimberInputs inputs) {}
 
     public default void setClimberMotorPercentage(double percent) {}
 
-    public default void setIndexerMotorPercentage(double percent) {}
 
 }
