@@ -14,6 +14,8 @@ public class ElevatorCoral extends SubsystemBase {
 
     /**
      * Constructor for Elevator Coral class
+     * 
+     * @param io io
      */
     public ElevatorCoral(ElevatorCoralIO io) {
         this.io = io;
@@ -28,7 +30,7 @@ public class ElevatorCoral extends SubsystemBase {
     /**
      * set motor speed function
      * 
-     * @param speed
+     * @param speed speed to set Coral motor to
      */
     public void setFeederMotorSpeed(double speed) { // set motor speed function
         io.setFeederMotorSpeed(speed);
@@ -37,8 +39,8 @@ public class ElevatorCoral extends SubsystemBase {
     /**
      * set motor speed Command
      * 
-     * @param speed
-     * @return
+     * @param speed speed to set coral motor
+     * @return command to set motor to a speed
      */
     public Command runFeederMotorCommand(double speed) { // set motor speed Command
         return Commands.runEnd(() -> io.setFeederMotorSpeed(speed), () -> io.setFeederMotorSpeed(0),

@@ -17,4 +17,5 @@ public interface ElevatorAlgaeIO {
     public default void setAlgaeMotorSpeed(double speed) {}
 
     public default void updateInputs(AlgaeIOInputs inputs) {}
+
 }
