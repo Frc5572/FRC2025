@@ -7,7 +7,7 @@ import org.littletonrobotics.junction.AutoLog;
  */
 public interface ElevatorAlgaeIO {
     /*
-     * Elevator Algae inputs
+     * ` Elevator Algae inputs
      */
     @AutoLog
     public class AlgaeIOInputs {
