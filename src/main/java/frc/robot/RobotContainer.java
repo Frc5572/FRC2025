@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Robot.RobotRunType;
 import frc.robot.subsystems.elevator_algae.ElevatorAlgae;
-import frc.robot.subsystems.elevator_coral.ElevatorCoral;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
 import frc.robot.subsystems.swerve.SwerveReal;
@@ -30,7 +29,6 @@ public class RobotContainer {
     /* Subsystems */
     private Swerve s_Swerve;
     private ElevatorAlgae s_ElevatorAlgae;
-    private ElevatorCoral s_ElevatorCoral;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -60,10 +58,6 @@ public class RobotContainer {
             .whileTrue(new InstantCommand(() -> s_ElevatorAlgae.runMotorCommand(1)));
         driver.leftBumper()
             .whileTrue(new InstantCommand(() -> s_ElevatorAlgae.runMotorCommand(-1)));
-        driver.rightTrigger()
-            .whileTrue(new InstantCommand(() -> s_ElevatorCoral.runFeederMotorCommand(1)));
-        driver.leftTrigger()
-            .whileTrue(new InstantCommand(() -> s_ElevatorCoral.runFeederMotorCommand(-1)));
 
 
     }
