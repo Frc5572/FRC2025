@@ -13,7 +13,7 @@ public class ClimberReal implements ClimberIO {
     private final TalonFXConfiguration rightConfig = new TalonFXConfiguration();// Kraken Motor
                                                                                 // Configuration
     private final TalonFXConfiguration leftConfig = new TalonFXConfiguration();// Kraken Motor
-                                                                               // Configration
+                                                                               // Configuration
     private final DigitalInput climberTouchSensor = new DigitalInput(5); // Touch Sensor
     private final VelocityVoltage climberVelocity = new VelocityVoltage(0); // velocity
 
