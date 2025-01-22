@@ -1,10 +1,13 @@
-package frc.robot.subsystems.ElevatorCoral;
+package frc.robot.subsystems.elevator_coral;
 
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+/*
+ * Elevator Coral main class
+ */
 public class ElevatorCoral extends SubsystemBase {
     ElevatorCoralIO io;
     ElevatorCoralIOInputsAutoLogged inputs = new ElevatorCoralIOInputsAutoLogged();

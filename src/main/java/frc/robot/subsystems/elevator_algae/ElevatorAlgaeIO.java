@@ -1,8 +1,14 @@
-package frc.robot.subsystems.ElevatorAlgae;
+package frc.robot.subsystems.elevator_algae;
 
 import org.littletonrobotics.junction.AutoLog;
 
+/*
+ * IO layer
+ */
 public interface ElevatorAlgaeIO {
+    /*
+     * Elevator Algae inputs
+     */
     @AutoLog
     public class AlgaeIOInputs {
         double AlgaeMotorSpeed;
