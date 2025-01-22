@@ -8,7 +8,7 @@ public interface ClimberIO {
     public static class ClimberInputs {
         public double climberRPM;
         public double indexerRPM;
-        public boolean climberBeamBrake;
+        public boolean climberTouchSensor;
 
 
 

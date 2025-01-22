@@ -28,8 +28,8 @@ public class Climber extends SubsystemBase {
         io.setClimberMotorPercentage(percentage);
     }
 
-    public boolean getClimberBeamBrakeStatus() {
-        return climberAutoLogged.climberBeamBrake;
+    public boolean getClimberTouchSensorStatus() {
+        return climberAutoLogged.climberTouchSensor;
     }
 
 
