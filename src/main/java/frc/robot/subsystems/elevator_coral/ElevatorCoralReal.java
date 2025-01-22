@@ -9,11 +9,11 @@ import frc.robot.Constants;
  */
 public class ElevatorCoralReal implements ElevatorCoralIO {
 
-    private final SparkMax feederMotor =
+    private final SparkMax feederMotor = // Coral motor
         new SparkMax(Constants.Motors.AlgaeMotors.FEEDER_MOTOR_ID, MotorType.kBrushless);
 
     @Override
-    public void setFeederMotorSpeed(double speed) {
+    public void setFeederMotorSpeed(double speed) { // set hardware speed
         feederMotor.set(speed);
     }
 }

@@ -24,17 +24,12 @@ public class ElevatorAlgae extends SubsystemBase {
         io.updateInputs(inputs);
     }
 
-    /*
-     * Set motor speed
-     */
-    public void setAlgaeMotorSpeed(double speed) {
+
+    public void setAlgaeMotorSpeed(double speed) { // set motor speed function
         io.setAlgaeMotorSpeed(speed);
     }
 
-    /*
-     * Set motor speed command
-     */
-    public Command runMotorCommand(double speed) {
+    public Command runMotorCommand(double speed) { // set motor speed Command
         return Commands.runEnd(() -> setAlgaeMotorSpeed(speed), () -> setAlgaeMotorSpeed(0), this);
     }
 

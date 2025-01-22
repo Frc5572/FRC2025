@@ -25,17 +25,11 @@ public class ElevatorCoral extends SubsystemBase {
         Logger.processInputs("Elevator", inputs);
     }
 
-    /*
-     * Set motor speed
-     */
-    public void setFeederMotorSpeed(double speed) {
+    public void setFeederMotorSpeed(double speed) { // set motor speed function
         io.setFeederMotorSpeed(speed);
     }
 
-    /*
-     * Set motor speed command
-     */
-    public Command runFeederMotorCommand(double speed) {
+    public Command runFeederMotorCommand(double speed) { // set motor speed Command
         return Commands.runEnd(() -> io.setFeederMotorSpeed(speed), () -> io.setFeederMotorSpeed(0),
             this);
     }
