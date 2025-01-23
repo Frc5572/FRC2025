@@ -11,11 +11,13 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import frc.robot.Constants;
 
+/** Simulation of vision using built-in PhotonVision simulator. */
 public class VisionSimPhoton extends VisionReal {
 
     private final SwerveDriveSimulation sim;
     private final VisionSystemSim visionSim;
 
+    /** Simulation of vision using built-in PhotonVision simulator. */
     public static Function<Constants.Vision.CameraConstants[], VisionIO> partial(
         SwerveDriveSimulation sim) {
         return (constants) -> new VisionSimPhoton(constants, sim);

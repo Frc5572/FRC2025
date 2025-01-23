@@ -5,10 +5,12 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import frc.robot.Constants;
 
+/** PhotonVision-attached implementation */
 public class VisionReal implements VisionIO {
 
     protected final PhotonCamera[] cameras;
 
+    /** PhotonVision-attached implementation */
     public VisionReal(Constants.Vision.CameraConstants[] constants) {
         cameras = Stream.of(constants).map((consts) -> new PhotonCamera(consts.name()))
             .toArray(PhotonCamera[]::new);

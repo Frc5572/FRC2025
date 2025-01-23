@@ -15,6 +15,7 @@ import frc.robot.Constants.Vision.CameraConstants;
 /** IO Class for Vision */
 public interface VisionIO {
 
+    /** Inputs for an individual camera */
     public static class CameraInputs implements LoggableInputs, Cloneable {
         public PhotonPipelineResult[] results = new PhotonPipelineResult[0];
         public Optional<Matrix<N3, N3>> cameraMatrix = Optional.empty();

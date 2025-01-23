@@ -235,6 +235,8 @@ public final class Constants {
 
     /** Vision Constants */
     public static class Vision {
+
+        /** Constants for an individual camera. */
         public static final record CameraConstants(String name, int height, int width,
             Rotation2d horizontalFieldOfView, Frequency framesPerSecond, Time latencyAvg,
             Time latencyStdDev, double calibErrorAvg, double calibErrorStdDev,
@@ -243,6 +245,6 @@ public final class Constants {
 
         public static final CameraConstants[] cameras = new CameraConstants[] {
             new CameraConstants("cam0", 1600, 1200, Rotation2d.fromDegrees(100), Hertz.of(20),
-                Seconds.of(0.3), Seconds.of(0.02), 0.25, 0.08, new Transform3d()),};
+                Seconds.of(0.3), Seconds.of(0.02), 0.25, 0.08, new Transform3d())};
     }
 }
