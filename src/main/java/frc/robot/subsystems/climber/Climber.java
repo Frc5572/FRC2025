@@ -1,6 +1,5 @@
 package frc.robot.subsystems.climber;
 
-import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -36,10 +35,10 @@ public class Climber extends SubsystemBase {
 
 
 
-    public Command runClimberMotor(DoubleSupplier climberSpeed) { // The function to make the motors
-                                                                  // move.
-        return Commands.startEnd(() -> {
-            setClimberMotor(climberSpeed.getAsDouble());
+    public Command runClimberMotor() { 
+        return Commands.startEnd(() ->
+            setClimberMotor(climberSpeed.getAsDouble() * 12);
+
 
         }, () -> {
             setClimberMotor(0);

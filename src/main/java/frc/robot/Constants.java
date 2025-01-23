@@ -176,10 +176,7 @@ public final class Constants {
 
     }
     public static final class Climb {
-        public static final boolean leftConfigSupplyCurrentLimitEnable = true;
-        public static final boolean rightConfigSupplyCurrentLimitEnable = true;
-        public static final int leftSupplyCurrentLimit = 25;
-        public static final int rightSupplyCurrentLimit = 25;
+
         public static final int LeftTalonFXID = 1;
         public static final int RightTalonFXID = 1;
         public static final int TouchSenorChannel = 5;

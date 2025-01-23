@@ -1,13 +1,12 @@
 package frc.robot.subsystems.climber;
 
 import org.littletonrobotics.junction.AutoLog;
-
+import edu.wpi.first.units.measure.Angle;
 
 public interface ClimberIO {
     @AutoLog
     public static class ClimberInputs {
-        public double climberRPM;
-        public double indexerRPM;
+        public Angle climberPosition;
         public boolean climberTouchSensor;
 
 
