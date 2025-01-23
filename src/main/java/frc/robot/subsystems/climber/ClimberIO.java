@@ -16,7 +16,7 @@ public interface ClimberIO {
 
     public default void ClimberInputsAutoLogged(ClimberInputs inputs) {}
 
-    public default void setClimberMotorPercentage(double percent) {}
+    public default void setClimbMotor(double power) {}
 
 
 }

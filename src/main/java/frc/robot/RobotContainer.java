@@ -54,7 +54,8 @@ public class RobotContainer {
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
         driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
-        driver.x().onTrue(new InstantCommand(() -> climb.runClimberMotor(50))); // moves the motors.
+        driver.x().whileTrue(climb.runClimberMotor(driver::getLeftTriggerAxis)); // moves the
+                                                                                 // motors.
     }
 
     /**
