@@ -26,7 +26,7 @@ public class ElevatorAlgae extends SubsystemBase {
     }
 
 
-    public void setAlgaeMotorSpeed(double voltage) { // set motor speed function
+    public void setAlgaeMotorVoltage(double voltage) { // set motor speed function
         io.setAlgaeMotorVoltage(voltage);
     }
 
@@ -34,8 +34,9 @@ public class ElevatorAlgae extends SubsystemBase {
         return inputs.algaeMotorCurrent > Constants.HAS_ALGAE_CURRENT_THRESHOLD;
     }
 
-    public Command runMotorCommand(double speed) { // set motor speed Command
-        return Commands.runEnd(() -> setAlgaeMotorSpeed(speed), () -> setAlgaeMotorSpeed(0), this);
+    public Command setMotorVoltageCommand(double speed) { // set motor speed Command
+        return Commands.runEnd(() -> setAlgaeMotorVoltage(speed), () -> setAlgaeMotorVoltage(0),
+            this);
     }
 
 }

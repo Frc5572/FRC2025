@@ -55,9 +55,9 @@ public class RobotContainer {
     private void configureButtonBindings(RobotRunType runtimeType) {
         driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
         driver.rightBumper()
-            .whileTrue(new InstantCommand(() -> s_ElevatorAlgae.runMotorCommand(1)));
+            .whileTrue(new InstantCommand(() -> s_ElevatorAlgae.setAlgaeMotorVoltage(1)));
         driver.leftBumper()
-            .whileTrue(new InstantCommand(() -> s_ElevatorAlgae.runMotorCommand(-1)));
+            .whileTrue(new InstantCommand(() -> s_ElevatorAlgae.setAlgaeMotorVoltage(-1)));
 
 
     }
