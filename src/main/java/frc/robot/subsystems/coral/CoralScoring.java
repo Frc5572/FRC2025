@@ -1,4 +1,4 @@
-package frc.robot.subsystems.primaryCoralScoring;
+package frc.robot.subsystems.coral;
 
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -7,9 +7,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.PrimaryCoralScoring.CoralScoringInputsAutoLogged;
 
 /*
- * Coral Scoring Subsytems
+ * Coral Scoring Subsystems
  */
-
+/*
+ *
+ */
 public class CoralScoring extends SubsystemBase {
     private CoralScoringIO io;
     private CoralScoringInputsAutoLogged coralScoringAutoLogged =
@@ -35,7 +37,7 @@ public class CoralScoring extends SubsystemBase {
         return coralScoringAutoLogged.scoringBeamBrake;
     }
 
-    /*
+    /**
      * Runs Pre Scoring Motor
      */
     public Command runPreScoringMotor(double scoringSpeed) {

@@ -1,6 +1,10 @@
-package frc.robot.subsystems.primaryCoralScoring;
+package frc.robot.subsystems.coral;
 
 import org.littletonrobotics.junction.AutoLog;
+
+/**
+ * Coral Scoring IO
+ */
 
 public interface CoralScoringIO {
 

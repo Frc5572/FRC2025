@@ -1,4 +1,4 @@
-package frc.robot.subsystems.primaryCoralScoring;
+package frc.robot.subsystems.coral;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -9,8 +9,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants;
 
-/*
- * Coral Scoring IO
+/**
+ * Real Class Coral Scoring
  */
 
 public class CoralScoringReal implements CoralScoringIO {

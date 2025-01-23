@@ -35,7 +35,7 @@ public final class Constants {
      * Motor CAN id's.
      */
     public static final class Motors {
-        /*
+        /**
          * Primary Coral Scoring CAN id's
          */
         public static final class PrimaryCoralScoring {
@@ -66,7 +66,7 @@ public final class Constants {
         public static final Translation2d MOD0_MODOFFSET =
             new Translation2d(wheelBase / 2.0, trackWidth / 2.0);
 
-        /*
+        /**
          * Swerve Kinematics No need to ever change this unless you are not doing a traditional
          * rectangular/square 4 module swerve
          */
@@ -100,7 +100,7 @@ public final class Constants {
         public static final double driveCurrentThresholdTime = 0.1;
         public static final boolean driveEnableCurrentLimit = true;
 
-        /*
+        /**
          * These values are used by the drive falcon to ramp in open loop and closed loop driving.
          * We found a small open loop ramp (0.25) helps with wear, tipping, etc
          */
@@ -180,7 +180,7 @@ public final class Constants {
         }
     }
 
-    /*
+    /**
      * Primary Coral Scoring Constants
      */
     public static final class CoralScoringConstants {
