@@ -6,7 +6,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.PrimaryCoralScoring.CoralScoringInputsAutoLogged;
 
-
+/*
+ * Coral Scoring Subsytems
+ */
 
 public class CoralScoring extends SubsystemBase {
     private CoralScoringIO io;
@@ -33,6 +35,9 @@ public class CoralScoring extends SubsystemBase {
         return coralScoringAutoLogged.scoringBeamBrake;
     }
 
+    /*
+     * Runs Pre Scoring Motor
+     */
     public Command runPreScoringMotor(double scoringSpeed) {
         return Commands.startEnd(() -> {
             setScoringMotor(scoringSpeed);
@@ -41,6 +46,9 @@ public class CoralScoring extends SubsystemBase {
         }, this).until(() -> getScoringBeamBrakeStatus());
     }
 
+    /**
+     * Sets motor speed to score.
+     */
     public Command runScoringMotor(double scoringSpeed) {
         return Commands.startEnd(() -> {
             setScoringMotor(scoringSpeed);

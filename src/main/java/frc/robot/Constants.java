@@ -35,6 +35,9 @@ public final class Constants {
      * Motor CAN id's.
      */
     public static final class Motors {
+        /*
+         * Primary Coral Scoring CAN id's
+         */
         public static final class PrimaryCoralScoring {
             public static final int Coral_Scoring_NEO_ID = 11;
         }

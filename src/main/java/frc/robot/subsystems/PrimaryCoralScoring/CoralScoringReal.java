@@ -9,6 +9,10 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants;
 
+/*
+ * Coral Scoring IO
+ */
+
 public class CoralScoringReal implements CoralScoringIO {
     private final SparkMax coralScoringMotor = new SparkMax(
         Constants.Motors.PrimaryCoralScoring.Coral_Scoring_NEO_ID, MotorType.kBrushless);
