@@ -1,6 +1,10 @@
 package frc.robot;
 
+import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -10,6 +14,7 @@ import frc.robot.Robot.RobotRunType;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
 import frc.robot.subsystems.swerve.SwerveReal;
+import frc.robot.subsystems.swerve.SwerveSim;
 
 
 /**
@@ -36,8 +41,14 @@ public class RobotContainer {
             case kReal:
                 s_Swerve = new Swerve(new SwerveReal());
                 break;
+            case kSimulation:
+                driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
+                    new Pose2d(3, 3, Rotation2d.kZero));
+                SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
+                s_Swerve = new Swerve(new SwerveSim(driveSimulation));
+                break;
             default:
-                s_Swerve = new Swerve(new SwerveIO() {});
+                s_Swerve = new Swerve(new SwerveIO.Empty() {});
         }
         s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
@@ -71,13 +82,24 @@ public class RobotContainer {
     }
 
     /** Start simulation */
-    public void startSimulation() {}
+    public void startSimulation() {
+        if (driveSimulation != null) {
+            SimulatedArena.getInstance().resetFieldForAuto();
+        }
+    }
 
     /**
      * Update simulation
      */
     public void updateSimulation() {
-
+        if (driveSimulation != null) {
+            SimulatedArena.getInstance().simulationPeriodic();
+            Logger.recordOutput("simulatedPose", driveSimulation.getSimulatedDriveTrainPose());
+            Logger.recordOutput("FieldSimulation/Algae",
+                SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+            Logger.recordOutput("FieldSimulation/Coral",
+                SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
+        }
     }
 
 }
