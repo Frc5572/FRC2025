@@ -7,7 +7,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Robot.RobotRunType;
-import frc.robot.subsystems.PrimaryCoralScoring.CoralScoring;
+import frc.robot.subsystems.primaryCoralScoring.CoralScoring;
+import frc.robot.subsystems.primaryCoralScoring.CoralScoringIO;
+import frc.robot.subsystems.primaryCoralScoring.CoralScoringReal;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
 import frc.robot.subsystems.swerve.SwerveReal;
@@ -28,7 +30,7 @@ public class RobotContainer {
 
     /* Subsystems */
     private Swerve s_Swerve;
-    private CoralScoring Score;
+    private CoralScoring score;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -37,9 +39,11 @@ public class RobotContainer {
         switch (runtimeType) {
             case kReal:
                 s_Swerve = new Swerve(new SwerveReal());
+                score = new CoralScoring(new CoralScoringReal());
                 break;
             default:
                 s_Swerve = new Swerve(new SwerveIO() {});
+                score = new CoralScoring(new CoralScoringIO() {});
         }
         s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
@@ -54,7 +58,8 @@ public class RobotContainer {
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
         driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
-        driver.a().onTrue(new InstantCommand(() -> Score.runPreScoringMotor(5)));
+        driver.a().onTrue(new InstantCommand(() -> score.runPreScoringMotor(5)));
+        driver.b().onTrue(new InstantCommand(() -> score.runScoringMotor(5)));
     }
 
     /**

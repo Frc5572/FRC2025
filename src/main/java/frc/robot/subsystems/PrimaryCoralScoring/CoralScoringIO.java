@@ -1,4 +1,4 @@
-package frc.robot.subsystems.PrimaryCoralScoring;
+package frc.robot.subsystems.primaryCoralScoring;
 
 import org.littletonrobotics.junction.AutoLog;
 

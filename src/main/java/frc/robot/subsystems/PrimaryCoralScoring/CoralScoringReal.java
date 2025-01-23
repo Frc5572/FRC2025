@@ -1,4 +1,4 @@
-package frc.robot.subsystems.PrimaryCoralScoring;
+package frc.robot.subsystems.primaryCoralScoring;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -12,7 +12,7 @@ import frc.robot.Constants;
 public class CoralScoringReal implements CoralScoringIO {
     private final SparkMax coralScoringMotor = new SparkMax(
         Constants.Motors.PrimaryCoralScoring.Coral_Scoring_NEO_ID, MotorType.kBrushless);
-    public final RelativeEncoder CoralScoringRelativeEnc = coralScoringMotor.getEncoder();
+    public final RelativeEncoder coralScoringRelativeEnc = coralScoringMotor.getEncoder();
     private final DigitalInput scoringBeamBrake =
         new DigitalInput(Constants.CoralScoringConstants.Scoring_Beam_Brake_DIO_Port);
     SparkMaxConfig motorConfig = new SparkMaxConfig();

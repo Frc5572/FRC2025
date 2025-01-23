@@ -181,9 +181,10 @@ public final class Constants {
      * Primary Coral Scoring Constants
      */
     public static final class CoralScoringConstants {
-        public static final double Scoring_Motor = 0;
-        public static final double Scoring_Motor_Backward = -0;
+        public static final double Scoring_Motor = 1;
+        public static final double Scoring_Motor_Backward = -1;
         public static final double Scoring_Motor_Stop = 0;
+        public static final boolean Scoring_Motor_Inverted = false;
 
         public static final int Scoring_Beam_Brake_DIO_Port = 1;
     }
