@@ -1,25 +1,52 @@
 package frc.robot.subsystems.swerve;
 
 import org.littletonrobotics.junction.AutoLog;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.lib.util.swerve.SwerveModule;
+import frc.lib.util.swerve.SwerveModuleIO;
 
-/**
- * DrivetrainIO interface
- */
+/** IO Class for Swerve */
 public interface SwerveIO {
-    /**
-     * Drivetrain IO
-     */
+
+    /** Inputs Class for Swerve */
+
     @AutoLog
     public static class SwerveInputs {
-        public Rotation2d gyroYaw = new Rotation2d();
+        public double yaw;
+        public double roll;
+        public double pitch;
     }
 
-    /** Updates the set of loggable inputs. */
-    public default void updateInputs(SwerveInputs inputs) {}
+    public void updateInputs(SwerveInputs inputs);
 
-    /** Run the motor at the specified voltage. */
-    public default void setDriveVoltage(double lvolts, double rvolts) {}
+    public SwerveModule[] createModules();
 
+    public void setPose(Pose2d pose);
+
+
+    /** Empty Swerve implementation (for replay) */
+    public static class Empty implements SwerveIO {
+
+        @Override
+        public void updateInputs(SwerveInputs inputs) {
+            // Intentionally do nothing
+        }
+
+        @Override
+        public SwerveModule[] createModules() {
+            return new SwerveModule[] {
+                new SwerveModule(0, Rotation2d.kZero, new SwerveModuleIO.Empty()),
+                new SwerveModule(1, Rotation2d.kZero, new SwerveModuleIO.Empty()),
+                new SwerveModule(2, Rotation2d.kZero, new SwerveModuleIO.Empty()),
+                new SwerveModule(3, Rotation2d.kZero, new SwerveModuleIO.Empty())};
+        }
+
+        @Override
+        public void setPose(Pose2d pose) {
+            // Intentionally do nothing
+        }
+
+    }
 
 }
