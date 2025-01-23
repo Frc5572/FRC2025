@@ -29,6 +29,10 @@ public final class Constants {
     public static final int operatorId = 1;
 
     public static final boolean tuningMode = false;
+    /**
+     * Current threshold that indicates an algae is in possestion
+     */
+    public static final double HAS_ALGAE_CURRENT_THRESHOLD = 0;
 
 
     /**
@@ -39,9 +43,7 @@ public final class Constants {
          * Algae Motor CAN id's
          */
         public static final class AlgaeMotors {
-            public static final int INTAKE_MOTOR_ID = 0;
-            public static final int FEEDER_MOTOR_ID = 0;
-
+            public static final int ALGAE_MOTOR_ID = 0;
         }
     }
 
