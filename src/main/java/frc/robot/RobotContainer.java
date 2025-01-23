@@ -15,6 +15,10 @@ import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
 import frc.robot.subsystems.swerve.SwerveReal;
 import frc.robot.subsystems.swerve.SwerveSim;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionReal;
+import frc.robot.subsystems.vision.VisionSimPhoton;
 
 
 /**
@@ -31,7 +35,8 @@ public class RobotContainer {
     private SwerveDriveSimulation driveSimulation;
 
     /* Subsystems */
-    private Swerve s_Swerve;
+    private final Swerve s_Swerve;
+    private final Vision s_Vision;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -40,15 +45,18 @@ public class RobotContainer {
         switch (runtimeType) {
             case kReal:
                 s_Swerve = new Swerve(new SwerveReal());
+                s_Vision = new Vision(VisionReal::new);
                 break;
             case kSimulation:
                 driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
                     new Pose2d(3, 3, Rotation2d.kZero));
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
                 s_Swerve = new Swerve(new SwerveSim(driveSimulation));
+                s_Vision = new Vision(VisionSimPhoton.partial(driveSimulation));
                 break;
             default:
                 s_Swerve = new Swerve(new SwerveIO.Empty() {});
+                s_Vision = new Vision(VisionIO::empty);
         }
         s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
