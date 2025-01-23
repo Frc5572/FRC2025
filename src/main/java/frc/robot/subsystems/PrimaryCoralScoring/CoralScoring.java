@@ -33,17 +33,17 @@ public class CoralScoring extends SubsystemBase {
         return coralScoringAutoLogged.scoringBeamBrake;
     }
 
-    public Command runPreScoringMotor(double ScoringSpeed) {
+    public Command runPreScoringMotor(double scoringSpeed) {
         return Commands.startEnd(() -> {
-            setScoringMotor(ScoringSpeed);
+            setScoringMotor(scoringSpeed);
         }, () -> {
             setScoringMotor(0);
         }, this).until(() -> getScoringBeamBrakeStatus());
     }
 
-    public Command runScoringMotor(double ScoringSpeed) {
+    public Command runScoringMotor(double scoringSpeed) {
         return Commands.startEnd(() -> {
-            setScoringMotor(ScoringSpeed);
+            setScoringMotor(scoringSpeed);
         }, () -> {
             setScoringMotor(0);
         }, this).until(() -> !getScoringBeamBrakeStatus());
