@@ -1,6 +1,7 @@
 package frc.robot.subsystems.elevator;
 
 import org.littletonrobotics.junction.AutoLog;
+import edu.wpi.first.units.measure.Angle;
 
 /**
  * Elevator IO Class for Elevator
@@ -14,6 +15,8 @@ public interface ElevatorIO {
     @AutoLog
     public class ElevatorInputs {
         public boolean limitSwitch;
+        public boolean atPositon;
+        public Angle positon;
     }
 
     public default void updateInputs(ElevatorInputs inputs) {}

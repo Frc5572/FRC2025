@@ -5,6 +5,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants;
 
@@ -38,22 +39,22 @@ public class ElevatorReal implements ElevatorIO {
         // PID and feedforward
 
         // right
-        rightElevatorConf.Slot0.kP = Constants.Elevator.RIGHT_KP;
-        rightElevatorConf.Slot0.kI = Constants.Elevator.RIGHT_KI;
-        rightElevatorConf.Slot0.kD = Constants.Elevator.RIGHT_KD;
-        rightElevatorConf.Slot0.kS = Constants.Elevator.RIGHT_KS;
-        rightElevatorConf.Slot0.kV = Constants.Elevator.RIGHT_KV;
-        rightElevatorConf.Slot0.kA = Constants.Elevator.RIGHT_KA;
-        rightElevatorConf.Slot0.kG = Constants.Elevator.RIGHT_KG;
+        rightElevatorConf.Slot0.kP = Constants.Elevator.KP;
+        rightElevatorConf.Slot0.kI = Constants.Elevator.KI;
+        rightElevatorConf.Slot0.kD = Constants.Elevator.KD;
+        rightElevatorConf.Slot0.kS = Constants.Elevator.KS;
+        rightElevatorConf.Slot0.kV = Constants.Elevator.KV;
+        rightElevatorConf.Slot0.kA = Constants.Elevator.KA;
+        rightElevatorConf.Slot0.kG = Constants.Elevator.KG;
 
         // left
-        leftElevatorConf.Slot0.kP = Constants.Elevator.RIGHT_KP;
-        leftElevatorConf.Slot0.kI = Constants.Elevator.RIGHT_KI;
-        leftElevatorConf.Slot0.kD = Constants.Elevator.RIGHT_KD;
-        leftElevatorConf.Slot0.kS = Constants.Elevator.RIGHT_KS;
-        leftElevatorConf.Slot0.kV = Constants.Elevator.RIGHT_KV;
-        leftElevatorConf.Slot0.kA = Constants.Elevator.RIGHT_KA;
-        leftElevatorConf.Slot0.kG = Constants.Elevator.RIGHT_KG;
+        leftElevatorConf.Slot0.kP = Constants.Elevator.KP;
+        leftElevatorConf.Slot0.kI = Constants.Elevator.KI;
+        leftElevatorConf.Slot0.kD = Constants.Elevator.KD;
+        leftElevatorConf.Slot0.kS = Constants.Elevator.KS;
+        leftElevatorConf.Slot0.kV = Constants.Elevator.KV;
+        leftElevatorConf.Slot0.kA = Constants.Elevator.KA;
+        leftElevatorConf.Slot0.kG = Constants.Elevator.KG;
 
         rightElevatorMotor.getConfigurator().apply(rightElevatorConf);
         leftElevatorMotor.getConfigurator().apply(leftElevatorConf);
@@ -69,6 +70,7 @@ public class ElevatorReal implements ElevatorIO {
 
     public void updateInputs(ElevatorInputs inputs) {
         inputs.limitSwitch = limitSwitch.get();
+        inputs.positon = ((Angle) rightElevatorMotor.getPosition());
     }
 
 

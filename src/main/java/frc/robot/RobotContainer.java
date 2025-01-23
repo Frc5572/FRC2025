@@ -56,12 +56,12 @@ public class RobotContainer {
      * Use this method to vol your button->command mappings. Buttons can be created by instantiating
      * a {@link GenericHID} or one of its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or
      * {@link XboxController}), and then passing it to a
-     * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+     * {@link edu1.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
         driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
         driver.a().onTrue(elevator.home());
-        driver.x().onTrue(elevator.raise());
+        driver.x().onTrue(elevator.l2());
     }
 
     /**

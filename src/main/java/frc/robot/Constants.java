@@ -185,24 +185,22 @@ public final class Constants {
 
         public static final NeutralModeValue BREAK = NeutralModeValue.Brake;
 
-        // right PID and feedforward
-        public static final double RIGHT_KP = 0.0;
-        public static final double RIGHT_KI = 0.0;
-        public static final double RIGHT_KD = 0.0;
-        public static final double RIGHT_KS = 0.0;
-        public static final double RIGHT_KV = 0.0;
-        public static final double RIGHT_KA = 0.0;
-        public static final double RIGHT_KG = 0.0;
+        // PID and feedforward
+        public static final double KP = 0.0;
+        public static final double KI = 0.0;
+        public static final double KD = 0.0;
+        public static final double KS = 0.0;
+        public static final double KV = 0.0;
+        public static final double KA = 0.0;
+        public static final double KG = 0.0;
 
-        // left PID and feedforward
+        // positons
+        public static final double HOME = 0.0;
+        public static final double L2 = 0.0;
+        public static final double L3 = 0.0;
+        public static final double L4 = 0.0;
 
-        public static final double LEFT_KP = 0.0;
-        public static final double LEFT_KI = 0.0;
-        public static final double LEFT_KD = 0.0;
-        public static final double LEFT_KS = 0.0;
-        public static final double LEFT_KV = 0.0;
-        public static final double LEFT_KA = 0.0;
-        public static final double LEFT_KG = 0.0;
+        public static final double gearRatio = 1.0;
     }
 
 }
