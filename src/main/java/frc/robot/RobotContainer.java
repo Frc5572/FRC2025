@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.lib.util.WebController;
 import frc.robot.Robot.RobotRunType;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
@@ -27,6 +28,7 @@ public class RobotContainer {
 
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
+    public final WebController operator = new WebController("web", 5800);
 
     private SwerveDriveSimulation driveSimulation;
 
