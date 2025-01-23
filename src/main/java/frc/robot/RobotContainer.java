@@ -32,7 +32,11 @@ public class RobotContainer {
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
 
+    /** Simulation */
     private SwerveDriveSimulation driveSimulation;
+
+    /** State */
+    private final RobotState state;
 
     /* Subsystems */
     private final Swerve s_Swerve;
@@ -42,21 +46,22 @@ public class RobotContainer {
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer(RobotRunType runtimeType) {
+        state = new RobotState();
         switch (runtimeType) {
             case kReal:
-                s_Swerve = new Swerve(new SwerveReal());
-                s_Vision = new Vision(VisionReal::new);
+                s_Swerve = new Swerve(state, new SwerveReal());
+                s_Vision = new Vision(state, VisionReal::new);
                 break;
             case kSimulation:
                 driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
                     new Pose2d(3, 3, Rotation2d.kZero));
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
-                s_Swerve = new Swerve(new SwerveSim(driveSimulation));
-                s_Vision = new Vision(VisionSimPhoton.partial(driveSimulation));
+                s_Swerve = new Swerve(state, new SwerveSim(driveSimulation));
+                s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
                 break;
             default:
-                s_Swerve = new Swerve(new SwerveIO.Empty() {});
-                s_Vision = new Vision(VisionIO::empty);
+                s_Swerve = new Swerve(state, new SwerveIO.Empty() {});
+                s_Vision = new Vision(state, VisionIO::empty);
         }
         s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));

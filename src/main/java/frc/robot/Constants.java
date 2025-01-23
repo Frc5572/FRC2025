@@ -246,5 +246,8 @@ public final class Constants {
         public static final CameraConstants[] cameras = new CameraConstants[] {
             new CameraConstants("cam0", 1600, 1200, Rotation2d.fromDegrees(100), Hertz.of(20),
                 Seconds.of(0.3), Seconds.of(0.02), 0.25, 0.08, new Transform3d())};
+
+        public static final double zMargin = 0.75;
+        public static final double fieldBorderMargin = 0.5;
     }
 }
