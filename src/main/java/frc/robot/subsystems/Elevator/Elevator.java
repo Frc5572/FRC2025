@@ -29,18 +29,40 @@ public class Elevator extends SubsystemBase {
         Logger.processInputs("Elevator", inputs);
     }
 
+    /**
+     * converts angles to distance
+     * 
+     * @param angle
+     * @return distance
+     */
     private Distance angleToDistance(Angle angle) {
         return Meters.of(angle.in(Rotation) * Constants.Elevator.gearRatio);
     }
 
+    /**
+     * converts distance to angle
+     * 
+     * @param distance
+     * @return angle
+     */
     private Angle distanceToAngle(Distance distance) {
         return Rotations.of(distance.in(Meters) / Constants.Elevator.gearRatio);
     }
 
+    /**
+     * moves elevator to home
+     * 
+     * @return elevator at home
+     */
     public Command home() {
         return raise(Constants.Elevator.HOME);
     }
 
+    /**
+     * moves elevator to l2
+     * 
+     * @return elevator at l2
+     */
     public Command l2() {
         return raise(Constants.Elevator.L2);
     }
@@ -53,6 +75,12 @@ public class Elevator extends SubsystemBase {
         return raise(Constants.Elevator.L4);
     }
 
+    /**
+     * sets hights of elevator
+     * 
+     * @param height
+     * @return elevator height change
+     */
     public Command raise(Distance height) {
         return runOnce(() -> io.setPositon(distanceToAngle(height).in(Rotation)))
             .andThen(Commands.waitUntil(() -> angleToDistance(inputs.positon) == height));
