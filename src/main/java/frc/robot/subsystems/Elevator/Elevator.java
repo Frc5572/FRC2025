@@ -29,12 +29,12 @@ public class Elevator extends SubsystemBase {
         Logger.processInputs("Elevator", inputs);
     }
 
-    private Distance angleToDistnce(Angle angle) {
+    private Distance angleToDistance(Angle angle) {
         return Meters.of(angle.in(Rotation) * Constants.Elevator.gearRatio);
     }
 
-    private Angle distnceToAngle(Distance distance) {
-        return Rotations.of(distance.in(Meters) * Constants.Elevator.gearRatio);
+    private Angle distanceToAngle(Distance distance) {
+        return Rotations.of(distance.in(Meters) / Constants.Elevator.gearRatio);
     }
 
     public Command home() {
@@ -53,8 +53,8 @@ public class Elevator extends SubsystemBase {
         return raise(Constants.Elevator.L4);
     }
 
-    public Command raise(double positon) {
-        return runOnce(() -> io.setPositon(positon))
-            .andThen(Commands.waitUntil(() -> inputs.positon.in(Rotation) == positon));
+    public Command raise(Distance height) {
+        return runOnce(() -> io.setPositon(distanceToAngle(height).in(Rotation)))
+            .andThen(Commands.waitUntil(() -> angleToDistance(inputs.positon) == height));
     }
 }

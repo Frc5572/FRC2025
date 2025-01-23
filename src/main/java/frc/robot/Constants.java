@@ -1,6 +1,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -194,11 +195,11 @@ public final class Constants {
         public static final double KA = 0.0;
         public static final double KG = 0.0;
 
-        // positons
-        public static final double HOME = 0.0;
-        public static final double L2 = 0.0;
-        public static final double L3 = 0.0;
-        public static final double L4 = 0.0;
+        // positions
+        public static final Distance HOME = Meters.of(0);
+        public static final Distance L2 = Meters.of(0);
+        public static final Distance L3 = Meters.of(0);
+        public static final Distance L4 = Meters.of(0);
 
         public static final double gearRatio = 1.0;
     }

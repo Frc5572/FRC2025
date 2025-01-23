@@ -1,5 +1,7 @@
 package frc.robot.subsystems.elevator;
 
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -19,11 +21,14 @@ public class ElevatorReal implements ElevatorIO {
     private final TalonFXConfiguration rightElevatorConf = new TalonFXConfiguration();
     private final TalonFXConfiguration leftElevatorConf = new TalonFXConfiguration();
     private final PositionVoltage positionVoltage = new PositionVoltage(0.0);
+    private StatusSignal<Angle> elevatorPosition = rightElevatorMotor.getPosition();
 
     /** Real Elevator Initializer */
     public ElevatorReal() {
         configMotors();
     }
+
+    public void periodic() {}
 
     private void configMotors() {
         // left conf
@@ -69,8 +74,9 @@ public class ElevatorReal implements ElevatorIO {
     }
 
     public void updateInputs(ElevatorInputs inputs) {
+        BaseStatusSignal.refreshAll(elevatorPosition);
         inputs.limitSwitch = limitSwitch.get();
-        inputs.positon = ((Angle) rightElevatorMotor.getPosition());
+        inputs.positon = elevatorPosition.getValue();
     }
 
 
