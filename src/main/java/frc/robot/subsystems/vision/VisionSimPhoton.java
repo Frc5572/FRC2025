@@ -23,6 +23,7 @@ public class VisionSimPhoton extends VisionReal {
         return (constants) -> new VisionSimPhoton(constants, sim);
     }
 
+    /** Simulation of vision using built-in PhotonVision simulator. */
     public VisionSimPhoton(Constants.Vision.CameraConstants[] constants,
         SwerveDriveSimulation sim) {
         super(constants);
