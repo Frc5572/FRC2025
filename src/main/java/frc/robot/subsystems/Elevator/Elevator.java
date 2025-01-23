@@ -1,7 +1,11 @@
 package frc.robot.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotation;
+import static edu.wpi.first.units.Units.Rotations;
 import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,10 +29,13 @@ public class Elevator extends SubsystemBase {
         Logger.processInputs("Elevator", inputs);
     }
 
-    // private Distance angleToDistnce(Angle angle) {
-    // x = Meter.of(angle);
-    // return Meter.of(9);
-    // }
+    private Distance angleToDistnce(Angle angle) {
+        return Meters.of(angle.in(Rotation) * Constants.Elevator.gearRatio);
+    }
+
+    private Angle distnceToAngle(Distance distance) {
+        return Rotations.of(distance.in(Meters) * Constants.Elevator.gearRatio);
+    }
 
     public Command home() {
         return raise(Constants.Elevator.HOME);
