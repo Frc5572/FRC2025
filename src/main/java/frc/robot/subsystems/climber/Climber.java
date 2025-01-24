@@ -1,6 +1,7 @@
 package frc.robot.subsystems.climber;
 
 import static edu.wpi.first.units.Units.Degrees;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -40,10 +41,13 @@ public class Climber extends SubsystemBase {
         return Commands
             .runEnd(() -> setClimberMotorVoltage(Constants.Climb.VOLTAGE),
                 () -> setClimberMotorVoltage(0), this)
-            .until(() -> climberAutoLogged.climberPosition.in(Degrees)
-                * Constants.Climb.GEAR_RATIO >= Constants.Climb.MAX_ANGLE.in(Degrees))
-            .unless(() -> climberAutoLogged.climberPosition.in(Degrees)
-                * Constants.Climb.GEAR_RATIO >= Constants.Climb.MAX_ANGLE.in(Degrees));
+            .until(passedMaxAngle()).unless(passedMaxAngle());
+    }
+
+    public BooleanSupplier passedMaxAngle() {
+        return () -> climberAutoLogged.climberPosition.in(Degrees)
+            * Constants.Climb.GEAR_RATIO >= Constants.Climb.MAX_ANGLE.in(Degrees);
+
     }
 
 
