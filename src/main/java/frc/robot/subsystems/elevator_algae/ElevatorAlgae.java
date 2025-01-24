@@ -34,7 +34,8 @@ public class ElevatorAlgae extends SubsystemBase {
     }
 
     public Command setMotorVoltageCommand(double speed) { // set motor speed Command
-        return runEnd(() -> setAlgaeMotorVoltage(speed), () -> setAlgaeMotorVoltage(0));
+        return runEnd(() -> setAlgaeMotorVoltage(speed), () -> setAlgaeMotorVoltage(0))
+            .until(() -> hasAlgae()).unless(() -> hasAlgae());
     }
 
 }
