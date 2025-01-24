@@ -19,12 +19,12 @@ public class ClimberReal implements ClimberIO {
         new TalonFX(Constants.Climb.RIGHT_TALON_FX_ID, "canivore"); // Kraken Motor
     private final TalonFXConfiguration rightConfig = new TalonFXConfiguration(); // Kraken Config
     private final TalonFXConfiguration leftConfig = new TalonFXConfiguration(); // Kraken Config
-    private StatusSignal<Angle> climbMotorPosition = climberMotorLeft.getPosition();
+    private StatusSignal<Angle> climbMotorPosition = climberMotorRight.getPosition();
     private final DigitalInput climberTouchSensor =
         new DigitalInput(Constants.Climb.TOUCH_SENSOR_CHANNEL); // Touch Sensor
 
 
-    public ClimberReal() { // test
+    public ClimberReal() {
         leftConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         rightConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         climberMotorLeft.getConfigurator().apply(leftConfig);
@@ -44,7 +44,7 @@ public class ClimberReal implements ClimberIO {
 
     @Override
     public void setClimbMotorVoltage(double voltage) {
-        climberMotorRight.setVoltage(voltage); // sets the velocity
+        climberMotorRight.setVoltage(voltage);
     }
 
 }
