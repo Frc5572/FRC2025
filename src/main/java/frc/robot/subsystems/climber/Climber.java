@@ -1,17 +1,18 @@
 package frc.robot.subsystems.climber;
 
+import static edu.wpi.first.units.Units.Degrees;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.inputs.LoggableInputs;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 /**
  * Climber Subsystem
  */
 public class Climber extends SubsystemBase {
     private ClimberIO io;
-    private ClimberIO.ClimberInputs climberAutoLogged = new ClimberIO.ClimberInputs();
+    private ClimberInputsAutoLogged climberAutoLogged = new ClimberInputsAutoLogged();
 
     public Climber(ClimberIO io) {
         this.io = io;
@@ -19,14 +20,13 @@ public class Climber extends SubsystemBase {
 
     @Override
     public void periodic() {
-        io.ClimberInputsAutoLogged(climberAutoLogged);
-        Logger.processInputs("Climber", (LoggableInputs) climberAutoLogged);
-
+        io.updateInputs(climberAutoLogged);
+        Logger.processInputs("Climber", climberAutoLogged);
     }
 
-    public void setClimberMotor(double power) {
-        Logger.recordOutput("/Climber/Climber Percentage", power);
-        io.setClimbMotor(power);
+    public void setClimberMotorVoltage(double voltage) {
+        Logger.recordOutput("/Climber/Climber Voltage", voltage);
+        io.setClimbMotorVoltage(voltage);
     }
 
     public boolean getClimberTouchSensorStatus() {
@@ -35,14 +35,21 @@ public class Climber extends SubsystemBase {
 
 
 
-    public Command runClimberMotor() { 
-        return Commands.startEnd(() ->
-            setClimberMotor(climberSpeed.getAsDouble() * 12);
+    // rotatios * gear ratio (1)
+    public Command runClimberMotorCommand() {
+        return Commands
+            .runEnd(() -> setClimberMotorVoltage(Constants.Climb.VOLTAGE),
+                () -> setClimberMotorVoltage(0), this)
+            .until(() -> climberAutoLogged.climberPosition.in(Degrees)
+                * Constants.Climb.GEAR_RATIO >= Constants.Climb.MAX_ANGLE.in(Degrees))
+            .unless(() -> climberAutoLogged.climberPosition.in(Degrees)
+                * Constants.Climb.GEAR_RATIO >= Constants.Climb.MAX_ANGLE.in(Degrees));
+    }
 
 
-        }, () -> {
-            setClimberMotor(0);
+    public Command resetClimberCommand() {
+        return runEnd(() -> setClimberMotorVoltage(Constants.Climb.RESET_VOLTAGE),
+            () -> setClimberMotorVoltage(0)).until(() -> climberAutoLogged.climberTouchSensor);
 
-        }, this);
     }
 }

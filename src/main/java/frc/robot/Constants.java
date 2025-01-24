@@ -1,5 +1,6 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -9,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 
 /**
@@ -177,11 +179,13 @@ public final class Constants {
     }
     public static final class Climb {
 
-        public static final int LeftTalonFXID = 1;
-        public static final int RightTalonFXID = 1;
-        public static final int TouchSenorChannel = 5;
-
-
+        public static final int LEFT_TALON_FX_ID = 1;
+        public static final int RIGHT_TALON_FX_ID = 1;
+        public static final int TOUCH_SENSOR_CHANNEL = 5;
+        public static final Angle MAX_ANGLE = Degrees.of(0);
+        public static final double GEAR_RATIO = 1;
+        public static final double VOLTAGE = 12;
+        public static final double RESET_VOLTAGE = -12;
 
     }
 }
