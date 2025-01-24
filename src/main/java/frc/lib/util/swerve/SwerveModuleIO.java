@@ -13,23 +13,48 @@ public interface SwerveModuleIO {
         public AngularVelocity driveMotorSelectedSensorVelocity;
         public Angle angleMotorSelectedPosition;
         public Angle absolutePositionAngleEncoder;
-        public double[] odometryTimestamps;
         // public double driveMotorTemp;
         // public double angleMotorTemp;
     }
 
-    public default void setModNumber(int number) {}
+    public void updateInputs(SwerveModuleInputs inputs);
 
-    public default void updateInputs(SwerveModuleInputs inputs) {}
+    public void setDriveMotor(double mps);
 
-    public default void setDriveMotor(double mps) {}
+    public void setDriveMotorPower(double power);
 
-    public default void setDriveMotorPower(double power) {}
+    public void setAngleMotor(double angle);
 
-    public default void setAngleMotor(double angle) {}
+    public void setPositionAngleMotor(double absolutePosition);
 
-    public default void setAngleSelectedSensorPosition(double angle) {}
+    /** Empty implementation of a Swerve Module (for replay) */
+    public static class Empty implements SwerveModuleIO {
 
-    public default void setPositionAngleMotor(double absolutePosition) {}
+        @Override
+        public void updateInputs(SwerveModuleInputs inputs) {
+            // Intentionally do nothing
+        }
+
+        @Override
+        public void setDriveMotor(double mps) {
+            // Intentionally do nothing
+        }
+
+        @Override
+        public void setDriveMotorPower(double power) {
+            // Intentionally do nothing
+        }
+
+        @Override
+        public void setAngleMotor(double angle) {
+            // Intentionally do nothing
+        }
+
+        @Override
+        public void setPositionAngleMotor(double absolutePosition) {
+            // Intentionally do nothing
+        }
+
+    }
 
 }

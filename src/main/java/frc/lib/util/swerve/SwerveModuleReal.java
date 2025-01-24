@@ -1,12 +1,14 @@
 package frc.lib.util.swerve;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Seconds;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 // import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
@@ -35,8 +37,8 @@ public class SwerveModuleReal implements SwerveModuleIO {
     private StatusSignal<Angle> absolutePositionAngleEncoder;
 
     /* drive motor control requests */
-    private final DutyCycleOut driveDutyCycle = new DutyCycleOut(0);
     private final VelocityVoltage driveVelocity = new VelocityVoltage(0);
+    private final VoltageOut driveVoltage = new VoltageOut(0.0);
 
     /* angle motor control requests */
     private final PositionVoltage anglePosition = new PositionVoltage(0);
@@ -72,22 +74,24 @@ public class SwerveModuleReal implements SwerveModuleIO {
         swerveAngleFXConfig.Feedback.FeedbackRemoteSensorID = angleEncoder.getDeviceID();
         swerveAngleFXConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
         swerveAngleFXConfig.Feedback.SensorToMechanismRatio = 1.0;
-        swerveAngleFXConfig.Feedback.RotorToSensorRatio = Constants.Swerve.angleGearRatio;
+        swerveAngleFXConfig.Feedback.RotorToSensorRatio =
+            Constants.Swerve.ModuleConstants.angleReduction;
         swerveAngleFXConfig.ClosedLoopGeneral.ContinuousWrap = true;
 
         /* Current Limiting */
         swerveAngleFXConfig.CurrentLimits.SupplyCurrentLimitEnable =
-            Constants.Swerve.angleEnableCurrentLimit;
-        swerveAngleFXConfig.CurrentLimits.SupplyCurrentLimit = Constants.Swerve.angleCurrentLimit;
+            Constants.Swerve.ModuleConstants.angleEnableCurrentLimit;
+        swerveAngleFXConfig.CurrentLimits.SupplyCurrentLimit =
+            Constants.Swerve.ModuleConstants.angleCurrentLimit.in(Amps);
         swerveAngleFXConfig.CurrentLimits.SupplyCurrentLowerLimit =
-            Constants.Swerve.angleCurrentThreshold;
+            Constants.Swerve.ModuleConstants.angleCurrentThreshold.in(Amps);
         swerveAngleFXConfig.CurrentLimits.SupplyCurrentLowerTime =
-            Constants.Swerve.angleCurrentThresholdTime;
+            Constants.Swerve.ModuleConstants.angleCurrentThresholdTime.in(Seconds);
 
         /* PID Config */
-        swerveAngleFXConfig.Slot0.kP = Constants.Swerve.angleKP;
-        swerveAngleFXConfig.Slot0.kI = Constants.Swerve.angleKI;
-        swerveAngleFXConfig.Slot0.kD = Constants.Swerve.angleKD;
+        swerveAngleFXConfig.Slot0.kP = Constants.Swerve.ModuleConstants.anglekP;
+        swerveAngleFXConfig.Slot0.kI = 0.0;
+        swerveAngleFXConfig.Slot0.kD = Constants.Swerve.ModuleConstants.anglekD;
 
         mAngleMotor.getConfigurator().apply(swerveAngleFXConfig);
     }
@@ -99,24 +103,26 @@ public class SwerveModuleReal implements SwerveModuleIO {
         swerveDriveFXConfig.MotorOutput.NeutralMode = Constants.Swerve.driveNeutralMode;
 
         /* Gear Ratio Config */
-        swerveDriveFXConfig.Feedback.SensorToMechanismRatio = Constants.Swerve.driveGearRatio;
+        swerveDriveFXConfig.Feedback.SensorToMechanismRatio =
+            Constants.Swerve.ModuleConstants.driveReduction;
 
         /* Current Limiting */
         swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimitEnable =
-            Constants.Swerve.driveEnableCurrentLimit;
-        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimit = Constants.Swerve.driveCurrentLimit;
+            Constants.Swerve.ModuleConstants.driveEnableCurrentLimit;
+        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimit =
+            Constants.Swerve.ModuleConstants.driveCurrentLimit.in(Amps);
         swerveDriveFXConfig.CurrentLimits.SupplyCurrentLowerLimit =
-            Constants.Swerve.driveCurrentThreshold;
+            Constants.Swerve.ModuleConstants.driveCurrentLowerLimit.in(Amps);
         swerveDriveFXConfig.CurrentLimits.SupplyCurrentLowerTime =
-            Constants.Swerve.driveCurrentThresholdTime;
+            Constants.Swerve.ModuleConstants.driveCurrentLowerTimeThreshold.in(Seconds);
 
         /* PID Config */
-        swerveDriveFXConfig.Slot0.kP = Constants.Swerve.driveKP;
-        swerveDriveFXConfig.Slot0.kI = Constants.Swerve.driveKI;
-        swerveDriveFXConfig.Slot0.kD = Constants.Swerve.driveKD;
-        swerveDriveFXConfig.Slot0.kS = Constants.Swerve.driveKS;
-        swerveDriveFXConfig.Slot0.kV = Constants.Swerve.driveKV;
-        swerveDriveFXConfig.Slot0.kA = Constants.Swerve.driveKA;
+        swerveDriveFXConfig.Slot0.kP = Constants.Swerve.ModuleConstants.drivekP;
+        swerveDriveFXConfig.Slot0.kI = 0.0;
+        swerveDriveFXConfig.Slot0.kD = Constants.Swerve.ModuleConstants.drivekD;
+        swerveDriveFXConfig.Slot0.kS = Constants.Swerve.ModuleConstants.ffkS;
+        swerveDriveFXConfig.Slot0.kV = Constants.Swerve.ModuleConstants.ffkV;
+        swerveDriveFXConfig.Slot0.kA = Constants.Swerve.ModuleConstants.ffkA;
 
         /* Open and Closed Loop Ramping */
         swerveDriveFXConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod =
@@ -170,6 +176,11 @@ public class SwerveModuleReal implements SwerveModuleIO {
     @Override
     public void setPositionAngleMotor(double absolutePosition) {
         mAngleMotor.setPosition(absolutePosition);
+    }
+
+    @Override
+    public void setDriveMotorPower(double power) {
+        mDriveMotor.setControl(driveVoltage.withOutput(power));
     }
 
 }
