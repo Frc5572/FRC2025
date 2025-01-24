@@ -34,7 +34,11 @@ public final class Constants {
      */
     public static final double HAS_ALGAE_CURRENT_THRESHOLD = 0;
 
+    public static final class Algae {
+        public static final int VOLTAGE = 0;
+        public static final int NEGATIVE_VOLTAGE = 0;
 
+    }
     /**
      * Motor CAN id's.
      */

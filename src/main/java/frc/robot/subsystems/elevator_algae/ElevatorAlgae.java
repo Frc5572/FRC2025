@@ -1,7 +1,6 @@
 package frc.robot.subsystems.elevator_algae;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -35,8 +34,7 @@ public class ElevatorAlgae extends SubsystemBase {
     }
 
     public Command setMotorVoltageCommand(double speed) { // set motor speed Command
-        return Commands.runEnd(() -> setAlgaeMotorVoltage(speed), () -> setAlgaeMotorVoltage(0),
-            this);
+        return runEnd(() -> setAlgaeMotorVoltage(speed), () -> setAlgaeMotorVoltage(0));
     }
 
 }
