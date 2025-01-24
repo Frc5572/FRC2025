@@ -52,15 +52,17 @@ public class CoralScoring extends SubsystemBase {
      * Runs Pre Scoring Motor
      */
     public Command runPreScoringMotor(double scoringSpeed) {
-        return motorStartEndCommand(scoringSpeed).until(() -> getScoringBeamBrakeStatus());
+        return motorStartEndCommand(scoringSpeed).until(() -> getScoringBeamBrakeStatus())
+            .withTimeout(10);
     }
 
     /**
      * Sets motor speed to score.
      */
     public Command runScoringMotor(double scoringSpeed) {
-        return runScoringMotor(scoringSpeed).withDeadline(Commands
-            .waitUntil(() -> !getScoringBeamBrakeStatus()).andThen(Commands.waitSeconds(2)));
+        return runScoringMotor(scoringSpeed).withDeadline(
+            Commands.waitUntil(() -> !getScoringBeamBrakeStatus()).andThen(Commands.waitSeconds(2)))
+            .withTimeout(10);
 
     }
 

@@ -30,7 +30,7 @@ public class RobotContainer {
 
     /* Subsystems */
     private Swerve s_Swerve;
-    private CoralScoring score;
+    private CoralScoring coralScoring;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -39,11 +39,11 @@ public class RobotContainer {
         switch (runtimeType) {
             case kReal:
                 s_Swerve = new Swerve(new SwerveReal());
-                score = new CoralScoring(new CoralScoringReal());
+                coralScoring = new CoralScoring(new CoralScoringReal());
                 break;
             default:
                 s_Swerve = new Swerve(new SwerveIO() {});
-                score = new CoralScoring(new CoralScoringIO() {});
+                coralScoring = new CoralScoring(new CoralScoringIO() {});
         }
         s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
@@ -58,8 +58,8 @@ public class RobotContainer {
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
         driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
-        driver.a().onTrue(new InstantCommand(() -> score.runPreScoringMotor(5)));
-        driver.b().onTrue(new InstantCommand(() -> score.runScoringMotor(5)));
+        driver.a().onTrue(coralScoring.runPreScoringMotor(5));
+        driver.b().onTrue(coralScoring.runScoringMotor(5));
     }
 
     /**
