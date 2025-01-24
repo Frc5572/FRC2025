@@ -36,6 +36,10 @@ public class CoralScoring extends SubsystemBase {
         return coralScoringAutoLogged.scoringBeamBrake;
     }
 
+    public boolean getGrabingBeamBrakeStatus() {
+        return coralScoringAutoLogged.grabingBeamBrake;
+    }
+
     /**
      * Command that returns a command
      */
