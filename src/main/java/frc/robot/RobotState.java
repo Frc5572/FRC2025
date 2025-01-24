@@ -1,5 +1,6 @@
 package frc.robot;
 
+import java.util.stream.Stream;
 import org.photonvision.targeting.PhotonPipelineResult;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -9,9 +10,16 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import frc.lib.util.viz.Viz2025;
 
 /** Primary Drivetrain State Estimator */
 public class RobotState {
+
+    private final Viz2025 vis;
+
+    public RobotState(Viz2025 vis) {
+        this.vis = vis;
+    }
 
     private SwerveDrivePoseEstimator swerveOdometry = null;
     private final AprilTagFieldLayout fieldLayout =
@@ -55,6 +63,18 @@ public class RobotState {
      */
     public void addSwerveObservation(SwerveModulePosition[] positions, Rotation2d gyroYaw) {
         swerveOdometry.update(gyroYaw, positions);
+        vis.setDrivetrainState(swerveOdometry.getEstimatedPosition(),
+            Stream.of(positions).map(x -> x.angle).toArray(this::swerveRotationsArray));
+    }
+
+    private Rotation2d[] swerveRotations = new Rotation2d[4];
+
+    /**
+     * To avoid allocating every loop, we create this function to accommodate a
+     * {@link Stream.toArray} call.
+     */
+    private Rotation2d[] swerveRotationsArray(int _count) {
+        return swerveRotations;
     }
 
 }
