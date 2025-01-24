@@ -29,6 +29,7 @@ public class RobotContainer {
     private Swerve s_Swerve;
     private ElevatorAlgae s_ElevatorAlgae;
 
+    /* Triggers */
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */

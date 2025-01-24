@@ -37,5 +37,4 @@ public class ElevatorAlgae extends SubsystemBase {
         return runEnd(() -> setAlgaeMotorVoltage(speed), () -> setAlgaeMotorVoltage(0))
             .until(() -> hasAlgae());
     }
-
 }

@@ -37,6 +37,7 @@ public final class Constants {
     public static final class Algae {
         public static final int VOLTAGE = 0;
         public static final int NEGATIVE_VOLTAGE = 0;
+        public static final int BEAM_BRAKE_ID = 0;
 
     }
     /**
