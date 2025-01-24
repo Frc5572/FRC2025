@@ -8,12 +8,11 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
-// import frc.lib.math.Conversions;
 import frc.robot.Constants;
 
 
 
-public class ClimberReal implements ClimberIO { // test
+public class ClimberReal implements ClimberIO {
     private final TalonFX climberMotorLeft =
         new TalonFX(Constants.Climb.LEFT_TALON_FX_ID, "canivore"); // Kraken
     private final TalonFX climberMotorRight =
@@ -30,7 +29,6 @@ public class ClimberReal implements ClimberIO { // test
         rightConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         climberMotorLeft.getConfigurator().apply(leftConfig);
         climberMotorRight.getConfigurator().apply(rightConfig);
-        // climberMotorRight.getConfigurator().setPosition(0.0);
         climberMotorLeft.setControl(new Follower(climberMotorRight.getDeviceID(), true));
     }
 
@@ -46,7 +44,6 @@ public class ClimberReal implements ClimberIO { // test
 
     @Override
     public void setClimbMotorVoltage(double voltage) {
-        // climberMotorRight.climbMotorSelectedPosition
         climberMotorRight.setVoltage(voltage); // sets the velocity
     }
 

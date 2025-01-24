@@ -32,6 +32,9 @@ public final class Constants {
 
     public static final boolean tuningMode = false;
 
+    // Controller "3"
+    public static final int controllerThreeId = 3;
+
 
     /**
      * Motor CAN id's.

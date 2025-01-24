@@ -24,6 +24,9 @@ public class RobotContainer {
 
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
+    public final CommandXboxController controllerThree =
+        new CommandXboxController(Constants.controllerThreeId);
+
 
     private SwerveDriveSimulation driveSimulation;
     /* Subsystems */
@@ -54,8 +57,8 @@ public class RobotContainer {
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
         driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
-        driver.x().whileTrue(new InstantCommand(() -> climb.runClimberMotorCommand()));
-        driver.leftBumper().whileTrue(new InstantCommand(() -> climb.resetClimberCommand()));
+        controllerThree.x().whileTrue(new InstantCommand(() -> climb.runClimberMotorCommand()));
+        controllerThree.y().whileTrue(new InstantCommand(() -> climb.resetClimberCommand()));
         // driver.x().whileTrue(climb.runClimberMotor(driver::getLeftTriggerAxis));
     }
 

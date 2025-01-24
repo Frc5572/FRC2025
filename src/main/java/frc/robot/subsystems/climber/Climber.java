@@ -53,7 +53,8 @@ public class Climber extends SubsystemBase {
 
     public Command resetClimberCommand() {
         return runEnd(() -> setClimberMotorVoltage(Constants.Climb.RESET_VOLTAGE),
-            () -> setClimberMotorVoltage(0)).until(() -> climberAutoLogged.climberTouchSensor);
+            () -> setClimberMotorVoltage(0)).until(() -> climberAutoLogged.climberTouchSensor)
+                .unless(() -> climberAutoLogged.climberTouchSensor);
 
     }
 }

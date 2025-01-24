@@ -34,7 +34,6 @@ public class SwerveModuleReal implements SwerveModuleIO {
     private StatusSignal<Angle> absolutePositionAngleEncoder;
 
     /* drive motor control requests */
-    // private final DutyCycleOut driveDutyCycle = new DutyCycleOut(0);
     private final VelocityVoltage driveVelocity = new VelocityVoltage(0);
 
     /* angle motor control requests */
