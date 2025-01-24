@@ -85,6 +85,9 @@ public class Vision extends SubsystemBase {
                 .flatMap(x -> Stream.of(x.get(), cameraPose)).toArray(Pose3d[]::new);
             cameraTags.clear();
             Logger.recordOutput("Vision/Camera" + i + "/AprilTags", draw);
+            if (draw.length != 0) {
+                Logger.recordOutput("Vision/Camera" + i + "/AprilTagsCached", draw);
+            }
         }
     }
 
