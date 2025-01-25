@@ -1,6 +1,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
@@ -17,12 +18,14 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.studica.frc.AHRS.NavXComType;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
@@ -228,5 +231,23 @@ public final class Constants {
                 this.reduction = reduction;
             }
         }
+    }
+
+    /** Vision Constants */
+    public static class Vision {
+
+        /** Constants for an individual camera. */
+        public static final record CameraConstants(String name, int height, int width,
+            Rotation2d horizontalFieldOfView, Frequency framesPerSecond, Time latencyAvg,
+            Time latencyStdDev, double calibErrorAvg, double calibErrorStdDev,
+            Transform3d robotToCamera) {
+        }
+
+        public static final CameraConstants[] cameras = new CameraConstants[] {
+            new CameraConstants("cam0", 1600, 1200, Rotation2d.fromDegrees(100), Hertz.of(20),
+                Seconds.of(0.3), Seconds.of(0.02), 0.25, 0.08, new Transform3d())};
+
+        public static final double zMargin = 0.75;
+        public static final double fieldBorderMargin = 0.5;
     }
 }

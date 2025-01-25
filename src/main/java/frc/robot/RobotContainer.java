@@ -15,6 +15,10 @@ import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
 import frc.robot.subsystems.swerve.SwerveReal;
 import frc.robot.subsystems.swerve.SwerveSim;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionReal;
+import frc.robot.subsystems.vision.VisionSimPhoton;
 
 
 /**
@@ -28,27 +32,36 @@ public class RobotContainer {
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
 
+    /** Simulation */
     private SwerveDriveSimulation driveSimulation;
 
+    /** State */
+    private final RobotState state;
+
     /* Subsystems */
-    private Swerve s_Swerve;
+    private final Swerve s_Swerve;
+    private final Vision s_Vision;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer(RobotRunType runtimeType) {
+        state = new RobotState();
         switch (runtimeType) {
             case kReal:
-                s_Swerve = new Swerve(new SwerveReal());
+                s_Swerve = new Swerve(state, new SwerveReal());
+                s_Vision = new Vision(state, VisionReal::new);
                 break;
             case kSimulation:
                 driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
                     new Pose2d(3, 3, Rotation2d.kZero));
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
-                s_Swerve = new Swerve(new SwerveSim(driveSimulation));
+                s_Swerve = new Swerve(state, new SwerveSim(driveSimulation));
+                s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
                 break;
             default:
-                s_Swerve = new Swerve(new SwerveIO.Empty() {});
+                s_Swerve = new Swerve(state, new SwerveIO.Empty() {});
+                s_Vision = new Vision(state, VisionIO::empty);
         }
         s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
