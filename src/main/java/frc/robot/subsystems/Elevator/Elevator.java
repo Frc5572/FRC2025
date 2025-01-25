@@ -43,7 +43,9 @@ public class Elevator extends SubsystemBase {
      * converts distance to angle
      * 
      * @param distance
+     * 
      * @return angle
+     * 
      */
     private Angle distanceToAngle(Distance distance) {
         return Rotations.of(distance.in(Meters) / Constants.Elevator.gearRatio);
@@ -53,6 +55,7 @@ public class Elevator extends SubsystemBase {
      * moves elevator to home
      * 
      * @return elevator at home
+     * 
      */
     public Command home() {
         return raise(Constants.Elevator.HOME);
@@ -62,6 +65,7 @@ public class Elevator extends SubsystemBase {
      * moves elevator to l2
      * 
      * @return elevator at l2
+     * 
      */
     public Command l2() {
         return raise(Constants.Elevator.L2);
@@ -80,6 +84,7 @@ public class Elevator extends SubsystemBase {
      * 
      * @param height
      * @return elevator height change
+     * 
      */
     public Command raise(Distance height) {
         return runOnce(() -> io.setPositon(distanceToAngle(height).in(Rotation)))
