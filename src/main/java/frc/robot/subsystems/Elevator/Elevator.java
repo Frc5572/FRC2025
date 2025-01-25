@@ -32,7 +32,7 @@ public class Elevator extends SubsystemBase {
     /**
      * converts angles to distance
      * 
-     * @param angle 1234567890
+     * @param angle the angle the motor moves
      * @return distance
      */
     private Distance angleToDistance(Angle angle) {
@@ -42,7 +42,7 @@ public class Elevator extends SubsystemBase {
     /**
      * converts distance to angle
      * 
-     * @param distance
+     * @param distance the hight we want converted
      * 
      * @return angle
      * 
@@ -82,7 +82,7 @@ public class Elevator extends SubsystemBase {
     /**
      * sets hights of elevator
      * 
-     * @param height
+     * @param height desired hight of elevator
      * @return elevator height change
      * 
      */
