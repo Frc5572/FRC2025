@@ -73,6 +73,7 @@ public class ElevatorReal implements ElevatorIO {
         rightElevatorMotor.setControl(positionVoltage.withPosition(position));
     }
 
+    /** Updates Inputs to IO */
     public void updateInputs(ElevatorInputs inputs) {
         BaseStatusSignal.refreshAll(elevatorPosition);
         inputs.limitSwitch = limitSwitch.get();
