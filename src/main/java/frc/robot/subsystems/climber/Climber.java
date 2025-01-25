@@ -36,22 +36,22 @@ public class Climber extends SubsystemBase {
 
 
 
-    // rotatios * gear ratio (1)
-    public Command runClimberMotorCommand() {
+    // rotations * gear ratio (1)
+    public Command runClimberMotorCommand() { // run
         return Commands
             .runEnd(() -> setClimberMotorVoltage(Constants.Climb.VOLTAGE),
                 () -> setClimberMotorVoltage(0), this)
             .until(passedMaxAngle()).unless(passedMaxAngle());
     }
 
-    public BooleanSupplier passedMaxAngle() {
+    public BooleanSupplier passedMaxAngle() { // degrees
         return () -> climberAutoLogged.climberPosition.in(Degrees)
             * Constants.Climb.GEAR_RATIO >= Constants.Climb.MAX_ANGLE.in(Degrees);
 
     }
 
 
-    public Command resetClimberCommand() {
+    public Command resetClimberCommand() { // reset
         return runEnd(() -> setClimberMotorVoltage(Constants.Climb.RESET_VOLTAGE),
             () -> setClimberMotorVoltage(0)).until(() -> getClimberTouchSensorStatus())
                 .unless(() -> getClimberTouchSensorStatus());

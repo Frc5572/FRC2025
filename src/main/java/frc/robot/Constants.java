@@ -180,6 +180,7 @@ public final class Constants {
 
 
     }
+
     public static final class Climb {
 
         public static final int LEFT_TALON_FX_ID = 1;
