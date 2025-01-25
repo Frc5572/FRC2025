@@ -33,7 +33,6 @@ public class Elevator extends SubsystemBase {
      * converts angles to distance
      * 
      * @param angle
-     * 
      * @return distance
      */
     private Distance angleToDistance(Angle angle) {
@@ -81,12 +80,6 @@ public class Elevator extends SubsystemBase {
      * 
      * @param height
      * @return elevator height change
-     */
-
-    /**
-     * if (inputs.positon != 0) { height =- inputs.positon;
-     * 
-     * }
      */
     public Command raise(Distance height) {
         return runOnce(() -> io.setPositon(distanceToAngle(height).in(Rotation)))
