@@ -79,21 +79,18 @@ public final class Constants {
         public static final Distance wheelDiameter = Inches.of(3.8);
         public static final Distance wheelCircumference = wheelDiameter.times(Math.PI);
 
-        /** Get translations of each module. */
-        public static Translation2d[] getModuleTranslations() {
-            return new Translation2d[] {
-                new Translation2d(wheelBase.in(Meters) / 2, trackWidth.in(Meters) / 2),
-                new Translation2d(wheelBase.in(Meters) / 2, -trackWidth.in(Meters) / 2),
-                new Translation2d(-wheelBase.in(Meters) / 2, trackWidth.in(Meters) / 2),
-                new Translation2d(-wheelBase.in(Meters) / 2, -trackWidth.in(Meters) / 2)};
-        }
+        public static final Translation2d[] moduleTranslations = new Translation2d[] {
+            new Translation2d(wheelBase.in(Meters) / 2, trackWidth.in(Meters) / 2),
+            new Translation2d(wheelBase.in(Meters) / 2, -trackWidth.in(Meters) / 2),
+            new Translation2d(-wheelBase.in(Meters) / 2, trackWidth.in(Meters) / 2),
+            new Translation2d(-wheelBase.in(Meters) / 2, -trackWidth.in(Meters) / 2)};
 
         /*
          * Swerve Kinematics No need to ever change this unless you are not doing a traditional
          * rectangular/square 4 module swerve
          */
         public static final SwerveDriveKinematics swerveKinematics =
-            new SwerveDriveKinematics(getModuleTranslations());
+            new SwerveDriveKinematics(moduleTranslations);
 
         /* Motor Inverts */
         public static final InvertedValue angleMotorInvert = InvertedValue.Clockwise_Positive;
@@ -214,7 +211,7 @@ public final class Constants {
         /** Get config for Maple-Sim. */
         public static DriveTrainSimulationConfig getMapleConfig() {
             return DriveTrainSimulationConfig.Default().withRobotMass(robotMass)
-                .withGyro(COTS.ofNav2X()).withCustomModuleTranslations(getModuleTranslations())
+                .withGyro(COTS.ofNav2X()).withCustomModuleTranslations(moduleTranslations)
                 .withSwerveModule(new SwerveModuleSimulationConfig(ModuleConstants.driveMotor,
                     ModuleConstants.angleMotor, ModuleConstants.driveReduction,
                     ModuleConstants.angleReduction, ModuleConstants.driveFrictionVoltage,
