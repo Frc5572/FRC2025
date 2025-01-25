@@ -16,7 +16,7 @@ public interface ElevatorIO {
     public class ElevatorInputs {
         public boolean limitSwitch;
         public boolean atPositon;
-        public Angle positon;
+        public Angle position;
     }
 
     public default void updateInputs(ElevatorInputs inputs) {}

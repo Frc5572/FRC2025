@@ -88,6 +88,6 @@ public class Elevator extends SubsystemBase {
      */
     public Command raise(Distance height) {
         return runOnce(() -> io.setPositon(distanceToAngle(height).in(Rotation)))
-            .andThen(Commands.waitUntil(() -> angleToDistance(inputs.positon) == height));
+            .andThen(Commands.waitUntil(() -> angleToDistance(inputs.position) == height));
     }
 }

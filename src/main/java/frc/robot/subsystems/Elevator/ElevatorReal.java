@@ -77,7 +77,7 @@ public class ElevatorReal implements ElevatorIO {
     public void updateInputs(ElevatorInputs inputs) {
         BaseStatusSignal.refreshAll(elevatorPosition);
         inputs.limitSwitch = limitSwitch.get();
-        inputs.positon = elevatorPosition.getValue();
+        inputs.position = elevatorPosition.getValue();
     }
 
 
