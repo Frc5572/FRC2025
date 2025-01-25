@@ -3,9 +3,6 @@ plugins {
     id "edu.wpi.first.GradleRIO" version "2025.2.1"
     id "com.peterabeles.gversion" version "1.10"
     id "io.freefair.lombok" version "8.4"
-    
-
-
 }
 
 java {
@@ -60,6 +57,9 @@ def includeDesktopSupport = false
 repositories {
     mavenLocal()
     maven { url 'https://jitpack.io' }
+    maven { url 'https://maplesim.maven.frc5572.org/maple-sim/vendordep/repos/releases' }
+    maven { url 'https://choreo.maven.frc5572.org/dep' }
+    maven { url 'https://pathplanner.maven.frc5572.org/pathplannerlib/repo' }
 }
 
 task(replayWatch, type: JavaExec) {
@@ -90,10 +90,10 @@ dependencies {
 
     implementation 'org.apache.httpcomponents:httpclient:4.5.14'
     implementation 'org.apache.httpcomponents:httpmime:4.5.14'
-   
+
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    
+
     def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
     annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
 }
