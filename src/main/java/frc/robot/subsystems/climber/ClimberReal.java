@@ -4,6 +4,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
@@ -22,6 +23,10 @@ public class ClimberReal implements ClimberIO {
     private StatusSignal<Angle> climbMotorPosition = climberMotorRight.getPosition();
     private final DigitalInput climberTouchSensor =
         new DigitalInput(Constants.Climb.TOUCH_SENSOR_CHANNEL); // Touch Sensor
+    private final CANcoder CanEncoder = new CANcoder(Constants.Climb.CanID, "canivore"); // made
+                                                                                         // can
+                                                                                         // object
+
 
     /*** Real */
     public ClimberReal() {
@@ -30,6 +35,8 @@ public class ClimberReal implements ClimberIO {
         climberMotorLeft.getConfigurator().apply(leftConfig);
         climberMotorRight.getConfigurator().apply(rightConfig);
         climberMotorLeft.setControl(new Follower(climberMotorRight.getDeviceID(), true));
+
+
     }
 
 
