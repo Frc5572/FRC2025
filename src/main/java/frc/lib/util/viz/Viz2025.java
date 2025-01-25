@@ -13,6 +13,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import frc.robot.Constants;
 
+/* Visualization of the 2025 Robot */
 public class Viz2025 {
 
     private final FieldViz fieldViz;
@@ -37,6 +38,7 @@ public class Viz2025 {
     private static final int FL_ID = 7;
     private static final int FR_ID = 8;
 
+    /* Visualization of the 2025 Robot */
     public Viz2025(FieldViz fieldViz, String prefix) {
         this.fieldViz = fieldViz;
         this.prefix = prefix;
@@ -46,19 +48,23 @@ public class Viz2025 {
         this.reset(Pose2d.kZero);
     }
 
+    /** Set the angle of the climber, with 0 being straight up and down. */
     public void setClimberAngle(Angle angle) {
         mechanisms[CLIMBER_ID] = new Pose3d(Translation3d.kZero,
             new Rotation3d(Radians.of(0.0), angle, Radians.of(0.0)));
     }
 
+    /** Show coral in the coral scorer. */
     public void setHasCoral(boolean hasCoral) {
         this.hasCoral = hasCoral;
     }
 
+    /** Show algae in the algae scorer. */
     public void setHasAlgae(boolean hasAlgae) {
         this.hasAlgae = hasAlgae;
     }
 
+    /** Set the estimated drivetrain state, including swerve drive poses.` */
     public void setDrivetrainState(Pose2d estimatedPose, Rotation2d[] states) {
         this.estimatedPose = estimatedPose;
         mechanisms[BL_ID] = new Pose3d(new Translation3d(Constants.Swerve.moduleTranslations[0]),
@@ -71,14 +77,17 @@ public class Viz2025 {
             new Rotation3d(states[3]));
     }
 
+    /** Set the actual pose (only different for sim) */
     public void setActualPose(Pose2d pose) {
         this.actualPose = pose;
     }
 
+    /** Set the elevator height relative to its lowest point. */
     public void setElevatorHeight(Distance height) {
         elevatorHeight = height.in(Meters);
     }
 
+    /** Reset all values, getting ready for auto. */
     public void reset(Pose2d pose) {
         elevatorHeight = 0.0;
         algaeAngle = 0.0;
@@ -88,6 +97,7 @@ public class Viz2025 {
         mechanisms[CLIMBER_ID] = new Pose3d(Translation3d.kZero, Rotation3d.kZero);
     }
 
+    /** Publish all values to Logger */
     public void draw() {
         if (elevatorHeight > 0.1) {
             algaeDropped = true;
