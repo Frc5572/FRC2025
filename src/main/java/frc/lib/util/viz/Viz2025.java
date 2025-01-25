@@ -13,7 +13,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import frc.robot.Constants;
 
-/* Visualization of the 2025 Robot */
+/** Visualization of the 2025 Robot */
 public class Viz2025 {
 
     private final FieldViz fieldViz;
@@ -38,7 +38,7 @@ public class Viz2025 {
     private static final int FL_ID = 7;
     private static final int FR_ID = 8;
 
-    /* Visualization of the 2025 Robot */
+    /** Visualization of the 2025 Robot */
     public Viz2025(FieldViz fieldViz, String prefix) {
         this.fieldViz = fieldViz;
         this.prefix = prefix;
