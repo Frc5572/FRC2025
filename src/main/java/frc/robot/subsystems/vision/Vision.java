@@ -27,7 +27,7 @@ public class Vision extends SubsystemBase {
 
     private final RobotState state;
 
-    private final Transform3d robotToCamera[];
+    private final Transform3d[] robotToCamera;
 
     private static final AprilTagFieldLayout fieldLayout =
         AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);

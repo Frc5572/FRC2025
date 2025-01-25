@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.viz.FieldViz;
@@ -43,7 +42,6 @@ public class RobotContainer {
     /** Visualization */
     private final FieldViz fieldVis;
     private final Viz2025 vis;
-
     /** State */
     private final RobotState state;
 
@@ -69,9 +67,6 @@ public class RobotContainer {
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
                 s_Swerve = new Swerve(state, new SwerveSim(driveSimulation));
                 s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
-                CommandScheduler.getInstance()
-                    .schedule(new InstantCommand().andThen(new InstantCommand(() -> s_Swerve
-                        .resetOdometry(driveSimulation.getSimulatedDriveTrainPose()))));
                 break;
             default:
                 s_Swerve = new Swerve(state, new SwerveIO.Empty() {});
