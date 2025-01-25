@@ -32,7 +32,7 @@ public class Elevator extends SubsystemBase {
     /**
      * converts angles to distance
      * 
-     * @param angle
+     * @param angle 1234567890
      * @return distance
      */
     private Distance angleToDistance(Angle angle) {
