@@ -11,8 +11,8 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants;
 
 
-
-public class ClimberReal implements ClimberIO { // Class
+/*** Class */
+public class ClimberReal implements ClimberIO {
     private final TalonFX climberMotorLeft =
         new TalonFX(Constants.Climb.LEFT_TALON_FX_ID, "canivore"); // Kraken
     private final TalonFX climberMotorRight =
@@ -23,8 +23,8 @@ public class ClimberReal implements ClimberIO { // Class
     private final DigitalInput climberTouchSensor =
         new DigitalInput(Constants.Climb.TOUCH_SENSOR_CHANNEL); // Touch Sensor
 
-
-    public ClimberReal() { // Real
+    /*** Real */
+    public ClimberReal() {
         leftConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         rightConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         climberMotorLeft.getConfigurator().apply(leftConfig);
