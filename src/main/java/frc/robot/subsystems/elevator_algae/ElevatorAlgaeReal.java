@@ -16,6 +16,9 @@ public class ElevatorAlgaeReal implements ElevatorAlgaeIO {
         new SparkFlex(Constants.Motors.AlgaeMotors.ALGAE_MOTOR_ID, MotorType.kBrushless);
     private final SparkFlexConfig algaeMotorConfig = new SparkFlexConfig();
 
+    /**
+     * Algae Real constructor
+     */
     public ElevatorAlgaeReal() {
         algaeMotorConfig.idleMode(IdleMode.kBrake);
         algaeMotor.configure(algaeMotorConfig, ResetMode.kResetSafeParameters,

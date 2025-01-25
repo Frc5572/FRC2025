@@ -53,7 +53,7 @@ public class RobotContainer {
     private final Vision s_Vision;
 
     /* Triggers */
-    private Trigger AlgaeInIntake = new Trigger(() -> s_ElevatorAlgae.hasAlgae());
+    private Trigger algaeInIntake = new Trigger(() -> s_ElevatorAlgae.hasAlgae());
 
 
     /**
