@@ -1,9 +1,9 @@
 package frc.robot;
 
 import java.util.stream.Stream;
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.targeting.PhotonPipelineResult;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -22,8 +22,7 @@ public class RobotState {
     }
 
     private SwerveDrivePoseEstimator swerveOdometry = null;
-    private final AprilTagFieldLayout fieldLayout =
-        AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+
 
     public void init(SwerveModulePosition[] positions, Rotation2d gyroYaw) {
         swerveOdometry = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, gyroYaw,
@@ -48,13 +47,17 @@ public class RobotState {
     /**
      * Add information from cameras.
      */
-    public void addVisionObservation(PhotonPipelineResult result, Transform3d robotToCamera) {
+    public void addVisionObservation(PhotonPipelineResult result, Transform3d robotToCamera,
+        int whichCamera) {
         if (result.multitagResult.isPresent()) {
             Transform3d best = result.multitagResult.get().estimatedPose.best;
-            Pose3d cameraPose = new Pose3d().plus(best).relativeTo(fieldLayout.getOrigin());
+            Pose3d cameraPose =
+                new Pose3d().plus(best).relativeTo(Constants.Vision.fieldLayout.getOrigin());
             Pose3d robotPose = cameraPose.plus(robotToCamera.inverse());
             Pose2d robotPose2d = robotPose.toPose2d();
-            swerveOdometry.addVisionMeasurement(robotPose2d, result.getTimestampSeconds());
+            Logger.recordOutput("State/GlobalVisionEstimate", robotPose);
+            swerveOdometry.addVisionMeasurement(robotPose2d, result.getTimestampSeconds(),
+                VecBuilder.fill(0.02, 0.02, 0.02));
         }
     }
 

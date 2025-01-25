@@ -17,6 +17,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.studica.frc.AHRS.NavXComType;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -233,11 +235,17 @@ public final class Constants {
     /** Vision Constants */
     public static class Vision {
 
+        public static final AprilTagFieldLayout fieldLayout =
+            AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+
         /** Constants for an individual camera. */
         public static final record CameraConstants(String name, int height, int width,
             Rotation2d horizontalFieldOfView, Frequency framesPerSecond, Time latencyAvg,
             Time latencyStdDev, double calibErrorAvg, double calibErrorStdDev,
             Transform3d robotToCamera) {
+            public double centerPixelYawRads() {
+                return robotToCamera.getRotation().getZ();
+            }
         }
 
         public static final CameraConstants[] cameras = new CameraConstants[] {
