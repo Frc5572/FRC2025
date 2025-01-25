@@ -24,9 +24,8 @@ public class Viz2025 {
     private Pose2d estimatedPose;
     private Pose2d actualPose = new Pose2d();
     private final Pose3d[] mechanisms = new Pose3d[9];
-    private final Pose3d[] coral = new Pose3d[1];
-    private final Pose3d[] noCoral = new Pose3d[0];
     private boolean hasCoral = false;
+    private boolean hasAlgae = false;
 
     private static final int CLIMBER_ID = 0;
     private static final int STAGE2_ID = 1;
@@ -54,6 +53,10 @@ public class Viz2025 {
 
     public void setHasCoral(boolean hasCoral) {
         this.hasCoral = hasCoral;
+    }
+
+    public void setHasAlgae(boolean hasAlgae) {
+        this.hasAlgae = hasAlgae;
     }
 
     public void setDrivetrainState(Pose2d estimatedPose, Rotation2d[] states) {
