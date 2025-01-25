@@ -15,17 +15,15 @@ import frc.robot.Constants;
 /*** Class */
 public class ClimberReal implements ClimberIO {
     private final TalonFX climberMotorLeft =
-        new TalonFX(Constants.Climb.LEFT_TALON_FX_ID, "canivore"); // Kraken
+        new TalonFX(Constants.Climb.LEFT_TALON_FX_ID, "canivore");
     private final TalonFX climberMotorRight =
-        new TalonFX(Constants.Climb.RIGHT_TALON_FX_ID, "canivore"); // Kraken Motor
-    private final TalonFXConfiguration rightConfig = new TalonFXConfiguration(); // Kraken Config
-    private final TalonFXConfiguration leftConfig = new TalonFXConfiguration(); // Kraken Config
+        new TalonFX(Constants.Climb.RIGHT_TALON_FX_ID, "canivore");
+    private final TalonFXConfiguration rightConfig = new TalonFXConfiguration();
+    private final TalonFXConfiguration leftConfig = new TalonFXConfiguration();
     private StatusSignal<Angle> climbMotorPosition = climberMotorRight.getPosition();
     private final DigitalInput climberTouchSensor =
-        new DigitalInput(Constants.Climb.TOUCH_SENSOR_CHANNEL); // Touch Sensor
-    private final CANcoder CanEncoder = new CANcoder(Constants.Climb.CanID, "canivore"); // made
-                                                                                         // can
-                                                                                         // object
+        new DigitalInput(Constants.Climb.TOUCH_SENSOR_CHANNEL);
+    private final CANcoder CanEncoder = new CANcoder(Constants.Climb.CanID, "canivore");
 
 
     /*** Real */
