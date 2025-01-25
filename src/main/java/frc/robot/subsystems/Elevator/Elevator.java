@@ -42,7 +42,7 @@ public class Elevator extends SubsystemBase {
     /**
      * converts distance to angle
      * 
-     * @param distance the hight we want converted
+     * @param distance the height we want converted
      * 
      * @return angle
      * 
@@ -80,9 +80,9 @@ public class Elevator extends SubsystemBase {
     }
 
     /**
-     * sets hights of elevator
+     * sets height of elevator
      * 
-     * @param height desired hight of elevator
+     * @param height desired height of elevator
      * @return elevator height change
      * 
      */
