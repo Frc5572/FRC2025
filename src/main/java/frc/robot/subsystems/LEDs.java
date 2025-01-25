@@ -36,8 +36,9 @@ public class LEDs extends SubsystemBase {
     }
 
     /**
-     * 
+     *
      * @param mainColor color to blink (on and off)
+     *
      * @return sets leds to blink
      */
     public Command blinkLEDs(LEDPattern mainColor) {
@@ -46,8 +47,9 @@ public class LEDs extends SubsystemBase {
     }
 
     /**
-     * 
+     *
      * @param color color to set the leds to solidly
+     *
      * @return sets leds to a solid color
      */
     public Command setLEDsSolid(Color color) {
@@ -56,9 +58,10 @@ public class LEDs extends SubsystemBase {
     }
 
     /**
-     * 
+     *
      * @param color first color for gradient
      * @param color2 second color for gradient
+     *
      * @return sets color gradient
      */
     public Command setLEDsGradient(Color color, Color color2) {
@@ -67,8 +70,9 @@ public class LEDs extends SubsystemBase {
     }
 
     /**
-     * 
+     *
      * @param color Color to set leds to
+     *
      * @return leds breathe command
      */
     public Command setLEDsBreathe(Color color) {
