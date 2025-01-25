@@ -20,6 +20,7 @@ public class LEDs extends SubsystemBase {
         leds = new AddressableLED(Constants.LEDs.LED_PORT);
         buffer = new AddressableLEDBuffer(Constants.LEDs.LED_LENGTH);
         leds.setLength(Constants.LEDs.LED_LENGTH);
+        leds.start();
 
     }
 
