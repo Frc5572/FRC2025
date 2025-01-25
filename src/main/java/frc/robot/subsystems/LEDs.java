@@ -10,6 +10,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
+/**
+ * LEDs subsystem
+ */
 public class LEDs extends SubsystemBase {
     private final AddressableLED leds;
     private final AddressableLEDBuffer buffer;
@@ -21,6 +24,9 @@ public class LEDs extends SubsystemBase {
         leds.setData(buffer);
     }
 
+    /**
+     * constructor
+     */
     public LEDs() {
         leds = new AddressableLED(Constants.LEDs.LED_PORT);
         buffer = new AddressableLEDBuffer(Constants.LEDs.LED_LENGTH);
@@ -29,21 +35,42 @@ public class LEDs extends SubsystemBase {
 
     }
 
+    /**
+     * 
+     * @param mainColor color to blink (on and off)
+     * @return sets leds to blink
+     */
     public Command blinkLEDs(LEDPattern mainColor) {
         LEDPattern blinkPattern = mainColor.blink(Seconds.of(1));
         return run(() -> blinkPattern.applyTo(buffer));
     }
 
+    /**
+     * 
+     * @param color color to set the leds to solidly
+     * @return sets leds to a solid color
+     */
     public Command setLEDsSolid(Color color) {
         LEDPattern solidPattern = LEDPattern.solid(color);
         return run(() -> solidPattern.applyTo(buffer));
     }
 
+    /**
+     * 
+     * @param color first color for gradient
+     * @param color2 second color for gradient
+     * @return sets color gradient
+     */
     public Command setLEDsGradient(Color color, Color color2) {
         LEDPattern gradientPattern = LEDPattern.gradient(GradientType.kContinuous, color, color2);
         return run(() -> gradientPattern.applyTo(buffer));
     }
 
+    /**
+     * 
+     * @param color Color to set leds to
+     * @return leds breathe command
+     */
     public Command setLEDsBreathe(Color color) {
         LEDPattern base = LEDPattern.solid(color);
         LEDPattern breathe = base.breathe(Seconds.of(2));
