@@ -165,6 +165,16 @@ public class Robot extends LoggedRobot {
     @Override
     public void testPeriodic() {}
 
+    @Override
+    public void simulationInit() {
+        robotContainer.startSimulation();
+    }
+
+    @Override
+    public void simulationPeriodic() {
+        robotContainer.updateSimulation();
+    }
+
 
     private static final String environmentVariable = "AKIT_LOG_PATH";
     private static final String advantageScopeFileName = "akit-log-path.txt";
