@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -16,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
+import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.elevator_algae.ElevatorAlgae;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
@@ -48,8 +50,9 @@ public class RobotContainer {
     private final RobotState state;
 
     /* Subsystems */
-    private Swerve s_Swerve;
     private ElevatorAlgae s_ElevatorAlgae;
+    private LEDs leds = new LEDs();
+    private final Swerve s_Swerve;
     private final Vision s_Vision;
 
     /* Triggers */
@@ -82,6 +85,8 @@ public class RobotContainer {
         s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
         configureButtonBindings(runtimeType);
+        leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed));
+
     }
 
     /**

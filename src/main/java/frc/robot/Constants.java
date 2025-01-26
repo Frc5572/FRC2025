@@ -67,6 +67,7 @@ public final class Constants {
      * Motor CAN id's.
      */
 
+
     public static final class Motors {
         /**
          * Algae Motor CAN id's
@@ -74,9 +75,19 @@ public final class Constants {
         public static final class AlgaeMotors {
             public static final int ALGAE_MOTOR_ID = 0;
         }
+
     }
 
+    /**
+     * leds constants class
+     */
+    public static final class LEDs {
+        public static final int LED_PORT = 0;
+        public static final int LED_LENGTH = 123;
 
+
+
+    }
 
     /**
      * Swerve Constants
