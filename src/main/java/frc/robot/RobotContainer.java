@@ -7,6 +7,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.util.Color;
@@ -19,6 +20,7 @@ import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.elevator_algae.ElevatorAlgae;
+import frc.robot.subsystems.elevator_algae.ElevatorAlgaeReal;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
 import frc.robot.subsystems.swerve.SwerveReal;
@@ -70,6 +72,7 @@ public class RobotContainer {
             case kReal:
                 s_Swerve = new Swerve(state, new SwerveReal());
                 s_Vision = new Vision(state, VisionReal::new);
+                s_ElevatorAlgae = new ElevatorAlgae(new ElevatorAlgaeReal());
                 break;
             case kSimulation:
                 driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
@@ -96,6 +99,7 @@ public class RobotContainer {
      * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
+        algaeInIntake.whileTrue(leds.blinkLEDs(LEDPattern.solid(Color.kCyan)));
         driver.rightBumper()
             .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
         driver.leftBumper()
