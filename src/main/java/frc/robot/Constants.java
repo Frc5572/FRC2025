@@ -209,11 +209,14 @@ public final class Constants {
         }
 
         public static final Mass robotMass = Pounds.of(120.0);
+        public static final Distance bumperFront = Inches.of(20.0);
+        public static final Distance bumperRight = Inches.of(20.0);
 
         /** Get config for Maple-Sim. */
         public static DriveTrainSimulationConfig getMapleConfig() {
             return DriveTrainSimulationConfig.Default().withRobotMass(robotMass)
                 .withGyro(COTS.ofNav2X()).withCustomModuleTranslations(moduleTranslations)
+                .withBumperSize(bumperFront.times(2), bumperRight.times(2))
                 .withSwerveModule(new SwerveModuleSimulationConfig(ModuleConstants.driveMotor,
                     ModuleConstants.angleMotor, ModuleConstants.driveReduction,
                     ModuleConstants.angleReduction, ModuleConstants.driveFrictionVoltage,
@@ -254,5 +257,13 @@ public final class Constants {
 
         public static final double zMargin = 0.75;
         public static final double fieldBorderMargin = 0.5;
+    }
+
+    /** State Estimator Constants */
+    public static class StateEstimator {
+        public static final boolean keepInField = true;
+        public static final boolean keepOutOfReefs = true;
+        public static final double visionTrust = 0.02;
+        public static final double visionTrustRotation = 200.0;
     }
 }
