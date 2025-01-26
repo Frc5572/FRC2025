@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.lib.util.viz.Drawable;
 
+/** A static hexagon shape. */
 public class Hexagon implements ConvexShape, Drawable {
 
     private final Axis[] axes = new Axis[] {Axis.fromRotation(Rotation2d.kZero),
@@ -16,6 +17,7 @@ public class Hexagon implements ConvexShape, Drawable {
     private final Translation2d center;
     private final String name;
 
+    /** A static hexagon shape. */
     public Hexagon(String name, Translation2d center, double radius, Rotation2d offset) {
         this.name = name;
         this.center = center;
@@ -47,6 +49,7 @@ public class Hexagon implements ConvexShape, Drawable {
         Logger.recordOutput(name, vertices);
     }
 
+    /** Returns true if `p` is inside this hexagon. */
     public boolean contains(Translation2d p) {
         int size = this.vertices.length;
         Translation2d p1 = this.vertices[size - 1];

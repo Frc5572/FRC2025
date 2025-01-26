@@ -14,6 +14,7 @@ public class Line implements Drawable {
     public double c;
     public String name;
 
+    /** Represents a line in 2d space. Uses Ax + By + c = 0 representation. */
     public Line(String name, double a, double b, double c) {
         this.name = name;
         this.a = a;
@@ -62,6 +63,7 @@ public class Line implements Drawable {
         }
     }
 
+    /** Get intersection of two lines. Returns null if lines are parallel. */
     public Translation2d intersection(Line other) {
         double d = a * other.b - b * other.a;
         if (d != 0) {
@@ -70,14 +72,6 @@ public class Line implements Drawable {
             return new Translation2d(dx / d, dy / d);
         } else {
             return null;
-        }
-    }
-
-    public double parametricCoeff(Translation2d point) {
-        if (b == 0) {
-            return point.getY();
-        } else {
-            return point.getX() / b;
         }
     }
 

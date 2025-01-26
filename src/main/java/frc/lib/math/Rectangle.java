@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.lib.util.viz.Drawable;
 
+/** Rotating Rectangle Shape */
 public class Rectangle implements ConvexShape, Drawable {
 
     public final double width;
@@ -18,6 +19,7 @@ public class Rectangle implements ConvexShape, Drawable {
 
     private final String name;
 
+    /** Rotating Rectangle Shape */
     public Rectangle(String name, Pose2d pose, double length, double width) {
         this.name = name;
         this.pose = pose;
@@ -57,6 +59,7 @@ public class Rectangle implements ConvexShape, Drawable {
         return pose.getTranslation();
     }
 
+    /** Override rectangle pose. */
     public void setPose(Pose2d pose) {
         this.pose = pose;
     }

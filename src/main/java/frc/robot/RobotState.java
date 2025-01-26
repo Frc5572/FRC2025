@@ -17,6 +17,7 @@ import frc.lib.math.Penetration;
 import frc.lib.math.Rectangle;
 import frc.lib.math.SeparatingAxis;
 import frc.lib.util.viz.Viz2025;
+import frc.robot.subsystems.swerve.Swerve;
 
 /** Primary Drivetrain State Estimator */
 public class RobotState {
@@ -29,10 +30,16 @@ public class RobotState {
 
     private SwerveDrivePoseEstimator swerveOdometry = null;
 
-
+    /**
+     * Initialize this {@link RobotState}. Should only be called once (usually from the
+     * {@link Swerve} constructor).
+     */
     public void init(SwerveModulePosition[] positions, Rotation2d gyroYaw) {
         swerveOdometry = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, gyroYaw,
             positions, new Pose2d());
+        swerveOdometry.setVisionMeasurementStdDevs(VecBuilder.fill(
+            Constants.StateEstimator.visionTrust, Constants.StateEstimator.visionTrust,
+            Constants.StateEstimator.visionTrustRotation));
     }
 
     /**
@@ -62,10 +69,7 @@ public class RobotState {
             Pose3d robotPose = cameraPose.plus(robotToCamera.inverse());
             Pose2d robotPose2d = robotPose.toPose2d();
             Logger.recordOutput("State/GlobalVisionEstimate", robotPose);
-            swerveOdometry.addVisionMeasurement(robotPose2d, result.getTimestampSeconds(),
-                VecBuilder.fill(Constants.StateEstimator.visionTrust,
-                    Constants.StateEstimator.visionTrust,
-                    Constants.StateEstimator.visionTrustRotation));
+            swerveOdometry.addVisionMeasurement(robotPose2d, result.getTimestampSeconds());
         }
     }
 
@@ -224,7 +228,7 @@ public class RobotState {
             if (SeparatingAxis.solve(robot, reef1, penetration)) {
                 sepResult[0] = robot.getCenter();
                 Translation2d offs = new Translation2d(penetration.getDepth(),
-                    new Rotation2d(penetration.getNormalX(), penetration.getNormalY()));
+                    new Rotation2d(penetration.getXDir(), penetration.getYDir()));
                 Translation2d resPos = robot.getCenter().plus(offs);
                 robotTest.setPose(new Pose2d(resPos, original.getRotation()));
                 sepResult[1] = robotTest.getCenter();
@@ -235,7 +239,7 @@ public class RobotState {
             } else if (SeparatingAxis.solve(robot, reef2, penetration)) {
                 sepResult[0] = robot.getCenter();
                 Translation2d offs = new Translation2d(penetration.getDepth(),
-                    new Rotation2d(penetration.getNormalX(), penetration.getNormalY()));
+                    new Rotation2d(penetration.getXDir(), penetration.getYDir()));
                 Translation2d resPos = robot.getCenter().plus(offs);
                 robotTest.setPose(new Pose2d(resPos, original.getRotation()));
                 sepResult[1] = robotTest.getCenter();
@@ -246,7 +250,7 @@ public class RobotState {
             } else if (SeparatingAxis.solve(robot, centerPost, penetration)) {
                 sepResult[0] = robot.getCenter();
                 Translation2d offs = new Translation2d(penetration.getDepth(),
-                    new Rotation2d(penetration.getNormalX(), penetration.getNormalY()));
+                    new Rotation2d(penetration.getXDir(), penetration.getYDir()));
                 Translation2d resPos = robot.getCenter().plus(offs);
                 robotTest.setPose(new Pose2d(resPos, original.getRotation()));
                 sepResult[1] = robotTest.getCenter();

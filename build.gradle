@@ -3,6 +3,7 @@ plugins {
     id "edu.wpi.first.GradleRIO" version "2025.2.1"
     id "com.peterabeles.gversion" version "1.10"
     id "io.freefair.lombok" version "8.4"
+    id 'checkstyle'
 }
 
 java {
@@ -146,4 +147,8 @@ gversion {
     dateFormat   = "yyyy-MM-dd HH:mm:ss z"
     timeZone     = "America/New_York"
     indent       = "  "
+}
+
+checkstyle {
+    configFile file("checks.xml")
 }

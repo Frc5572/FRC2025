@@ -2,8 +2,22 @@ package frc.lib.math;
 
 import edu.wpi.first.math.geometry.Translation2d;
 
-public class SeparatingAxis {
+/** Implementation of Separating Axis Theorem solver. */
+public final class SeparatingAxis {
 
+    private SeparatingAxis() {}
+
+    /**
+     * Solve the for the separating axis between two convex shape.
+     *
+     * @param shape1 resolving object. Result contains the transform for this shape to no longer be
+     *        penetrating.
+     * @param shape2 pseudo-static object. Result assumes this shape does not move.
+     * @param penetration out-parameter. Contains the direction and length of the minimum
+     *        translation vector.
+     * @return {@code true} if {@code shape1} and {@code shape2} are intersecting. If {@code false},
+     *         {@code penetration} is unmodified.
+     */
     public static boolean solve(ConvexShape shape1, ConvexShape shape2, Penetration penetration) {
 
         Axis n = null;
