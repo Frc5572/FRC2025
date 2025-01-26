@@ -45,8 +45,8 @@ public class Penetration implements Drawable {
 
     @Override
     public void draw() {
-        Logger.recordOutput(name + "/NormalX", xDir);
-        Logger.recordOutput(name + "/NormalY", yDir);
+        Logger.recordOutput(name + "/XDir", xDir);
+        Logger.recordOutput(name + "/YDir", yDir);
         Logger.recordOutput(name + "/Depth", depth);
     }
 
