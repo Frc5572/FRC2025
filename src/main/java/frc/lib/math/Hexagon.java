@@ -78,6 +78,11 @@ public class Hexagon implements ConvexShape, Drawable {
         return true;
     }
 
+    /** Get the vertices in world-space. */
+    public Translation2d[] getVertices() {
+        return vertices;
+    }
+
     private static double getLocation(Translation2d point, Translation2d linePoint1,
         Translation2d linePoint2) {
         return (linePoint2.getX() - linePoint1.getX()) * (point.getY() - linePoint1.getY())

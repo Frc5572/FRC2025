@@ -19,7 +19,18 @@ public final class SeparatingAxis {
      *         {@code penetration} is unmodified.
      */
     public static boolean solve(ConvexShape shape1, ConvexShape shape2, Penetration penetration) {
-
+        if (shape1 instanceof Circle c1 && shape2 instanceof Circle c2) {
+            // Two circles have no axes, so we use a different solver for them.
+            var v = c2.getCenter().minus(c1.getCenter());
+            double radii = c1.getRadius() + c2.getRadius();
+            double norm = v.getNorm();
+            if (norm < radii) {
+                penetration.setDepth(radii - norm);
+                penetration.setNormal(v.getX() / norm, v.getY() / norm);
+                return true;
+            }
+            return false;
+        }
         Axis n = null;
         double overlap = Double.MAX_VALUE;
 

@@ -135,7 +135,7 @@ public class RobotContainer {
      * @return Returns autonomous command selected.
      */
     public Command getAutonomousCommand() {
-        return null;
+        return s_Swerve.moveAndAvoidReef(() -> new Pose2d(0, 4, Rotation2d.kZero), true, 0.3);
     }
 
     /**
