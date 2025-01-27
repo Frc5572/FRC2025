@@ -2,6 +2,7 @@ package frc.lib.util;
 
 import java.nio.file.Paths;
 import java.util.EnumSet;
+import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -24,9 +25,19 @@ public class WebController {
                     .toString(), Location.EXTERNAL);
         }).start(port);
         NetworkTableInstance instance = NetworkTableInstance.getDefault();
-        instance.addListener(instance.getTopic("/" + index + "/test"),
+        IntegerPublisher confirmLoc =
+            instance.getIntegerTopic("/coral-selector/coralLocConfirm").publish();
+        instance.addListener(instance.getTopic("/coral-selector/coralLoc"),
             EnumSet.of(NetworkTableEvent.Kind.kValueRemote), (ev) -> {
-                ev.valueData.value.getString();
+                long level = ev.valueData.value.getInteger();
+                confirmLoc.accept(level);
+            });
+        IntegerPublisher confirmHeight =
+            instance.getIntegerTopic("/coral-selector/coralHeightConfirm").publish();
+        instance.addListener(instance.getTopic("/coral-selector/coralHeight"),
+            EnumSet.of(NetworkTableEvent.Kind.kValueRemote), (ev) -> {
+                long level = ev.valueData.value.getInteger();
+                confirmHeight.accept(level);
             });
     }
 
