@@ -1,6 +1,9 @@
 package frc.lib.util;
 
 import java.nio.file.Paths;
+import java.util.EnumSet;
+import edu.wpi.first.networktables.NetworkTableEvent;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Filesystem;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
@@ -20,6 +23,11 @@ public class WebController {
                 .add(Paths.get(Filesystem.getDeployDirectory().getAbsolutePath().toString(), index)
                     .toString(), Location.EXTERNAL);
         }).start(port);
+        NetworkTableInstance instance = NetworkTableInstance.getDefault();
+        instance.addListener(instance.getTopic("/" + index + "/test"),
+            EnumSet.of(NetworkTableEvent.Kind.kValueRemote), (ev) -> {
+                ev.valueData.value.getString();
+            });
     }
 
 }
