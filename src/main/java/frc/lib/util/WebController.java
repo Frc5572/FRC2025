@@ -14,7 +14,7 @@ public class WebController {
 
     /**
      * Create a new WebController
-     * 
+     *
      * @param index relative path (from deploy directory) of the folder containing the web contents.
      * @param port Port the webserver is exposed on.
      */
