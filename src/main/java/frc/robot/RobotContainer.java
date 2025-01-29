@@ -1,13 +1,12 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -63,7 +62,7 @@ public class RobotContainer {
                 break;
             case kSimulation:
                 driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
-                    new Pose2d(3, 3, Rotation2d.kZero));
+                    new Pose2d(1, 3, Rotation2d.kZero));
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
                 s_Swerve = new Swerve(state, new SwerveSim(driveSimulation));
                 s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
@@ -85,45 +84,6 @@ public class RobotContainer {
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
         driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
-        driver.a().onTrue(new Command() {
-            Timer timer = new Timer();
-
-            @Override
-            public void initialize() {
-                timer.reset();
-                timer.start();
-            }
-
-            @Override
-            public void execute() {
-                vis.setElevatorHeight(Inches.of(timer.get() * 30.0));
-            }
-
-            @Override
-            public boolean isFinished() {
-                return timer.hasElapsed(3.0);
-            }
-        });
-        driver.b().onTrue(new Command() {
-            Timer timer = new Timer();
-
-            @Override
-            public void initialize() {
-                timer.reset();
-                timer.start();
-            }
-
-            @Override
-            public void execute() {
-                vis.setElevatorHeight(Inches.of(Math.max(72.0 - timer.get() * 30.0, 0)));
-            }
-
-            @Override
-            public boolean isFinished() {
-                return timer.hasElapsed(3.0);
-            }
-        });
-
         driver.x().onTrue(new InstantCommand(() -> {
             s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
         }));
@@ -135,7 +95,9 @@ public class RobotContainer {
      * @return Returns autonomous command selected.
      */
     public Command getAutonomousCommand() {
-        return s_Swerve.moveAndAvoidReef(() -> new Pose2d(0, 4, Rotation2d.kZero), true, 0.3);
+        return s_Swerve.moveAndAvoidReef(
+            () -> new Pose2d(FieldConstants.fieldLength.in(Meters) - 1, 3, Rotation2d.kZero), false,
+            0.1, 1);
     }
 
     /**

@@ -1,7 +1,6 @@
 
 package frc.robot.subsystems.swerve;
 
-import static edu.wpi.first.units.Units.Meters;
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -24,12 +23,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.math.AllianceFlipUtil;
-import frc.lib.math.Circle;
-import frc.lib.math.Rectangle;
-import frc.lib.math.SweptRectangles;
+import frc.lib.util.AvoidReef;
 import frc.lib.util.swerve.SwerveModule;
 import frc.robot.Constants;
-import frc.robot.FieldConstants;
 import frc.robot.RobotState;
 
 /**
@@ -56,6 +52,9 @@ public class Swerve extends SubsystemBase {
         swerveIO.updateInputs(inputs);
 
         state.init(getModulePositions(), getGyroYaw());
+
+        holonomicDriveController.getXController().setIZone(0.5);
+        holonomicDriveController.getYController().setIZone(0.5);
     }
 
     /**
@@ -277,24 +276,35 @@ public class Swerve extends SubsystemBase {
         });
     }
 
-    /** Move to a given {@link Pose2d}. */
-    public Command moveToPose(Supplier<Pose2d> pose2dSupplier, boolean flipForRed, double tol) {
-        Swerve swerveCopy = this;
+    private final HolonomicDriveController holonomicDriveController = new HolonomicDriveController(
+        new PIDController(Constants.SwerveTransformPID.PID_XKP,
+            Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
+        new PIDController(Constants.SwerveTransformPID.PID_YKP,
+            Constants.SwerveTransformPID.PID_YKI, Constants.SwerveTransformPID.PID_YKD),
+        new ProfiledPIDController(Constants.SwerveTransformPID.PID_TKP,
+            Constants.SwerveTransformPID.PID_TKI, Constants.SwerveTransformPID.PID_TKD,
+            new TrapezoidProfile.Constraints(Constants.SwerveTransformPID.MAX_ANGULAR_VELOCITY,
+                Constants.SwerveTransformPID.MAX_ANGULAR_ACCELERATION)));
 
-        HolonomicDriveController holonomicDriveController = new HolonomicDriveController(
-            new PIDController(Constants.SwerveTransformPID.PID_XKP,
-                Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
-            new PIDController(Constants.SwerveTransformPID.PID_YKP,
-                Constants.SwerveTransformPID.PID_YKI, Constants.SwerveTransformPID.PID_YKD),
-            new ProfiledPIDController(Constants.SwerveTransformPID.PID_TKP,
-                Constants.SwerveTransformPID.PID_TKI, Constants.SwerveTransformPID.PID_TKD,
-                new TrapezoidProfile.Constraints(Constants.SwerveTransformPID.MAX_ANGULAR_VELOCITY,
-                    Constants.SwerveTransformPID.MAX_ANGULAR_ACCELERATION)));
-        holonomicDriveController.setTolerance(new Pose2d(tol, tol, Rotation2d.fromDegrees(1)));
+    private void moveToPose(Pose2d pose) {
+        ChassisSpeeds ctrlEffort =
+            holonomicDriveController.calculate(getPose(), pose, 0, pose.getRotation());
+        setModuleStates(ctrlEffort);
+    }
+
+    public Command moveAndAvoidReef(Supplier<Pose2d> pose2dSupplier, boolean flipForRed, double tol,
+        double rotTol) {
+        return new AvoidReef(this, flipForRed, this::getPose, this::moveToPose, pose2dSupplier, tol,
+            rotTol).andThen(this.runOnce(this::setMotorsZero));
+    }
+
+    /** Move to a given {@link Pose2d}. */
+    public Command moveToPose(Supplier<Pose2d> pose2dSupplier, boolean flipForRed, double tol,
+        double rotTol) {
+
         Command c = new Command() {
 
             private Pose2d pose2d;
-            private Swerve swerve = swerveCopy;
 
             @Override
             public void initialize() {
@@ -306,135 +316,26 @@ public class Swerve extends SubsystemBase {
 
             @Override
             public void execute() {
-                ChassisSpeeds ctrlEffort = holonomicDriveController.calculate(swerve.getPose(),
-                    pose2d, 0, pose2d.getRotation());
-                swerve.setModuleStates(ctrlEffort);
+                moveToPose(pose2d);
             }
 
             @Override
             public void end(boolean interrupted) {
-                swerve.setMotorsZero();
+                setMotorsZero();
             }
 
             @Override
             public boolean isFinished() {
-                return holonomicDriveController.atReference();
+                Pose2d poseError = Pose2d.kZero.plus(pose2d.minus(getPose()));
+                final var eTranslate = poseError.getTranslation();
+                final var eRotate = poseError.getRotation();
+                return Math.abs(eTranslate.getX()) < tol && Math.abs(eTranslate.getY()) < tol
+                    && Math.abs(eRotate.getDegrees()) < rotTol;
             }
         };
         c.addRequirements(this);
         return c;
     }
 
-    /** Move to a given {@link Pose2d}. */
-    public Command moveAndAvoidReef(Supplier<Pose2d> pose2dSupplier, boolean flipForRed,
-        double tol) {
-        Swerve swerveCopy = this;
 
-        HolonomicDriveController holonomicDriveController = new HolonomicDriveController(
-            new PIDController(Constants.SwerveTransformPID.PID_XKP,
-                Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
-            new PIDController(Constants.SwerveTransformPID.PID_YKP,
-                Constants.SwerveTransformPID.PID_YKI, Constants.SwerveTransformPID.PID_YKD),
-            new ProfiledPIDController(Constants.SwerveTransformPID.PID_TKP,
-                Constants.SwerveTransformPID.PID_TKI, Constants.SwerveTransformPID.PID_TKD,
-                new TrapezoidProfile.Constraints(Constants.SwerveTransformPID.MAX_ANGULAR_VELOCITY,
-                    Constants.SwerveTransformPID.MAX_ANGULAR_ACCELERATION)));
-        holonomicDriveController.setTolerance(new Pose2d(tol, tol, Rotation2d.fromDegrees(1)));
-        Command c = new Command() {
-
-            private Pose2d pose2d;
-            private Swerve swerve = swerveCopy;
-
-            @Override
-            public void initialize() {
-                pose2d = pose2dSupplier.get();
-                if (flipForRed) {
-                    pose2d = AllianceFlipUtil.apply(pose2d);
-                }
-                pose2d = RobotState.constrain(pose2d, (_newPose) -> {
-                });
-                targetBumpers.setPose(pose2d);
-                if (DriverStation.getAlliance().get() == Alliance.Red) {
-                    thisDriveCircle = driveCircleRed;
-                } else {
-                    thisDriveCircle = driveCircleBlue;
-                }
-            }
-
-            private Circle thisDriveCircle;
-
-            private final Rectangle targetBumpers = new Rectangle("moveAndAvoidReef/target",
-                new Pose2d(), Constants.Swerve.bumperFront.in(Meters) * 2,
-                Constants.Swerve.bumperRight.in(Meters) * 2);
-
-            private SweptRectangles sweep = new SweptRectangles("moveAndAvoidReef/sweep",
-                RobotState.robotBumperOutline, targetBumpers);
-
-            private static final double driveCircleRadius =
-                FieldConstants.Reef.circumscribedRadius.in(Meters)
-                    + Math.hypot(Constants.Swerve.bumperFront.in(Meters),
-                        Constants.Swerve.bumperRight.in(Meters));
-
-            private final Circle driveCircleRed = new Circle("moveAndAvoidReef/driveCircleRed",
-                new Translation2d(
-                    FieldConstants.fieldLength.in(Meters) - FieldConstants.Reef.center.getX(),
-                    FieldConstants.Reef.center.getY()),
-                driveCircleRadius);
-
-            private final Circle driveCircleBlue = new Circle("moveAndAvoidReef/driveCircleBlue",
-                FieldConstants.Reef.center, driveCircleRadius);
-
-            @Override
-            public void execute() {
-                targetBumpers.draw();
-                driveCircleRed.draw();
-                driveCircleBlue.draw();
-                // sweep.draw();
-
-                {
-                    Translation2d diff =
-                        swerve.getPose().getTranslation().minus(driveCircleBlue.getCenter());
-                    Rotation2d angle = diff.getAngle();
-                    double dist = diff.getNorm();
-                    // TODO
-                }
-
-                driveAroundReef(driveCircleBlue, false);
-            }
-
-            private static final double radiusLookaheadAdj = driveCircleRadius
-                / Constants.SwerveTransformPID.CIRCLE_REEF_LOOKAHEAD_ANGLE.getCos();
-
-            private void driveAroundReef(Circle circle, boolean clockwise) {
-                Rotation2d angle =
-                    swerve.getPose().getTranslation().minus(circle.getCenter()).getAngle();
-                Rotation2d targetAngle = clockwise
-                    ? angle.minus(Constants.SwerveTransformPID.CIRCLE_REEF_LOOKAHEAD_ANGLE)
-                    : angle.plus(Constants.SwerveTransformPID.CIRCLE_REEF_LOOKAHEAD_ANGLE);
-                Pose2d targetPose = new Pose2d(
-                    circle.getCenter().plus(new Translation2d(radiusLookaheadAdj, targetAngle)),
-                    targetAngle.plus(Rotation2d.k180deg));
-                driveToTarget(targetPose);
-            }
-
-            private void driveToTarget(Pose2d pose) {
-                Logger.recordOutput("moveAndAvoidReef/intermediateTarget", pose);
-                ChassisSpeeds ctrlEffort = holonomicDriveController.calculate(swerve.getPose(),
-                    pose, 0, pose.getRotation());
-                swerve.setModuleStates(ctrlEffort);
-            }
-
-            @Override
-            public void end(boolean interrupted) {
-                swerve.setMotorsZero();
-            }
-
-            @Override
-            public boolean isFinished() {
-                return holonomicDriveController.atReference();
-            }
-        };
-        c.addRequirements(this);
-        return c;
-    }
 }
