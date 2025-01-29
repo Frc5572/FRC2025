@@ -6,22 +6,26 @@ import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Filesystem;
+import frc.lib.util.ScoringLocation.CoralHeight;
+import frc.lib.util.ScoringLocation.CoralLocation;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 
 /** Controller via HTTP. */
 public class WebController {
 
+    private ScoringLocation.CoralHeight currentHeight = ScoringLocation.CoralHeight.L1;
+    private ScoringLocation.CoralLocation currentLocation = ScoringLocation.CoralLocation.A;
+
     /**
      * Create a new WebController
      *
-     * @param index relative path (from deploy directory) of the folder containing the web contents.
      * @param port Port the webserver is exposed on.
      */
-    public WebController(String index, int port) {
+    public WebController(int port) {
         Javalin.create(config -> {
             config.staticFiles
-                .add(Paths.get(Filesystem.getDeployDirectory().getAbsolutePath().toString(), index)
+                .add(Paths.get(Filesystem.getDeployDirectory().getAbsolutePath().toString(), "web")
                     .toString(), Location.EXTERNAL);
         }).start(port);
         NetworkTableInstance instance = NetworkTableInstance.getDefault();
@@ -30,6 +34,7 @@ public class WebController {
         instance.addListener(instance.getTopic("/coral-selector/coralLoc"),
             EnumSet.of(NetworkTableEvent.Kind.kValueRemote), (ev) -> {
                 long level = ev.valueData.value.getInteger();
+                currentLocation = CoralLocation.fromInt((int) level);
                 confirmLoc.accept(level);
             });
         IntegerPublisher confirmHeight =
@@ -37,8 +42,19 @@ public class WebController {
         instance.addListener(instance.getTopic("/coral-selector/coralHeight"),
             EnumSet.of(NetworkTableEvent.Kind.kValueRemote), (ev) -> {
                 long level = ev.valueData.value.getInteger();
+                currentHeight = CoralHeight.fromInt((int) level);
                 confirmHeight.accept(level);
             });
+    }
+
+    /** Get the current location selected by the webcontroller */
+    public ScoringLocation.CoralLocation getDesiredLocation() {
+        return currentLocation;
+    }
+
+    /** Get the current height selected by the webcontroller */
+    public ScoringLocation.CoralHeight getDesiredHeight() {
+        return currentHeight;
     }
 
 }

@@ -38,7 +38,7 @@ public class RobotContainer {
 
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
-    public final WebController operator = new WebController("web", 5800);
+    public final WebController operator = new WebController(5800);
 
     /** Simulation */
     private SwerveDriveSimulation driveSimulation;
