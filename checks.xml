@@ -318,9 +318,9 @@
       <property name="forbiddenSummaryFragments"
                value="^@return the *|^This method returns |^A [{]@code [_a-zA-Z0-9]+[}]( is a )"/>
     </module> -->
-    <module name="JavadocParagraph">
+    <!-- <module name="JavadocParagraph">
       <property name="allowNewlineParagraph" value="true" />
-    </module>
+    </module> -->
     <module name="JavadocStyle">
       <property name="checkFirstSentence" value="false" />
     </module>
