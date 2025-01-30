@@ -37,7 +37,7 @@ public class Climber extends SubsystemBase {
 
 
     /**
-     * 
+     *
      * @return Set Motor Voltage until reached certain angle
      */
     public Command runClimberMotorCommand() { // run
@@ -48,7 +48,7 @@ public class Climber extends SubsystemBase {
     }
 
     /**
-     * 
+     *
      * @return Climber Position
      */
     public BooleanSupplier passedMaxAngle() { // degrees
@@ -58,7 +58,7 @@ public class Climber extends SubsystemBase {
     }
 
     /**
-     * 
+     *
      * @return Bring Climb Subsystem down until button is pressed.
      */
     public Command resetClimberCommand() { // reset
