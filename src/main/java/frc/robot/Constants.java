@@ -2,6 +2,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
@@ -17,7 +18,10 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.studica.frc.AHRS.NavXComType;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -25,6 +29,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
@@ -54,15 +59,31 @@ public final class Constants {
     public static final int controllerThreeId = 3;
 
 
+
     /**
      * Motor CAN id's.
      */
+
     public static final class Motors {
+
     }
 
+
     /**
+     * leds constants class
+     */
+
+    public static final class LEDs {
+        public static final int LED_PORT = 0;
+        public static final int LED_LENGTH = 123;
+    }
+
+
+    /**
+     *
      * Climb Constants.
      */
+
     public static final class Climb {
 
         public static final int LEFT_TALON_FX_ID = 27;
@@ -75,6 +96,8 @@ public final class Constants {
         public static final double RESET_VOLTAGE = -12;
 
     }
+
+
 
     /**
      * Swerve Constants
@@ -95,21 +118,18 @@ public final class Constants {
         public static final Distance wheelDiameter = Inches.of(3.8);
         public static final Distance wheelCircumference = wheelDiameter.times(Math.PI);
 
-        /** Get translations of each module. */
-        public static Translation2d[] getModuleTranslations() {
-            return new Translation2d[] {
-                new Translation2d(wheelBase.in(Meters) / 2, trackWidth.in(Meters) / 2),
-                new Translation2d(wheelBase.in(Meters) / 2, -trackWidth.in(Meters) / 2),
-                new Translation2d(-wheelBase.in(Meters) / 2, trackWidth.in(Meters) / 2),
-                new Translation2d(-wheelBase.in(Meters) / 2, -trackWidth.in(Meters) / 2)};
-        }
+        public static final Translation2d[] moduleTranslations = new Translation2d[] {
+            new Translation2d(wheelBase.in(Meters) / 2, trackWidth.in(Meters) / 2),
+            new Translation2d(wheelBase.in(Meters) / 2, -trackWidth.in(Meters) / 2),
+            new Translation2d(-wheelBase.in(Meters) / 2, trackWidth.in(Meters) / 2),
+            new Translation2d(-wheelBase.in(Meters) / 2, -trackWidth.in(Meters) / 2)};
 
         /*
          * Swerve Kinematics No need to ever change this unless you are not doing a traditional
          * rectangular/square 4 module swerve
          */
         public static final SwerveDriveKinematics swerveKinematics =
-            new SwerveDriveKinematics(getModuleTranslations());
+            new SwerveDriveKinematics(moduleTranslations);
 
         /* Motor Inverts */
         public static final InvertedValue angleMotorInvert = InvertedValue.Clockwise_Positive;
@@ -226,11 +246,14 @@ public final class Constants {
         }
 
         public static final Mass robotMass = Pounds.of(120.0);
+        public static final Distance bumperFront = Inches.of(20.0);
+        public static final Distance bumperRight = Inches.of(20.0);
 
         /** Get config for Maple-Sim. */
         public static DriveTrainSimulationConfig getMapleConfig() {
             return DriveTrainSimulationConfig.Default().withRobotMass(robotMass)
-                .withGyro(COTS.ofNav2X()).withCustomModuleTranslations(getModuleTranslations())
+                .withGyro(COTS.ofNav2X()).withCustomModuleTranslations(moduleTranslations)
+                .withBumperSize(bumperFront.times(2), bumperRight.times(2))
                 .withSwerveModule(new SwerveModuleSimulationConfig(ModuleConstants.driveMotor,
                     ModuleConstants.angleMotor, ModuleConstants.driveReduction,
                     ModuleConstants.angleReduction, ModuleConstants.driveFrictionVoltage,
@@ -247,5 +270,37 @@ public final class Constants {
                 this.reduction = reduction;
             }
         }
+    }
+
+    /** Vision Constants */
+    public static class Vision {
+
+        public static final AprilTagFieldLayout fieldLayout =
+            AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+
+        /** Constants for an individual camera. */
+        public static final record CameraConstants(String name, int height, int width,
+            Rotation2d horizontalFieldOfView, Frequency framesPerSecond, Time latencyAvg,
+            Time latencyStdDev, double calibErrorAvg, double calibErrorStdDev,
+            Transform3d robotToCamera) {
+            public double centerPixelYawRads() {
+                return robotToCamera.getRotation().getZ();
+            }
+        }
+
+        public static final CameraConstants[] cameras = new CameraConstants[] {
+            new CameraConstants("cam0", 1600, 1200, Rotation2d.fromDegrees(100), Hertz.of(20),
+                Seconds.of(0.3), Seconds.of(0.02), 0.25, 0.08, new Transform3d())};
+
+        public static final double zMargin = 0.75;
+        public static final double fieldBorderMargin = 0.5;
+    }
+
+    /** State Estimator Constants */
+    public static class StateEstimator {
+        public static final boolean keepInField = true;
+        public static final boolean keepOutOfReefs = true;
+        public static final double visionTrust = 0.02;
+        public static final double visionTrustRotation = 200.0;
     }
 }

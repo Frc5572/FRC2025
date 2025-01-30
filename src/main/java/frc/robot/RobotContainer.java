@@ -1,22 +1,32 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.lib.util.viz.FieldViz;
+import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
+import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberReal;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
 import frc.robot.subsystems.swerve.SwerveReal;
 import frc.robot.subsystems.swerve.SwerveSim;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionReal;
+import frc.robot.subsystems.vision.VisionSimPhoton;
 
 
 
@@ -34,32 +44,52 @@ public class RobotContainer {
         new CommandXboxController(Constants.controllerThreeId);
 
 
+    /** Simulation */
     private SwerveDriveSimulation driveSimulation;
+
+
+    /** Visualization */
+    private final FieldViz fieldVis;
+    private final Viz2025 vis;
+    /** State */
+    private final RobotState state;
+
     /* Subsystems */
+
+    private LEDs leds = new LEDs();
+    private final Swerve s_Swerve;
+    private final Vision s_Vision;
     private Climber climb;
-    private Swerve s_Swerve;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer(RobotRunType runtimeType) {
+        fieldVis = new FieldViz();
+        vis = new Viz2025(fieldVis, "");
+        state = new RobotState(vis);
         switch (runtimeType) {
             case kReal:
-                s_Swerve = new Swerve(new SwerveReal());
+                s_Swerve = new Swerve(state, new SwerveReal());
+                s_Vision = new Vision(state, VisionReal::new);
                 climb = new Climber(new ClimberReal());
                 break;
             case kSimulation:
                 driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
                     new Pose2d(3, 3, Rotation2d.kZero));
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
-                s_Swerve = new Swerve(new SwerveSim(driveSimulation));
+                s_Swerve = new Swerve(state, new SwerveSim(driveSimulation));
+                s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
                 break;
             default:
-                s_Swerve = new Swerve(new SwerveIO.Empty() {});
+                s_Swerve = new Swerve(state, new SwerveIO.Empty() {});
+                s_Vision = new Vision(state, VisionIO::empty);
         }
         s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
         configureButtonBindings(runtimeType);
+        leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed));
+
     }
 
     /**
@@ -70,9 +100,51 @@ public class RobotContainer {
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
         driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
-        driver.x().whileTrue(climb.runClimberMotorCommand());
+        driver.a().onTrue(new Command() {
+            Timer timer = new Timer();
+
+            @Override
+            public void initialize() {
+                timer.reset();
+                timer.start();
+            }
+
+            @Override
+            public void execute() {
+                vis.setElevatorHeight(Inches.of(timer.get() * 30.0));
+            }
+
+            @Override
+            public boolean isFinished() {
+                return timer.hasElapsed(3.0);
+            }
+        });
+        driver.b().onTrue(new Command() {
+            Timer timer = new Timer();
+
+            @Override
+            public void initialize() {
+                timer.reset();
+                timer.start();
+            }
+
+            @Override
+            public void execute() {
+                vis.setElevatorHeight(Inches.of(Math.max(72.0 - timer.get() * 30.0, 0)));
+            }
+
+            @Override
+            public boolean isFinished() {
+                return timer.hasElapsed(3.0);
+            }
+        });
+
+        driver.x().onTrue(new InstantCommand(() -> {
+            s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
+        }));
+        driver.rightStick().whileTrue(climb.runClimberMotorCommand());
         controllerThree.y().whileTrue(climb.resetClimberCommand());
-        // driver.x().whileTrue(climb.runClimberMotor(driver::getLeftTriggerAxis));
+
     }
 
     /**
@@ -88,13 +160,13 @@ public class RobotContainer {
      * Update viz
      */
     public void updateViz() {
-
+        vis.draw();
     }
 
     /** Start simulation */
     public void startSimulation() {
         if (driveSimulation != null) {
-            SimulatedArena.getInstance().resetFieldForAuto();
+            // SimulatedArena.getInstance().resetFieldForAuto();
         }
     }
 
@@ -104,11 +176,12 @@ public class RobotContainer {
     public void updateSimulation() {
         if (driveSimulation != null) {
             SimulatedArena.getInstance().simulationPeriodic();
-            Logger.recordOutput("simulatedPose", driveSimulation.getSimulatedDriveTrainPose());
             Logger.recordOutput("FieldSimulation/Algae",
                 SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
             Logger.recordOutput("FieldSimulation/Coral",
                 SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
+            vis.setActualPose(driveSimulation.getSimulatedDriveTrainPose());
+
         }
     }
 
