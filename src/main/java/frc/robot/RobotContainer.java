@@ -7,12 +7,14 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
@@ -57,6 +59,15 @@ public class RobotContainer {
     private final Vision s_Vision;
     private CoralScoring coralScoring;
 
+    /* Triggers */
+
+    private Trigger intakedCoralRight =
+        new Trigger(() -> coralScoring.getGrabingRightBeamBrakeStatus());
+
+    private Trigger intakedCoralLeft =
+        new Trigger(() -> coralScoring.getGrabingLeftBeamBrakeStatus());
+
+    private Trigger outtakedCoral = new Trigger(() -> coralScoring.getScoringBeamBrakeStatus());
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -97,6 +108,9 @@ public class RobotContainer {
      * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
+        intakedCoralRight.whileTrue(leds.setLEDsSolid(Color.kRed));
+        intakedCoralLeft.whileTrue(leds.setLEDsSolid(Color.kRed));
+        outtakedCoral.whileTrue(leds.blinkLEDs(LEDPattern.solid(Color.kCyan)));
         driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
         driver.a().onTrue(new Command() {
             Timer timer = new Timer();

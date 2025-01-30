@@ -292,7 +292,8 @@ public final class Constants {
         public static final boolean Scoring_Motor_Inverted = false;
 
         public static final int Scoring_Beam_Brake_DIO_Port = 1;
-        public static final int Grabing_Beam_Brake_DIO_Port = 2;
+        public static final int Grabing_RBeam_Brake_DIO_Port = 2;
+        public static final int Grabing_LBeam_Brake_DIO_Port = 3;
     }
 
 }
