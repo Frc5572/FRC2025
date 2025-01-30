@@ -41,10 +41,10 @@ public class Climber extends SubsystemBase {
      * @return Set Motor Voltage until reached certain angle
      */
     public Command runClimberMotorCommand() { // run
-        return Commands
-            .runEnd(() -> setClimberMotorVoltage(Constants.Climb.VOLTAGE),
-                () -> setClimberMotorVoltage(0), this)
-            .until(passedMaxAngle()).unless(passedMaxAngle());
+        return Commands.runEnd(() -> setClimberMotorVoltage(Constants.Climb.VOLTAGE), () -> {
+            setClimberMotorVoltage(0);
+            System.out.println("Climber Done!");
+        }, this).until(passedMaxAngle()).unless(passedMaxAngle());
     }
 
     /**
