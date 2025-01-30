@@ -31,7 +31,6 @@ import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.Constants.Vision.CameraConstants;
 
 /**
  * Constants file.
@@ -237,8 +236,8 @@ public final class Constants {
      */
 
     public static final class Elevator {
-        public static final int RIGHT_ID = 0;
-        public static final int LEFT_ID = 0;
+        public static final int RIGHT_ID = 28;
+        public static final int LEFT_ID = 27;
         public static final int LIMIT_ID = 0;
 
         public static final NeutralModeValue BREAK = NeutralModeValue.Brake;
@@ -251,10 +250,11 @@ public final class Constants {
         public static final double KV = 0.0;
         public static final double KA = 0.0;
         public static final double KG = 0.0;
+        public static final AngularVelocity MAX_VELOCITY = RotationsPerSecond.of(0.0);
 
         // positions
         public static final Distance HOME = Meters.of(0);
-        public static final Distance L2 = Meters.of(0);
+        public static final Distance L2 = Meters.of(5);
         public static final Distance L3 = Meters.of(0);
         public static final Distance L4 = Meters.of(0);
 

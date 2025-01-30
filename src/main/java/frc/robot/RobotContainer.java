@@ -38,7 +38,6 @@ public class RobotContainer {
 
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
-    public final CommandXboxController operator = new CommandXboxController(Constants.operatorId);
 
     /** Simulation */
     private SwerveDriveSimulation driveSimulation;
@@ -101,9 +100,11 @@ public class RobotContainer {
     private void configureButtonBindings(RobotRunType runtimeType) {
         driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
 
-        operator.a().onTrue(elevator.home());
-        operator.x().onTrue(elevator.l2());
+        driver.povDown().onTrue(elevator.home());
+        driver.povLeft().onTrue(elevator.l2());
 
+        driver.povUp().whileTrue(elevator.move());
+        driver.povRight().whileTrue(elevator.moveeng());
         driver.a().onTrue(new Command() {
             Timer timer = new Timer();
 

@@ -8,6 +8,7 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants;
 
@@ -22,6 +23,7 @@ public class ElevatorReal implements ElevatorIO {
     private final TalonFXConfiguration leftElevatorConf = new TalonFXConfiguration();
     private final PositionVoltage positionVoltage = new PositionVoltage(0.0);
     private StatusSignal<Angle> elevatorPosition = rightElevatorMotor.getPosition();
+    private StatusSignal<AngularVelocity> elevatorVelocity = rightElevatorMotor.getVelocity();
 
     /** Real Elevator Initializer */
     public ElevatorReal() {
@@ -70,14 +72,16 @@ public class ElevatorReal implements ElevatorIO {
     }
 
     public void setPositon(double position) {
-        rightElevatorMotor.setControl(positionVoltage.withPosition(position));
+        rightElevatorMotor.setControl(positionVoltage.withPosition(position).withSlot(0)
+            .withVelocity(Constants.Elevator.MAX_VELOCITY));
     }
 
     /** Updates Inputs to IO */
     public void updateInputs(ElevatorInputs inputs) {
-        BaseStatusSignal.refreshAll(elevatorPosition);
+        BaseStatusSignal.refreshAll(elevatorPosition, elevatorVelocity);
         inputs.limitSwitch = limitSwitch.get();
         inputs.position = elevatorPosition.getValue();
+        inputs.velocity = elevatorVelocity.getValue();
     }
 
 

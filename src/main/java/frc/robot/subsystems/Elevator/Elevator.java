@@ -79,6 +79,10 @@ public class Elevator extends SubsystemBase {
         return raise(Constants.Elevator.L4);
     }
 
+    public Command barage() {
+        return raise(Constants.Elevator.L2);
+    }
+
     /**
      * sets height of elevator
      * 
@@ -89,5 +93,13 @@ public class Elevator extends SubsystemBase {
     public Command raise(Distance height) {
         return runOnce(() -> io.setPositon(distanceToAngle(height).in(Rotation)))
             .andThen(Commands.waitUntil(() -> angleToDistance(inputs.position) == height));
+    }
+
+    public Command move() {
+        return runEnd(() -> io.setVoltage(.5), () -> io.setVoltage(0));
+    }
+
+    public Command moveeng() {
+        return runEnd(() -> io.setVoltage(-.5), () -> io.setVoltage(0));
     }
 }
