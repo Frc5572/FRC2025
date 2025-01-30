@@ -17,6 +17,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.studica.frc.AHRS.NavXComType;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -217,11 +219,14 @@ public final class Constants {
         }
 
         public static final Mass robotMass = Pounds.of(120.0);
+        public static final Distance bumperFront = Inches.of(20.0);
+        public static final Distance bumperRight = Inches.of(20.0);
 
         /** Get config for Maple-Sim. */
         public static DriveTrainSimulationConfig getMapleConfig() {
             return DriveTrainSimulationConfig.Default().withRobotMass(robotMass)
                 .withGyro(COTS.ofNav2X()).withCustomModuleTranslations(moduleTranslations)
+                .withBumperSize(bumperFront.times(2), bumperRight.times(2))
                 .withSwerveModule(new SwerveModuleSimulationConfig(ModuleConstants.driveMotor,
                     ModuleConstants.angleMotor, ModuleConstants.driveReduction,
                     ModuleConstants.angleReduction, ModuleConstants.driveFrictionVoltage,
@@ -243,11 +248,17 @@ public final class Constants {
     /** Vision Constants */
     public static class Vision {
 
+        public static final AprilTagFieldLayout fieldLayout =
+            AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+
         /** Constants for an individual camera. */
         public static final record CameraConstants(String name, int height, int width,
             Rotation2d horizontalFieldOfView, Frequency framesPerSecond, Time latencyAvg,
             Time latencyStdDev, double calibErrorAvg, double calibErrorStdDev,
             Transform3d robotToCamera) {
+            public double centerPixelYawRads() {
+                return robotToCamera.getRotation().getZ();
+            }
         }
 
         public static final CameraConstants[] cameras = new CameraConstants[] {
@@ -256,5 +267,13 @@ public final class Constants {
 
         public static final double zMargin = 0.75;
         public static final double fieldBorderMargin = 0.5;
+    }
+
+    /** State Estimator Constants */
+    public static class StateEstimator {
+        public static final boolean keepInField = true;
+        public static final boolean keepOutOfReefs = true;
+        public static final double visionTrust = 0.02;
+        public static final double visionTrustRotation = 200.0;
     }
 }

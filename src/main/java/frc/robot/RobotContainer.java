@@ -129,6 +129,10 @@ public class RobotContainer {
                 return timer.hasElapsed(3.0);
             }
         });
+
+        driver.x().onTrue(new InstantCommand(() -> {
+            s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
+        }));
     }
 
     /**
@@ -150,7 +154,7 @@ public class RobotContainer {
     /** Start simulation */
     public void startSimulation() {
         if (driveSimulation != null) {
-            SimulatedArena.getInstance().resetFieldForAuto();
+            // SimulatedArena.getInstance().resetFieldForAuto();
         }
     }
 

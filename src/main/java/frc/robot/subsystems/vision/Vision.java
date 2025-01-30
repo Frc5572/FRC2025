@@ -8,13 +8,11 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.targeting.PhotonPipelineResult;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.IntArrayList;
+import frc.lib.util.Tuples.Tuple3;
 import frc.robot.Constants;
 import frc.robot.RobotState;
 import frc.robot.subsystems.vision.VisionIO.CameraInputs;
@@ -28,9 +26,6 @@ public class Vision extends SubsystemBase {
     private final RobotState state;
 
     private final Transform3d[] robotToCamera;
-
-    private static final AprilTagFieldLayout fieldLayout =
-        AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
     /** Vision Subsystem */
     public Vision(RobotState state, Function<Constants.Vision.CameraConstants[], VisionIO> io) {
@@ -55,18 +50,19 @@ public class Vision extends SubsystemBase {
         }
 
         // Update RobotState
-        List<Pair<Transform3d, PhotonPipelineResult>> results = new ArrayList<>();
+        List<Tuple3<Integer, Transform3d, PhotonPipelineResult>> results = new ArrayList<>();
         for (int i = 0; i < cameraInputs.length; i++) {
             var transform = robotToCamera[i];
+
             for (int j = 0; j < cameraInputs[i].results.length; j++) {
                 var result = cameraInputs[i].results[j];
-                results.add(Pair.of(transform, result));
+                results.add(new Tuple3<>(i, transform, result));
             }
         }
-        results.sort((a, b) -> Double.compare(a.getSecond().getTimestampSeconds(),
-            b.getSecond().getTimestampSeconds()));
+        results.sort(
+            (a, b) -> Double.compare(a._2().getTimestampSeconds(), b._2().getTimestampSeconds()));
         for (var result : results) {
-            state.addVisionObservation(result.getSecond(), result.getFirst());
+            state.addVisionObservation(result._2(), result._1(), result._0());
         }
 
         // Viz
@@ -81,8 +77,9 @@ public class Vision extends SubsystemBase {
             }
             Pose3d cameraPose = robotPose.plus(robotToCamera[i]);
             Pose3d[] draw = IntStream.of(cameraTags.toArray()).distinct()
-                .mapToObj(id -> fieldLayout.getTagPose(id)).filter(Optional::isPresent)
-                .flatMap(x -> Stream.of(x.get(), cameraPose)).toArray(Pose3d[]::new);
+                .mapToObj(id -> Constants.Vision.fieldLayout.getTagPose(id))
+                .filter(Optional::isPresent).flatMap(x -> Stream.of(x.get(), cameraPose))
+                .toArray(Pose3d[]::new);
             cameraTags.clear();
             Logger.recordOutput("Vision/Camera" + i + "/AprilTags", draw);
             if (draw.length != 0) {
