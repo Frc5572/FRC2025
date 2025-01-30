@@ -31,7 +31,7 @@ public class Elevator extends SubsystemBase {
 
     /**
      * converts angles to distance
-     * 
+     *
      * @param angle the angle the motor moves
      * @return distance
      */
@@ -41,9 +41,9 @@ public class Elevator extends SubsystemBase {
 
     /**
      * converts distance to angle
-     * 
+     *
      * @param distance the height we want converted
-     * 
+     *
      * @return angle
      * 
      */
@@ -53,7 +53,7 @@ public class Elevator extends SubsystemBase {
 
     /**
      * moves elevator to home
-     * 
+     *
      * @return elevator at home
      * 
      */
@@ -63,7 +63,7 @@ public class Elevator extends SubsystemBase {
 
     /**
      * moves elevator to l2
-     * 
+     *
      * @return elevator at l2
      * 
      */
@@ -85,7 +85,7 @@ public class Elevator extends SubsystemBase {
 
     /**
      * sets height of elevator
-     * 
+     *
      * @param height desired height of elevator
      * @return elevator height change
      * 
