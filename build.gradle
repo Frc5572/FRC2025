@@ -1,11 +1,8 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2025.1.1"
+    id "edu.wpi.first.GradleRIO" version "2025.2.1"
     id "com.peterabeles.gversion" version "1.10"
     id "io.freefair.lombok" version "8.4"
-
-
-
 }
 
 java {
@@ -60,6 +57,9 @@ def includeDesktopSupport = false
 repositories {
     mavenLocal()
     maven { url 'https://jitpack.io' }
+    if(System.getenv("GITHUB_ACTOR") == null || System.getenv("GITHUB_ACTOR").equals("")) {
+        maven { url 'https://maven-clone.frc5572.org/' }
+    }
 }
 
 task(replayWatch, type: JavaExec) {
