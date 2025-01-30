@@ -31,6 +31,10 @@ public class CoralScoringReal implements CoralScoringIO {
             PersistMode.kPersistParameters);
     }
 
+    /**
+     * updating coral beam brakes
+     */
+
     public void updateInputs(CoralScoringInputs inputs) {
         inputs.scoringBeamBrake = !scoringBeamBrake.get();
         inputs.grabingBeamBrakeRight = !grabingBeamBrakeRight.get();

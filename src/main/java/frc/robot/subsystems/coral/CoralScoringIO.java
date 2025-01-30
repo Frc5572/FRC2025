@@ -10,6 +10,10 @@ public interface CoralScoringIO {
 
     @AutoLog
 
+    /**
+     * Getting coral inpusts
+     */
+
     public static class CoralScoringInputs {
         public double scoringRPM;
         public boolean scoringBeamBrake;
