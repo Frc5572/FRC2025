@@ -8,11 +8,11 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface CoralScoringIO {
 
-    @AutoLog
-
     /**
      * Getting coral inpusts
      */
+
+    @AutoLog
 
     public static class CoralScoringInputs {
         public double scoringRPM;
