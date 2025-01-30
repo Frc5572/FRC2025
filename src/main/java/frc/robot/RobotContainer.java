@@ -79,7 +79,7 @@ public class RobotContainer {
         s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
         configureButtonBindings(runtimeType);
-        leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed));
+        leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed).ignoringDisable(true));
 
     }
 
