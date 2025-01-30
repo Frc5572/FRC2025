@@ -21,7 +21,7 @@ public class ClimberReal implements ClimberIO {
     private StatusSignal<Angle> climbMotorPosition = climberMotorRight.getPosition();
     private final DigitalInput climberTouchSensor =
         new DigitalInput(Constants.Climb.TOUCH_SENSOR_CHANNEL);
-    private final CANcoder CanEncoder = new CANcoder(Constants.Climb.CanID, "canivore");
+    private final CANcoder canEncoder = new CANcoder(Constants.Climb.CanID, "canivore");
 
 
     /*** Real */
