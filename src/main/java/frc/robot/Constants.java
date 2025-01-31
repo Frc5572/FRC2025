@@ -1,13 +1,13 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -90,10 +90,10 @@ public final class Constants {
         public static final int RIGHT_TALON_FX_ID = 28;
         public static final int CanID = 3;
         public static final int TOUCH_SENSOR_CHANNEL = 3;
-        public static final Angle MAX_ANGLE = Degrees.of(0);
+        public static final Angle MAX_ANGLE = Radians.of(250);
         public static final double GEAR_RATIO = 1;
-        public static final double VOLTAGE = -4;
-        public static final double RESET_VOLTAGE = -12;
+        public static final double VOLTAGE = 4;
+        public static final double RESET_VOLTAGE = -.5;
 
     }
 

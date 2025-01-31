@@ -23,5 +23,7 @@ public interface ClimberIO {
 
     public void setClimbMotorVoltage(double voltage);
 
+    public void setEncoderPoisiton(double position);
+
 
 }

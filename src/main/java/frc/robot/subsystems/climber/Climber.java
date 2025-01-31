@@ -1,11 +1,11 @@
 package frc.robot.subsystems.climber;
 
-import static edu.wpi.first.units.Units.Degrees;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 
 /**
@@ -14,6 +14,7 @@ import frc.robot.Constants;
 public class Climber extends SubsystemBase {
     private ClimberIO io;
     private ClimberInputsAutoLogged climberAutoLogged = new ClimberInputsAutoLogged();
+    public Trigger resetButton = new Trigger(() -> getClimberTouchSensorStatus());
 
     public Climber(ClimberIO io) {
         this.io = io;
@@ -52,8 +53,10 @@ public class Climber extends SubsystemBase {
      * @return Climber Position
      */
     public BooleanSupplier passedMaxAngle() { // degrees
-        return () -> climberAutoLogged.climberPosition.in(Degrees)
-            * Constants.Climb.GEAR_RATIO >= Constants.Climb.MAX_ANGLE.in(Degrees);
+        return () -> climberAutoLogged.climberPosition
+            .baseUnitMagnitude() >= Constants.Climb.MAX_ANGLE.baseUnitMagnitude();
+
+        // Constants.Climb.GEAR_RATIO >= Constants.Climb.MAX_ANGLE.in(Degrees);
 
     }
 
@@ -63,8 +66,13 @@ public class Climber extends SubsystemBase {
      */
     public Command resetClimberCommand() { // reset
         return runEnd(() -> setClimberMotorVoltage(Constants.Climb.RESET_VOLTAGE),
-            () -> setClimberMotorVoltage(0)).until(() -> getClimberTouchSensorStatus())
-                .unless(() -> getClimberTouchSensorStatus());
-
+            () -> setClimberMotorVoltage(0)).until(resetButton).unless(resetButton);
     }
+
+    public Command restEncoder() {
+        return Commands.runOnce(() -> io.setEncoderPoisiton(0.0)).ignoringDisable(true);
+    }
+
+
 }
+// -250

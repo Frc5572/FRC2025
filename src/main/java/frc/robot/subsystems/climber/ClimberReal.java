@@ -6,6 +6,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -28,6 +29,8 @@ public class ClimberReal implements ClimberIO {
     public ClimberReal() {
         leftConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         rightConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        rightConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        leftConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         climberMotorLeft.getConfigurator().apply(leftConfig);
         climberMotorRight.getConfigurator().apply(rightConfig);
         climberMotorLeft.setControl(new Follower(climberMotorRight.getDeviceID(), true));
@@ -49,5 +52,12 @@ public class ClimberReal implements ClimberIO {
     public void setClimbMotorVoltage(double voltage) {
         climberMotorRight.setVoltage(voltage);
     }
+
+    @Override
+    public void setEncoderPoisiton(double position) {
+        climberMotorRight.getConfigurator().setPosition(position);
+    }
+
+
 
 }
