@@ -4,22 +4,25 @@ import static edu.wpi.first.units.Units.Inches;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
 import frc.robot.subsystems.LEDs;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberReal;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorReal;
-import frc.robot.subsystems.climber.Climber;
-import frc.robot.subsystems.climber.ClimberReal;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
 import frc.robot.subsystems.swerve.SwerveReal;
@@ -79,18 +82,17 @@ public class RobotContainer {
                 climb = new Climber(new ClimberReal());
                 break;
             case kSimulation:
-                // driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
-                // new Pose2d(3, 3, Rotation2d.kZero));
-                // SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
-                // s_Swerve = new Swerve(state, new SwerveSim(driveSimulation));
-                // s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
+                driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
+                    new Pose2d(3, 3, Rotation2d.kZero));
+                SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
+                s_Swerve = new Swerve(state, new SwerveSim(driveSimulation));
+                s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
                 break;
             default:
 
                 elevator = new Elevator(new ElevatorIO() {});
-
-                // s_Swerve = new Swerve(state, new SwerveIO.Empty() {});
-                // s_Vision = new Vision(state, VisionIO::empty);
+                s_Swerve = new Swerve(state, new SwerveIO.Empty() {});
+                s_Vision = new Vision(state, VisionIO::empty);
 
         }
         // s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
@@ -165,7 +167,8 @@ public class RobotContainer {
     }
 
     public void configureTriggerBindings() {
-        climb.resetButton.onTrue(climb.restEncoder());    }
+        climb.resetButton.onTrue(climb.restEncoder());
+    }
 
     /**
      * Gets the user's selected autonomous command.
