@@ -93,10 +93,6 @@ public class Elevator extends SubsystemBase {
         return moveTo(Constants.Elevator.BARGE);
     }
 
-    // public Command barage() {
-    // return moveTo(Constants.Elevator.L2);
-    // }
-
     /**
      * sets height of elevator
      *
