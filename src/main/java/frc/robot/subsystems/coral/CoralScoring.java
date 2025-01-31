@@ -26,10 +26,6 @@ public class CoralScoring extends SubsystemBase {
         return coralScoringAutoLogged.grabingBeamBrakeRight;
     }
 
-    public boolean getGrabingLeftBeamBrakeStatus() {
-        return coralScoringAutoLogged.grabingBeamBrakeLeft;
-    }
-
     @Override
     public void periodic() {
         io.updateInputs(coralScoringAutoLogged);

@@ -18,8 +18,6 @@ public interface CoralScoringIO {
         public double scoringRPM;
         public boolean scoringBeamBrake;
         public boolean grabingBeamBrakeRight;
-        public boolean grabingBeamBrakeLeft;
-
     }
 
     public default void updateInputs(CoralScoringInputs inputs) {}

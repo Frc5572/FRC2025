@@ -64,9 +64,6 @@ public class RobotContainer {
     private Trigger intakedCoralRight =
         new Trigger(() -> coralScoring.getGrabingRightBeamBrakeStatus());
 
-    private Trigger intakedCoralLeft =
-        new Trigger(() -> coralScoring.getGrabingLeftBeamBrakeStatus());
-
     private Trigger outtakedCoral = new Trigger(() -> coralScoring.getScoringBeamBrakeStatus());
 
     /**
@@ -109,7 +106,6 @@ public class RobotContainer {
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
         intakedCoralRight.whileTrue(leds.setLEDsSolid(Color.kRed));
-        intakedCoralLeft.whileTrue(leds.setLEDsSolid(Color.kRed));
         outtakedCoral.whileTrue(leds.blinkLEDs(LEDPattern.solid(Color.kCyan)));
         driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
         driver.a().onTrue(new Command() {
