@@ -4,14 +4,12 @@ import static edu.wpi.first.units.Units.Inches;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
@@ -20,14 +18,6 @@ import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorReal;
-import frc.robot.subsystems.swerve.Swerve;
-import frc.robot.subsystems.swerve.SwerveIO;
-import frc.robot.subsystems.swerve.SwerveReal;
-import frc.robot.subsystems.swerve.SwerveSim;
-import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionIO;
-import frc.robot.subsystems.vision.VisionReal;
-import frc.robot.subsystems.vision.VisionSimPhoton;
 
 
 /**
@@ -55,8 +45,8 @@ public class RobotContainer {
     /* Subsystems */
 
     private LEDs leds = new LEDs();
-    private final Swerve s_Swerve;
-    private final Vision s_Vision;
+    // private final Swerve s_Swerve;
+    // private final Vision s_Vision;
 
     private Elevator elevator;
 
@@ -72,26 +62,26 @@ public class RobotContainer {
 
                 elevator = new Elevator(new ElevatorReal());
 
-                s_Swerve = new Swerve(state, new SwerveReal());
-                s_Vision = new Vision(state, VisionReal::new);
+                // s_Swerve = new Swerve(state, new SwerveReal());
+                // s_Vision = new Vision(state, VisionReal::new);
                 break;
             case kSimulation:
-                driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
-                    new Pose2d(3, 3, Rotation2d.kZero));
-                SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
-                s_Swerve = new Swerve(state, new SwerveSim(driveSimulation));
-                s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
+                // driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
+                // new Pose2d(3, 3, Rotation2d.kZero));
+                // SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
+                // s_Swerve = new Swerve(state, new SwerveSim(driveSimulation));
+                // s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
                 break;
             default:
 
                 elevator = new Elevator(new ElevatorIO() {});
 
-                s_Swerve = new Swerve(state, new SwerveIO.Empty() {});
-                s_Vision = new Vision(state, VisionIO::empty);
+                // s_Swerve = new Swerve(state, new SwerveIO.Empty() {});
+                // s_Vision = new Vision(state, VisionIO::empty);
 
         }
-        s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
-            Constants.Swerve.isOpenLoop));
+        // s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
+        // Constants.Swerve.isOpenLoop));
         configureButtonBindings(runtimeType);
         leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed));
 
@@ -104,11 +94,12 @@ public class RobotContainer {
      * {@link edu1.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
-        driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
+        // driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
 
         driver.povDown().onTrue(elevator.home());
-        driver.povLeft().onTrue(elevator.l2());
-
+        driver.povLeft().onTrue(elevator.P2());
+        driver.leftTrigger().onTrue(elevator.P3());
+        SmartDashboard.putNumber("elevatorVoltage", 1.0);
         driver.povUp().whileTrue(elevator.move());
         driver.povRight().whileTrue(elevator.moveeng());
         driver.a().onTrue(new Command() {
@@ -151,9 +142,9 @@ public class RobotContainer {
         });
 
 
-        driver.x().onTrue(new InstantCommand(() -> {
-            s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
-        }));
+        // driver.x().onTrue(new InstantCommand(() -> {
+        // s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
+        // }));
 
     }
 

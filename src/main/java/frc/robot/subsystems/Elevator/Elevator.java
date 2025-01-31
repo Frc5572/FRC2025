@@ -6,8 +6,8 @@ import static edu.wpi.first.units.Units.Rotations;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -67,21 +67,21 @@ public class Elevator extends SubsystemBase {
      * @return elevator at l2
      * 
      */
-    public Command l2() {
-        return raise(Constants.Elevator.L2);
+    public Command P2() {
+        return raise(Constants.Elevator.P1);
     }
 
-    public Command l3() {
-        return raise(Constants.Elevator.L3);
+    public Command P3() {
+        return raise(Constants.Elevator.P2);
     }
 
-    public Command l4() {
-        return raise(Constants.Elevator.L4);
+    public Command P4() {
+        return raise(Constants.Elevator.P3);
     }
 
-    public Command barage() {
-        return raise(Constants.Elevator.L2);
-    }
+    // public Command barage() {
+    // return raise(Constants.Elevator.L2);
+    // }
 
     /**
      * sets height of elevator
@@ -91,15 +91,18 @@ public class Elevator extends SubsystemBase {
      * 
      */
     public Command raise(Distance height) {
-        return runOnce(() -> io.setPositon(distanceToAngle(height).in(Rotation)))
-            .andThen(Commands.waitUntil(() -> angleToDistance(inputs.position) == height));
+        return run(() -> {
+            Logger.recordOutput("targetHeight", height.in(Meters));
+            io.setPositon(height.in(Meters));
+        });
     }
 
     public Command move() {
-        return runEnd(() -> io.setVoltage(.5), () -> io.setVoltage(0));
+        return runEnd(() -> io.setVoltage(SmartDashboard.getNumber("elevatorVoltage", 1.0)),
+            () -> io.setVoltage(0));
     }
 
     public Command moveeng() {
-        return runEnd(() -> io.setVoltage(-.5), () -> io.setVoltage(0));
+        return runEnd(() -> io.setVoltage(-1.0), () -> io.setVoltage(0));
     }
 }

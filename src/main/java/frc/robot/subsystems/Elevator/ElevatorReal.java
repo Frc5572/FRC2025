@@ -1,14 +1,18 @@
 package frc.robot.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Rotations;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants;
 
@@ -21,8 +25,9 @@ public class ElevatorReal implements ElevatorIO {
     private final DigitalInput limitSwitch = new DigitalInput(Constants.Elevator.LIMIT_ID);
     private final TalonFXConfiguration rightElevatorConf = new TalonFXConfiguration();
     private final TalonFXConfiguration leftElevatorConf = new TalonFXConfiguration();
-    private final PositionVoltage positionVoltage = new PositionVoltage(0.0);
+    private final PositionVoltage positionVoltage = new PositionVoltage(0.0).withSlot(0);
     private StatusSignal<Angle> elevatorPosition = rightElevatorMotor.getPosition();
+    private StatusSignal<Voltage> elevatorVoltage = rightElevatorMotor.getMotorVoltage();
     private StatusSignal<AngularVelocity> elevatorVelocity = rightElevatorMotor.getVelocity();
 
     /** Real Elevator Initializer */
@@ -34,7 +39,6 @@ public class ElevatorReal implements ElevatorIO {
 
     private void configMotors() {
         // left conf
-        leftElevatorConf.MotorOutput.NeutralMode = null;
 
         leftElevatorMotor.setControl(new Follower(rightElevatorMotor.getDeviceID(), true));
         leftElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
@@ -43,9 +47,15 @@ public class ElevatorReal implements ElevatorIO {
         rightElevatorConf.MotorOutput.NeutralMode = Constants.Elevator.BREAK;
         leftElevatorConf.MotorOutput.NeutralMode = Constants.Elevator.BREAK;
 
+        rightElevatorConf.Feedback.SensorToMechanismRatio =
+            Constants.Elevator.ROTATIONS_AT_TOP / Constants.Elevator.METERS_AT_TOP;
+        leftElevatorConf.Feedback.SensorToMechanismRatio =
+            Constants.Elevator.ROTATIONS_AT_TOP / Constants.Elevator.METERS_AT_TOP;
+
         // PID and feedforward
 
         // right
+        rightElevatorConf.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         rightElevatorConf.Slot0.kP = Constants.Elevator.KP;
         rightElevatorConf.Slot0.kI = Constants.Elevator.KI;
         rightElevatorConf.Slot0.kD = Constants.Elevator.KD;
@@ -72,16 +82,17 @@ public class ElevatorReal implements ElevatorIO {
     }
 
     public void setPositon(double position) {
-        rightElevatorMotor.setControl(positionVoltage.withPosition(position).withSlot(0)
-            .withVelocity(Constants.Elevator.MAX_VELOCITY));
+        rightElevatorMotor.setControl(positionVoltage.withPosition(position));
     }
+
 
     /** Updates Inputs to IO */
     public void updateInputs(ElevatorInputs inputs) {
-        BaseStatusSignal.refreshAll(elevatorPosition, elevatorVelocity);
+        BaseStatusSignal.refreshAll(elevatorPosition, elevatorVelocity, elevatorVoltage);
         inputs.limitSwitch = limitSwitch.get();
-        inputs.position = elevatorPosition.getValue();
+        inputs.position = Meters.of(elevatorPosition.getValue().in(Rotations));
         inputs.velocity = elevatorVelocity.getValue();
+        inputs.outputVoltage = elevatorVoltage.getValue();
     }
 
 
