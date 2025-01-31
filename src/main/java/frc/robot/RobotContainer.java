@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
@@ -18,6 +19,14 @@ import frc.robot.Robot.RobotRunType;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberReal;
+import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.swerve.SwerveIO;
+import frc.robot.subsystems.swerve.SwerveReal;
+import frc.robot.subsystems.swerve.SwerveSim;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionReal;
+import frc.robot.subsystems.vision.VisionSimPhoton;
 
 
 
@@ -48,8 +57,8 @@ public class RobotContainer {
     /* Subsystems */
 
     private LEDs leds = new LEDs();
-    // private final Swerve s_Swerve;
-    // private final Vision s_Vision;
+    private final Swerve s_Swerve;
+    private final Vision s_Vision;
     private Climber climb;
 
     /**
@@ -61,23 +70,23 @@ public class RobotContainer {
         state = new RobotState(vis);
         switch (runtimeType) {
             case kReal:
-                // s_Swerve = new Swerve(state, new SwerveReal());
-                // s_Vision = new Vision(state, VisionReal::new);
+                s_Swerve = new Swerve(state, new SwerveReal());
+                s_Vision = new Vision(state, VisionReal::new);
                 climb = new Climber(new ClimberReal());
                 break;
             case kSimulation:
                 driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
                     new Pose2d(3, 3, Rotation2d.kZero));
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
-                // s_Swerve = new Swerve(state, new SwerveSim(driveSimulation));
-                // s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
+                s_Swerve = new Swerve(state, new SwerveSim(driveSimulation));
+                s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
                 break;
             default:
-                // s_Swerve = new Swerve(state, new SwerveIO.Empty() {});
-                // s_Vision = new Vision(state, VisionIO::empty);
+                s_Swerve = new Swerve(state, new SwerveIO.Empty() {});
+                s_Vision = new Vision(state, VisionIO::empty);
         }
-        // s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
-        // Constants.Swerve.isOpenLoop));
+        s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
+            Constants.Swerve.isOpenLoop));
         configureButtonBindings(runtimeType);
         leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed));
         configureTriggerBindings();
@@ -91,7 +100,7 @@ public class RobotContainer {
      * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
-        // driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
+        driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
         driver.a().onTrue(new Command() {
             Timer timer = new Timer();
 
@@ -131,9 +140,9 @@ public class RobotContainer {
             }
         });
 
-        // driver.x().onTrue(new InstantCommand(() -> {
-        // s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
-        // }));
+        driver.x().onTrue(new InstantCommand(() -> {
+            s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
+        }));
         driver.rightStick().whileTrue(climb.runClimberMotorCommand());
         controllerThree.y().whileTrue(climb.resetClimberCommand());
 

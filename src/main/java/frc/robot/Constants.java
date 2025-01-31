@@ -63,7 +63,6 @@ public final class Constants {
     /**
      * Motor CAN id's.
      */
-
     public static final class Motors {
 
     }
@@ -72,7 +71,6 @@ public final class Constants {
     /**
      * leds constants class
      */
-
     public static final class LEDs {
         public static final int LED_PORT = 0;
         public static final int LED_LENGTH = 123;
@@ -83,7 +81,6 @@ public final class Constants {
      *
      * Climb Constants.
      */
-
     public static final class Climb {
 
         public static final int LEFT_TALON_FX_ID = 27;
