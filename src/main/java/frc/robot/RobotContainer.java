@@ -18,6 +18,17 @@ import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorReal;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberReal;
+import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.swerve.SwerveIO;
+import frc.robot.subsystems.swerve.SwerveReal;
+import frc.robot.subsystems.swerve.SwerveSim;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionReal;
+import frc.robot.subsystems.vision.VisionSimPhoton;
+
 
 
 /**
@@ -30,6 +41,9 @@ public class RobotContainer {
 
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
+    public final CommandXboxController controllerThree =
+        new CommandXboxController(Constants.controllerThreeId);
+
 
     /** Simulation */
     private SwerveDriveSimulation driveSimulation;
@@ -45,10 +59,10 @@ public class RobotContainer {
     /* Subsystems */
 
     private LEDs leds = new LEDs();
-    // private final Swerve s_Swerve;
-    // private final Vision s_Vision;
-
     private Elevator elevator;
+    private final Swerve s_Swerve;
+    private final Vision s_Vision;
+    private Climber climb;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -59,11 +73,10 @@ public class RobotContainer {
         state = new RobotState(vis);
         switch (runtimeType) {
             case kReal:
-
                 elevator = new Elevator(new ElevatorReal());
-
-                // s_Swerve = new Swerve(state, new SwerveReal());
-                // s_Vision = new Vision(state, VisionReal::new);
+                s_Swerve = new Swerve(state, new SwerveReal());
+                s_Vision = new Vision(state, VisionReal::new);
+                climb = new Climber(new ClimberReal());
                 break;
             case kSimulation:
                 // driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
@@ -84,6 +97,7 @@ public class RobotContainer {
         // Constants.Swerve.isOpenLoop));
         configureButtonBindings(runtimeType);
         leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed));
+        configureTriggerBindings();
 
     }
 
@@ -142,11 +156,16 @@ public class RobotContainer {
         });
 
 
-        // driver.x().onTrue(new InstantCommand(() -> {
-        // s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
-        // }));
+        driver.x().onTrue(new InstantCommand(() -> {
+            s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
+        }));
+        driver.rightStick().whileTrue(climb.runClimberMotorCommand());
+        controllerThree.y().whileTrue(climb.resetClimberCommand());
 
     }
+
+    public void configureTriggerBindings() {
+        climb.resetButton.onTrue(climb.restEncoder());    }
 
     /**
      * Gets the user's selected autonomous command.
@@ -182,6 +201,7 @@ public class RobotContainer {
             Logger.recordOutput("FieldSimulation/Coral",
                 SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
             vis.setActualPose(driveSimulation.getSimulatedDriveTrainPose());
+
         }
     }
 }
