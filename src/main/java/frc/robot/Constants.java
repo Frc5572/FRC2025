@@ -7,6 +7,7 @@ import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -24,6 +25,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
@@ -53,13 +55,18 @@ public final class Constants {
 
     public static final boolean tuningMode = false;
 
+    // Controller "3"
+    public static final int controllerThreeId = 3;
+
+
+
     /**
      * Motor CAN id's.
      */
-
     public static final class Motors {
 
     }
+
 
     /**
      * leds constants class
@@ -67,10 +74,27 @@ public final class Constants {
     public static final class LEDs {
         public static final int LED_PORT = 0;
         public static final int LED_LENGTH = 123;
+    }
 
 
+    /**
+     *
+     * Climb Constants.
+     */
+    public static final class Climb {
+
+        public static final int LEFT_TALON_FX_ID = 27;
+        public static final int RIGHT_TALON_FX_ID = 28;
+        public static final int CanID = 3;
+        public static final int TOUCH_SENSOR_CHANNEL = 3;
+        public static final Angle MAX_ANGLE = Radians.of(250);
+        public static final double GEAR_RATIO = 1;
+        public static final double VOLTAGE = 4;
+        public static final double RESET_VOLTAGE = -.5;
 
     }
+
+
 
     /**
      * Swerve Constants
@@ -140,9 +164,9 @@ public final class Constants {
          * Front Left Module - Module 0
          */
         public static final class Mod0 {
-            public static final int driveMotorID = 1;
-            public static final int angleMotorID = 5;
-            public static final int canCoderID = 1;
+            public static final int driveMotorID = 2;
+            public static final int angleMotorID = 1;
+            public static final int canCoderID = 1; // duplicate?
             public static final Rotation2d angleOffset = Rotation2d.fromRotations(0.008789);
 
         }
@@ -151,9 +175,9 @@ public final class Constants {
          * Front Right Module - Module 1
          */
         public static final class Mod1 {
-            public static final int driveMotorID = 2;
-            public static final int angleMotorID = 6;
-            public static final int canCoderID = 2;
+            public static final int driveMotorID = 9;
+            public static final int angleMotorID = 8;
+            public static final int canCoderID = 2; // duplicate?
             public static final Rotation2d angleOffset = Rotation2d.fromRotations(-0.298096);
 
         }
@@ -162,8 +186,8 @@ public final class Constants {
          * Back Left Module - Module 2
          */
         public static final class Mod2 {
-            public static final int driveMotorID = 4;
-            public static final int angleMotorID = 8;
+            public static final int driveMotorID = 0;
+            public static final int angleMotorID = 19;
             public static final int canCoderID = 4;
             public static final Rotation2d angleOffset = Rotation2d.fromRotations(-0.451172);
 
@@ -173,8 +197,8 @@ public final class Constants {
          * Back Right Module - Module 3
          */
         public static final class Mod3 {
-            public static final int driveMotorID = 3;
-            public static final int angleMotorID = 7;
+            public static final int driveMotorID = 11;
+            public static final int angleMotorID = 10;
             public static final int canCoderID = 3;
             public static final Rotation2d angleOffset = Rotation2d.fromRotations(0.321777);
         }
