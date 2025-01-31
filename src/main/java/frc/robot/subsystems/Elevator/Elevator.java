@@ -59,7 +59,7 @@ public class Elevator extends SubsystemBase {
      * 
      */
     public Command home() {
-        return raise(Constants.Elevator.HOME).andThen(() -> io.setVoltage(-0.1))
+        return moveTo(Constants.Elevator.HOME).andThen(() -> io.setVoltage(-0.1))
             .until(() -> (inputs.limitSwitch == true));
     }
 
@@ -70,31 +70,31 @@ public class Elevator extends SubsystemBase {
      * 
      */
     public Command p1() {
-        return raise(Constants.Elevator.P1);
+        return moveTo(Constants.Elevator.P1);
     }
 
     public Command p2() {
-        return raise(Constants.Elevator.P2);
+        return moveTo(Constants.Elevator.P2);
     }
 
     public Command p3() {
-        return raise(Constants.Elevator.P3);
+        return moveTo(Constants.Elevator.P3);
     }
 
     public Command p4() {
-        return raise(Constants.Elevator.P4);
+        return moveTo(Constants.Elevator.P4);
     }
 
     public Command p5() {
-        return raise(Constants.Elevator.P5);
+        return moveTo(Constants.Elevator.P5);
     }
 
     public Command barge() {
-        return raise(Constants.Elevator.BARGE);
+        return moveTo(Constants.Elevator.BARGE);
     }
 
     // public Command barage() {
-    // return raise(Constants.Elevator.L2);
+    // return moveTo(Constants.Elevator.L2);
     // }
 
     /**
@@ -104,7 +104,7 @@ public class Elevator extends SubsystemBase {
      * @return elevator height change
      * 
      */
-    public Command raise(Distance height) {
+    public Command moveTo(Distance height) {
         return run(() -> {
             Logger.recordOutput("targetHeight", height.in(Meters));
             io.setPositon(height.in(Meters));
@@ -112,12 +112,12 @@ public class Elevator extends SubsystemBase {
             .inchesToMeters(1.0));
     }
 
-    public Command move() {
+    public Command moveUp() {
         return runEnd(() -> io.setVoltage(SmartDashboard.getNumber("elevatorVoltage", 1.0)),
             () -> io.setVoltage(0));
     }
 
-    public Command moveeng() {
+    public Command moveDown() {
         return runEnd(() -> io.setVoltage(-1.0), () -> io.setVoltage(0));
     }
 }

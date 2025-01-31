@@ -116,8 +116,8 @@ public class RobotContainer {
         driver.povLeft().onTrue(elevator.p1());
         driver.leftTrigger().onTrue(elevator.p2());
         SmartDashboard.putNumber("elevatorVoltage", 1.0);
-        driver.povUp().whileTrue(elevator.move());
-        driver.povRight().whileTrue(elevator.moveeng());
+        driver.povUp().whileTrue(elevator.moveUp());
+        driver.povRight().whileTrue(elevator.moveDown());
         driver.a().onTrue(new Command() {
             Timer timer = new Timer();
 
