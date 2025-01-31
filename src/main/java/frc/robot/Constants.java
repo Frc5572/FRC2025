@@ -7,6 +7,7 @@ import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -24,6 +25,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
@@ -53,13 +55,18 @@ public final class Constants {
 
     public static final boolean tuningMode = false;
 
+    // Controller "3"
+    public static final int controllerThreeId = 3;
+
+
+
     /**
      * Motor CAN id's.
      */
-
     public static final class Motors {
 
     }
+
 
     /**
      * leds constants class
@@ -67,10 +74,27 @@ public final class Constants {
     public static final class LEDs {
         public static final int LED_PORT = 0;
         public static final int LED_LENGTH = 123;
+    }
 
 
+    /**
+     *
+     * Climb Constants.
+     */
+    public static final class Climb {
+
+        public static final int LEFT_TALON_FX_ID = 27;
+        public static final int RIGHT_TALON_FX_ID = 28;
+        public static final int CanID = 3;
+        public static final int TOUCH_SENSOR_CHANNEL = 3;
+        public static final Angle MAX_ANGLE = Radians.of(250);
+        public static final double GEAR_RATIO = 1;
+        public static final double VOLTAGE = 4;
+        public static final double RESET_VOLTAGE = -.5;
 
     }
+
+
 
     /**
      * Swerve Constants
