@@ -269,10 +269,14 @@ public final class Constants {
         public static final AngularVelocity MAX_VELOCITY = RotationsPerSecond.of(0.0);
 
         // positions
-        public static final Distance HOME = Inches.of(10);
+        public static final Distance HOME = Inches.of(2);
         public static final Distance P1 = Inches.of(60);
         public static final Distance P2 = Inches.of(32);
         public static final Distance P3 = Inches.of(44);
+        public static final Distance P4 = Inches.of(48);
+        public static final Distance P5 = Inches.of(72);
+        public static final Distance BARGE = Inches.of(72);
+
 
         public static final double gearRatio = 1.0;
 

@@ -58,7 +58,8 @@ public class Elevator extends SubsystemBase {
      * 
      */
     public Command home() {
-        return raise(Constants.Elevator.HOME);
+        return raise(Constants.Elevator.HOME).andThen(() -> io.setVoltage(-0.1))
+            .until(() -> (inputs.limitSwitch == true));
     }
 
     /**
@@ -67,16 +68,28 @@ public class Elevator extends SubsystemBase {
      * @return elevator at l2
      * 
      */
-    public Command P2() {
+    public Command p1() {
         return raise(Constants.Elevator.P1);
     }
 
-    public Command P3() {
+    public Command p2() {
         return raise(Constants.Elevator.P2);
     }
 
-    public Command P4() {
+    public Command p3() {
         return raise(Constants.Elevator.P3);
+    }
+
+    public Command p4() {
+        return raise(Constants.Elevator.P4);
+    }
+
+    public Command p5() {
+        return raise(Constants.Elevator.P5);
+    }
+
+    public Command barge() {
+        return raise(Constants.Elevator.BARGE);
     }
 
     // public Command barage() {

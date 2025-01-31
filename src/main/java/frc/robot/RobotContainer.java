@@ -97,8 +97,8 @@ public class RobotContainer {
         // driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
 
         driver.povDown().onTrue(elevator.home());
-        driver.povLeft().onTrue(elevator.P2());
-        driver.leftTrigger().onTrue(elevator.P3());
+        driver.povLeft().onTrue(elevator.p1());
+        driver.leftTrigger().onTrue(elevator.p2());
         SmartDashboard.putNumber("elevatorVoltage", 1.0);
         driver.povUp().whileTrue(elevator.move());
         driver.povRight().whileTrue(elevator.moveeng());
