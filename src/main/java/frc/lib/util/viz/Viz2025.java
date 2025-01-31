@@ -99,7 +99,7 @@ public class Viz2025 implements Drawable {
 
     /** Publish all values to Logger */
     @Override
-    public void draw() {
+    public void drawImpl() {
         if (elevatorHeight > 0.1) {
             algaeDropped = true;
         }

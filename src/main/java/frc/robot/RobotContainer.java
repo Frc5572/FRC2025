@@ -148,7 +148,7 @@ public class RobotContainer {
      * Update viz
      */
     public void updateViz() {
-        vis.draw();
+        vis.drawImpl();
     }
 
     /** Start simulation */

@@ -38,6 +38,9 @@ import edu.wpi.first.units.measure.Voltage;
  * Constants file.
  */
 public final class Constants {
+
+    public static final boolean shouldDrawStuff = false;
+
     /**
      * Stick Deadband
      */
