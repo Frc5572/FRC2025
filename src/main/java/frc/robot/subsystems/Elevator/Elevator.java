@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Rotations;
 import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -107,7 +108,8 @@ public class Elevator extends SubsystemBase {
         return run(() -> {
             Logger.recordOutput("targetHeight", height.in(Meters));
             io.setPositon(height.in(Meters));
-        });
+        }).until(() -> Math.abs(inputs.position.in(Meters) - height.in(Meters)) < Units
+            .inchesToMeters(1.0));
     }
 
     public Command move() {
