@@ -179,7 +179,7 @@ public class Swerve extends SubsystemBase {
      * Resets the gyro field relative driving offset
      */
     public void resetFieldRelativeOffset() {
-        fieldOffset = getGyroYaw().getDegrees() + 180;
+        fieldOffset = getGyroYaw().getDegrees();
     }
 
     @Override

@@ -95,12 +95,15 @@ public class RobotContainer {
                 s_Vision = new Vision(state, VisionIO::empty);
 
         }
-        // s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
-        // Constants.Swerve.isOpenLoop));
-        configureButtonBindings(runtimeType);
-        leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed));
-        configureTriggerBindings();
 
+        /* Default Commands */
+        s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
+            Constants.Swerve.isOpenLoop));
+        leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed).ignoringDisable(true));
+        /* Button and Trigger Bindings */
+
+        configureButtonBindings(runtimeType);
+        configureTriggerBindings();
     }
 
     /**
