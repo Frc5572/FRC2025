@@ -15,7 +15,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.ScoringLocation.AlgaeHeight;
 import frc.lib.util.ScoringLocation.CoralHeight;
+import frc.lib.util.ScoringLocation.HeightMode;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
@@ -174,14 +177,31 @@ public class RobotContainer {
         driver.rightBumper().whileTrue(climb.runClimberMotorCommand());
 
         // alt operator controlls
-        altOperator.povDown().onTrue(Commands.runOnce(() -> CoralHeight.decrementState()));
-        altOperator.povUp().onTrue(Commands.runOnce(() -> CoralHeight.incrementState()));
+        altOperator.povDown().and(isCoralTrigger)
+            .onTrue(Commands.runOnce(() -> CoralHeight.decrementState()));
+        altOperator.povUp().and(isCoralTrigger)
+            .onTrue(Commands.runOnce(() -> CoralHeight.incrementState()));
+        altOperator.povUp().and(isAlgaeTrigger)
+            .onTrue(Commands.runOnce(() -> AlgaeHeight.incrementState()));
+        altOperator.povDown().and(isAlgaeTrigger)
+            .onTrue(Commands.runOnce(() -> AlgaeHeight.decrementState()));
+        altOperator.povLeft().onTrue(Commands.runOnce(() -> HeightMode.decrementState()));
+        altOperator.povRight().onTrue(Commands.runOnce(() -> HeightMode.incrementState()));
 
         // pit controller
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());
+    }
 
+    // trigger
+    public Trigger isCoralTrigger = new Trigger(() -> isCoral());
+    public Trigger isAlgaeTrigger = new Trigger(() -> isAlgae());
 
+    public boolean isCoral() {
+        return HeightMode.getCurrentHeightMode() == HeightMode.kCoral;
+    }
 
+    public boolean isAlgae() {
+        return HeightMode.getCurrentHeightMode() == HeightMode.kAlgae;
     }
 
     /**
