@@ -276,8 +276,8 @@ public final class Constants {
      */
 
     public static final class Elevator {
-        public static final int RIGHT_ID = 28;
-        public static final int LEFT_ID = 27;
+        public static final int RIGHT_ID = 7;
+        public static final int LEFT_ID = 4;
         public static final int LIMIT_ID = 0;
 
         public static final NeutralModeValue BREAK = NeutralModeValue.Brake;
