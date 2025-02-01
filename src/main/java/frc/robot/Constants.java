@@ -90,7 +90,7 @@ public final class Constants {
         public static final Angle MAX_ANGLE = Radians.of(250);
         public static final double GEAR_RATIO = 1;
         public static final double VOLTAGE = 4;
-        public static final double RESET_VOLTAGE = -.5;
+        public static final double RESET_VOLTAGE = -4;
 
     }
 

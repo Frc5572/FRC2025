@@ -40,6 +40,8 @@ public class RobotContainer {
 
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
+    public final CommandXboxController backUpOperator =
+        new CommandXboxController(Constants.operatorId);
     public final CommandXboxController controllerThree =
         new CommandXboxController(Constants.controllerThreeId);
 
@@ -102,7 +104,7 @@ public class RobotContainer {
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
         driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
-        driver.a().onTrue(new Command() {
+        backUpOperator.a().onTrue(new Command() {
             Timer timer = new Timer();
 
             @Override
@@ -121,7 +123,7 @@ public class RobotContainer {
                 return timer.hasElapsed(3.0);
             }
         });
-        driver.b().onTrue(new Command() {
+        backUpOperator.b().onTrue(new Command() {
             Timer timer = new Timer();
 
             @Override
