@@ -7,6 +7,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -18,6 +19,7 @@ import frc.robot.Constants;
  */
 public class Elevator extends SubsystemBase {
     ElevatorIO io;
+    Timer time = new Timer();
     private ElevatorInputsAutoLogged inputs = new ElevatorInputsAutoLogged();
 
     public Elevator(ElevatorIO io) {
@@ -53,6 +55,12 @@ public class Elevator extends SubsystemBase {
         return Rotations.of(distance.in(Meters) / Constants.Elevator.gearRatio);
     }
 
+    public Command homeTimer() {
+        Timer.getTimestamp();
+        Command slowLower = Commands.run(() -> io.setVoltage(-0.1));
+        return moveTo(Constants.Elevator.HOME).andThen(slowLower).withTimeout(1);
+    }
+
     /**
      * moves elevator to home
      *
@@ -60,6 +68,7 @@ public class Elevator extends SubsystemBase {
      * 
      */
     public Command home() {
+
         Command slowLower = Commands.run(() -> io.setVoltage(-0.1));
         return moveTo(Constants.Elevator.HOME).andThen(slowLower)
             .until(() -> (inputs.limitSwitch == true));
