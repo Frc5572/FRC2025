@@ -157,6 +157,10 @@ public class RobotContainer {
 
     }
 
+    /**
+     * Triggers
+     */
+
     public void configureTriggerBindings() {
         coralScoring.intakedCoralRight.whileTrue(leds.setLEDsSolid(Color.kRed));
         coralScoring.intakedCoralRight.onTrue(coralScoring.runPreScoringMotor(2));
