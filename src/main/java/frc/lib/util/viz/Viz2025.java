@@ -14,7 +14,7 @@ import edu.wpi.first.units.measure.Distance;
 import frc.robot.Constants;
 
 /** Visualization of the 2025 Robot */
-public class Viz2025 {
+public class Viz2025 implements Drawable {
 
     private final FieldViz fieldViz;
     private final String prefix;
@@ -98,6 +98,7 @@ public class Viz2025 {
     }
 
     /** Publish all values to Logger */
+    @Override
     public void draw() {
         if (elevatorHeight > 0.1) {
             algaeDropped = true;

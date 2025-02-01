@@ -7,8 +7,6 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import frc.robot.Constants;
 
 /** Simulation of vision using built-in PhotonVision simulator. */
@@ -30,8 +28,7 @@ public class VisionSimPhoton extends VisionReal {
         this.sim = sim;
         visionSim = new VisionSystemSim("main");
 
-        AprilTagFieldLayout tagLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
-        visionSim.addAprilTags(tagLayout);
+        visionSim.addAprilTags(Constants.Vision.fieldLayout);
 
         for (int i = 0; i < constants.length; i++) {
             SimCameraProperties props = new SimCameraProperties();
