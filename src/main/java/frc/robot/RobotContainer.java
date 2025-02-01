@@ -19,6 +19,8 @@ import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
 import frc.robot.subsystems.LEDs;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberReal;
 import frc.robot.subsystems.coral.CoralScoring;
 import frc.robot.subsystems.coral.CoralScoringIO;
 import frc.robot.subsystems.coral.CoralScoringReal;
@@ -32,6 +34,7 @@ import frc.robot.subsystems.vision.VisionReal;
 import frc.robot.subsystems.vision.VisionSimPhoton;
 
 
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -42,9 +45,13 @@ public class RobotContainer {
 
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
+    public final CommandXboxController controllerThree =
+        new CommandXboxController(Constants.controllerThreeId);
+
 
     /** Simulation */
     private SwerveDriveSimulation driveSimulation;
+
 
     /** Visualization */
     private final FieldViz fieldVis;
@@ -58,6 +65,7 @@ public class RobotContainer {
     private final Swerve s_Swerve;
     private final Vision s_Vision;
     private CoralScoring coralScoring;
+    private Climber climb;
 
     /* Triggers */
 
@@ -78,6 +86,7 @@ public class RobotContainer {
                 s_Swerve = new Swerve(state, new SwerveReal());
                 s_Vision = new Vision(state, VisionReal::new);
                 coralScoring = new CoralScoring(new CoralScoringReal());
+                climb = new Climber(new ClimberReal());
                 break;
             case kSimulation:
                 driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
@@ -91,11 +100,13 @@ public class RobotContainer {
                 s_Swerve = new Swerve(state, new SwerveIO.Empty() {});
                 s_Vision = new Vision(state, VisionIO::empty);
         }
+        /* Default Commands */
         s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
+        leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed).ignoringDisable(true));
+        /* Button and Trigger Bindings */
         configureButtonBindings(runtimeType);
-        leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed));
-
+        configureTriggerBindings();
     }
 
     /**
@@ -152,6 +163,13 @@ public class RobotContainer {
             s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
         }));
         driver.y().whileTrue(coralScoring.runScoringMotor(2));
+        driver.rightStick().whileTrue(climb.runClimberMotorCommand());
+        controllerThree.y().whileTrue(climb.resetClimberCommand());
+
+    }
+
+    public void configureTriggerBindings() {
+        climb.resetButton.onTrue(climb.restEncoder());
     }
 
     /**
@@ -188,6 +206,7 @@ public class RobotContainer {
             Logger.recordOutput("FieldSimulation/Coral",
                 SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
             vis.setActualPose(driveSimulation.getSimulatedDriveTrainPose());
+
         }
     }
 
