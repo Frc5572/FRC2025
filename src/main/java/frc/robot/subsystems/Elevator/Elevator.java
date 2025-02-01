@@ -55,6 +55,11 @@ public class Elevator extends SubsystemBase {
         return Rotations.of(distance.in(Meters) / Constants.Elevator.gearRatio);
     }
 
+    /**
+     * moves elevator to home with time out
+     * 
+     * @return home positon
+     */
     public Command homeTimer() {
         Timer.getTimestamp();
         Command slowLower = Commands.run(() -> io.setVoltage(-0.1));
