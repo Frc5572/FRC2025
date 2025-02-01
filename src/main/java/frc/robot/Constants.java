@@ -62,7 +62,7 @@ public final class Constants {
          * Primary Coral Scoring CAN id's
          */
         public static final class PrimaryCoralScoring {
-            public static final int Coral_Scoring_NEO_ID = 11;
+            public static final int Coral_Scoring_NEO_ID = 8;
         }
     }
 
