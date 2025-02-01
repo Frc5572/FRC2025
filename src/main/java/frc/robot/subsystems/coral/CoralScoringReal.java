@@ -24,7 +24,9 @@ public class CoralScoringReal implements CoralScoringIO {
         new DigitalInput(Constants.CoralScoringConstants.Grabing_RBeam_Brake_DIO_Port);
     SparkMaxConfig motorConfig = new SparkMaxConfig();
 
-
+    /**
+     * Coral Scoring Real
+     */
     public CoralScoringReal() {
         motorConfig.idleMode(IdleMode.kBrake);
         coralScoringMotor.configure(motorConfig, ResetMode.kResetSafeParameters,
