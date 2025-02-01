@@ -169,14 +169,14 @@ public class RobotContainer {
         coralScoring.outtakedCoral
             .onTrue(leds.blinkLEDs(LEDPattern.solid(Color.kCyan)).withTimeout(5));
         climb.resetButton.onTrue(climb.restEncoder());
-        // driver controlls
+        // driver controls
         driver.x().onTrue(new InstantCommand(() -> {
             s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
         }));
         driver.y().whileTrue(coralScoring.runScoringMotor(2));
         driver.rightBumper().whileTrue(climb.runClimberMotorCommand());
 
-        // alt operator controlls
+        // alt operator controls
         altOperator.povDown().and(isCoralTrigger)
             .onTrue(Commands.runOnce(() -> CoralHeight.decrementState()));
         altOperator.povUp().and(isCoralTrigger)
