@@ -4,6 +4,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * Coral Scoring Subsystems
@@ -12,6 +13,9 @@ public class CoralScoring extends SubsystemBase {
     private CoralScoringIO io;
     private CoralScoringInputsAutoLogged coralScoringAutoLogged =
         new CoralScoringInputsAutoLogged();
+    public Trigger intakedCoralRight = new Trigger(() -> getGrabingRightBeamBrakeStatus());
+    public Trigger outtakedCoral = new Trigger(() -> getScoringBeamBrakeStatus());
+
 
     public CoralScoring(CoralScoringIO io) {
         this.io = io;
@@ -65,7 +69,6 @@ public class CoralScoring extends SubsystemBase {
             Commands.waitUntil(() -> !getScoringBeamBrakeStatus()).andThen(Commands.waitSeconds(2)))
             .withTimeout(10);
     }
-
 
     // Consolidates scoring motor
     // public Command runCoralOuttakeMotor(double scoringSpeed) {
