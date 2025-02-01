@@ -83,8 +83,8 @@ public final class Constants {
      */
     public static final class Climb {
 
-        public static final int LEFT_TALON_FX_ID = 27;
-        public static final int RIGHT_TALON_FX_ID = 28;
+        public static final int LEFT_TALON_FX_ID = 3;
+        public static final int RIGHT_TALON_FX_ID = 12;
         public static final int CanID = 3;
         public static final int TOUCH_SENSOR_CHANNEL = 0;
         public static final Angle MAX_ANGLE = Radians.of(250);
