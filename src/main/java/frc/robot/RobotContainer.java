@@ -173,7 +173,7 @@ public class RobotContainer {
     /** Start simulation */
     public void startSimulation() {
         if (driveSimulation != null) {
-            // SimulatedArena.getInstance().resetFieldForAuto();
+            SimulatedArena.getInstance().resetFieldForAuto();
         }
     }
 
