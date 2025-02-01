@@ -7,6 +7,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.util.Color;
@@ -19,6 +20,9 @@ import frc.robot.Robot.RobotRunType;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberReal;
+import frc.robot.subsystems.coral.CoralScoring;
+import frc.robot.subsystems.coral.CoralScoringIO;
+import frc.robot.subsystems.coral.CoralScoringReal;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
 import frc.robot.subsystems.swerve.SwerveReal;
@@ -59,6 +63,7 @@ public class RobotContainer {
     private LEDs leds = new LEDs();
     private final Swerve s_Swerve;
     private final Vision s_Vision;
+    private CoralScoring coralScoring;
     private Climber climb;
 
     /**
@@ -72,6 +77,7 @@ public class RobotContainer {
             case kReal:
                 s_Swerve = new Swerve(state, new SwerveReal());
                 s_Vision = new Vision(state, VisionReal::new);
+                coralScoring = new CoralScoring(new CoralScoringReal());
                 climb = new Climber(new ClimberReal());
                 break;
             case kSimulation:
@@ -80,6 +86,7 @@ public class RobotContainer {
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
                 s_Swerve = new Swerve(state, new SwerveSim(driveSimulation));
                 s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
+                coralScoring = new CoralScoring(new CoralScoringIO() {});
                 break;
             default:
                 s_Swerve = new Swerve(state, new SwerveIO.Empty() {});
@@ -144,12 +151,21 @@ public class RobotContainer {
         driver.x().onTrue(new InstantCommand(() -> {
             s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
         }));
+        driver.y().whileTrue(coralScoring.runScoringMotor(2));
         driver.rightStick().whileTrue(climb.runClimberMotorCommand());
         controllerThree.y().whileTrue(climb.resetClimberCommand());
 
     }
 
+    /**
+     * Triggers
+     */
+
     public void configureTriggerBindings() {
+        coralScoring.intakedCoralRight.onTrue(leds.setLEDsSolid(Color.kRed).withTimeout(5));
+        coralScoring.intakedCoralRight.onTrue(coralScoring.runPreScoringMotor(2));
+        coralScoring.outtakedCoral
+            .onTrue(leds.blinkLEDs(LEDPattern.solid(Color.kCyan)).withTimeout(5));
         climb.resetButton.onTrue(climb.restEncoder());
     }
 
@@ -172,7 +188,7 @@ public class RobotContainer {
     /** Start simulation */
     public void startSimulation() {
         if (driveSimulation != null) {
-            // SimulatedArena.getInstance().resetFieldForAuto();
+            SimulatedArena.getInstance().resetFieldForAuto();
         }
     }
 
