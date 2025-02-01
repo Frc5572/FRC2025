@@ -57,6 +57,19 @@ public final class Constants {
     public static final int operatorId = 1;
 
     public static final boolean tuningMode = false;
+    /**
+     * Current threshold that indicates an algae is in possestion
+     */
+    public static final double HAS_ALGAE_CURRENT_THRESHOLD = 0;
+
+    /**
+     * Algae misc values
+     */
+    public static final class Algae {
+        public static final int VOLTAGE = 0;
+        public static final int NEGATIVE_VOLTAGE = 0;
+        public static final int BEAM_BRAKE_ID = 0;
+    }
 
     // Controller "3"
     public static final int controllerThreeId = 3;
@@ -67,6 +80,13 @@ public final class Constants {
      * Motor CAN id's.
      */
     public static final class Motors {
+
+        /**
+         * Algae Motor CAN id's
+         */
+        public static final class AlgaeMotors {
+            public static final int ALGAE_MOTOR_ID = 0;
+        }
 
     }
 

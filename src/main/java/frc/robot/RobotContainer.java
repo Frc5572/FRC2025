@@ -13,12 +13,15 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberReal;
+import frc.robot.subsystems.elevator_algae.ElevatorAlgae;
+import frc.robot.subsystems.elevator_algae.ElevatorAlgaeReal;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
 import frc.robot.subsystems.swerve.SwerveReal;
@@ -55,10 +58,14 @@ public class RobotContainer {
     private final RobotState state;
 
     /* Subsystems */
-
+    private ElevatorAlgae s_ElevatorAlgae;
     private LEDs leds = new LEDs();
     private final Swerve s_Swerve;
     private final Vision s_Vision;
+
+    /* Triggers */
+    private Trigger algaeInIntake = new Trigger(() -> s_ElevatorAlgae.hasAlgae());
+
     private Climber climb;
 
     /**
@@ -72,6 +79,7 @@ public class RobotContainer {
             case kReal:
                 s_Swerve = new Swerve(state, new SwerveReal());
                 s_Vision = new Vision(state, VisionReal::new);
+                s_ElevatorAlgae = new ElevatorAlgae(new ElevatorAlgaeReal());
                 climb = new Climber(new ClimberReal());
                 break;
             case kSimulation:
@@ -101,6 +109,13 @@ public class RobotContainer {
      * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
+        algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan));
+        driver.rightBumper()
+            .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
+        driver.leftBumper()
+            .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
+
+
         driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
         driver.a().onTrue(new Command() {
             Timer timer = new Timer();
