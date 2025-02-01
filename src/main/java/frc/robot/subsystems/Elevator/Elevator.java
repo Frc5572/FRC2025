@@ -2,10 +2,7 @@ package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Rotation;
-import static edu.wpi.first.units.Units.Rotations;
 import org.littletonrobotics.junction.Logger;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -31,28 +28,6 @@ public class Elevator extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);
-    }
-
-    /**
-     * converts angles to distance
-     *
-     * @param angle the angle the motor moves
-     * @return distance
-     */
-    private Distance angleToDistance(Angle angle) {
-        return Meters.of(angle.in(Rotation) * Constants.Elevator.gearRatio);
-    }
-
-    /**
-     * converts distance to angle
-     *
-     * @param distance the height we want converted
-     *
-     * @return angle
-     * 
-     */
-    private Angle distanceToAngle(Distance distance) {
-        return Rotations.of(distance.in(Meters) / Constants.Elevator.gearRatio);
     }
 
     /**
