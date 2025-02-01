@@ -144,8 +144,8 @@ public class RobotContainer {
         driver.x().onTrue(new InstantCommand(() -> {
             s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
         }));
-        driver.rightStick().whileTrue(climb.runClimberMotorCommand());
-        controllerThree.y().whileTrue(climb.resetClimberCommand());
+        driver.rightBumper().whileTrue(climb.runClimberMotorCommand());
+        driver.leftBumper().whileTrue(climb.resetClimberCommand());
 
     }
 
