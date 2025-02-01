@@ -1,10 +1,10 @@
 package frc.robot.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Rotations;
 import org.littletonrobotics.junction.Logger;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
@@ -61,7 +61,6 @@ public class Elevator extends SubsystemBase {
      * @return home position
      */
     public Command homeTimer() {
-        Timer.getTimestamp();
         Command slowLower = Commands.run(() -> io.setVoltage(-0.1));
         return moveTo(Constants.Elevator.HOME).andThen(slowLower).withTimeout(1);
     }
@@ -120,8 +119,7 @@ public class Elevator extends SubsystemBase {
         return run(() -> {
             Logger.recordOutput("targetHeight", height.in(Meters));
             io.setPositon(height.in(Meters));
-        }).until(() -> Math.abs(inputs.position.in(Meters) - height.in(Meters)) < Units
-            .inchesToMeters(1.0));
+        }).until(() -> Math.abs(inputs.position.in(Inches) - height.in(Inches)) < 1);
     }
 
     public Command moveUp() {
