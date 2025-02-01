@@ -57,8 +57,8 @@ public class Elevator extends SubsystemBase {
 
     /**
      * moves elevator to home with time out
-     * 
-     * @return home positon
+     *
+     * @return home position
      */
     public Command homeTimer() {
         Timer.getTimestamp();
