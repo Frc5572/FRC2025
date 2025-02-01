@@ -27,6 +27,38 @@
             color: white;
         }
 
+        #barge-text {
+            position: absolute;
+            left: 1360px;
+            top: 50px;
+            font-size: 40px;
+            text-align: center;
+        }
+
+        #lf-text {
+            position: absolute;
+            left: 1330px;
+            top: 340px;
+            font-size: 32px;
+            text-align: center;
+        }
+
+        #rf-text {
+            position: absolute;
+            left: 1330px;
+            top: 610px;
+            font-size: 28px;
+            text-align: center;
+        }
+
+        #pr-text {
+            position: absolute;
+            left: 1330px;
+            top: 890px;
+            font-size: 36px;
+            text-align: center;
+        }
+
         .bad {
             background-color: #770000;
         }
@@ -299,9 +331,45 @@
                         stroke-width="8px" fill="transparent">
                     </path>
                 </g>
+                <g id="selector-l5-bg">
+                    <path d="M1304.13,808.023L1304.13,1077.62L1525.87,1077.62L1525.87,808.023Z" stroke="black"
+                        stroke-width="8px" fill="transparent" />
+                </g>
+                <g id="selector-m-bg">
+                    <path d="M1304.13,538.42323L1304.13,808.0L1525.87,808.0L1525.87,538.42323Z" stroke="black"
+                        stroke-width="8px" fill="transparent" />
+                </g>
+                <g id="selector-n-bg">
+                    <path d="M1304.13,268.823L1304.13,538.423L1525.87,538.423L1525.87,268.823Z" stroke="black"
+                        stroke-width="8px" fill="transparent" />
+                </g>
+                <g id="selector-o-bg">
+                    <path d="M1304.13,0L1304.13,268.823L1525.87,268.823L1525.87,0Z" stroke="black" stroke-width="8px"
+                        fill="transparent" />
+                </g>
+                <g id="selector-l5" style="display: none">
+                    <path d="M1304.13,808.023L1304.13,1077.62L1525.87,1077.62L1525.87,808.023Z" stroke="red"
+                        stroke-width="8px" fill="transparent" />
+                </g>
+                <g id="selector-m" style="display: none">
+                    <path d="M1304.13,538.42323L1304.13,808.0L1525.87,808.0L1525.87,538.42323Z" stroke="red"
+                        stroke-width="8px" fill="transparent" />
+                </g>
+                <g id="selector-n" style="display: none">
+                    <path d="M1304.13,268.823L1304.13,538.423L1525.87,538.423L1525.87,268.823Z" stroke="red"
+                        stroke-width="8px" fill="transparent" />
+                </g>
+                <g id="selector-o" style="display: none">
+                    <path d="M1304.13,0L1304.13,268.823L1525.87,268.823L1525.87,0Z" stroke="red" stroke-width="8px"
+                        fill="transparent" />
+                </g>
             </g>
         </g>
     </svg>
+    <p id="barge-text">Barge</p>
+    <p id="lf-text">Left Feeder</p>
+    <p id="rf-text">Right Feeder</p>
+    <p id="pr-text">Processor</p>
     <div id="side">
         <p>Status: <span id="status" class="bad">Not Connected</span></p>
     </div>
@@ -363,11 +431,11 @@
         let selectedLevel = -1;
 
         function redraw() {
-            for (let i = 0; i < 12; i++) {
+            for (let i = 0; i < 15; i++) {
                 let disp = selectedReef == i ? "block" : "none";
                 document.getElementById("selector-" + String.fromCharCode('a'.charCodeAt(0) + i)).style.display = disp;
             }
-            for (let i = 0; i < 4; i++) {
+            for (let i = 0; i < 5; i++) {
                 let disp = selectedLevel == i ? "block" : "none";
                 document.getElementById("selector-l" + (i + 1)).style.display = disp;
             }
@@ -450,6 +518,28 @@
                     }
                 }
                 client.addSample(HEIGHT_ID, newLevel);
+            } else if (x < 1525.87) {
+                let newLevel = -1;
+                let newReef = -1;
+                if (y > 538.423) {
+                    if (y > 808.023) {
+                        newLevel = 4;
+                    } else {
+                        newReef = 12
+                    }
+                } else {
+                    if (y > 268.823) {
+                        newReef = 13
+                    } else {
+                        newReef = 14
+                    }
+                }
+                if (newLevel >= 0) {
+                    client.addSample(HEIGHT_ID, newLevel);
+                }
+                if (newReef >= 0) {
+                    client.addSample(REEF_ID, newReef);
+                }
             }
         })
 

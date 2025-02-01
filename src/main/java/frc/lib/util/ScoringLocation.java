@@ -5,7 +5,7 @@ public class ScoringLocation {
 
     /** Reef locations */
     public static enum CoralLocation {
-        A, B, C, D, E, F, G, H, I, J, K, L;
+        A, B, C, D, E, F, G, H, I, J, K, L, LeftFeeder, RightFeeder, Processor;
 
         /** Deserialize from integer */
         public static CoralLocation fromInt(int id) {
@@ -34,6 +34,12 @@ public class ScoringLocation {
                     return CoralLocation.K;
                 case 11:
                     return CoralLocation.L;
+                case 12:
+                    return CoralLocation.LeftFeeder;
+                case 13:
+                    return CoralLocation.RightFeeder;
+                case 14:
+                    return CoralLocation.Processor;
                 default:
                     return null;
             }
@@ -42,7 +48,7 @@ public class ScoringLocation {
 
     /** Reef branch heights */
     public static enum CoralHeight {
-        L1, L2, L3, L4;
+        L1, L2, L3, L4, Barge;
 
         /** Deserialize from integer */
         public static CoralHeight fromInt(int id) {
@@ -54,6 +60,8 @@ public class ScoringLocation {
                 case 2:
                     return CoralHeight.L3;
                 case 3:
+                    return CoralHeight.L4;
+                case 4:
                     return CoralHeight.L4;
                 default:
                     return null;
