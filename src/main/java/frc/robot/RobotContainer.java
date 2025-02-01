@@ -150,8 +150,9 @@ public class RobotContainer {
     }
 
     public void configureTriggerBindings() {
-        climb.resetButton.onTrue(climb.restEncoder());
+        climb.resetButton.and(controllerThree.y()).onTrue(climb.restEncoder());
     }
+
 
     /**
      * Gets the user's selected autonomous command.
