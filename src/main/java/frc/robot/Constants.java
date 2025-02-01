@@ -76,8 +76,8 @@ public final class Constants {
     /**
      * Motor CAN id's.
      */
-
     public static final class Motors {
+
         /**
          * Algae Motor CAN id's
          */
