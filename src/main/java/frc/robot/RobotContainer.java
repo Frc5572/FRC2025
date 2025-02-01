@@ -12,8 +12,10 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.lib.util.ScoringLocation.CoralHeight;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
@@ -46,8 +48,10 @@ public class RobotContainer {
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
     public final CommandXboxController backUpOperator =
         new CommandXboxController(Constants.operatorId);
-    public final CommandXboxController controllerThree =
-        new CommandXboxController(Constants.controllerThreeId);
+    public final CommandXboxController pitController =
+        new CommandXboxController(Constants.PIT_CONTROLLER_ID);
+    public final CommandXboxController altOperator =
+        new CommandXboxController(Constants.ALT_OPERATOR_ID);
 
 
     /** Simulation */
@@ -150,13 +154,6 @@ public class RobotContainer {
             }
         });
 
-        driver.x().onTrue(new InstantCommand(() -> {
-            s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
-        }));
-        driver.y().whileTrue(coralScoring.runScoringMotor(2));
-        driver.rightBumper().whileTrue(climb.runClimberMotorCommand());
-        controllerThree.leftBumper().whileTrue(climb.resetClimberCommand());
-
     }
 
     /**
@@ -169,6 +166,21 @@ public class RobotContainer {
         coralScoring.outtakedCoral
             .onTrue(leds.blinkLEDs(LEDPattern.solid(Color.kCyan)).withTimeout(5));
         climb.resetButton.onTrue(climb.restEncoder());
+        // driver controlls
+        driver.x().onTrue(new InstantCommand(() -> {
+            s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
+        }));
+        driver.y().whileTrue(coralScoring.runScoringMotor(2));
+        driver.rightBumper().whileTrue(climb.runClimberMotorCommand());
+
+        // alt operator controlls
+        altOperator.povDown().onTrue(Commands.runOnce(() -> CoralHeight.decrementState()));
+        altOperator.povUp().onTrue(Commands.runOnce(() -> CoralHeight.incrementState()));
+
+        // pit controller
+        pitController.leftBumper().whileTrue(climb.resetClimberCommand());
+
+
 
     }
 
