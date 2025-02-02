@@ -41,6 +41,9 @@ import edu.wpi.first.units.measure.Voltage;
  * Constants file.
  */
 public final class Constants {
+
+    public static final boolean shouldDrawStuff = false;
+
     /**
      * Stick Deadband
      */
@@ -65,7 +68,12 @@ public final class Constants {
      * Motor CAN id's.
      */
     public static final class Motors {
-
+        /**
+         * Primary Coral Scoring CAN id's
+         */
+        public static final class PrimaryCoralScoring {
+            public static final int Coral_Scoring_NEO_ID = 8;
+        }
     }
 
 
@@ -122,7 +130,7 @@ public final class Constants {
             new Translation2d(-wheelBase.in(Meters) / 2, trackWidth.in(Meters) / 2),
             new Translation2d(-wheelBase.in(Meters) / 2, -trackWidth.in(Meters) / 2)};
 
-        /*
+        /**
          * Swerve Kinematics No need to ever change this unless you are not doing a traditional
          * rectangular/square 4 module swerve
          */
@@ -141,7 +149,7 @@ public final class Constants {
         /* Swerve Current Limiting */
 
 
-        /*
+        /**
          * These values are used by the drive falcon to ramp in open loop and closed loop driving.
          * We found a small open loop ramp (0.25) helps with wear, tipping, etc
          */
@@ -341,4 +349,13 @@ public final class Constants {
         public static final double visionTrust = 0.02;
         public static final double visionTrustRotation = 200.0;
     }
+
+    /**
+     * Primary Coral Scoring Constants
+     */
+    public static final class CoralScoringConstants {
+        public static final int Scoring_Beam_Brake_DIO_Port = 1;
+        public static final int Grabing_RBeam_Brake_DIO_Port = 2;
+    }
+
 }

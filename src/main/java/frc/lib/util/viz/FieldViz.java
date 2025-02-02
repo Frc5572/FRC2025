@@ -23,7 +23,7 @@ public class FieldViz implements Drawable {
     }
 
     @Override
-    public void draw() {
+    public void drawImpl() {
 
     }
 
