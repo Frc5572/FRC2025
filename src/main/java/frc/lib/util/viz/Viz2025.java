@@ -97,6 +97,9 @@ public class Viz2025 implements Drawable {
         mechanisms[CLIMBER_ID] = new Pose3d(Translation3d.kZero, Rotation3d.kZero);
     }
 
+    private Rotation3d prevRotation = new Rotation3d();
+    private double prevAlgaeAngle = 0.0;
+
     /** Publish all values to Logger */
     @Override
     public void drawImpl() {
@@ -120,7 +123,15 @@ public class Viz2025 implements Drawable {
         mechanisms[STAGE4_ID] =
             new Pose3d(new Translation3d(0, 0, Math.min(elevatorHeight, 1.96337 - 0.226559)),
                 Rotation3d.kZero);
-        Rotation3d algaeRotation3d = new Rotation3d(0.0, Units.degreesToRadians(algaeAngle), 0.0);
+
+        Rotation3d algaeRotation3d;
+        if (Math.abs(algaeAngle - prevAlgaeAngle) < 0.1) {
+            algaeRotation3d = prevRotation;
+        } else {
+            algaeRotation3d = new Rotation3d(0.0, Units.degreesToRadians(algaeAngle), 0.0);
+        }
+        prevRotation = algaeRotation3d;
+        prevAlgaeAngle = algaeAngle;
         Translation3d algaeTranslation3d = new Translation3d(0.13335, 0.006358,
             0.615387 + Math.min(elevatorHeight, 1.96337 - 0.226559));
         mechanisms[ALGAE_ID] = new Pose3d(algaeTranslation3d, algaeRotation3d);

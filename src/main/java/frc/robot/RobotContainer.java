@@ -19,6 +19,7 @@ import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberReal;
 import frc.robot.subsystems.coral.CoralScoring;
 import frc.robot.subsystems.coral.CoralScoringIO;
@@ -26,11 +27,9 @@ import frc.robot.subsystems.coral.CoralScoringReal;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
 import frc.robot.subsystems.swerve.SwerveReal;
-import frc.robot.subsystems.swerve.SwerveSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionReal;
-import frc.robot.subsystems.vision.VisionSimPhoton;
 
 
 
@@ -80,17 +79,20 @@ public class RobotContainer {
                 coralScoring = new CoralScoring(new CoralScoringReal());
                 climb = new Climber(new ClimberReal());
                 break;
-            case kSimulation:
-                driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
-                    new Pose2d(3, 3, Rotation2d.kZero));
-                SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
-                s_Swerve = new Swerve(state, new SwerveSim(driveSimulation));
-                s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
-                coralScoring = new CoralScoring(new CoralScoringIO() {});
-                break;
+            // case kSimulation:
+            // driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
+            // new Pose2d(3, 3, Rotation2d.kZero));
+            // SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
+            // s_Swerve = new Swerve(state, new SwerveSim(driveSimulation));
+            // s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
+            // coralScoring = new CoralScoring(new CoralScoringIO() {});
+            // climb = new Climber(new ClimberIO.Empty());
+            // break;
             default:
                 s_Swerve = new Swerve(state, new SwerveIO.Empty() {});
                 s_Vision = new Vision(state, VisionIO::empty);
+                coralScoring = new CoralScoring(new CoralScoringIO() {});
+                climb = new Climber(new ClimberIO.Empty());
         }
         /* Default Commands */
         s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,

@@ -5,8 +5,10 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.math.Conversions;
+import frc.lib.mut.MutableRotation2d;
+import frc.lib.mut.MutableSwerveModulePosition;
+import frc.lib.mut.MutableSwerveModuleState;
 import frc.robot.Constants;
 
 /**
@@ -53,14 +55,10 @@ public class SwerveModule {
      * @param desiredState The desired {@link SwerveModuleState} for the module
      * @param isOpenLoop Whether the state should be open or closed loop controlled
      */
-    public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
+    public void setDesiredState(MutableSwerveModuleState desiredState, boolean isOpenLoop) {
         desiredState.optimize(getState().angle);
         io.setAngleMotor(desiredState.angle.getRotations());
         setSpeed(desiredState, isOpenLoop);
-        SmartDashboard.putNumber("desired state speed/" + moduleNumber,
-            desiredState.speedMetersPerSecond);
-        SmartDashboard.putNumber("desired state angle/" + moduleNumber,
-            desiredState.angle.getDegrees());
     }
 
     /**
@@ -69,7 +67,7 @@ public class SwerveModule {
      * @param desiredState The desired {@link SwerveModuleState} of the module
      * @param isOpenLoop Whether the state should be open or closed loop controlled
      */
-    private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
+    private void setSpeed(MutableSwerveModuleState desiredState, boolean isOpenLoop) {
         if (isOpenLoop) {
             double power = desiredState.speedMetersPerSecond / Constants.Swerve.maxSpeed;
             io.setDriveMotorPower(power);
@@ -78,25 +76,39 @@ public class SwerveModule {
         }
     }
 
+    private final MutableRotation2d canCoderCurrent = new MutableRotation2d();
+
     /**
      * Get the rotation of the CANCoder
      *
-     * @return The rotation of the CANCoder in {@link Rotation2d}
+     * @return The rotation of the CANCoder in {@link MutableRotation2d}
      */
-    public Rotation2d getCANcoder() {
-        return Rotation2d.fromRotations(inputs.absolutePositionAngleEncoder.in(Rotations));
+    public MutableRotation2d getCANcoder() {
+        canCoderCurrent.setAngle(inputs.absolutePositionAngleEncoder);
+        return canCoderCurrent;
     }
+
+    private final MutableRotation2d angle = new MutableRotation2d();
+
+    private MutableRotation2d getAngle() {
+        angle.setRotations(inputs.angleMotorSelectedPosition.in(Rotations));
+        return angle;
+    }
+
+    private final MutableSwerveModuleState state = new MutableSwerveModuleState(0.0, angle);
+    private final MutableSwerveModulePosition position =
+        new MutableSwerveModulePosition(0.0, angle);
 
     /**
      * Get the current Swerve Module State
      *
-     * @return The current {@link SwerveModuleState}
+     * @return The current {@link MutableSwerveModuleState}
      */
-    public SwerveModuleState getState() {
-        return new SwerveModuleState(
-            Conversions.rotationPerSecondToMetersPerSecond(inputs.driveMotorSelectedSensorVelocity,
-                Constants.Swerve.wheelCircumference),
-            Rotation2d.fromRotations(inputs.angleMotorSelectedPosition.in(Rotations)));
+    public MutableSwerveModuleState getState() {
+        getAngle();
+        state.speedMetersPerSecond = Conversions.rotationPerSecondToMetersPerSecond(
+            inputs.driveMotorSelectedSensorVelocity, Constants.Swerve.wheelCircumference);
+        return state;
     }
 
     /**
@@ -104,10 +116,10 @@ public class SwerveModule {
      *
      * @return The current {@link SwerveModulePosition}
      */
-    public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(
-            Conversions.rotationsToMeters(inputs.driveMotorSelectedPosition,
-                Constants.Swerve.wheelCircumference),
-            Rotation2d.fromRotations(inputs.angleMotorSelectedPosition.in(Rotations)));
+    public MutableSwerveModulePosition getPosition() {
+        getAngle();
+        position.distanceMeters = Conversions.rotationsToMeters(inputs.driveMotorSelectedPosition,
+            Constants.Swerve.wheelCircumference);
+        return position;
     }
 }
