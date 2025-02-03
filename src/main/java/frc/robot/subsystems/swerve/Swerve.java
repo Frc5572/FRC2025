@@ -68,7 +68,7 @@ public class Swerve extends SubsystemBase {
 
     private final MutableSwerveModuleState[] desiredStates = new MutableSwerveModuleState[] {
         new MutableSwerveModuleState(), new MutableSwerveModuleState(),
-        new MutableSwerveModuleState(), new MutableSwerveModuleState(),};
+        new MutableSwerveModuleState(), new MutableSwerveModuleState()};
 
     /**
      * Set Swerve Module States

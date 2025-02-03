@@ -57,7 +57,7 @@ public class Rectangle implements ConvexShape, Drawable {
 
     private final MutableTranslation2d[] corners =
         new MutableTranslation2d[] {new MutableTranslation2d(), new MutableTranslation2d(),
-            new MutableTranslation2d(), new MutableTranslation2d(),};
+            new MutableTranslation2d(), new MutableTranslation2d()};
 
     private final double[] cornerValues;
 

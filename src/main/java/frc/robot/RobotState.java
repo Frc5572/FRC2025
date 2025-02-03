@@ -267,7 +267,7 @@ public class RobotState {
 
     private final MutableTranslation2d[] tr =
         new MutableTranslation2d[] {new MutableTranslation2d(), new MutableTranslation2d(),
-            new MutableTranslation2d(), new MutableTranslation2d(),};
+            new MutableTranslation2d(), new MutableTranslation2d()};
 
     private final Penetration penetration = new Penetration("ReefPen");
     private final MutableTranslation2d[] sepResult =

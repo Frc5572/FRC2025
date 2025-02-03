@@ -17,14 +17,17 @@ public class MutableSwerveModuleState {
         this.angle = angle;
     }
 
+    /** Mutable version of {@link SwerveModuleState} */
     public MutableSwerveModuleState() {
         this(0.0, new MutableRotation2d());
     }
 
+    /** Create immutable version */
     public SwerveModuleState toImmutable() {
         return new SwerveModuleState(speedMetersPerSecond, angle.toImmutable());
     }
 
+    /** Copy from immutable version */
     public MutableSwerveModuleState fromImmutable(SwerveModuleState state) {
         this.speedMetersPerSecond = state.speedMetersPerSecond;
         this.angle.setRadians(state.angle.getRadians());

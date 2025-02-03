@@ -77,6 +77,7 @@ public class Axis {
         return project(points, new Interval(0.0, 0.0));
     }
 
+    /** Project multiple points onto this axis. */
     public Interval project(MutableTranslation2d[] points, Interval out) {
         double v = 0.0;
         MutableTranslation2d p = points[0];
