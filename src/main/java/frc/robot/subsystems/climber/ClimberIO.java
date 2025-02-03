@@ -25,6 +25,7 @@ public interface ClimberIO {
 
     public void setEncoderPoisiton(double position);
 
+    /** Do nothing implementation */
     public static class Empty implements ClimberIO {
 
         @Override
