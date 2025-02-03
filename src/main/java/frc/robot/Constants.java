@@ -251,8 +251,8 @@ public final class Constants {
         }
 
         public static final Mass robotMass = Pounds.of(120.0);
-        public static final Distance bumperFront = Inches.of(20.0);
-        public static final Distance bumperRight = Inches.of(20.0);
+        public static final Distance bumperFront = Inches.of(17.5);
+        public static final Distance bumperRight = Inches.of(17.5);
 
         /** Get config for Maple-Sim. */
         public static DriveTrainSimulationConfig getMapleConfig() {
