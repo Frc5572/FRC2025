@@ -285,8 +285,8 @@ public final class Constants {
      */
 
     public static final class Elevator {
-        public static final int RIGHT_ID = 28;
-        public static final int LEFT_ID = 27;
+        public static final int RIGHT_ID = 7;
+        public static final int LEFT_ID = 4;
         public static final int LIMIT_ID = 0;
 
         public static final NeutralModeValue BREAK = NeutralModeValue.Brake;
@@ -303,14 +303,11 @@ public final class Constants {
 
         // positions
         public static final Distance HOME = Inches.of(2);
-        public static final Distance P1 = Inches.of(60);
-        public static final Distance P2 = Inches.of(32);
-        public static final Distance P3 = Inches.of(44);
-        public static final Distance P4 = Inches.of(48);
-        public static final Distance P5 = Inches.of(72);
-        public static final Distance A1 = Inches.of(0); // unset: lower reef algae
-        public static final Distance A2 = Inches.of(0); // unset: upper reef algae
-        public static final Distance BARGE = Inches.of(72);
+        public static final Distance P0 = Inches.of(60);
+        public static final Distance P1 = Inches.of(32);
+        public static final Distance P2 = Inches.of(44);
+        public static final Distance P3 = Inches.of(48);
+        public static final Distance P4 = Inches.of(72);
 
 
         public static final double gearRatio = 1.0;

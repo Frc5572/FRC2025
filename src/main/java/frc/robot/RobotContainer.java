@@ -24,14 +24,14 @@ import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
 import frc.robot.subsystems.LEDs;
-import frc.robot.subsystems.Elevator.Elevator;
-import frc.robot.subsystems.Elevator.ElevatorIO;
-import frc.robot.subsystems.Elevator.ElevatorReal;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberReal;
 import frc.robot.subsystems.coral.CoralScoring;
 import frc.robot.subsystems.coral.CoralScoringIO;
 import frc.robot.subsystems.coral.CoralScoringReal;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorIO;
+import frc.robot.subsystems.elevator.ElevatorReal;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
 import frc.robot.subsystems.swerve.SwerveReal;
@@ -102,8 +102,10 @@ public class RobotContainer {
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
                 s_Swerve = new Swerve(state, new SwerveSim(driveSimulation));
                 s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
+
                 coralScoring = new CoralScoring(new CoralScoringIO() {});
                 elevator = new Elevator(new ElevatorIO() {});
+
                 break;
             default:
                 elevator = new Elevator(new ElevatorIO() {});
@@ -132,7 +134,7 @@ public class RobotContainer {
         driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
 
         driver.povDown().onTrue(elevator.home());
-        driver.povLeft().onTrue(elevator.p1());
+        driver.povLeft().onTrue(elevator.p0());
         driver.leftTrigger().onTrue(elevator.p2());
         SmartDashboard.putNumber("elevatorVoltage", 1.0);
         driver.povUp().whileTrue(elevator.moveUp());

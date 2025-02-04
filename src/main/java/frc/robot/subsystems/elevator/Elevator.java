@@ -60,6 +60,10 @@ public class Elevator extends SubsystemBase {
      * @return elevator at l2
      *
      */
+    public Command p0() {
+        return moveTo(Constants.Elevator.P0);
+    }
+
     public Command p1() {
         return moveTo(Constants.Elevator.P1);
     }
@@ -76,6 +80,7 @@ public class Elevator extends SubsystemBase {
         return moveTo(Constants.Elevator.P4);
     }
 
+<<<<<<< HEAD:src/main/java/frc/robot/subsystems/Elevator/Elevator.java
     public Command p5() {
         return moveTo(Constants.Elevator.P5);
     }
@@ -100,6 +105,8 @@ public class Elevator extends SubsystemBase {
         }).until(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1);
     }
 
+=======
+>>>>>>> Elevator:src/main/java/frc/robot/subsystems/elevator/Elevator.java
     /**
      * sets height of elevator
      *
