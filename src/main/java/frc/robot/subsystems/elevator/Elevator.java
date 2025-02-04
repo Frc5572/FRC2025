@@ -129,35 +129,5 @@ public class Elevator extends SubsystemBase {
             default:
                 return home();
         }
-        // switch (HeightMode.getCurrentHeightMode()) {
-        // case kAlgae:
-        // switch (CoralHeight.getCurrentState()) {
-        // case Klevel1:
-        // return elevator.p1();
-        // break;
-        // case Klevel2:
-        // return elevator.p2();
-        // break;
-        // case Klevel3:
-        // return elevator.p3();
-        // break;
-        // case Klevel4:
-        // return elevator.p4();
-        // break;
-        // }
-        // break;
-        // case kCoral:
-        // switch (AlgaeHeight.getCurrentHeightMode()) {
-        // case Klevel1:
-        // elevator.a1(); // constant unset
-        // break;
-
-        // case Klevel2:
-        // elevator.a2(); // constant unset
-        // break;
-        // }
-        // default:
-        // return null;
-        // }
     }
 }
