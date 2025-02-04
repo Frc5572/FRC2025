@@ -96,6 +96,7 @@ public class RobotContainer {
                 coralScoring = new CoralScoring(new CoralScoringReal());
                 climb = new Climber(new ClimberReal());
                 break;
+
             case kSimulation:
                 driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
                     new Pose2d(3, 3, Rotation2d.kZero));
@@ -206,34 +207,37 @@ public class RobotContainer {
             .onTrue(Commands.runOnce(() -> AlgaeHeight.decrementState()));
         altOperator.povLeft().onTrue(Commands.runOnce(() -> HeightMode.decrementState()));
         altOperator.povRight().onTrue(Commands.runOnce(() -> HeightMode.incrementState()));
-        altOperator.a().whileTrue(elevator.moveTo(() -> {
+        altOperator.a().whileTrue(elevator.goToHeight(() -> {
             switch (HeightMode.getCurrentHeightMode()) {
                 case kAlgae:
                     switch (CoralHeight.getCurrentState()) {
                         case Klevel1:
-                            elevator.p1();
-                            break;
+                            return Constants.Elevator.P1;
                         case Klevel2:
-                            elevator.p2();
-                            break;
+                            return Constants.Elevator.P1;
+
                         case Klevel3:
-                            elevator.p3();
-                            break;
+                            return Constants.Elevator.P1;
+
                         case Klevel4:
-                            elevator.p4();
-                            break;
+                            return Constants.Elevator.P1;
+                        default:
+                            return null;
                     }
-                    break;
+
                 case kCoral:
                     switch (AlgaeHeight.getCurrentHeightMode()) {
                         case Klevel1:
-                            elevator.a1(); // constant unset
-                            break;
+                            return Constants.Elevator.P1;
+
 
                         case Klevel2:
-                            elevator.a2(); // constant unset
-                            break;
+                            return Constants.Elevator.P1;
+                        default:
+                            return null;
                     }
+                default:
+                    return null;
             }
         }));
 
