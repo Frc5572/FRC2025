@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -310,9 +311,11 @@ public final class Constants {
 
 
         public static final double gearRatio = 1.0;
-
-        public static final double METERS_AT_TOP = Units.inchesToMeters(72.0);
-        public static final double ROTATIONS_AT_TOP = 220.0 / 2.0 / Math.PI;
+        public static final double SensorToMechanismRatio =
+            Constants.Elevator.ROTATIONS_AT_TOP.in(Rotations)
+                / Constants.Elevator.METERS_AT_TOP.in(Meters);
+        public static final Distance METERS_AT_TOP = Meters.of(Units.inchesToMeters(72.0));
+        public static final Angle ROTATIONS_AT_TOP = Rotations.of(220.0 / 2.0 / Math.PI);
     }
 
 

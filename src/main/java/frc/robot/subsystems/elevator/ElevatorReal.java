@@ -42,15 +42,16 @@ public class ElevatorReal implements ElevatorIO {
 
         leftElevatorMotor.setControl(new Follower(rightElevatorMotor.getDeviceID(), true));
         leftElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
+        leftElevatorConf.Feedback.SensorToMechanismRatio =
+            Constants.Elevator.SensorToMechanismRatio;
 
         // right conf
         rightElevatorConf.MotorOutput.NeutralMode = Constants.Elevator.BREAK;
         leftElevatorConf.MotorOutput.NeutralMode = Constants.Elevator.BREAK;
 
         rightElevatorConf.Feedback.SensorToMechanismRatio =
-            Constants.Elevator.ROTATIONS_AT_TOP / Constants.Elevator.METERS_AT_TOP;
-        leftElevatorConf.Feedback.SensorToMechanismRatio =
-            Constants.Elevator.ROTATIONS_AT_TOP / Constants.Elevator.METERS_AT_TOP;
+            Constants.Elevator.SensorToMechanismRatio;
+
 
         // PID and feedforward
 

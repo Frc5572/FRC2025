@@ -36,8 +36,8 @@ public class Elevator extends SubsystemBase {
      * @return home position
      */
     public Command homeTimer() {
-        Command slowLower = Commands.run(() -> io.setVoltage(-0.1));
-        return moveTo(Constants.Elevator.HOME).andThen(slowLower).withTimeout(1);
+        Command slowLower = Commands.run(() -> io.setVoltage(-0.1)).withTimeout(1);
+        return moveTo(Constants.Elevator.HOME).andThen(slowLower);
     }
 
     /**
