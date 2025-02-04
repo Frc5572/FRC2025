@@ -1,4 +1,4 @@
-package frc.robot.subsystems.Elevator;
+package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
@@ -80,23 +80,6 @@ public class Elevator extends SubsystemBase {
         return moveTo(Constants.Elevator.P4);
     }
 
-<<<<<<< HEAD:src/main/java/frc/robot/subsystems/Elevator/Elevator.java
-    public Command p5() {
-        return moveTo(Constants.Elevator.P5);
-    }
-
-    public Command barge() {
-        return moveTo(Constants.Elevator.BARGE);
-    }
-
-    public Command a1() {
-        return moveTo(Constants.Elevator.A1);
-    }
-
-    public Command a2() {
-        return moveTo(Constants.Elevator.A2);
-    }
-
     public Command goToHeight(Supplier<Distance> height) {
         return run(() -> {
             double desiredHeight = height.get().in(Meters);
@@ -105,8 +88,6 @@ public class Elevator extends SubsystemBase {
         }).until(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1);
     }
 
-=======
->>>>>>> Elevator:src/main/java/frc/robot/subsystems/elevator/Elevator.java
     /**
      * sets height of elevator
      *
