@@ -45,7 +45,7 @@ public class Hexagon implements ConvexShape, Drawable {
     }
 
     @Override
-    public void draw() {
+    public void drawImpl() {
         Logger.recordOutput(name, vertices);
     }
 

@@ -149,7 +149,7 @@ public class AvoidReef extends Command implements Drawable {
     }
 
     @Override
-    public void draw() {
+    public void drawImpl() {
         Pose2d current = currentPose.get();
         ArrayList<Pose2d> poses = new ArrayList<>();
         poses.add(current);

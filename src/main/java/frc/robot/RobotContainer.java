@@ -1,5 +1,6 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -7,13 +8,23 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
+import frc.robot.subsystems.LEDs;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberIO;
+import frc.robot.subsystems.climber.ClimberReal;
+import frc.robot.subsystems.coral.CoralScoring;
+import frc.robot.subsystems.coral.CoralScoringIO;
+import frc.robot.subsystems.coral.CoralScoringReal;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
 import frc.robot.subsystems.swerve.SwerveReal;
@@ -22,6 +33,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionReal;
 import frc.robot.subsystems.vision.VisionSimPhoton;
+
 
 
 /**
@@ -34,9 +46,13 @@ public class RobotContainer {
 
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
+    public final CommandXboxController controllerThree =
+        new CommandXboxController(Constants.controllerThreeId);
+
 
     /** Simulation */
     private SwerveDriveSimulation driveSimulation;
+
 
     /** Visualization */
     private final FieldViz fieldVis;
@@ -45,8 +61,12 @@ public class RobotContainer {
     private final RobotState state;
 
     /* Subsystems */
+
+    private LEDs leds = new LEDs();
     private final Swerve s_Swerve;
     private final Vision s_Vision;
+    private CoralScoring coralScoring;
+    private Climber climb;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -59,6 +79,8 @@ public class RobotContainer {
             case kReal:
                 s_Swerve = new Swerve(state, new SwerveReal());
                 s_Vision = new Vision(state, VisionReal::new);
+                coralScoring = new CoralScoring(new CoralScoringReal());
+                climb = new Climber(new ClimberReal());
                 break;
             case kSimulation:
                 driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
@@ -66,14 +88,22 @@ public class RobotContainer {
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
                 s_Swerve = new Swerve(state, new SwerveSim(driveSimulation));
                 s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
+                coralScoring = new CoralScoring(new CoralScoringIO() {});
+                climb = new Climber(new ClimberIO.Empty());
                 break;
             default:
                 s_Swerve = new Swerve(state, new SwerveIO.Empty() {});
                 s_Vision = new Vision(state, VisionIO::empty);
+                coralScoring = new CoralScoring(new CoralScoringIO() {});
+                climb = new Climber(new ClimberIO.Empty());
         }
+        /* Default Commands */
         s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
+        leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed).ignoringDisable(true));
+        /* Button and Trigger Bindings */
         configureButtonBindings(runtimeType);
+        configureTriggerBindings();
     }
 
     /**
@@ -87,6 +117,64 @@ public class RobotContainer {
         driver.x().onTrue(new InstantCommand(() -> {
             s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
         }));
+        driver.a().onTrue(new Command() {
+            Timer timer = new Timer();
+
+            @Override
+            public void initialize() {
+                timer.reset();
+                timer.start();
+            }
+
+            @Override
+            public void execute() {
+                vis.setElevatorHeight(Inches.of(timer.get() * 30.0));
+            }
+
+            @Override
+            public boolean isFinished() {
+                return timer.hasElapsed(3.0);
+            }
+        });
+        driver.b().onTrue(new Command() {
+            Timer timer = new Timer();
+
+            @Override
+            public void initialize() {
+                timer.reset();
+                timer.start();
+            }
+
+            @Override
+            public void execute() {
+                vis.setElevatorHeight(Inches.of(Math.max(72.0 - timer.get() * 30.0, 0)));
+            }
+
+            @Override
+            public boolean isFinished() {
+                return timer.hasElapsed(3.0);
+            }
+        });
+
+        driver.x().onTrue(new InstantCommand(() -> {
+            s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
+        }));
+        driver.y().whileTrue(coralScoring.runScoringMotor(2));
+        driver.rightStick().whileTrue(climb.runClimberMotorCommand());
+        controllerThree.y().whileTrue(climb.resetClimberCommand());
+
+    }
+
+    /**
+     * Triggers
+     */
+
+    public void configureTriggerBindings() {
+        coralScoring.intakedCoralRight.onTrue(leds.setLEDsSolid(Color.kRed).withTimeout(5));
+        coralScoring.intakedCoralRight.onTrue(coralScoring.runPreScoringMotor(2));
+        coralScoring.outtakedCoral
+            .onTrue(leds.blinkLEDs(LEDPattern.solid(Color.kCyan)).withTimeout(5));
+        climb.resetButton.onTrue(climb.restEncoder());
     }
 
     /**
@@ -104,7 +192,7 @@ public class RobotContainer {
      * Update viz
      */
     public void updateViz() {
-        vis.draw();
+        vis.drawImpl();
     }
 
     /** Start simulation */
@@ -125,6 +213,7 @@ public class RobotContainer {
             Logger.recordOutput("FieldSimulation/Coral",
                 SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
             vis.setActualPose(driveSimulation.getSimulatedDriveTrainPose());
+
         }
     }
 

@@ -70,7 +70,7 @@ public class Rectangle implements ConvexShape, Drawable {
     }
 
     @Override
-    public void draw() {
+    public void drawImpl() {
         updateVertices();
         Logger.recordOutput(name, vertices);
     }
