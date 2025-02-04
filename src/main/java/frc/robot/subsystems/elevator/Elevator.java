@@ -113,21 +113,32 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command modeSwapper() {
+        Command positon;
         switch (Height.getCurrentState()) {
             case kHome:
-                return home();
+                SmartDashboard.putData("home", null);
+                positon = home();
+                break;
             case KPosition0:
-                return p0();
+                positon = p0();
+                break;
             case KPosition1:
-                return p1();
+                positon = p1();
+                break;
             case KPosition2:
-                return p2();
+                positon = p2();
+                break;
             case KPosition3:
-                return p3();
+                positon = p3();
+                break;
             case kPosition4:
-                return p4();
+                positon = p4();
+                break;
             default:
-                return home();
+                positon = home();
+                break;
+
         }
+        return positon;
     }
 }
