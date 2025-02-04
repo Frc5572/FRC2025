@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.ScoringLocation.AlgaeHeight;
 import frc.lib.util.ScoringLocation.CoralHeight;
+import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.ScoringLocation.HeightMode;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
@@ -124,6 +125,7 @@ public class RobotContainer {
         configureTriggerBindings();
     }
 
+
     /**
      * Use this method to vol your button->command mappings. Buttons can be created by instantiating
      * a {@link GenericHID} or one of its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or
@@ -139,6 +141,12 @@ public class RobotContainer {
         SmartDashboard.putNumber("elevatorVoltage", 1.0);
         driver.povUp().whileTrue(elevator.moveUp());
         driver.povRight().whileTrue(elevator.moveDown());
+
+        // alt operator
+        altOperator.povUp().whileTrue(Commands.runOnce(() -> Height.incrementState()));
+        altOperator.povDown().whileTrue(Commands.runOnce(() -> Height.decrementState()));
+        altOperator.a().whileTrue(elevator.modeSwapper());
+
         backUpOperator.a().onTrue(new Command() {
             Timer timer = new Timer();
 
@@ -208,36 +216,7 @@ public class RobotContainer {
             .onTrue(Commands.runOnce(() -> AlgaeHeight.decrementState()));
         altOperator.povLeft().onTrue(Commands.runOnce(() -> HeightMode.decrementState()));
         altOperator.povRight().onTrue(Commands.runOnce(() -> HeightMode.incrementState()));
-        altOperator.a().whileTrue(elevator.moveTo(() -> {
-            switch (HeightMode.getCurrentHeightMode()) {
-                case kAlgae:
-                    switch (CoralHeight.getCurrentState()) {
-                        case Klevel1:
-                            elevator.p1();
-                            break;
-                        case Klevel2:
-                            elevator.p2();
-                            break;
-                        case Klevel3:
-                            elevator.p3();
-                            break;
-                        case Klevel4:
-                            elevator.p4();
-                            break;
-                    }
-                    break;
-                case kCoral:
-                    switch (AlgaeHeight.getCurrentHeightMode()) {
-                        case Klevel1:
-                            elevator.a1(); // constant unset
-                            break;
-
-                        case Klevel2:
-                            elevator.a2(); // constant unset
-                            break;
-                    }
-            }
-        }));
+        // altOperator.a().whileTrue(() -> ());
 
         // pit controller
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());

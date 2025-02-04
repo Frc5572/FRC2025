@@ -20,7 +20,7 @@ public class ScoringLocation {
          */
         public HeightMode increment() {
             int new_ordinal = this.ordinal() + 1;
-            if (new_ordinal >= CoralHeight.values().length) {
+            if (new_ordinal >= Height.values().length) {
                 return this;
             }
             return HeightMode.values()[new_ordinal];
@@ -32,7 +32,7 @@ public class ScoringLocation {
          */
         public HeightMode decrement() {
             int new_ordinal = this.ordinal() - 1;
-            if (new_ordinal >= CoralHeight.values().length) {
+            if (new_ordinal >= Height.values().length) {
                 return this;
             }
             return HeightMode.values()[new_ordinal];
@@ -55,6 +55,7 @@ public class ScoringLocation {
             return currentState;
         }
     }
+
 
     /**
      * algae height states
@@ -138,6 +139,55 @@ public class ScoringLocation {
 
         /** Get currently tracked state. */
         public static CoralHeight getCurrentState() {
+            return currentState;
+        }
+
+        /** Advance state forward by one. */
+        public static void incrementState() {
+            currentState = currentState.increment();
+        }
+
+        /** Advance state backwards by one. */
+        public static void decrementState() {
+            currentState = currentState.decrement();
+        }
+    }
+
+    /**
+     * Coral height states
+     */
+    public enum Height {
+        kHome, KPosition0, KPosition1, KPosition2, KPosition3, kPosition4;
+
+        /**
+         *
+         * @return increments coral state
+         */
+        public Height increment() {
+            int new_ordinal = this.ordinal() + 1;
+            if (new_ordinal >= Height.values().length) {
+                return this;
+            }
+            return Height.values()[new_ordinal];
+        }
+
+        /**
+         *
+         * @return decrements coral state
+         */
+        public Height decrement() {
+            int new_ordinal = this.ordinal() - 1;
+            if (new_ordinal < 0) {
+                return this;
+            }
+            return Height.values()[new_ordinal];
+
+        }
+
+        public static Height currentState = Height.kHome;
+
+        /** Get currently tracked state. */
+        public static Height getCurrentState() {
             return currentState;
         }
 

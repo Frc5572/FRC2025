@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.ScoringLocation.Height;
 import frc.robot.Constants;
 
 /**
@@ -109,5 +110,54 @@ public class Elevator extends SubsystemBase {
 
     public Command moveDown() {
         return runEnd(() -> io.setVoltage(-1.0), () -> io.setVoltage(0));
+    }
+
+    public Command modeSwapper() {
+        switch (Height.getCurrentState()) {
+            case kHome:
+                return home();
+            case KPosition0:
+                return p0();
+            case KPosition1:
+                return p1();
+            case KPosition2:
+                return p2();
+            case KPosition3:
+                return p3();
+            case kPosition4:
+                return p4();
+            default:
+                return home();
+        }
+        // switch (HeightMode.getCurrentHeightMode()) {
+        // case kAlgae:
+        // switch (CoralHeight.getCurrentState()) {
+        // case Klevel1:
+        // return elevator.p1();
+        // break;
+        // case Klevel2:
+        // return elevator.p2();
+        // break;
+        // case Klevel3:
+        // return elevator.p3();
+        // break;
+        // case Klevel4:
+        // return elevator.p4();
+        // break;
+        // }
+        // break;
+        // case kCoral:
+        // switch (AlgaeHeight.getCurrentHeightMode()) {
+        // case Klevel1:
+        // elevator.a1(); // constant unset
+        // break;
+
+        // case Klevel2:
+        // elevator.a2(); // constant unset
+        // break;
+        // }
+        // default:
+        // return null;
+        // }
     }
 }
