@@ -28,7 +28,7 @@ public class Line implements Drawable {
     private static final double maxY = FieldConstants.fieldWidth.in(Meters) + 20.0;
 
     @Override
-    public void draw() {
+    public void drawImpl() {
         if (a == 0 && b == 0) {
             throw new IllegalArgumentException("a and b cannot simultaneously be zero!");
         } else if (b == 0) {
