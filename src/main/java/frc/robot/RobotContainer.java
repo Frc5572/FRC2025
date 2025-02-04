@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -23,6 +24,9 @@ import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
 import frc.robot.subsystems.LEDs;
+import frc.robot.subsystems.Elevator.Elevator;
+import frc.robot.subsystems.Elevator.ElevatorIO;
+import frc.robot.subsystems.Elevator.ElevatorReal;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberReal;
 import frc.robot.subsystems.coral.CoralScoring;
@@ -67,9 +71,11 @@ public class RobotContainer {
     /** State */
     private final RobotState state;
 
+
     /* Subsystems */
 
     private LEDs leds = new LEDs();
+    private Elevator elevator;
     private final Swerve s_Swerve;
     private final Vision s_Vision;
     private CoralScoring coralScoring;
@@ -84,6 +90,7 @@ public class RobotContainer {
         state = new RobotState(vis);
         switch (runtimeType) {
             case kReal:
+                elevator = new Elevator(new ElevatorReal());
                 s_Swerve = new Swerve(state, new SwerveReal());
                 s_Vision = new Vision(state, VisionReal::new);
                 coralScoring = new CoralScoring(new CoralScoringReal());
@@ -96,16 +103,21 @@ public class RobotContainer {
                 s_Swerve = new Swerve(state, new SwerveSim(driveSimulation));
                 s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
                 coralScoring = new CoralScoring(new CoralScoringIO() {});
+                elevator = new Elevator(new ElevatorIO() {});
                 break;
             default:
+                elevator = new Elevator(new ElevatorIO() {});
                 s_Swerve = new Swerve(state, new SwerveIO.Empty() {});
                 s_Vision = new Vision(state, VisionIO::empty);
+
         }
+
         /* Default Commands */
         s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
         leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed).ignoringDisable(true));
         /* Button and Trigger Bindings */
+
         configureButtonBindings(runtimeType);
         configureTriggerBindings();
     }
@@ -114,10 +126,17 @@ public class RobotContainer {
      * Use this method to vol your button->command mappings. Buttons can be created by instantiating
      * a {@link GenericHID} or one of its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or
      * {@link XboxController}), and then passing it to a
-     * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+     * {@link edu1.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
         driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
+
+        driver.povDown().onTrue(elevator.home());
+        driver.povLeft().onTrue(elevator.p1());
+        driver.leftTrigger().onTrue(elevator.p2());
+        SmartDashboard.putNumber("elevatorVoltage", 1.0);
+        driver.povUp().whileTrue(elevator.moveUp());
+        driver.povRight().whileTrue(elevator.moveDown());
         backUpOperator.a().onTrue(new Command() {
             Timer timer = new Timer();
 
@@ -187,10 +206,42 @@ public class RobotContainer {
             .onTrue(Commands.runOnce(() -> AlgaeHeight.decrementState()));
         altOperator.povLeft().onTrue(Commands.runOnce(() -> HeightMode.decrementState()));
         altOperator.povRight().onTrue(Commands.runOnce(() -> HeightMode.incrementState()));
+        altOperator.a().whileTrue(elevator.moveTo(() -> {
+            switch (HeightMode.getCurrentHeightMode()) {
+                case kAlgae:
+                    switch (CoralHeight.getCurrentState()) {
+                        case Klevel1:
+                            elevator.p1();
+                            break;
+                        case Klevel2:
+                            elevator.p2();
+                            break;
+                        case Klevel3:
+                            elevator.p3();
+                            break;
+                        case Klevel4:
+                            elevator.p4();
+                            break;
+                    }
+                    break;
+                case kCoral:
+                    switch (AlgaeHeight.getCurrentHeightMode()) {
+                        case Klevel1:
+                            elevator.a1(); // constant unset
+                            break;
+
+                        case Klevel2:
+                            elevator.a2(); // constant unset
+                            break;
+                    }
+            }
+        }));
 
         // pit controller
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());
     }
+
+
 
     // trigger
     public Trigger isCoralTrigger = new Trigger(() -> isCoral());
@@ -241,5 +292,6 @@ public class RobotContainer {
 
         }
     }
-
 }
+
+

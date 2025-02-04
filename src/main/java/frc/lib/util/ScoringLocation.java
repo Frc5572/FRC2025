@@ -97,6 +97,10 @@ public class ScoringLocation {
         public static void decrementState() {
             currentState = currentState.decrement();
         }
+
+        public static AlgaeHeight getCurrentHeightMode() {
+            return currentState;
+        }
     }
 
     /**

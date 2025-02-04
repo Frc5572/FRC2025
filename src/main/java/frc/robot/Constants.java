@@ -25,6 +25,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -278,6 +279,47 @@ public final class Constants {
         }
     }
 
+
+    /**
+     * Elevator Constants
+     */
+
+    public static final class Elevator {
+        public static final int RIGHT_ID = 28;
+        public static final int LEFT_ID = 27;
+        public static final int LIMIT_ID = 0;
+
+        public static final NeutralModeValue BREAK = NeutralModeValue.Brake;
+
+        // PID and feedforward
+        public static final double KP = 5.0;
+        public static final double KI = 1.5;
+        public static final double KD = 0.0;
+        public static final double KS = 0.1675;
+        public static final double KV = 0.0;
+        public static final double KA = 0.0;
+        public static final double KG = 0.3375;
+        public static final AngularVelocity MAX_VELOCITY = RotationsPerSecond.of(0.0);
+
+        // positions
+        public static final Distance HOME = Inches.of(2);
+        public static final Distance P1 = Inches.of(60);
+        public static final Distance P2 = Inches.of(32);
+        public static final Distance P3 = Inches.of(44);
+        public static final Distance P4 = Inches.of(48);
+        public static final Distance P5 = Inches.of(72);
+        public static final Distance A1 = Inches.of(0); // unset: lower reef algae
+        public static final Distance A2 = Inches.of(0); // unset: upper reef algae
+        public static final Distance BARGE = Inches.of(72);
+
+
+        public static final double gearRatio = 1.0;
+
+        public static final double METERS_AT_TOP = Units.inchesToMeters(72.0);
+        public static final double ROTATIONS_AT_TOP = 220.0 / 2.0 / Math.PI;
+    }
+
+
     /** Vision Constants */
     public static class Vision {
 
@@ -317,5 +359,6 @@ public final class Constants {
         public static final int Scoring_Beam_Brake_DIO_Port = 1;
         public static final int Grabing_RBeam_Brake_DIO_Port = 2;
     }
+
 
 }
