@@ -7,10 +7,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.Constants;
 
 /** Visualization of the 2025 Robot */
@@ -24,9 +28,13 @@ public class Viz2025 implements Drawable {
     private boolean algaeDropped = false;
     private Pose2d estimatedPose;
     private Pose2d actualPose = new Pose2d();
-    private final Pose3d[] mechanisms = new Pose3d[9];
-    private boolean hasCoral = false;
-    private boolean hasAlgae = false;
+    private final Pose3d[] mechanisms = new Pose3d[11];
+    private boolean hasCoral = true;
+    private boolean hasAlgae = true;
+    private static final Transform3d coralOffset = new Transform3d(
+        new Translation3d(0.236157, -0.157444, 0.383131), new Rotation3d(0, Math.toRadians(42), 0));
+    private static final Transform3d algaeOffset =
+        new Transform3d(new Translation3d(0.389977, 0, 0.602934), Rotation3d.kZero);
 
     private static final int CLIMBER_ID = 0;
     private static final int STAGE2_ID = 1;
@@ -37,6 +45,11 @@ public class Viz2025 implements Drawable {
     private static final int BR_ID = 6;
     private static final int FL_ID = 7;
     private static final int FR_ID = 8;
+    private static final int RED_BUMPER = 9;
+    private static final int BLUE_BUMPER = 10;
+
+    private final Pose3d useBumper = new Pose3d(new Translation3d(0, 0, 1), Rotation3d.kZero);
+    private final Pose3d invisible = new Pose3d(new Translation3d(0, 0, -100), Rotation3d.kZero);
 
     /** Visualization of the 2025 Robot */
     public Viz2025(FieldViz fieldViz, String prefix) {
@@ -66,7 +79,20 @@ public class Viz2025 implements Drawable {
 
     /** Set the estimated drivetrain state, including swerve drive poses.` */
     public void setDrivetrainState(Pose2d estimatedPose, Rotation2d[] states) {
+        var alliance = DriverStation.getAlliance();
+        if (alliance.isPresent()) {
+            if (alliance.get() == Alliance.Red) {
+                mechanisms[RED_BUMPER] = useBumper;
+                mechanisms[BLUE_BUMPER] = Pose3d.kZero;
+            } else {
+                mechanisms[BLUE_BUMPER] = useBumper;
+                mechanisms[RED_BUMPER] = Pose3d.kZero;
+            }
+        }
         this.estimatedPose = estimatedPose;
+        if (RobotBase.isReal()) {
+            this.actualPose = estimatedPose;
+        }
         mechanisms[BL_ID] = new Pose3d(new Translation3d(Constants.Swerve.moduleTranslations[0]),
             new Rotation3d(states[0]));
         mechanisms[BR_ID] = new Pose3d(new Translation3d(Constants.Swerve.moduleTranslations[1]),
@@ -99,7 +125,7 @@ public class Viz2025 implements Drawable {
 
     /** Publish all values to Logger */
     @Override
-    public void draw() {
+    public void drawImpl() {
         if (elevatorHeight > 0.1) {
             algaeDropped = true;
         }
@@ -127,6 +153,18 @@ public class Viz2025 implements Drawable {
         Logger.recordOutput(prefix + "Viz/Mechanisms", mechanisms);
         Logger.recordOutput(prefix + "Viz/EstimatedPose", estimatedPose);
         Logger.recordOutput(prefix + "Viz/ActualPose", actualPose);
+        if (hasCoral) {
+            Logger.recordOutput(prefix + "Viz/HeldCoral", new Pose3d(actualPose)
+                .plus(mechanisms[STAGE4_ID].minus(Pose3d.kZero)).plus(coralOffset));
+        } else {
+            Logger.recordOutput(prefix + "Viz/HeldCoral", invisible);
+        }
+        if (hasAlgae) {
+            Logger.recordOutput(prefix + "Viz/HeldAlgae", new Pose3d(actualPose)
+                .plus(mechanisms[STAGE4_ID].minus(Pose3d.kZero)).plus(algaeOffset));
+        } else {
+            Logger.recordOutput(prefix + "Viz/HeldAlgae", invisible);
+        }
     }
 
 }

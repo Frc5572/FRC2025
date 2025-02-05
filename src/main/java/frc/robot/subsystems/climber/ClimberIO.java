@@ -25,5 +25,24 @@ public interface ClimberIO {
 
     public void setEncoderPoisiton(double position);
 
+    /** Do nothing implementation */
+    public static class Empty implements ClimberIO {
+
+        @Override
+        public void updateInputs(ClimberInputs inputs) {
+
+        }
+
+        @Override
+        public void setClimbMotorVoltage(double voltage) {
+
+        }
+
+        @Override
+        public void setEncoderPoisiton(double position) {
+
+        }
+
+    }
 
 }
