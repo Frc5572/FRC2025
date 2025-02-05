@@ -3,6 +3,8 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import java.util.stream.IntStream;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
@@ -76,6 +78,17 @@ public class FieldConstants {
         // Axis.fromRotation(Rotation2d.fromDegrees(60)),
         // Axis.fromRotation(Rotation2d.fromDegrees(120)),};
 
+    }
+
+    /** Staged game pieces */
+    public static class StagingPositions {
+        // Measured from the center of the ice cream
+        public static final Pose2d leftIceCream =
+            new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(230.5), new Rotation2d());
+        public static final Pose2d middleIceCream =
+            new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(158.5), new Rotation2d());
+        public static final Pose2d rightIceCream =
+            new Pose2d(Units.inchesToMeters(48), Units.inchesToMeters(86.5), new Rotation2d());
     }
 
 }
