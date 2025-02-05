@@ -170,8 +170,9 @@ public class RobotContainer {
         coralScoring.intakedCoralRight.onTrue(coralScoring.runPreScoringMotor(2));
         coralScoring.outtakedCoral
             .onTrue(leds.blinkLEDs(LEDPattern.solid(Color.kCyan)).withTimeout(5));
-        climb.resetButton.onTrue(climb.restEncoder());
+        climb.resetButton.and(controllerThree.y()).onTrue(climb.restEncoder());
     }
+
 
     /**
      * Gets the user's selected autonomous command.
