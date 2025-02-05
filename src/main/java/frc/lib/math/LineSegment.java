@@ -17,7 +17,7 @@ public class LineSegment implements ConvexShape, Drawable {
     }
 
     @Override
-    public void draw() {
+    public void drawImpl() {
         Logger.recordOutput(name, new Translation2d[] {from, to});
     }
 

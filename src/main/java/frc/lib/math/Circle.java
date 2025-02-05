@@ -21,7 +21,7 @@ public class Circle implements ConvexShape, Drawable {
     private static final int RESOLUTION = 20;
 
     @Override
-    public void draw() {
+    public void drawImpl() {
         Translation2d[] points = new Translation2d[RESOLUTION + 1];
         for (int i = 0; i < RESOLUTION + 1; i++) {
             points[i] = center.plus(new Translation2d(radius,

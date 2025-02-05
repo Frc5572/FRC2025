@@ -18,7 +18,7 @@ public class SweptRectangles implements ConvexShape, Drawable {
     }
 
     @Override
-    public void draw() {
+    public void drawImpl() {
         Translation2d[] hull = convexHull();
         Translation2d[] draw = new Translation2d[hull.length + 1];
         System.arraycopy(hull, 0, draw, 0, hull.length);
