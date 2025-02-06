@@ -26,7 +26,6 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -287,7 +286,7 @@ public final class Constants {
     public static final class Elevator {
         public static final int RIGHT_ID = 7;
         public static final int LEFT_ID = 4;
-        public static final int LIMIT_ID = 0;
+        public static final int LIMIT_ID = 1;
 
         public static final NeutralModeValue BREAK = NeutralModeValue.Brake;
 
@@ -313,8 +312,8 @@ public final class Constants {
         public static final double gearRatio = 1.0;
         public static final double SensorToMechanismRatio =
             Constants.Elevator.ROTATIONS_AT_TOP.in(Rotations)
-                / Constants.Elevator.METERS_AT_TOP.in(Meters);
-        public static final Distance METERS_AT_TOP = Meters.of(Units.inchesToMeters(72.0));
+                / Constants.Elevator.INCHES_AT_TOP.in(Meters);
+        public static final Distance INCHES_AT_TOP = Inches.of(72.0);
         public static final Angle ROTATIONS_AT_TOP = Rotations.of(220.0 / 2.0 / Math.PI);
     }
 
