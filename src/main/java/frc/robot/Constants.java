@@ -314,7 +314,7 @@ public final class Constants {
             Constants.Elevator.ROTATIONS_AT_TOP.in(Rotations)
                 / Constants.Elevator.INCHES_AT_TOP.in(Meters);
         public static final Distance INCHES_AT_TOP = Inches.of(72.0);
-        public static final Angle ROTATIONS_AT_TOP = Rotations.of(220.0 / 2.0 / Math.PI);
+        public static final Angle ROTATIONS_AT_TOP = Radians.of(220);
     }
 
 
