@@ -67,6 +67,13 @@ task(replayWatch, type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
 }
 
+sourceSets {
+    tools {
+        compileClasspath += sourceSets.main.compileClasspath + sourceSets.main.output
+        runtimeClasspath += sourceSets.main.runtimeClasspath + sourceSets.main.output
+    }
+}
+
 dependencies {
     annotationProcessor wpi.java.deps.wpilibAnnotations()
     implementation wpi.java.deps.wpilib()
@@ -146,4 +153,10 @@ gversion {
     dateFormat   = "yyyy-MM-dd HH:mm:ss z"
     timeZone     = "America/New_York"
     indent       = "  "
+}
+
+task(genTrajectories, dependsOn: "jar", type: JavaExec) {
+    mainClass = "frc.tools.GenTrajectories2"
+    classpath = sourceSets.tools.runtimeClasspath
+    systemProperties["java.library.path"] = new File(project.projectDir, "build/jni/release")
 }

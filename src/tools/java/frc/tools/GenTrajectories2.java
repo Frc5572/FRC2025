@@ -34,16 +34,17 @@ public class GenTrajectories2 {
         // @formatter:on
     };
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, InterruptedException {
         // Generate 1000 poses
         int numPoses = 1000;
         Random rand = new Random(5572);
         Pose2d[] poses = new Pose2d[numPoses];
         for (int i = 0; i < numPoses; i++) {
             double x = rand.nextDouble() * FieldConstants.fieldLength.in(Meters) / 2.0;
-            double y = rand.nextDouble() * FieldConstants.fieldLength.in(Meters);
+            double y = rand.nextDouble() * FieldConstants.fieldWidth.in(Meters);
             Rotation2d t = new Rotation2d(Rotations.of(rand.nextDouble()));
-            poses[i] = new Pose2d(x, y, t);
+            poses[i] = frc.robot.RobotState.constrain(new Pose2d(x, y, t), (_p) -> {
+            });
         }
         for (int i = 0; i < numPoses; i++) {
             Pose2d pose1 = poses[i];
@@ -55,8 +56,20 @@ public class GenTrajectories2 {
         }
     }
 
-    private static void generateTrajectory(Pose2d pose1, Pose2d pose2) {
-        // TOOD
+    private static void generateTrajectory(Pose2d pose1, Pose2d pose2)
+        throws IOException, InterruptedException {
+        generateTrajectoryDirection(pose1, pose2, Rotation2d.fromDegrees(15));
+        generateTrajectoryDirection(pose1, pose2, Rotation2d.fromDegrees(-15));
+        System.exit(0);
+    }
+
+    private static void generateTrajectoryDirection(Pose2d pose1, Pose2d pose2,
+        Rotation2d direction) throws IOException, InterruptedException {
+        System.out.println("Generating for " + pose1 + " to " + pose2);
+        Rotation2d startRotation = driveCircle.getAngle(pose1.getTranslation());
+        Rotation2d endRotation = driveCircle.getAngle(pose2.getTranslation());
+
+        System.exit(0);
     }
 
     private static sealed interface Waypoint {
