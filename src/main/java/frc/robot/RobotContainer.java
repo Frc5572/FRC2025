@@ -20,6 +20,7 @@ import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberReal;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
@@ -95,12 +96,14 @@ public class RobotContainer {
                 s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
                 elevator = new Elevator(new ElevatorIO() {});
                 coralScoring = new CoralScoring(new CoralScoringIO() {});
+                climb = new Climber(new ClimberIO.Empty());
                 break;
             default:
                 elevator = new Elevator(new ElevatorIO() {});
                 s_Swerve = new Swerve(state, new SwerveIO.Empty() {});
                 s_Vision = new Vision(state, VisionIO::empty);
-
+                coralScoring = new CoralScoring(new CoralScoringIO() {});
+                climb = new Climber(new ClimberIO.Empty());
         }
 
         /* Default Commands */
@@ -185,8 +188,9 @@ public class RobotContainer {
         coralScoring.intakedCoralRight.onTrue(coralScoring.runPreScoringMotor(2));
         coralScoring.outtakedCoral
             .onTrue(leds.blinkLEDs(LEDPattern.solid(Color.kCyan)).withTimeout(5));
-        climb.resetButton.onTrue(climb.restEncoder());
+        climb.resetButton.and(controllerThree.y()).onTrue(climb.restEncoder());
     }
+
 
     /**
      * Gets the user's selected autonomous command.
