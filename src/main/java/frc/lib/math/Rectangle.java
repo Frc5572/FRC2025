@@ -9,8 +9,8 @@ import frc.lib.util.viz.Drawable;
 /** Rotating Rectangle Shape */
 public class Rectangle implements ConvexShape, Drawable {
 
-    public final double width;
-    public final double length;
+    public double width;
+    public double length;
 
     private final Axis[] axes;
     private final Translation2d[] vertices;

@@ -29,8 +29,15 @@ public sealed interface Constraint {
 
         @Override
         public ObjectNode toJSON(ObjectMapper mapper) {
-            // TODO Auto-generated method stub
-            return null;
+            ObjectNode node = mapper.createObjectNode();
+            idx.addToObject(node, "from");
+            node.put("to", (String) null);
+            ObjectNode data = mapper.createObjectNode();
+            data.put("type", "StopPoint");
+            data.putObject("props");
+            node.set("data", data);
+            node.put("enabled", true);
+            return node;
         }
 
     }
@@ -57,8 +64,20 @@ public sealed interface Constraint {
 
         @Override
         public ObjectNode toJSON(ObjectMapper mapper) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'toJSON'");
+            ObjectNode node = mapper.createObjectNode();
+            from.addToObject(node, "from");
+            to.addToObject(node, "to");
+            ObjectNode data = mapper.createObjectNode();
+            data.put("type", "KeepInRectangle");
+            ObjectNode props = mapper.createObjectNode();
+            props.set("x", Project.units(mapper, x, "m"));
+            props.set("y", Project.units(mapper, y, "m"));
+            props.set("w", Project.units(mapper, w, "m"));
+            props.set("h", Project.units(mapper, h, "m"));
+            data.set("props", props);
+            node.set("data", data);
+            node.put("enabled", true);
+            return node;
         }
 
     }
@@ -82,8 +101,19 @@ public sealed interface Constraint {
 
         @Override
         public ObjectNode toJSON(ObjectMapper mapper) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'toJSON'");
+            ObjectNode node = mapper.createObjectNode();
+            from.addToObject(node, "from");
+            to.addToObject(node, "to");
+            ObjectNode data = mapper.createObjectNode();
+            data.put("type", "KeepOutCircle");
+            ObjectNode props = mapper.createObjectNode();
+            props.set("x", Project.units(mapper, x, "m"));
+            props.set("y", Project.units(mapper, y, "m"));
+            props.set("r", Project.units(mapper, r, "m"));
+            data.set("props", props);
+            node.set("data", data);
+            node.put("enabled", true);
+            return node;
         }
 
     }

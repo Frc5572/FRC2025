@@ -251,6 +251,7 @@ public final class Constants {
         }
 
         public static final Mass robotMass = Pounds.of(120.0);
+        public static final MomentOfInertia robotMOI = KilogramSquareMeters.of(6.0);
         public static final Distance bumperFront = Inches.of(17.5);
         public static final Distance bumperRight = Inches.of(17.5);
 

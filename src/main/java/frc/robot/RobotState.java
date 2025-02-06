@@ -79,7 +79,8 @@ public class RobotState {
      */
     public void addSwerveObservation(SwerveModulePosition[] positions, Rotation2d gyroYaw) {
         swerveOdometry.update(gyroYaw, positions);
-        constrain(getGlobalPoseEstimate(), (newPose) -> resetPose(newPose, positions, gyroYaw));
+        constrain(getGlobalPoseEstimate(), (newPose) -> resetPose(newPose, positions, gyroYaw),
+            0.0);
         vis.setDrivetrainState(swerveOdometry.getEstimatedPosition(),
             Stream.of(positions).map(x -> x.angle).toArray(this::swerveRotationsArray));
     }
@@ -94,20 +95,22 @@ public class RobotState {
         return swerveRotations;
     }
 
-    public static Pose2d constrain(Pose2d original, Consumer<Pose2d> reset) {
+    public static Pose2d constrain(Pose2d original, Consumer<Pose2d> reset, double tol) {
         double x = original.getX();
         double y = original.getY();
         double t = -original.getRotation().getRadians();
 
+        robot.length = Constants.Swerve.bumperFront.in(Meters) * 2 + tol * 2;
+        robot.width = Constants.Swerve.bumperRight.in(Meters) * 2 + tol * 2;
 
         Translation2d[] tr = new Translation2d[4];
         for (int i = 0; i < 4; i++) {
             double theta = t + i * Math.PI / 2;
             tr[i] = new Translation2d(
-                x + Math.cos(theta) * Constants.Swerve.bumperFront.in(Meters)
-                    + Math.sin(theta) * Constants.Swerve.bumperRight.in(Meters),
-                y - Math.sin(theta) * Constants.Swerve.bumperFront.in(Meters)
-                    + Math.cos(theta) * Constants.Swerve.bumperRight.in(Meters));
+                x + Math.cos(theta) * (Constants.Swerve.bumperFront.in(Meters) + tol)
+                    + Math.sin(theta) * (Constants.Swerve.bumperRight.in(Meters) + tol),
+                y - Math.sin(theta) * (Constants.Swerve.bumperFront.in(Meters) + tol)
+                    + Math.cos(theta) * (Constants.Swerve.bumperRight.in(Meters) + tol));
 
         }
 
