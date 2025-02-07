@@ -86,6 +86,7 @@ public final class Constants {
         public static final class PrimaryCoralScoring {
             public static final int Coral_Scoring_NEO_ID = 5;
         }
+
         /**
          * Algae Motor CAN id's
          */
