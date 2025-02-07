@@ -49,6 +49,7 @@ public class RobotContainer {
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
     public final CommandXboxController controllerThree =
         new CommandXboxController(Constants.controllerThreeId);
+    public final CommandXboxController operator = new CommandXboxController(1);
 
 
     /** Simulation */
@@ -120,9 +121,9 @@ public class RobotContainer {
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
         algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan));
-        driver.rightBumper()
+        operator.rightTrigger()
             .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
-        driver.leftBumper()
+        operator.leftTrigger()
             .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
 
 
@@ -169,9 +170,10 @@ public class RobotContainer {
         driver.x().onTrue(new InstantCommand(() -> {
             s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
         }));
-        driver.y().whileTrue(coralScoring.runScoringMotor(2));
+        operator.x().whileTrue(coralScoring.runScoringMotor(2));
         driver.rightStick().whileTrue(climb.runClimberMotorCommand());
         controllerThree.y().whileTrue(climb.resetClimberCommand());
+
 
     }
 
