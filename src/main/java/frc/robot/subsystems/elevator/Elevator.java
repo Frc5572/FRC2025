@@ -99,21 +99,33 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command altOpBinds() {
+
         return moveTo(() -> {
             switch (Height.getCurrentState()) {
                 case kHome:
+                    Logger.recordOutput("elevator height", "home");
                     return Constants.Elevator.HOME;
                 case KPosition0:
+                    Logger.recordOutput("elevator height", "p0");
                     return Constants.Elevator.P0;
                 case KPosition1:
+                    Logger.recordOutput("elevator height", "p1");
+
                     return Constants.Elevator.P1;
                 case KPosition2:
+                    Logger.recordOutput("elevator height", "p2");
+
                     return Constants.Elevator.P2;
                 case KPosition3:
+                    Logger.recordOutput("elevator height", "p3");
+
                     return Constants.Elevator.P3;
                 case kPosition4:
+                    Logger.recordOutput("elevator height", "p4");
+
                     return Constants.Elevator.P4;
                 default:
+                    Logger.recordOutput("elevator height", "home");
                     break;
             }
             return Constants.Elevator.HOME;
