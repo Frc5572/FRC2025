@@ -7,7 +7,6 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -26,6 +25,7 @@ import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberReal;
 import frc.robot.subsystems.coral.CoralScoring;
 import frc.robot.subsystems.coral.CoralScoringIO;
@@ -33,6 +33,8 @@ import frc.robot.subsystems.coral.CoralScoringReal;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorReal;
+import frc.robot.subsystems.elevator_algae.ElevatorAlgae;
+import frc.robot.subsystems.elevator_algae.ElevatorAlgaeReal;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
 import frc.robot.subsystems.swerve.SwerveReal;
@@ -60,6 +62,7 @@ public class RobotContainer {
         new CommandXboxController(Constants.PIT_CONTROLLER_ID);
     public final CommandXboxController altOperator =
         new CommandXboxController(Constants.ALT_OPERATOR_ID);
+    public final CommandXboxController operator = new CommandXboxController(1);
 
 
     /** Simulation */
@@ -72,14 +75,17 @@ public class RobotContainer {
     /** State */
     private final RobotState state;
 
-
     /* Subsystems */
-
+    private ElevatorAlgae s_ElevatorAlgae;
     private LEDs leds = new LEDs();
     private Elevator elevator;
     private final Swerve s_Swerve;
     private final Vision s_Vision;
     private CoralScoring coralScoring;
+
+    /* Triggers */
+    private Trigger algaeInIntake = new Trigger(() -> s_ElevatorAlgae.hasAlgae());
+
     private Climber climb;
 
     /**
@@ -95,6 +101,7 @@ public class RobotContainer {
                 s_Swerve = new Swerve(state, new SwerveReal());
                 s_Vision = new Vision(state, VisionReal::new);
                 coralScoring = new CoralScoring(new CoralScoringReal());
+                s_ElevatorAlgae = new ElevatorAlgae(new ElevatorAlgaeReal());
                 climb = new Climber(new ClimberReal());
                 break;
             case kSimulation:
@@ -103,16 +110,16 @@ public class RobotContainer {
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
                 s_Swerve = new Swerve(state, new SwerveSim(driveSimulation));
                 s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
-
-                coralScoring = new CoralScoring(new CoralScoringIO() {});
                 elevator = new Elevator(new ElevatorIO() {});
-
+                coralScoring = new CoralScoring(new CoralScoringIO() {});
+                climb = new Climber(new ClimberIO.Empty());
                 break;
             default:
                 elevator = new Elevator(new ElevatorIO() {});
                 s_Swerve = new Swerve(state, new SwerveIO.Empty() {});
                 s_Vision = new Vision(state, VisionIO::empty);
-
+                coralScoring = new CoralScoring(new CoralScoringIO() {});
+                climb = new Climber(new ClimberIO.Empty());
         }
 
         /* Default Commands */
@@ -133,6 +140,13 @@ public class RobotContainer {
      * {@link edu1.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
+        algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan));
+        driver.rightTrigger()
+            .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
+        driver.leftTrigger()
+            .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
+
+
         driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
 
         driver.povDown().onTrue(elevator.home());
@@ -149,42 +163,26 @@ public class RobotContainer {
 
         backUpOperator.a().onTrue(new Command() {
             Timer timer = new Timer();
-
-            @Override
-            public void initialize() {
-                timer.reset();
-                timer.start();
-            }
-
-            @Override
-            public void execute() {
-                vis.setElevatorHeight(Inches.of(timer.get() * 30.0));
-            }
-
-            @Override
-            public boolean isFinished() {
-                return timer.hasElapsed(3.0);
-            }
         });
-        backUpOperator.b().onTrue(new Command() {
-            Timer timer = new Timer();
 
-            @Override
-            public void initialize() {
-                timer.reset();
-                timer.start();
-            }
+        driver.povDown().onTrue(elevator.home());
+        driver.povLeft().onTrue(elevator.p0());
+        SmartDashboard.putNumber("elevatorVoltage", 1.0);
+        SmartDashboard.putNumber("elevatorTargetHeight", 20);
+        driver.a().whileTrue(
+            elevator.moveTo(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
+        driver.povUp().whileTrue(elevator.moveUp());
+        driver.povRight().whileTrue(elevator.moveDown());
 
-            @Override
-            public void execute() {
-                vis.setElevatorHeight(Inches.of(Math.max(72.0 - timer.get() * 30.0, 0)));
-            }
 
-            @Override
-            public boolean isFinished() {
-                return timer.hasElapsed(3.0);
-            }
-        });
+
+        // driver.x().onTrue(new InstantCommand(() -> {
+        // s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
+        // }));
+        driver.x().whileTrue(coralScoring.runScoringMotor(2));
+        driver.rightStick().whileTrue(climb.runClimberMotorCommand());
+        pitController.y().whileTrue(climb.resetClimberCommand());
+
 
     }
 
@@ -195,8 +193,7 @@ public class RobotContainer {
     public void configureTriggerBindings() {
         coralScoring.intakedCoralRight.onTrue(leds.setLEDsSolid(Color.kRed).withTimeout(5));
         coralScoring.intakedCoralRight.onTrue(coralScoring.runPreScoringMotor(2));
-        coralScoring.outtakedCoral
-            .onTrue(leds.blinkLEDs(LEDPattern.solid(Color.kCyan)).withTimeout(5));
+        coralScoring.outtakedCoral.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
         climb.resetButton.onTrue(climb.restEncoder());
         // driver controls
         driver.x().onTrue(new InstantCommand(() -> {
@@ -233,8 +230,12 @@ public class RobotContainer {
     }
 
     public boolean isAlgae() {
+        coralScoring.outtakedCoral.negate().whileTrue(coralScoring.runPreScoringMotor(.1));
+        coralScoring.outtakedCoral.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
+        climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());
         return HeightMode.getCurrentHeightMode() == HeightMode.kAlgae;
     }
+
 
     /**
      * Gets the user's selected autonomous command.

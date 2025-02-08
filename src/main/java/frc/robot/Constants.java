@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -25,7 +26,6 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -58,6 +58,18 @@ public final class Constants {
     public static final int operatorId = 1;
 
     public static final boolean tuningMode = false;
+    /**
+     * Current threshold that indicates an algae is in possestion
+     */
+    public static final double HAS_ALGAE_CURRENT_THRESHOLD = 100;
+
+    /**
+     * Algae misc values
+     */
+    public static final class Algae {
+        public static final int VOLTAGE = 2;
+        public static final int NEGATIVE_VOLTAGE = -2;
+    }
 
     // pit and alt operator controllers
     public static final int PIT_CONTROLLER_ID = 3;
@@ -73,8 +85,16 @@ public final class Constants {
          * Primary Coral Scoring CAN id's
          */
         public static final class PrimaryCoralScoring {
-            public static final int Coral_Scoring_NEO_ID = 8;
+            public static final int Coral_Scoring_NEO_ID = 5;
         }
+
+        /**
+         * Algae Motor CAN id's
+         */
+        public static final class AlgaeMotors {
+            public static final int ALGAE_MOTOR_ID = 6;
+        }
+
     }
 
 
@@ -93,10 +113,9 @@ public final class Constants {
      */
     public static final class Climb {
 
-        public static final int LEFT_TALON_FX_ID = 27;
-        public static final int RIGHT_TALON_FX_ID = 28;
-        public static final int CanID = 3;
-        public static final int TOUCH_SENSOR_CHANNEL = 3;
+        public static final int LEFT_TALON_FX_ID = 3;
+        public static final int RIGHT_TALON_FX_ID = 12;
+        public static final int TOUCH_SENSOR_CHANNEL = 2;
         public static final Angle MAX_ANGLE = Radians.of(250);
         public static final double GEAR_RATIO = 1;
         public static final double VOLTAGE = 4;
@@ -253,8 +272,8 @@ public final class Constants {
         }
 
         public static final Mass robotMass = Pounds.of(120.0);
-        public static final Distance bumperFront = Inches.of(20.0);
-        public static final Distance bumperRight = Inches.of(20.0);
+        public static final Distance bumperFront = Inches.of(17.5);
+        public static final Distance bumperRight = Inches.of(17.5);
 
         /** Get config for Maple-Sim. */
         public static DriveTrainSimulationConfig getMapleConfig() {
@@ -287,13 +306,13 @@ public final class Constants {
     public static final class Elevator {
         public static final int RIGHT_ID = 7;
         public static final int LEFT_ID = 4;
-        public static final int LIMIT_ID = 0;
+        public final static int LIMIT_ID = 1;
 
         public static final NeutralModeValue BREAK = NeutralModeValue.Brake;
 
         // PID and feedforward
-        public static final double KP = 5.0;
-        public static final double KI = 1.5;
+        public static final double KP = 7.0;
+        public static final double KI = 2.0;
         public static final double KD = 0.0;
         public static final double KS = 0.1675;
         public static final double KV = 0.0;
@@ -303,17 +322,19 @@ public final class Constants {
 
         // positions
         public static final Distance HOME = Inches.of(2);
-        public static final Distance P0 = Inches.of(60);
-        public static final Distance P1 = Inches.of(32);
-        public static final Distance P2 = Inches.of(44);
-        public static final Distance P3 = Inches.of(48);
-        public static final Distance P4 = Inches.of(72);
+        public static final Distance P0 = Inches.of(26); // Coral L2
+        public static final Distance P1 = Inches.of(16.5); // Algae L2-L3
+        public static final Distance P2 = Inches.of(43); // Coral L3
+        public static final Distance P3 = Inches.of(33); // Algae L3-L4
+        public static final Distance P4 = Inches.of(67); // Coral L4
 
 
         public static final double gearRatio = 1.0;
-
-        public static final double METERS_AT_TOP = Units.inchesToMeters(72.0);
-        public static final double ROTATIONS_AT_TOP = 220.0 / 2.0 / Math.PI;
+        public static final Distance INCHES_AT_TOP = Inches.of(72.0);
+        public static final Angle ROTATIONS_AT_TOP = Radians.of(220);
+        public static final double SensorToMechanismRatio =
+            Constants.Elevator.ROTATIONS_AT_TOP.in(Rotations)
+                / Constants.Elevator.INCHES_AT_TOP.in(Meters);
     }
 
 
@@ -341,6 +362,7 @@ public final class Constants {
         public static final double fieldBorderMargin = 0.5;
     }
 
+
     /** State Estimator Constants */
     public static class StateEstimator {
         public static final boolean keepInField = true;
@@ -353,9 +375,10 @@ public final class Constants {
      * Primary Coral Scoring Constants
      */
     public static final class CoralScoringConstants {
-        public static final int Scoring_Beam_Brake_DIO_Port = 1;
-        public static final int Grabing_RBeam_Brake_DIO_Port = 2;
+        public static final int Scoring_Beam_Brake_DIO_Port = 0;
+        public static final int Coral_Touch_Sensor_DIO_Port = 3;
+        public static final int Random_Touch_Sensor = 1;
     }
-
-
 }
+
+

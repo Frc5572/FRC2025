@@ -42,20 +42,21 @@ public class ElevatorReal implements ElevatorIO {
 
         leftElevatorMotor.setControl(new Follower(rightElevatorMotor.getDeviceID(), true));
         leftElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
+        leftElevatorConf.Feedback.SensorToMechanismRatio =
+            Constants.Elevator.SensorToMechanismRatio;
 
         // right conf
         rightElevatorConf.MotorOutput.NeutralMode = Constants.Elevator.BREAK;
         leftElevatorConf.MotorOutput.NeutralMode = Constants.Elevator.BREAK;
 
         rightElevatorConf.Feedback.SensorToMechanismRatio =
-            Constants.Elevator.ROTATIONS_AT_TOP / Constants.Elevator.METERS_AT_TOP;
-        leftElevatorConf.Feedback.SensorToMechanismRatio =
-            Constants.Elevator.ROTATIONS_AT_TOP / Constants.Elevator.METERS_AT_TOP;
+            Constants.Elevator.SensorToMechanismRatio;
+
 
         // PID and feedforward
 
         // right
-        rightElevatorConf.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        rightElevatorConf.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         rightElevatorConf.Slot0.kP = Constants.Elevator.KP;
         rightElevatorConf.Slot0.kI = Constants.Elevator.KI;
         rightElevatorConf.Slot0.kD = Constants.Elevator.KD;
@@ -89,10 +90,14 @@ public class ElevatorReal implements ElevatorIO {
     /** Updates Inputs to IO */
     public void updateInputs(ElevatorInputs inputs) {
         BaseStatusSignal.refreshAll(elevatorPosition, elevatorVelocity, elevatorVoltage);
-        inputs.limitSwitch = limitSwitch.get();
+        inputs.limitSwitch = !limitSwitch.get();
         inputs.position = Meters.of(elevatorPosition.getValue().in(Rotations));
         inputs.velocity = elevatorVelocity.getValue();
         inputs.outputVoltage = elevatorVoltage.getValue();
+    }
+
+    public void resetHome() {
+        rightElevatorMotor.setPosition(0);
     }
 
 
