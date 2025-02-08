@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -296,6 +297,46 @@ public final class Constants {
         }
     }
 
+
+    /**
+     * Elevator Constants
+     */
+
+    public static final class Elevator {
+        public static final int RIGHT_ID = 7;
+        public static final int LEFT_ID = 4;
+        public static final int LIMIT_ID = 1;
+
+        public static final NeutralModeValue BREAK = NeutralModeValue.Brake;
+
+        // PID and feedforward
+        public static final double KP = 7.0;
+        public static final double KI = 2.0;
+        public static final double KD = 0.0;
+        public static final double KS = 0.1675;
+        public static final double KV = 0.0;
+        public static final double KA = 0.0;
+        public static final double KG = 0.3375;
+        public static final AngularVelocity MAX_VELOCITY = RotationsPerSecond.of(0.0);
+
+        // positions
+        public static final Distance HOME = Inches.of(2);
+        public static final Distance P0 = Inches.of(26); // Coral L2
+        public static final Distance P1 = Inches.of(16.5); // Algae L2-L3
+        public static final Distance P2 = Inches.of(43); // Coral L3
+        public static final Distance P3 = Inches.of(33); // Algae L3-L4
+        public static final Distance P4 = Inches.of(67); // Coral L4
+
+
+        public static final double gearRatio = 1.0;
+        public static final Distance INCHES_AT_TOP = Inches.of(72.0);
+        public static final Angle ROTATIONS_AT_TOP = Radians.of(220);
+        public static final double SensorToMechanismRatio =
+            Constants.Elevator.ROTATIONS_AT_TOP.in(Rotations)
+                / Constants.Elevator.INCHES_AT_TOP.in(Meters);
+    }
+
+
     /** Vision Constants */
     public static class Vision {
 
@@ -320,6 +361,7 @@ public final class Constants {
         public static final double fieldBorderMargin = 0.5;
     }
 
+
     /** State Estimator Constants */
     public static class StateEstimator {
         public static final boolean keepInField = true;
@@ -336,5 +378,6 @@ public final class Constants {
         public static final int Coral_Touch_Sensor_DIO_Port = 3;
         public static final int Random_Touch_Sensor = 1;
     }
-
 }
+
+

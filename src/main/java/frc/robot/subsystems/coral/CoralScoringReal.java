@@ -23,8 +23,6 @@ public class CoralScoringReal implements CoralScoringIO {
     private final DigitalInput coralTouchSensor =
         new DigitalInput(Constants.CoralScoringConstants.Coral_Touch_Sensor_DIO_Port);
     SparkMaxConfig motorConfig = new SparkMaxConfig();
-    private final DigitalInput randomTouchSensor =
-        new DigitalInput(Constants.CoralScoringConstants.Random_Touch_Sensor);
 
     /**
      * Coral Scoring Real
@@ -40,7 +38,6 @@ public class CoralScoringReal implements CoralScoringIO {
      */
 
     public void updateInputs(CoralScoringInputs inputs) {
-        inputs.randomTouchSensor = randomTouchSensor.get();
         inputs.scoringBeamBrake = !scoringBeamBrake.get();
         inputs.grabingBeamBrakeRight = coralTouchSensor.get();
     }

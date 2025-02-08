@@ -18,7 +18,6 @@ public interface CoralScoringIO {
         public double scoringRPM;
         public boolean scoringBeamBrake;
         public boolean grabingBeamBrakeRight;
-        public boolean randomTouchSensor;
     }
 
     public default void updateInputs(CoralScoringInputs inputs) {}
