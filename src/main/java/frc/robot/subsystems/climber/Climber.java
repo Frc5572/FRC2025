@@ -1,6 +1,7 @@
 package frc.robot.subsystems.climber;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -46,6 +47,17 @@ public class Climber extends SubsystemBase {
             setClimberMotorVoltage(0);
             System.out.println("Climber Done!");
         }, this).until(passedMaxAngle()).unless(passedMaxAngle());
+    }
+
+    /**
+     *
+     * @return Set Motor Voltage until reached certain angle
+     */
+    public Command runClimberMotorCommand(DoubleSupplier voltage) { // run
+        return Commands.runEnd(() -> setClimberMotorVoltage(voltage.getAsDouble() * 3), () -> {
+            setClimberMotorVoltage(0);
+            System.out.println("Climber Done!");
+        }, this);
     }
 
     /**

@@ -173,7 +173,8 @@ public class RobotContainer {
         operator.x().whileTrue(coralScoring.runScoringMotor(2));
         driver.rightStick().whileTrue(climb.runClimberMotorCommand());
         controllerThree.y().whileTrue(climb.resetClimberCommand());
-
+ controllerThree.x()
+            .whileTrue(climb.runClimberMotorCommand(() -> controllerThree.getLeftY()));
 
     }
 
