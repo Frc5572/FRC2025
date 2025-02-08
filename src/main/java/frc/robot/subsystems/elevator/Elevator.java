@@ -98,33 +98,26 @@ public class Elevator extends SubsystemBase {
         return runEnd(() -> io.setVoltage(-1.0), () -> io.setVoltage(0));
     }
 
-    public Command modeSwapper() {
-        Command positon;
-        switch (Height.getCurrentState()) {
-            case kHome:
-                SmartDashboard.putData("home", null);
-                positon = home();
-                break;
-            case KPosition0:
-                positon = p0();
-                break;
-            case KPosition1:
-                positon = p1();
-                break;
-            case KPosition2:
-                positon = p2();
-                break;
-            case KPosition3:
-                positon = p3();
-                break;
-            case kPosition4:
-                positon = p4();
-                break;
-            default:
-                positon = home();
-                break;
+    public Command altOpBinds() {
+        return moveTo(() -> {
+            switch (Height.getCurrentState()) {
+                case kHome:
+                    return Constants.Elevator.HOME;
+                case KPosition0:
+                    return Constants.Elevator.P0;
+                case KPosition1:
+                    return Constants.Elevator.P1;
+                case KPosition2:
+                    return Constants.Elevator.P2;
+                case KPosition3:
+                    return Constants.Elevator.P3;
+                case kPosition4:
+                    return Constants.Elevator.P4;
+                default:
+                    break;
+            }
+            return Constants.Elevator.HOME;
+        });
+    };
 
-        }
-        return positon;
-    }
 }

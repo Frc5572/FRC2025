@@ -159,7 +159,6 @@ public class RobotContainer {
         // alt operator
         altOperator.povUp().whileTrue(Commands.runOnce(() -> Height.incrementState()));
         altOperator.povDown().whileTrue(Commands.runOnce(() -> Height.decrementState()));
-        altOperator.a().whileTrue(elevator.modeSwapper());
 
         backUpOperator.a().onTrue(new Command() {
             Timer timer = new Timer();
@@ -213,10 +212,15 @@ public class RobotContainer {
             .onTrue(Commands.runOnce(() -> AlgaeHeight.decrementState()));
         altOperator.povLeft().onTrue(Commands.runOnce(() -> HeightMode.decrementState()));
         altOperator.povRight().onTrue(Commands.runOnce(() -> HeightMode.incrementState()));
-        // altOperator.a().whileTrue(() -> ());
+        altOperator.a().whileTrue(elevator.altOpBinds());
+        altOperator.y().onTrue(elevator.home());
 
         // pit controller
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());
+
+        coralScoring.outtakedCoral.negate().whileTrue(coralScoring.runPreScoringMotor(.1));
+        coralScoring.outtakedCoral.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
+        climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());
     }
 
 
@@ -230,9 +234,7 @@ public class RobotContainer {
     }
 
     public boolean isAlgae() {
-        coralScoring.outtakedCoral.negate().whileTrue(coralScoring.runPreScoringMotor(.1));
-        coralScoring.outtakedCoral.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
-        climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());
+
         return HeightMode.getCurrentHeightMode() == HeightMode.kAlgae;
     }
 

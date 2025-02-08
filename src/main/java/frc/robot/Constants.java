@@ -22,10 +22,13 @@ import com.studica.frc.AHRS.NavXComType;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -322,10 +325,10 @@ public final class Constants {
 
         // positions
         public static final Distance HOME = Inches.of(2);
-        public static final Distance P0 = Inches.of(26); // Coral L2
-        public static final Distance P1 = Inches.of(16.5); // Algae L2-L3
-        public static final Distance P2 = Inches.of(43); // Coral L3
-        public static final Distance P3 = Inches.of(33); // Algae L3-L4
+        public static final Distance P0 = Inches.of(16.5); // Algae L2-L3
+        public static final Distance P1 = Inches.of(26); // Coral L2
+        public static final Distance P2 = Inches.of(33); // Algae L3-L4
+        public static final Distance P3 = Inches.of(43); // Coral L3
         public static final Distance P4 = Inches.of(67); // Coral L4
 
 
@@ -355,8 +358,11 @@ public final class Constants {
         }
 
         public static final CameraConstants[] cameras = new CameraConstants[] {
-            new CameraConstants("cam0", 1600, 1200, Rotation2d.fromDegrees(100), Hertz.of(20),
-                Seconds.of(0.3), Seconds.of(0.02), 0.25, 0.08, new Transform3d())};
+            new CameraConstants("cam0", 800, 1280, Rotation2d.fromDegrees(100), Hertz.of(20),
+                Seconds.of(0.3), Seconds.of(0.02), 0.25, 0.08,
+                new Transform3d(
+                    new Translation3d(Units.inchesToMeters(11), -Units.inchesToMeters(12), 0),
+                    new Rotation3d(Math.PI, 0, 0)))};
 
         public static final double zMargin = 0.75;
         public static final double fieldBorderMargin = 0.5;
@@ -368,7 +374,7 @@ public final class Constants {
         public static final boolean keepInField = true;
         public static final boolean keepOutOfReefs = true;
         public static final double visionTrust = 0.02;
-        public static final double visionTrustRotation = 200.0;
+        public static final double visionTrustRotation = 0.02;
     }
 
     /**
