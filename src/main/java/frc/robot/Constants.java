@@ -66,8 +66,8 @@ public final class Constants {
      * Algae misc values
      */
     public static final class Algae {
-        public static final int VOLTAGE = 4;
-        public static final int NEGATIVE_VOLTAGE = -4;
+        public static final int VOLTAGE = 2;
+        public static final int NEGATIVE_VOLTAGE = -2;
     }
 
     // Controller "3"
