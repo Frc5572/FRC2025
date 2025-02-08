@@ -131,9 +131,9 @@ public class RobotContainer {
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
         algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan));
-        operator.rightTrigger()
+        driver.rightTrigger()
             .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
-        operator.leftTrigger()
+        driver.leftTrigger()
             .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
 
 
@@ -141,7 +141,6 @@ public class RobotContainer {
 
         driver.povDown().onTrue(elevator.home());
         driver.povLeft().onTrue(elevator.p0());
-        driver.leftTrigger().onTrue(elevator.p2());
         SmartDashboard.putNumber("elevatorVoltage", 1.0);
         SmartDashboard.putNumber("elevatorTargetHeight", 20);
         driver.a().whileTrue(
@@ -150,10 +149,10 @@ public class RobotContainer {
         driver.povRight().whileTrue(elevator.moveDown());
 
 
-        driver.x().onTrue(new InstantCommand(() -> {
-            s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
-        }));
-        operator.x().whileTrue(coralScoring.runScoringMotor(2));
+        // driver.x().onTrue(new InstantCommand(() -> {
+        // s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
+        // }));
+        driver.x().whileTrue(coralScoring.runScoringMotor(2));
         driver.rightStick().whileTrue(climb.runClimberMotorCommand());
         controllerThree.y().whileTrue(climb.resetClimberCommand());
 

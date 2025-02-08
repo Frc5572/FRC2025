@@ -29,6 +29,10 @@ public class Elevator extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);
+        Logger.recordOutput("Elevator/position_in", inputs.position.in(Inches));
+        if (inputs.limitSwitch) {
+            io.resetHome();
+        }
     }
 
     /**
@@ -38,7 +42,8 @@ public class Elevator extends SubsystemBase {
      */
     public Command homeTimer() {
         Command slowLower = Commands.run(() -> io.setVoltage(-0.1)).withTimeout(1);
-        return moveTo(() -> Constants.Elevator.HOME).andThen(slowLower);
+        return moveTo(() -> Constants.Elevator.HOME).until(() -> inputs.position.in(Inches) < 5.0)
+            .andThen(slowLower);
     }
 
     /**
@@ -49,9 +54,9 @@ public class Elevator extends SubsystemBase {
      */
     public Command home() {
 
-        Command slowLower = Commands.run(() -> io.setVoltage(-0.1));
-        return moveTo(() -> Constants.Elevator.HOME).andThen(slowLower)
-            .until(() -> (inputs.limitSwitch == false));
+        Command slowLower = Commands.runEnd(() -> io.setVoltage(-0.7), () -> io.setVoltage(0.0));
+        return moveTo(() -> Constants.Elevator.HOME).until(() -> inputs.position.in(Inches) < 5.0)
+            .andThen(slowLower).until(() -> (inputs.limitSwitch == true));
     }
 
     /**

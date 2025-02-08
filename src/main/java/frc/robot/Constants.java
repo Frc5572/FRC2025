@@ -310,8 +310,8 @@ public final class Constants {
         public static final NeutralModeValue BREAK = NeutralModeValue.Brake;
 
         // PID and feedforward
-        public static final double KP = 0.5;
-        public static final double KI = 0.0;
+        public static final double KP = 7.0;
+        public static final double KI = 2.0;
         public static final double KD = 0.0;
         public static final double KS = 0.1675;
         public static final double KV = 0.0;
@@ -321,19 +321,19 @@ public final class Constants {
 
         // positions
         public static final Distance HOME = Inches.of(2);
-        public static final Distance P0 = Inches.of(60);
-        public static final Distance P1 = Inches.of(32);
-        public static final Distance P2 = Inches.of(44);
-        public static final Distance P3 = Inches.of(48);
-        public static final Distance P4 = Inches.of(62);
+        public static final Distance P0 = Inches.of(26); // Coral L2
+        public static final Distance P1 = Inches.of(16.5); // Algae L2-L3
+        public static final Distance P2 = Inches.of(43); // Coral L3
+        public static final Distance P3 = Inches.of(33); // Algae L3-L4
+        public static final Distance P4 = Inches.of(67); // Coral L4
 
 
         public static final double gearRatio = 1.0;
+        public static final Distance INCHES_AT_TOP = Inches.of(72.0);
+        public static final Angle ROTATIONS_AT_TOP = Radians.of(220);
         public static final double SensorToMechanismRatio =
             Constants.Elevator.ROTATIONS_AT_TOP.in(Rotations)
                 / Constants.Elevator.INCHES_AT_TOP.in(Meters);
-        public static final Distance INCHES_AT_TOP = Inches.of(72.0);
-        public static final Angle ROTATIONS_AT_TOP = Radians.of(220);
     }
 
 

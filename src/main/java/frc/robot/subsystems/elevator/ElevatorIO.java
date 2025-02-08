@@ -30,4 +30,6 @@ public interface ElevatorIO {
 
     public default void setPositon(double position) {}
 
+    public default void resetHome() {}
+
 }
