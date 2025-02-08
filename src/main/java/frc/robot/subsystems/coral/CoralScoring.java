@@ -30,10 +30,6 @@ public class CoralScoring extends SubsystemBase {
         return coralScoringAutoLogged.grabingBeamBrakeRight;
     }
 
-    public boolean getRandomStatus() {
-        return coralScoringAutoLogged.randomTouchSensor;
-    }
-
     @Override
     public void periodic() {
         io.updateInputs(coralScoringAutoLogged);
