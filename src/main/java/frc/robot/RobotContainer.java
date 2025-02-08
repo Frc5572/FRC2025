@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.LEDPattern;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -22,12 +21,12 @@ import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberReal;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorIO;
-import frc.robot.subsystems.elevator.ElevatorReal;
 import frc.robot.subsystems.coral.CoralScoring;
 import frc.robot.subsystems.coral.CoralScoringIO;
 import frc.robot.subsystems.coral.CoralScoringReal;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorIO;
+import frc.robot.subsystems.elevator.ElevatorReal;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
 import frc.robot.subsystems.swerve.SwerveReal;
@@ -129,46 +128,12 @@ public class RobotContainer {
         driver.povLeft().onTrue(elevator.p0());
         driver.leftTrigger().onTrue(elevator.p2());
         SmartDashboard.putNumber("elevatorVoltage", 1.0);
+        SmartDashboard.putNumber("elevatorTargetHeight", 20);
+        driver.a().whileTrue(
+            elevator.moveTo(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
         driver.povUp().whileTrue(elevator.moveUp());
         driver.povRight().whileTrue(elevator.moveDown());
-        driver.a().onTrue(new Command() {
-            Timer timer = new Timer();
 
-            @Override
-            public void initialize() {
-                timer.reset();
-                timer.start();
-            }
-
-            @Override
-            public void execute() {
-                vis.setElevatorHeight(Inches.of(timer.get() * 30.0));
-            }
-
-            @Override
-            public boolean isFinished() {
-                return timer.hasElapsed(3.0);
-            }
-        });
-        driver.b().onTrue(new Command() {
-            Timer timer = new Timer();
-
-            @Override
-            public void initialize() {
-                timer.reset();
-                timer.start();
-            }
-
-            @Override
-            public void execute() {
-                vis.setElevatorHeight(Inches.of(Math.max(72.0 - timer.get() * 30.0, 0)));
-            }
-
-            @Override
-            public boolean isFinished() {
-                return timer.hasElapsed(3.0);
-            }
-        });
 
         driver.x().onTrue(new InstantCommand(() -> {
             s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));

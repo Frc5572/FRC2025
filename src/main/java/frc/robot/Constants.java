@@ -290,8 +290,8 @@ public final class Constants {
         public static final NeutralModeValue BREAK = NeutralModeValue.Brake;
 
         // PID and feedforward
-        public static final double KP = 5.0;
-        public static final double KI = 1.5;
+        public static final double KP = 0.5;
+        public static final double KI = 0.0;
         public static final double KD = 0.0;
         public static final double KS = 0.1675;
         public static final double KV = 0.0;
@@ -305,7 +305,7 @@ public final class Constants {
         public static final Distance P1 = Inches.of(32);
         public static final Distance P2 = Inches.of(44);
         public static final Distance P3 = Inches.of(48);
-        public static final Distance P4 = Inches.of(72);
+        public static final Distance P4 = Inches.of(62);
 
 
         public static final double gearRatio = 1.0;

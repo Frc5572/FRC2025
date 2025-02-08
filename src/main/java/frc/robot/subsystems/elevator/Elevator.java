@@ -2,6 +2,7 @@ package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
@@ -37,7 +38,7 @@ public class Elevator extends SubsystemBase {
      */
     public Command homeTimer() {
         Command slowLower = Commands.run(() -> io.setVoltage(-0.1)).withTimeout(1);
-        return moveTo(Constants.Elevator.HOME).andThen(slowLower);
+        return moveTo(() -> Constants.Elevator.HOME).andThen(slowLower);
     }
 
     /**
@@ -49,8 +50,8 @@ public class Elevator extends SubsystemBase {
     public Command home() {
 
         Command slowLower = Commands.run(() -> io.setVoltage(-0.1));
-        return moveTo(Constants.Elevator.HOME).andThen(slowLower)
-            .until(() -> (inputs.limitSwitch == true));
+        return moveTo(() -> Constants.Elevator.HOME).andThen(slowLower)
+            .until(() -> (inputs.limitSwitch == false));
     }
 
     /**
@@ -60,23 +61,23 @@ public class Elevator extends SubsystemBase {
      * 
      */
     public Command p0() {
-        return moveTo(Constants.Elevator.P0);
+        return moveTo(() -> Constants.Elevator.P0);
     }
 
     public Command p1() {
-        return moveTo(Constants.Elevator.P1);
+        return moveTo(() -> Constants.Elevator.P1);
     }
 
     public Command p2() {
-        return moveTo(Constants.Elevator.P2);
+        return moveTo(() -> Constants.Elevator.P2);
     }
 
     public Command p3() {
-        return moveTo(Constants.Elevator.P3);
+        return moveTo(() -> Constants.Elevator.P3);
     }
 
     public Command p4() {
-        return moveTo(Constants.Elevator.P4);
+        return moveTo(() -> Constants.Elevator.P4);
     }
 
     /**
@@ -86,11 +87,11 @@ public class Elevator extends SubsystemBase {
      * @return elevator height change
      * 
      */
-    public Command moveTo(Distance height) {
+    public Command moveTo(Supplier<Distance> height) {
         return run(() -> {
-            Logger.recordOutput("targetHeight", height.in(Meters));
-            io.setPositon(height.in(Meters));
-        }).until(() -> Math.abs(inputs.position.in(Inches) - height.in(Inches)) < 1);
+            Logger.recordOutput("targetHeight", height.get().in(Meters));
+            io.setPositon(height.get().in(Meters));
+        }).until(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1);
     }
 
     public Command moveUp() {
