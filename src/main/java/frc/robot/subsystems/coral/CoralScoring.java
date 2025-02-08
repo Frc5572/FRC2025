@@ -30,6 +30,10 @@ public class CoralScoring extends SubsystemBase {
         return coralScoringAutoLogged.grabingBeamBrakeRight;
     }
 
+    public boolean getRandomStatus() {
+        return coralScoringAutoLogged.randomTouchSensor;
+    }
+
     @Override
     public void periodic() {
         io.updateInputs(coralScoringAutoLogged);
@@ -57,8 +61,7 @@ public class CoralScoring extends SubsystemBase {
      * Runs Pre Scoring Motor
      */
     public Command runPreScoringMotor(double scoringSpeed) {
-        return motorStartEndCommand(scoringSpeed).until(() -> getScoringBeamBrakeStatus())
-            .withTimeout(10);
+        return motorStartEndCommand(scoringSpeed).until(() -> getScoringBeamBrakeStatus());
     }
 
     /**
