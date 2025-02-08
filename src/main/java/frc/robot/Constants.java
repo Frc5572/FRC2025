@@ -58,6 +58,18 @@ public final class Constants {
     public static final int operatorId = 1;
 
     public static final boolean tuningMode = false;
+    /**
+     * Current threshold that indicates an algae is in possestion
+     */
+    public static final double HAS_ALGAE_CURRENT_THRESHOLD = 100;
+
+    /**
+     * Algae misc values
+     */
+    public static final class Algae {
+        public static final int VOLTAGE = 2;
+        public static final int NEGATIVE_VOLTAGE = -2;
+    }
 
     // Controller "3"
     public static final int controllerThreeId = 3;
@@ -72,8 +84,16 @@ public final class Constants {
          * Primary Coral Scoring CAN id's
          */
         public static final class PrimaryCoralScoring {
-            public static final int Coral_Scoring_NEO_ID = 8;
+            public static final int Coral_Scoring_NEO_ID = 5;
         }
+
+        /**
+         * Algae Motor CAN id's
+         */
+        public static final class AlgaeMotors {
+            public static final int ALGAE_MOTOR_ID = 6;
+        }
+
     }
 
 
@@ -94,7 +114,7 @@ public final class Constants {
 
         public static final int LEFT_TALON_FX_ID = 3;
         public static final int RIGHT_TALON_FX_ID = 12;
-        public static final int TOUCH_SENSOR_CHANNEL = 0;
+        public static final int TOUCH_SENSOR_CHANNEL = 2;
         public static final Angle MAX_ANGLE = Radians.of(250);
         public static final double GEAR_RATIO = 1;
         public static final double VOLTAGE = 4;
@@ -354,8 +374,10 @@ public final class Constants {
      * Primary Coral Scoring Constants
      */
     public static final class CoralScoringConstants {
-        public static final int Scoring_Beam_Brake_DIO_Port = 1;
-        public static final int Grabing_RBeam_Brake_DIO_Port = 2;
+        public static final int Scoring_Beam_Brake_DIO_Port = 0;
+        public static final int Coral_Touch_Sensor_DIO_Port = 3;
+        public static final int Random_Touch_Sensor = 1;
     }
-
 }
+
+
