@@ -157,7 +157,14 @@ public class ScoringLocation {
      * Coral height states
      */
     public enum Height {
-        kHome, KPosition0, KPosition1, KPosition2, KPosition3, kPosition4;
+        kHome("Home"), KPosition0("P0"), KPosition1("P1"), KPosition2("P2"), KPosition3(
+            "P3"), kPosition4("P4");
+
+        public final String name;
+
+        Height(String name) {
+            this.name = name;
+        }
 
         /**
          *

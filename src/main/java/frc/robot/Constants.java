@@ -338,6 +338,8 @@ public final class Constants {
         public static final double SensorToMechanismRatio =
             Constants.Elevator.ROTATIONS_AT_TOP.in(Rotations)
                 / Constants.Elevator.INCHES_AT_TOP.in(Meters);
+
+        public static final String heightName = "elevator height";
     }
 
 
