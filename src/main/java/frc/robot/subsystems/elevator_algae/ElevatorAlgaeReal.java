@@ -21,6 +21,7 @@ public class ElevatorAlgaeReal implements ElevatorAlgaeIO {
      */
     public ElevatorAlgaeReal() {
         algaeMotorConfig.idleMode(IdleMode.kBrake);
+        algaeMotorConfig.inverted(true);
         algaeMotor.configure(algaeMotorConfig, ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters);
     }
