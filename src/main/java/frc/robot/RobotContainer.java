@@ -141,25 +141,7 @@ public class RobotContainer {
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
         algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan));
-        driver.rightTrigger()
-            .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
-        driver.leftTrigger()
-            .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
-
-
         driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
-
-        driver.povDown().onTrue(elevator.home());
-        driver.povLeft().onTrue(elevator.p0());
-        driver.leftTrigger().onTrue(elevator.p2());
-        SmartDashboard.putNumber("elevatorVoltage", 1.0);
-        driver.povUp().whileTrue(elevator.moveUp());
-        driver.povRight().whileTrue(elevator.moveDown());
-
-        // alt operator
-        altOperator.povUp().whileTrue(Commands.runOnce(() -> Height.incrementState()));
-        altOperator.povDown().whileTrue(Commands.runOnce(() -> Height.decrementState()));
-
         backUpOperator.a().onTrue(new Command() {
             Timer timer = new Timer();
         });
@@ -178,7 +160,6 @@ public class RobotContainer {
         // driver.x().onTrue(new InstantCommand(() -> {
         // s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
         // }));
-        driver.x().whileTrue(coralScoring.runScoringMotor(2));
         driver.rightStick().whileTrue(climb.runClimberMotorCommand());
         pitController.y().whileTrue(climb.resetClimberCommand());
 
@@ -214,6 +195,14 @@ public class RobotContainer {
         altOperator.povRight().onTrue(Commands.runOnce(() -> HeightMode.incrementState()));
         altOperator.a().whileTrue(elevator.altOpBinds());
         altOperator.y().onTrue(elevator.home());
+        altOperator.x().whileTrue(coralScoring.runScoringMotor(2));
+        altOperator.rightTrigger()
+            .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
+        altOperator.leftTrigger()
+            .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
+        altOperator.povUp().whileTrue(Commands.runOnce(() -> Height.incrementState()));
+        altOperator.povDown().whileTrue(Commands.runOnce(() -> Height.decrementState()));
+
 
         // pit controller
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());
