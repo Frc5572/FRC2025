@@ -101,7 +101,7 @@ public class Elevator extends SubsystemBase {
     /**
      * moves elevator
      *
-     * @return new elevator positon
+     * @return new elevator position
      */
     public Command altOpBinds() {
 
@@ -126,7 +126,6 @@ public class Elevator extends SubsystemBase {
             }
             return Constants.Elevator.HOME;
         });
-
     };
 
 }
