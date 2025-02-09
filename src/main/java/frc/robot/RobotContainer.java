@@ -126,32 +126,36 @@ public class RobotContainer {
         }
 
         /* Default Commands */
-        swerve.setDefaultCommand(swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
-            Constants.Swerve.isOpenLoop));
         leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed).ignoringDisable(true));
         /* Button and Trigger Bindings */
 
         configureTriggerBindings();
         if (runtimeType == RobotRunType.kSimulation) {
-            maybeController(driver, this::setupDriver);
+            maybeController("Driver", driver, this::setupDriver);
         } else {
             setupDriver();
         }
-        maybeController(pitController, this::setupPitController);
-        maybeController(altOperator, this::setupAltOperatorController);
+        maybeController("Pit Controller", pitController, this::setupPitController);
+        maybeController("Alt Operator", altOperator, this::setupAltOperatorController);
     }
 
     private List<Runnable> controllerSetups = new ArrayList<>();
 
-    private void maybeController(CommandXboxController xboxController, Runnable setupFun) {
-        if (xboxController.isConnected()) {
+    private void maybeController(String name, CommandXboxController xboxController,
+        Runnable setupFun) {
+        Runnable runner = () -> {
+            System.out.println("Setting up buttons for " + name);
             setupFun.run();
+        };
+        if (xboxController.isConnected()) {
+            runner.run();
         } else {
-            new Trigger(xboxController::isConnected).onTrue(
-                Commands.runOnce(() -> controllerSetups.add(setupFun)).ignoringDisable(true));
+            new Trigger(xboxController::isConnected)
+                .onTrue(Commands.runOnce(() -> controllerSetups.add(runner)).ignoringDisable(true));
         }
     }
 
+    /** Setup buttons for newly attached controllers */
     public void queryControllers() {
         for (var setup : controllerSetups) {
             setup.run();
@@ -160,6 +164,8 @@ public class RobotContainer {
     }
 
     private void setupDriver() {
+        swerve.setDefaultCommand(swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
+            Constants.Swerve.isOpenLoop));
         driver.rightTrigger().whileTrue(algae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
         driver.leftTrigger()
             .whileTrue(algae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
