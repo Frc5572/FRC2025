@@ -98,6 +98,11 @@ public class Elevator extends SubsystemBase {
         return runEnd(() -> io.setVoltage(-1.0), () -> io.setVoltage(0));
     }
 
+    /**
+     * moves elevator
+     *
+     * @return new elevator positon
+     */
     public Command altOpBinds() {
 
         return moveTo(() -> {
@@ -120,9 +125,7 @@ public class Elevator extends SubsystemBase {
                     break;
             }
             return Constants.Elevator.HOME;
-        }
-
-        );
+        });
 
     };
 
