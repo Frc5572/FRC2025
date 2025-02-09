@@ -126,6 +126,6 @@ public class Elevator extends SubsystemBase {
             }
             return Constants.Elevator.HOME;
         });
-    };
+    }
 
 }
