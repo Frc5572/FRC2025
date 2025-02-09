@@ -7,13 +7,14 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.WebController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
@@ -21,6 +22,14 @@ import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberReal;
+import frc.robot.subsystems.coral.CoralScoring;
+import frc.robot.subsystems.coral.CoralScoringIO;
+import frc.robot.subsystems.coral.CoralScoringReal;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorIO;
+import frc.robot.subsystems.elevator.ElevatorReal;
+import frc.robot.subsystems.elevator_algae.ElevatorAlgae;
+import frc.robot.subsystems.elevator_algae.ElevatorAlgaeReal;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
 import frc.robot.subsystems.swerve.SwerveReal;
@@ -45,6 +54,7 @@ public class RobotContainer {
     public final WebController operator = new WebController(5800);
     public final CommandXboxController controllerThree =
         new CommandXboxController(Constants.controllerThreeId);
+    public final CommandXboxController operator = new CommandXboxController(1);
 
 
     /** Simulation */
@@ -57,11 +67,18 @@ public class RobotContainer {
     /** State */
     private final RobotState state;
 
-    /* Subsystems */
 
+    /* Subsystems */
+    private ElevatorAlgae s_ElevatorAlgae;
     private LEDs leds = new LEDs();
+    private Elevator elevator;
     private final Swerve s_Swerve;
     private final Vision s_Vision;
+    private CoralScoring coralScoring;
+
+    /* Triggers */
+    private Trigger algaeInIntake = new Trigger(() -> s_ElevatorAlgae.hasAlgae());
+
     private Climber climb;
 
     /**
@@ -73,8 +90,11 @@ public class RobotContainer {
         state = new RobotState(vis);
         switch (runtimeType) {
             case kReal:
+                elevator = new Elevator(new ElevatorReal());
                 s_Swerve = new Swerve(state, new SwerveReal());
                 s_Vision = new Vision(state, VisionReal::new);
+                coralScoring = new CoralScoring(new CoralScoringReal());
+                s_ElevatorAlgae = new ElevatorAlgae(new ElevatorAlgaeReal());
                 climb = new Climber(new ClimberReal());
                 break;
             case kSimulation:
@@ -83,79 +103,75 @@ public class RobotContainer {
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
                 s_Swerve = new Swerve(state, new SwerveSim(driveSimulation));
                 s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
+                elevator = new Elevator(new ElevatorIO() {});
+                coralScoring = new CoralScoring(new CoralScoringIO() {});
                 climb = new Climber(new ClimberIO.Empty());
                 break;
             default:
+                elevator = new Elevator(new ElevatorIO() {});
                 s_Swerve = new Swerve(state, new SwerveIO.Empty() {});
                 s_Vision = new Vision(state, VisionIO::empty);
+                coralScoring = new CoralScoring(new CoralScoringIO() {});
                 climb = new Climber(new ClimberIO.Empty());
         }
+
+        /* Default Commands */
         s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
-        configureButtonBindings(runtimeType);
-        leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed));
-        configureTriggerBindings();
+        leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed).ignoringDisable(true));
+        /* Button and Trigger Bindings */
 
+        configureButtonBindings(runtimeType);
+        configureTriggerBindings();
     }
 
     /**
      * Use this method to vol your button->command mappings. Buttons can be created by instantiating
      * a {@link GenericHID} or one of its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or
      * {@link XboxController}), and then passing it to a
-     * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+     * {@link edu1.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
+        algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan));
+        driver.rightTrigger()
+            .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
+        driver.leftTrigger()
+            .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
+
+
         driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
-        driver.a().onTrue(new Command() {
-            Timer timer = new Timer();
 
-            @Override
-            public void initialize() {
-                timer.reset();
-                timer.start();
-            }
+        driver.povDown().onTrue(elevator.home());
+        driver.povLeft().onTrue(elevator.p0());
+        SmartDashboard.putNumber("elevatorVoltage", 1.0);
+        SmartDashboard.putNumber("elevatorTargetHeight", 20);
+        driver.a().whileTrue(
+            elevator.moveTo(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
+        driver.povUp().whileTrue(elevator.moveUp());
+        driver.povRight().whileTrue(elevator.moveDown());
 
-            @Override
-            public void execute() {
-                vis.setElevatorHeight(Inches.of(timer.get() * 30.0));
-            }
 
-            @Override
-            public boolean isFinished() {
-                return timer.hasElapsed(3.0);
-            }
-        });
-        driver.b().onTrue(new Command() {
-            Timer timer = new Timer();
-
-            @Override
-            public void initialize() {
-                timer.reset();
-                timer.start();
-            }
-
-            @Override
-            public void execute() {
-                vis.setElevatorHeight(Inches.of(Math.max(72.0 - timer.get() * 30.0, 0)));
-            }
-
-            @Override
-            public boolean isFinished() {
-                return timer.hasElapsed(3.0);
-            }
-        });
-
-        driver.x().onTrue(new InstantCommand(() -> {
-            s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
-        }));
+        // driver.x().onTrue(new InstantCommand(() -> {
+        // s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
+        // }));
+        driver.x().whileTrue(coralScoring.runScoringMotor(2));
         driver.rightStick().whileTrue(climb.runClimberMotorCommand());
         controllerThree.y().whileTrue(climb.resetClimberCommand());
 
+
     }
 
+    /**
+     * Triggers
+     */
+
     public void configureTriggerBindings() {
-        climb.resetButton.onTrue(climb.restEncoder());
+        coralScoring.intakedCoralRight.onTrue(leds.setLEDsSolid(Color.kRed).withTimeout(5));
+        coralScoring.outtakedCoral.negate().whileTrue(coralScoring.runPreScoringMotor(.1));
+        coralScoring.outtakedCoral.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
+        climb.resetButton.and(controllerThree.y()).onTrue(climb.restEncoder());
     }
+
 
     /**
      * Gets the user's selected autonomous command.
@@ -170,13 +186,13 @@ public class RobotContainer {
      * Update viz
      */
     public void updateViz() {
-        vis.draw();
+        vis.drawImpl();
     }
 
     /** Start simulation */
     public void startSimulation() {
         if (driveSimulation != null) {
-            // SimulatedArena.getInstance().resetFieldForAuto();
+            SimulatedArena.getInstance().resetFieldForAuto();
         }
     }
 
@@ -194,7 +210,6 @@ public class RobotContainer {
 
         }
     }
-
 }
 
 
