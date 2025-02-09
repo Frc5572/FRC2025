@@ -14,7 +14,7 @@ import io.javalin.http.staticfiles.Location;
 /** Controller via HTTP. */
 public class WebController {
 
-    private ScoringLocation.CoralHeight currentHeight = ScoringLocation.CoralHeight.L1;
+    private ScoringLocation.CoralHeight currentHeight = ScoringLocation.CoralHeight.Klevel1;
     private ScoringLocation.CoralLocation currentLocation = ScoringLocation.CoralLocation.A;
 
     /**
