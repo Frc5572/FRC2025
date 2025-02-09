@@ -7,7 +7,6 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -20,6 +19,7 @@ import frc.lib.util.ScoringLocation.AlgaeHeight;
 import frc.lib.util.ScoringLocation.CoralHeight;
 import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.ScoringLocation.HeightMode;
+import frc.lib.util.WebController;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
@@ -56,13 +56,13 @@ public class RobotContainer {
 
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
+    public final WebController operator = new WebController(5800);
     public final CommandXboxController backUpOperator =
         new CommandXboxController(Constants.operatorId);
     public final CommandXboxController pitController =
         new CommandXboxController(Constants.PIT_CONTROLLER_ID);
     public final CommandXboxController altOperator =
         new CommandXboxController(Constants.ALT_OPERATOR_ID);
-    public final CommandXboxController operator = new CommandXboxController(1);
 
 
     /** Simulation */
@@ -159,10 +159,6 @@ public class RobotContainer {
         // alt operator
         altOperator.povUp().whileTrue(Commands.runOnce(() -> Height.incrementState()));
         altOperator.povDown().whileTrue(Commands.runOnce(() -> Height.decrementState()));
-
-        backUpOperator.a().onTrue(new Command() {
-            Timer timer = new Timer();
-        });
 
         driver.povDown().onTrue(elevator.home());
         driver.povLeft().onTrue(elevator.p0());

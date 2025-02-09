@@ -5,7 +5,45 @@ public class ScoringLocation {
 
     /** Reef locations */
     public static enum CoralLocation {
-        A, B, C, D, E, F, G, H, I, J, K, L
+        A, B, C, D, E, F, G, H, I, J, K, L, LeftFeeder, RightFeeder, Processor;
+
+        /** Deserialize from integer */
+        public static CoralLocation fromInt(int id) {
+            switch (id) {
+                case 0:
+                    return CoralLocation.A;
+                case 1:
+                    return CoralLocation.B;
+                case 2:
+                    return CoralLocation.C;
+                case 3:
+                    return CoralLocation.D;
+                case 4:
+                    return CoralLocation.E;
+                case 5:
+                    return CoralLocation.F;
+                case 6:
+                    return CoralLocation.G;
+                case 7:
+                    return CoralLocation.H;
+                case 8:
+                    return CoralLocation.I;
+                case 9:
+                    return CoralLocation.J;
+                case 10:
+                    return CoralLocation.K;
+                case 11:
+                    return CoralLocation.L;
+                case 12:
+                    return CoralLocation.LeftFeeder;
+                case 13:
+                    return CoralLocation.RightFeeder;
+                case 14:
+                    return CoralLocation.Processor;
+                default:
+                    return null;
+            }
+        }
     }
 
     /**
@@ -109,6 +147,24 @@ public class ScoringLocation {
      */
     public enum CoralHeight {
         Klevel1, Klevel2, Klevel3, Klevel4;
+
+        /** Deserialize from integer */
+        public static CoralHeight fromInt(int id) {
+            switch (id) {
+                case 0:
+                    return CoralHeight.Klevel1;
+                case 1:
+                    return CoralHeight.Klevel2;
+                case 2:
+                    return CoralHeight.Klevel3;
+                case 3:
+                    return CoralHeight.Klevel4;
+                case 4:
+                    return CoralHeight.Klevel4;
+                default:
+                    return null;
+            }
+        }
 
         /**
          *
