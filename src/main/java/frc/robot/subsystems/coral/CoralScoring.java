@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.viz.Viz2025;
 
 /**
- * Coral Scoring Subsystems
+ * Coral Scoring Subsystem
  */
 public class CoralScoring extends SubsystemBase {
     private CoralScoringIO io;
@@ -18,7 +18,7 @@ public class CoralScoring extends SubsystemBase {
     public Trigger intakedCoralRight = new Trigger(() -> getGrabingRightBeamBrakeStatus());
     public Trigger outtakedCoral = new Trigger(() -> getScoringBeamBrakeStatus());
 
-
+    /** Coral Scoring subsystem */
     public CoralScoring(CoralScoringIO io, Viz2025 viz) {
         this.viz = viz;
         this.io = io;

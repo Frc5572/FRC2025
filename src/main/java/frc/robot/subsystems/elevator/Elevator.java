@@ -22,6 +22,7 @@ public class Elevator extends SubsystemBase {
 
     private ElevatorInputsAutoLogged inputs = new ElevatorInputsAutoLogged();
 
+    /** Elevator Subsystem */
     public Elevator(ElevatorIO io, Viz2025 viz) {
         this.viz = viz;
         this.io = io;

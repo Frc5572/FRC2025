@@ -3,6 +3,7 @@ package frc.robot.subsystems.elevator;
 import static edu.wpi.first.units.Units.Inches;
 import edu.wpi.first.math.util.Units;
 
+/** Simulator for Elevator */
 public class ElevatorSim implements ElevatorIO {
 
     private static final double simkP = 19 / 48.0;
@@ -17,6 +18,7 @@ public class ElevatorSim implements ElevatorIO {
 
     private double offset = 0;
 
+    /** Simulator for Elevator */
     public ElevatorSim() {
         currentPoint = 0;
     }
