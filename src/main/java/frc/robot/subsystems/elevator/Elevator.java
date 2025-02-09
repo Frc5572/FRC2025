@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.ScoringLocation.Height;
 import frc.robot.Constants;
 
 /**
@@ -36,27 +37,16 @@ public class Elevator extends SubsystemBase {
     }
 
     /**
-     * moves elevator to home with time out
-     *
-     * @return home position
-     */
-    public Command homeTimer() {
-        Command slowLower = Commands.run(() -> io.setVoltage(-0.1)).withTimeout(1);
-        return moveTo(() -> Constants.Elevator.HOME).until(() -> inputs.position.in(Inches) < 5.0)
-            .andThen(slowLower);
-    }
-
-    /**
      * moves elevator to home
      *
      * @return elevator at home
      * 
      */
     public Command home() {
-
         Command slowLower = Commands.runEnd(() -> io.setVoltage(-0.7), () -> io.setVoltage(0.0));
         return moveTo(() -> Constants.Elevator.HOME).until(() -> inputs.position.in(Inches) < 5.0)
-            .andThen(slowLower).until(() -> (inputs.limitSwitch == true));
+            .andThen(slowLower).until(() -> (inputs.limitSwitch == true)).alongWith(
+                Commands.runOnce(() -> Logger.recordOutput(Constants.Elevator.heightName, "home")));
     }
 
     /**
@@ -107,4 +97,35 @@ public class Elevator extends SubsystemBase {
     public Command moveDown() {
         return runEnd(() -> io.setVoltage(-1.0), () -> io.setVoltage(0));
     }
+
+    /**
+     * moves elevator
+     *
+     * @return new elevator position
+     */
+    public Command altOpBinds() {
+
+        return moveTo(() -> {
+            var height = Height.getCurrentState();
+            Logger.recordOutput(Constants.Elevator.heightName, height.name);
+            switch (height) {
+                case kHome:
+                    return Constants.Elevator.HOME;
+                case KPosition0:
+                    return Constants.Elevator.P0;
+                case KPosition1:
+                    return Constants.Elevator.P1;
+                case KPosition2:
+                    return Constants.Elevator.P2;
+                case KPosition3:
+                    return Constants.Elevator.P3;
+                case kPosition4:
+                    return Constants.Elevator.P4;
+                default:
+                    break;
+            }
+            return Constants.Elevator.HOME;
+        });
+    }
+
 }
