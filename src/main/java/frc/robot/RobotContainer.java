@@ -27,7 +27,9 @@ import frc.robot.subsystems.coral.CoralScoringReal;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorReal;
+import frc.robot.subsystems.elevator.ElevatorSim;
 import frc.robot.subsystems.elevator_algae.ElevatorAlgae;
+import frc.robot.subsystems.elevator_algae.ElevatorAlgaeIO;
 import frc.robot.subsystems.elevator_algae.ElevatorAlgaeReal;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
@@ -67,15 +69,15 @@ public class RobotContainer {
 
 
     /* Subsystems */
-    private ElevatorAlgae s_ElevatorAlgae;
+    private ElevatorAlgae algae;
     private LEDs leds = new LEDs();
     private Elevator elevator;
-    private final Swerve s_Swerve;
-    private final Vision s_Vision;
+    private final Swerve swerve;
+    private final Vision vision;
     private CoralScoring coralScoring;
 
     /* Triggers */
-    private Trigger algaeInIntake = new Trigger(() -> s_ElevatorAlgae.hasAlgae());
+    private Trigger algaeInIntake = new Trigger(() -> algae.hasAlgae());
 
     private Climber climb;
 
@@ -88,33 +90,35 @@ public class RobotContainer {
         state = new RobotState(vis);
         switch (runtimeType) {
             case kReal:
-                elevator = new Elevator(new ElevatorReal());
-                s_Swerve = new Swerve(state, new SwerveReal());
-                s_Vision = new Vision(state, VisionReal::new);
+                elevator = new Elevator(new ElevatorReal(), vis);
+                swerve = new Swerve(state, new SwerveReal());
+                vision = new Vision(state, VisionReal::new);
                 coralScoring = new CoralScoring(new CoralScoringReal());
-                s_ElevatorAlgae = new ElevatorAlgae(new ElevatorAlgaeReal());
+                algae = new ElevatorAlgae(new ElevatorAlgaeReal());
                 climb = new Climber(new ClimberReal());
                 break;
             case kSimulation:
                 driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
                     new Pose2d(3, 3, Rotation2d.kZero));
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
-                s_Swerve = new Swerve(state, new SwerveSim(driveSimulation));
-                s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
-                elevator = new Elevator(new ElevatorIO() {});
-                coralScoring = new CoralScoring(new CoralScoringIO() {});
+                swerve = new Swerve(state, new SwerveSim(driveSimulation));
+                vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
+                elevator = new Elevator(new ElevatorSim(), vis);
+                coralScoring = new CoralScoring(new CoralScoringIO.Empty());
+                algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty());
                 climb = new Climber(new ClimberIO.Empty());
                 break;
             default:
-                elevator = new Elevator(new ElevatorIO() {});
-                s_Swerve = new Swerve(state, new SwerveIO.Empty() {});
-                s_Vision = new Vision(state, VisionIO::empty);
-                coralScoring = new CoralScoring(new CoralScoringIO() {});
+                elevator = new Elevator(new ElevatorIO.Empty(), vis);
+                swerve = new Swerve(state, new SwerveIO.Empty());
+                vision = new Vision(state, VisionIO::empty);
+                coralScoring = new CoralScoring(new CoralScoringIO.Empty());
+                algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty());
                 climb = new Climber(new ClimberIO.Empty());
         }
 
         /* Default Commands */
-        s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
+        swerve.setDefaultCommand(swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
         leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed).ignoringDisable(true));
         /* Button and Trigger Bindings */
@@ -131,13 +135,12 @@ public class RobotContainer {
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
         algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan));
-        driver.rightTrigger()
-            .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
+        driver.rightTrigger().whileTrue(algae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
         driver.leftTrigger()
-            .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
+            .whileTrue(algae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
 
 
-        driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
+        driver.y().onTrue(new InstantCommand(() -> swerve.resetFieldRelativeOffset()));
 
         driver.povDown().onTrue(elevator.home());
         driver.povLeft().onTrue(elevator.p0());
