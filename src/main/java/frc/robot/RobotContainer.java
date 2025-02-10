@@ -1,6 +1,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import java.util.ArrayList;
 import java.util.List;
 import org.ironmaple.simulation.SimulatedArena;
@@ -107,7 +108,7 @@ public class RobotContainer {
                 break;
             case kSimulation:
                 driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
-                    new Pose2d(3, 3, Rotation2d.kZero));
+                    new Pose2d(1, 3, Rotation2d.kZero));
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
                 swerve = new Swerve(state, new SwerveSim(driveSimulation));
                 vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
@@ -245,7 +246,9 @@ public class RobotContainer {
      * @return Returns autonomous command selected.
      */
     public Command getAutonomousCommand() {
-        return null;
+        return swerve.moveAndAvoidReef(
+            () -> new Pose2d(FieldConstants.fieldLength.in(Meters) - 1, 3, Rotation2d.kZero), false,
+            0.1, 1);
     }
 
     /**
@@ -258,7 +261,7 @@ public class RobotContainer {
     /** Start simulation */
     public void startSimulation() {
         if (driveSimulation != null) {
-            SimulatedArena.getInstance().resetFieldForAuto();
+            // SimulatedArena.getInstance().resetFieldForAuto();
         }
     }
 

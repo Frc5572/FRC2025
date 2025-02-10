@@ -370,6 +370,26 @@ public final class Constants {
         public static final double fieldBorderMargin = 0.5;
     }
 
+    /**
+     * MoveToPos constants.
+     */
+    public static class SwerveTransformPID {
+        public static final double PID_XKP = 5.0;
+        public static final double PID_XKI = 0.5;
+        public static final double PID_XKD = 0.0;
+        public static final double PID_YKP = 3.5;
+        public static final double PID_YKI = 0.5;
+        public static final double PID_YKD = 0.0;
+        public static final double PID_TKP = 3.0;
+        public static final double PID_TKI = 0.1;
+        public static final double PID_TKD = 0.0;
+
+        public static final double MAX_ANGULAR_VELOCITY = 9.0;
+        public static final double MAX_ANGULAR_ACCELERATION = 9 * 5;
+        public static final double STD_DEV_MOD = 2.0;
+
+        public static final Rotation2d CIRCLE_REEF_LOOKAHEAD_ANGLE = Rotation2d.fromDegrees(15);
+    }
 
     /** State Estimator Constants */
     public static class StateEstimator {

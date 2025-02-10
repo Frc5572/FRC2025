@@ -133,7 +133,6 @@ public class Robot extends LoggedRobot {
      */
     @Override
     public void autonomousInit() {
-        robotContainer.getAutonomousCommand().schedule();
         autoChooser = robotContainer.getAutonomousCommand();
 
         // schedule the autonomous command (example)

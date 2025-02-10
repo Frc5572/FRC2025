@@ -38,8 +38,13 @@ public class Rectangle implements ConvexShape, Drawable {
 
     @Override
     public Interval project(Axis axis) {
+        return axis.project(getVertices());
+    }
+
+    /** Get the vertices in world-space. */
+    public Translation2d[] getVertices() {
         updateVertices();
-        return axis.project(vertices);
+        return vertices;
     }
 
     private void updateVertices() {
