@@ -112,23 +112,7 @@ public class Elevator extends SubsystemBase {
         return moveTo(() -> {
             var height = Height.getCurrentState();
             Logger.recordOutput(Constants.Elevator.heightName, height.name);
-            switch (height) {
-                case kHome:
-                    return Constants.Elevator.HOME;
-                case KPosition0:
-                    return Constants.Elevator.P0;
-                case KPosition1:
-                    return Constants.Elevator.P1;
-                case KPosition2:
-                    return Constants.Elevator.P2;
-                case KPosition3:
-                    return Constants.Elevator.P3;
-                case kPosition4:
-                    return Constants.Elevator.P4;
-                default:
-                    break;
-            }
-            return Constants.Elevator.HOME;
+            return height.height;
         });
     }
 

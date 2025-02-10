@@ -3,6 +3,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import java.util.stream.IntStream;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
@@ -52,6 +53,9 @@ public class FieldConstants {
         public static final double leftM = (leftFarCorner.getY() - leftCloseCorner.getY())
             / (leftFarCorner.getX() - leftCloseCorner.getX());
         public static final double leftB = leftFarCorner.getY() - leftM * leftFarCorner.getX();
+
+        public static final Pose2d leftFeederPose = new Pose2d();
+        public static final Pose2d rightFeederPose = new Pose2d();
 
     }
 

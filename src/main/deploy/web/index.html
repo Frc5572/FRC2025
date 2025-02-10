@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playbook Interface</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #1e1e1e;
+            color: white;
+        }
+
+        #main {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: calc((100vw + 100vh) / 2);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #side {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: calc(100vw - (100vw + 100vh) / 2);
+            height: 100vh;
+            border: 2px solid red;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stage {
+            position: relative;
+            width: 90vh;
+            height: 90vh;
+            border: 2px solid red;
+            background-size: cover;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .grid div {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            aspect-ratio: 1 / 1;
+            background-size: cover;
+            background-color: #2e2e2e;
+            border-radius: 1rem;
+            margin: 0.5rem;
+            transition: margin 50ms ease-in-out;
+        }
+
+        .grid div:hover {
+            margin: 0rem;
+        }
+
+        .grid div span {
+            position: absolute;
+            right: 1rem;
+            bottom: 1rem;
+        }
+
+        .grid div p {
+            font-size: 2.4rem;
+        }
+
+        span {
+            font-size: 2rem;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, -1px 0px 0 #000, 1px 0px 0 #000, 0px 1px 0 #000, 0px -1px 0 #000;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .bad {
+            background-color: #770000;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main">
+        <div id="stage1" class="stage grid">
+            <div id="s1c" style="background-image: url(./coral.PNG);">
+                <span>c</span>
+            </div>
+            <div id="s1a" style="background-image: url(./algae.PNG);">
+                <span>a</span>
+            </div>
+            <div id="s1d">
+                <span>d</span>
+            </div>
+            <div id="s1f">
+                <span>f</span>
+            </div>
+        </div>
+        <div id="stage2" class="stage" style="background-image: url(./reef12.svg);">
+            <span class="s2a">a</span>
+            <span class="s2b">b</span>
+            <span class="s2c">c</span>
+            <span class="s2d">d</span>
+            <span class="s2e">e</span>
+            <span class="s2f">f</span>
+            <span class="s2g">g</span>
+            <span class="s2h">h</span>
+            <span class="s2i">i</span>
+            <span class="s2j">j</span>
+            <span class="s2k">k</span>
+            <span class="s2l">l</span>
+        </div>
+        <div id="stage3" class="stage" style="background-image: url(./reef6.svg);">
+            <span class="s2a">a</span>
+            <span class="s2b">b</span>
+            <span class="s2c">c</span>
+            <span class="s2d">d</span>
+            <span class="s2e">e</span>
+            <span class="s2f">f</span>
+            <span class="s2g">g</span>
+            <span class="s2h">h</span>
+            <span class="s2i">i</span>
+            <span class="s2j">j</span>
+            <span class="s2k">k</span>
+            <span class="s2l">l</span>
+        </div>
+        <div id="stage4" class="stage grid">
+            <div id="s4l">
+                <p>Left</p> <span>l</span>
+            </div>
+            <div id="s4f">
+                <p>Fastest</p> <span>f</span>
+            </div>
+            <div id="s4r">
+                <p>Right</p> <span>r</span>
+            </div>
+        </div>
+        <div id="stage5" class="stage grid">
+            <div id="s5p">
+                <p>Processor</p> <span>p</span>
+            </div>
+            <div id="s5b">
+                <p>Barge</p> <span>b</span>
+            </div>
+            <div id="s5d">
+                <p>Drop</p> <span>d</span>
+            </div>
+        </div>
+        <div id="stage6" class="stage grid">
+            <div id="s6m">
+                <p>Mark</p> <span>m</span>
+            </div>
+            <div id="s6r">
+                <p>Restore</p> <span>r</span>
+            </div>
+            <div id="s6c">
+                <p>Clear</p> <span>c</span>
+            </div>
+        </div>
+        <div id="stage7" class="stage grid">
+            <div id="s72">
+                <p>L2</p> <span>2</span>
+            </div>
+            <div id="s73">
+                <p>L3</p> <span>3</span>
+            </div>
+            <div id="s74">
+                <p>L4</p> <span>4</span>
+            </div>
+        </div>
+        <div id="stage8" class="stage grid">
+            <div id="s82">
+                <p>L2</p> <span>2</span>
+            </div>
+            <div id="s83">
+                <p>L3</p> <span>3</span>
+            </div>
+        </div>
+    </div>
+    <div id="side">
+        <p>Status: <span id="status" class="bad">Not Connected</span></p>
+    </div>
+    <script type="module">
+        import { NT4_Client } from "./NT4.js"
+
+        let status = document.getElementById("status");
+
+        const CMD_ID = "/playbook/command";
+        const CMD_CONFIRM_ID = "/playbook/confirm";
+
+        let client = new NT4_Client(
+            window.location.hostname,
+            "playbook",
+            (topic) => {
+                if (topic == CMD_CONFIRM_ID) {
+                    client.subscribe(CMD_CONFIRM_ID, false);
+                }
+            },
+            (topic) => {
+                // Topic unannounce
+            },
+            (topic, timestamp, value) => {
+                // Topic data
+                if (topic.name == CMD_CONFIRM_ID) {
+                    console.log("recieved: " + value)
+                }
+            },
+            () => {
+                // Connected
+                status.classList.remove("bad");
+                status.innerText = "Connected";
+            },
+            () => {
+                // Disconnected
+                status.classList.add("bad");
+                status.innerText = "Not Connected";
+            }
+        );
+
+        window.addEventListener("load", () => {
+            client.publishTopic(CMD_ID, "string");
+            console.log("connecting")
+            client.connect();
+            client.subscribe("/playbook", true);
+        });
+
+        for (let i = 0; i < 12; i++) {
+            let t = -i / 12 * (Math.PI * 2) + Math.PI / 2 + Math.PI / 12;
+            let x = 45 + 30 * Math.cos(t);
+            let y = 45 + 30 * Math.sin(t);
+            document.querySelectorAll(".s2" + String.fromCharCode(97 + i)).forEach((e) => {
+                e.style = "position: absolute; left: calc(" + x + "vh - 7px); top: calc(" + y + "vh - 12px);"
+            });
+        }
+
+        var stage = 1;
+
+        function redraw() {
+            for (let i = 1; i <= 8; i++) {
+                if (stage == i) {
+                    document.getElementById("stage" + i).classList.remove("hidden");
+                } else {
+                    document.getElementById("stage" + i).classList.add("hidden");
+                }
+            }
+        }
+
+        var buf = "";
+        function submit() {
+            console.log("submitting: " + buf);
+            client.addSample(CMD_ID, buf);
+            buf = "";
+            stage = 1;
+            redraw();
+        }
+
+        redraw();
+
+        document.addEventListener("keydown", (ev) => {
+            if (ev.key == "Escape") {
+                buf = "";
+                stage = 1;
+                redraw();
+            } else if (stage == 1) {
+                if (ev.key == "a") {
+                    buf += "a";
+                    stage = 3;
+                    redraw();
+                } else if (ev.key == "c") {
+                    buf += "c";
+                    stage = 2;
+                    redraw();
+                } else if (ev.key == "d") {
+                    buf += "d";
+                    stage = 6;
+                    redraw();
+                } else if (ev.key == "f") {
+                    buf += "f";
+                    stage = 4;
+                    redraw();
+                }
+            } else if (stage == 2) {
+                if (ev.key == "a") {
+                    buf += "a";
+                } else if (ev.key == "b") {
+                    buf += "b";
+                } else if (ev.key == "c") {
+                    buf += "c";
+                } else if (ev.key == "d") {
+                    buf += "d";
+                } else if (ev.key == "e") {
+                    buf += "e";
+                } else if (ev.key == "f") {
+                    buf += "f";
+                } else if (ev.key == "g") {
+                    buf += "g";
+                } else if (ev.key == "h") {
+                    buf += "h";
+                } else if (ev.key == "i") {
+                    buf += "i";
+                } else if (ev.key == "j") {
+                    buf += "j";
+                } else if (ev.key == "k") {
+                    buf += "k";
+                } else if (ev.key == "l") {
+                    buf += "l";
+                } else {
+                    return;
+                }
+                stage = 7;
+                redraw();
+            } else if (stage == 3) {
+                if (ev.key == "a") {
+                    buf += "a";
+                } else if (ev.key == "b") {
+                    buf += "b";
+                } else if (ev.key == "c") {
+                    buf += "c";
+                } else if (ev.key == "d") {
+                    buf += "d";
+                } else if (ev.key == "e") {
+                    buf += "e";
+                } else if (ev.key == "f") {
+                    buf += "f";
+                } else if (ev.key == "g") {
+                    buf += "g";
+                } else if (ev.key == "h") {
+                    buf += "h";
+                } else if (ev.key == "i") {
+                    buf += "i";
+                } else if (ev.key == "j") {
+                    buf += "j";
+                } else if (ev.key == "k") {
+                    buf += "k";
+                } else if (ev.key == "l") {
+                    buf += "l";
+                } else {
+                    return;
+                }
+                stage = 5;
+                redraw();
+            } else if (stage == 4) {
+                if (ev.key == "l") {
+                    buf += "l";
+                } else if (ev.key == "r") {
+                    buf += "r";
+                } else if (ev.key == "f") {
+                    buf += "f";
+                } else {
+                    return;
+                }
+                submit();
+            } else if (stage == 5) {
+                if (ev.key == "p") {
+                    buf += "p";
+                } else if (ev.key == "b") {
+                    buf += "b";
+                } else if (ev.key == "d") {
+                    buf += "d";
+                } else {
+                    return;
+                }
+                submit();
+            } else if (stage == 6) {
+                if (ev.key == "m") {
+                    buf += "m";
+                } else if (ev.key == "r") {
+                    buf += "r";
+                } else if (ev.key == "c") {
+                    buf += "c";
+                } else {
+                    return;
+                }
+                submit();
+            } else if (stage == 7) {
+                if (ev.key == "2") {
+                    buf += "2";
+                } else if (ev.key == "3") {
+                    buf += "3";
+                } else if (ev.key == "4") {
+                    buf += "4";
+                } else {
+                    return
+                }
+                submit();
+            } else if (stage == 8) {
+                if (ev.key == "2") {
+                    buf += "2";
+                } else if (ev.key == "3") {
+                    buf += "3";
+                } else {
+                    return
+                }
+                stage = 5;
+                redraw();
+            }
+        })
+    </script>
+</body>
+
+</html>

@@ -23,6 +23,7 @@ import frc.lib.util.ScoringLocation.HeightMode;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
+import frc.robot.playbook.Playbook;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIO;
@@ -131,13 +132,15 @@ public class RobotContainer {
         /* Button and Trigger Bindings */
 
         configureTriggerBindings();
-        if (runtimeType == RobotRunType.kSimulation) {
-            maybeController("Driver", driver, this::setupDriver);
-        } else {
-            setupDriver();
-        }
-        maybeController("Pit Controller", pitController, this::setupPitController);
-        maybeController("Alt Operator", altOperator, this::setupAltOperatorController);
+        driver.a()
+            .whileTrue(new Playbook(swerve, elevator, coralScoring.outtakedCoral, algaeInIntake));
+        // if (runtimeType == RobotRunType.kSimulation) {
+        // maybeController("Driver", driver, this::setupDriver);
+        // } else {
+        // setupDriver();
+        // }
+        // maybeController("Pit Controller", pitController, this::setupPitController);
+        // maybeController("Alt Operator", altOperator, this::setupAltOperatorController);
     }
 
     private List<Runnable> controllerSetups = new ArrayList<>();

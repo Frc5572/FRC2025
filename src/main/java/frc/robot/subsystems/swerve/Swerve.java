@@ -295,7 +295,13 @@ public class Swerve extends SubsystemBase {
     public Command moveAndAvoidReef(Supplier<Pose2d> pose2dSupplier, boolean flipForRed, double tol,
         double rotTol) {
         return new AvoidReef(this, flipForRed, this::getPose, this::moveToPose, pose2dSupplier, tol,
-            rotTol).andThen(this.runOnce(this::setMotorsZero));
+            rotTol);
+    }
+
+    public Command stop() {
+        return this.runOnce(() -> {
+            setMotorsZero();
+        });
     }
 
     /** Move to a given {@link Pose2d}. */
