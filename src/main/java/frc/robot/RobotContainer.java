@@ -7,7 +7,6 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -56,8 +55,6 @@ public class RobotContainer {
 
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
-    public final CommandXboxController backUpOperator =
-        new CommandXboxController(Constants.operatorId);
     public final CommandXboxController pitController =
         new CommandXboxController(Constants.PIT_CONTROLLER_ID);
     public final CommandXboxController altOperator =
@@ -142,9 +139,6 @@ public class RobotContainer {
     private void configureButtonBindings(RobotRunType runtimeType) {
         algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan));
         driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
-        backUpOperator.a().onTrue(new Command() {
-            Timer timer = new Timer();
-        });
 
         driver.povDown().onTrue(elevator.home());
         driver.povLeft().onTrue(elevator.p0());
