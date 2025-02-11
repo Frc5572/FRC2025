@@ -251,7 +251,8 @@ public class RobotContainer {
      * @return Returns autonomous command selected.
      */
     public Command getAutonomousCommand() {
-        return null;
+        Command autoCommand = autoChooser.selectedCommand();
+        return autoCommand;
     }
 
     /**
