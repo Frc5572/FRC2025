@@ -30,7 +30,7 @@ public class Elevator extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);
-        Logger.recordOutput("Elevator/position_in", inputs.position.in(Inches));
+        // Logger.recordOutput("Elevator/position_in", inputs.position.in(Inches));
         if (inputs.limitSwitch) {
             io.resetHome();
         }
