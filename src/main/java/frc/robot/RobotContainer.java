@@ -15,8 +15,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.lib.util.ScoringLocation.AlgaeHeight;
-import frc.lib.util.ScoringLocation.CoralHeight;
 import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.ScoringLocation.HeightMode;
 import frc.lib.util.viz.FieldViz;
@@ -79,11 +77,12 @@ public class RobotContainer {
     private final Swerve s_Swerve;
     private final Vision s_Vision;
     private CoralScoring coralScoring;
+    private Climber climb;
 
     /* Triggers */
     private Trigger algaeInIntake = new Trigger(() -> s_ElevatorAlgae.hasAlgae());
+    private Trigger manualMode = new Trigger(() -> OperatorStates.manualModeEnabled());
 
-    private Climber climb;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -177,17 +176,11 @@ public class RobotContainer {
         driver.rightBumper().whileTrue(climb.runClimberMotorCommand());
 
         // alt operator controls
-        altOperator.povDown().and(isCoralTrigger)
-            .onTrue(Commands.runOnce(() -> CoralHeight.decrementState()));
-        altOperator.povUp().and(isCoralTrigger)
-            .onTrue(Commands.runOnce(() -> CoralHeight.incrementState()));
-        altOperator.povUp().and(isAlgaeTrigger)
-            .onTrue(Commands.runOnce(() -> AlgaeHeight.incrementState()));
-        altOperator.povDown().and(isAlgaeTrigger)
-            .onTrue(Commands.runOnce(() -> AlgaeHeight.decrementState()));
-        altOperator.povLeft().onTrue(Commands.runOnce(() -> HeightMode.decrementState()));
-        altOperator.povRight().onTrue(Commands.runOnce(() -> HeightMode.incrementState()));
-        altOperator.a().whileTrue(elevator.altOpBinds());
+        altOperator.povLeft().and(manualMode.negate())
+            .onTrue(Commands.runOnce(() -> HeightMode.decrementState()));
+        altOperator.povRight().and(manualMode.negate())
+            .onTrue(Commands.runOnce(() -> HeightMode.incrementState()));
+        altOperator.a().and(manualMode.negate()).whileTrue(elevator.altOpBinds());
         altOperator.y().onTrue(elevator.home());
         altOperator.x().whileTrue(coralScoring.runScoringMotor(2));
         altOperator.rightTrigger()
@@ -196,6 +189,10 @@ public class RobotContainer {
             .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
         altOperator.povUp().whileTrue(Commands.runOnce(() -> Height.incrementState()));
         altOperator.povDown().whileTrue(Commands.runOnce(() -> Height.decrementState()));
+        altOperator.start().onTrue(Commands.runOnce(() -> {
+            OperatorStates.toggleManualMode();
+        }).ignoringDisable(true));
+        manualMode.onTrue(elevator.manualMove(altOperator));
 
 
         // pit controller
