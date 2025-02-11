@@ -1,5 +1,8 @@
 package frc.robot;
 
+/**
+ * changes operator states from normal to manual
+ */
 public class OperatorStates {
 
     private OperatorStates() {}
