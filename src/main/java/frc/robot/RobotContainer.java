@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.Inches;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
+import choreo.auto.AutoChooser;
+import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -23,6 +25,7 @@ import frc.lib.util.ScoringLocation.HeightMode;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
+import frc.robot.autos.test;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIO;
@@ -63,7 +66,8 @@ public class RobotContainer {
     public final CommandXboxController altOperator =
         new CommandXboxController(Constants.ALT_OPERATOR_ID);
     public final CommandXboxController operator = new CommandXboxController(1);
-
+    private AutoFactory factory;
+    private AutoChooser autoChooser = new AutoChooser();
 
     /** Simulation */
     private SwerveDriveSimulation driveSimulation;
@@ -84,7 +88,7 @@ public class RobotContainer {
     private CoralScoring coralScoring;
 
     /* Triggers */
-    private Trigger algaeInIntake = new Trigger(() -> s_ElevatorAlgae.hasAlgae());
+    // private Trigger algaeInIntake = new Trigger(() -> s_ElevatorAlgae.hasAlgae());
 
     private Climber climb;
 
@@ -121,6 +125,8 @@ public class RobotContainer {
                 coralScoring = new CoralScoring(new CoralScoringIO() {});
                 climb = new Climber(new ClimberIO.Empty());
         }
+        test test = new test(s_Swerve);
+        autoChooser.addCmd("test", test::cmd);
 
         /* Default Commands */
         s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
@@ -140,11 +146,11 @@ public class RobotContainer {
      * {@link edu1.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings(RobotRunType runtimeType) {
-        algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan));
-        driver.rightTrigger()
-            .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
-        driver.leftTrigger()
-            .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
+        // algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan));
+        // driver.rightTrigger()
+        // .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
+        // driver.leftTrigger()
+        // .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
 
 
         driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
@@ -276,6 +282,7 @@ public class RobotContainer {
 
         }
     }
+
 }
 
 
