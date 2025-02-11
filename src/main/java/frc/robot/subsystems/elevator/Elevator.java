@@ -100,7 +100,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command manualMove(CommandXboxController rightStick) {
-        return runEnd(() -> io.setVoltage(rightStick.getRightY()), () -> io.setVoltage(0.0));
+        return runEnd(() -> io.setPower(-rightStick.getRightY()), () -> io.setVoltage(0.0));
     }
 
     /**

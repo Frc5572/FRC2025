@@ -32,4 +32,6 @@ public interface ElevatorIO {
 
     public default void resetHome() {}
 
+    public default void setPower(double power) {}
+
 }
