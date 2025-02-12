@@ -40,6 +40,10 @@ public class Elevator extends SubsystemBase {
         }
     }
 
+    public Distance getHeight() {
+        return inputs.position;
+    }
+
     /**
      * moves elevator to home
      *
