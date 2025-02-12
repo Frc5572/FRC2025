@@ -16,6 +16,7 @@ public class RotationInterval {
 
     private RotationInterval() {}
 
+    /** A one-dimensional range with wrapping on [-pi,pi]. */
     public static RotationInterval acute(Rotation2d a, Rotation2d b) {
         RotationInterval interval = new RotationInterval(a, b);
         if (interval.range() > Math.PI) {
@@ -25,6 +26,7 @@ public class RotationInterval {
         }
     }
 
+    /** Get the interval opposite this. */
     public RotationInterval complement() {
         RotationInterval compl = new RotationInterval();
         compl.max = this.min;
@@ -32,6 +34,7 @@ public class RotationInterval {
         return compl;
     }
 
+    /** Get distance from min to max. */
     public double range() {
         if (min > max) {
             return (2 * Math.PI - min) + max;
@@ -60,6 +63,7 @@ public class RotationInterval {
         this.max = Math.atan2(max.getSin(), max.getCos());
     }
 
+    /** Get if two intervals share some angles. */
     public boolean overlaps(RotationInterval other) {
         return getOverlap(other) > 0;
     }

@@ -270,23 +270,42 @@ public class Swerve extends SubsystemBase {
             new TrapezoidProfile.Constraints(Constants.SwerveTransformPID.MAX_ANGULAR_VELOCITY,
                 Constants.SwerveTransformPID.MAX_ANGULAR_ACCELERATION)));
 
-    private void moveToPose(Pose2d pose) {
-        ChassisSpeeds ctrlEffort =
-            holonomicDriveController.calculate(getPose(), pose, 0, pose.getRotation());
-        setModuleStates(ctrlEffort);
-    }
 
+    /** Stop swerve motion. */
     public Command stop() {
         return this.runOnce(() -> this.setMotorsZero());
     }
 
+    /**
+     * Move to a position, pathing around reefs if necessary.
+     *
+     * @param pose2dSupplier pose to target
+     * @param flipForRed if true, {@code pose2dSupplier} provides pose in terms of blue side, and
+     *        the pose is flipped if the robot's alliance is red.
+     * @param tol X-Y error allowed in meters
+     * @param rotTol angle error allowed in degrees
+     */
     public Command moveAndAvoidReef(Supplier<Pose2d> pose2dSupplier, boolean flipForRed, double tol,
         double rotTol) {
         return new AvoidReef(this, flipForRed, this::getPose, this::moveToPose, pose2dSupplier, tol,
             rotTol).andThen(this.runOnce(this::setMotorsZero));
     }
 
-    /** Move to a given {@link Pose2d}. */
+    private void moveToPose(Pose2d pose) {
+        ChassisSpeeds ctrlEffort =
+            holonomicDriveController.calculate(getPose(), pose, 0, pose.getRotation());
+        setModuleStates(ctrlEffort);
+    }
+
+    /**
+     * Move to a position.
+     *
+     * @param pose2dSupplier pose to target
+     * @param flipForRed if true, {@code pose2dSupplier} provides pose in terms of blue side, and
+     *        the pose is flipped if the robot's alliance is red.
+     * @param tol X-Y error allowed in meters
+     * @param rotTol angle error allowed in degrees
+     */
     public Command moveToPose(Supplier<Pose2d> pose2dSupplier, boolean flipForRed, double tol,
         double rotTol) {
 

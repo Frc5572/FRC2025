@@ -19,6 +19,7 @@ import frc.robot.Constants;
 import frc.robot.FieldConstants;
 import frc.robot.subsystems.swerve.Swerve;
 
+/** Command to drive to a given point while pathing around the reefs. */
 public class AvoidReef extends Command implements Drawable {
 
     private static final double driveCircleRadius =
@@ -136,6 +137,7 @@ public class AvoidReef extends Command implements Drawable {
 
     private final boolean flipForRed;
 
+    /** Command to drive to a given point while pathing around the reefs. */
     public AvoidReef(Swerve swerve, boolean flipForRed, Supplier<Pose2d> currentPose,
         Consumer<Pose2d> intermediateTarget, Supplier<Pose2d> finalTarget, double tol,
         double rotTol) {

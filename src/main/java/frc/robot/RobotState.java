@@ -94,6 +94,16 @@ public class RobotState {
         return swerveRotations;
     }
 
+    /**
+     * Constrain a given pose to be within field boundaries.
+     *
+     * @param original pose which may or may not be within field boundaries
+     * @param reset a function called if {@code original} was not within field boundaries with a new
+     *        pose close to {@code original} that is within the field boundaries.
+     *
+     * @return {@code original} if it was within field boundaries, otherwise the parameter passed to
+     *         {@code reset}.
+     */
     public static Pose2d constrain(Pose2d original, Consumer<Pose2d> reset) {
         double x = original.getX();
         double y = original.getY();
