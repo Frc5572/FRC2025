@@ -1,6 +1,6 @@
 package frc.lib.math;
 
-import edu.wpi.first.math.geometry.Translation2d;
+import frc.lib.mut.MutableTranslation2d;
 
 /** Implementation of Separating Axis Theorem solver. */
 public final class SeparatingAxis {
@@ -90,9 +90,9 @@ public final class SeparatingAxis {
             }
         }
 
-        Translation2d c1 = shape1.getCenter();
-        Translation2d c2 = shape2.getCenter();
-        Translation2d cToc = c1.minus(c2);
+        MutableTranslation2d c1 = shape1.getCenter();
+        MutableTranslation2d c2 = shape2.getCenter();
+        MutableTranslation2d cToc = c1.minus(c2, tempTranslation);
         if (n.dot(cToc) < 0) {
             n = n.unaryMinus();
         }
@@ -102,4 +102,6 @@ public final class SeparatingAxis {
 
         return true;
     }
+
+    private static final MutableTranslation2d tempTranslation = new MutableTranslation2d();
 }

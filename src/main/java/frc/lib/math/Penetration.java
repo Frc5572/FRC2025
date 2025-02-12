@@ -1,6 +1,7 @@
 package frc.lib.math;
 
 import org.littletonrobotics.junction.Logger;
+import frc.lib.mut.MutableTranslation2d;
 import frc.lib.util.viz.Drawable;
 
 /** Result type for {@link SeparatingAxis}. */
@@ -41,6 +42,10 @@ public class Penetration implements Drawable {
     /** Get penetration depth. */
     public double getDepth() {
         return depth;
+    }
+
+    public MutableTranslation2d update(MutableTranslation2d out) {
+        return out.setXY(xDir * depth, yDir * depth);
     }
 
     @Override
