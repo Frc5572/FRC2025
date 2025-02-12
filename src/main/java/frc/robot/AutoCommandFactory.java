@@ -1,5 +1,6 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Seconds;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
@@ -36,10 +37,17 @@ public class AutoCommandFactory {
         routine.active()
             .onTrue(Commands.sequence(startToScore1.resetOdometry(), startToScore1.cmd()));
         startToScore1.active().onTrue(elevator.p0());
-        startToScore1.done().onTrue(Commands.sequence(elevator.p4(), coral.runScoringMotor(.5),
-            elevator.p0(), Score1ToFeeder.cmd()));
-        Score1ToFeeder.active().onTrue(elevator.home());
-        Score1ToFeeder.done().onTrue(FeederToScore2.cmd());
+        startToScore1.done()
+            .onTrue(Commands.sequence(
+                swerve.runOnce(swerve::setMotorsZero)
+                    .alongWith(Commands.waitTime(Seconds.of(0.01))),
+                elevator.p4(), coral.runScoringMotor(0.5), elevator.p0(), Score1ToFeeder.cmd()));
+        // Score1ToFeeder.active().onTrue(elevator.home());
+        Score1ToFeeder.done().onTrue(Commands.sequence(
+            swerve.runOnce(swerve::setMotorsZero).alongWith(Commands.waitTime(Seconds.of(0.01))),
+            FeederToScore2.cmd()));
+        FeederToScore2.done().onTrue(
+            swerve.runOnce(swerve::setMotorsZero).alongWith(Commands.waitTime(Seconds.of(0.01))));
 
         return routine;
     }

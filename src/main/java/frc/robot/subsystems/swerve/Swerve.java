@@ -283,6 +283,7 @@ public class Swerve extends SubsystemBase {
                     + headingController.calculate(pose.getRotation().getRadians(), sample.heading));
 
         // Apply the generated speeds
-        setModuleStates(speeds);
+        setModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
+            state.getGlobalPoseEstimate().getRotation()));
     }
 }

@@ -142,7 +142,9 @@ public class RobotContainer {
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Resnick", autos::resnick);
         SmartDashboard.putData("Auto Chooser", autoChooser);
-        RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
+        RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler()
+            .andThen(Commands.runOnce(() -> swerve.setMotorsZero())));
+        RobotModeTriggers.disabled().onTrue(Commands.runOnce(() -> swerve.setMotorsZero()));
 
         /* Default Commands */
         leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed).ignoringDisable(true));
