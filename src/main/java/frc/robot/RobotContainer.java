@@ -6,6 +6,8 @@ import java.util.List;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
+import choreo.auto.AutoChooser;
+import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -14,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.ScoringLocation.AlgaeHeight;
 import frc.lib.util.ScoringLocation.CoralHeight;
@@ -54,6 +57,9 @@ import frc.robot.subsystems.vision.VisionSimPhoton;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+    private final AutoFactory autoFactory;
+    private final AutoChooser autoChooser;
+
 
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
@@ -69,7 +75,6 @@ public class RobotContainer {
     /** Simulation */
     private SwerveDriveSimulation driveSimulation;
 
-
     /** Visualization */
     private final FieldViz fieldVis;
     private final Viz2025 vis;
@@ -83,11 +88,11 @@ public class RobotContainer {
     private final Swerve swerve;
     private final Vision vision;
     private CoralScoring coralScoring;
+    private Climber climb;
 
     /* Triggers */
     private Trigger algaeInIntake = new Trigger(() -> algae.hasAlgae());
 
-    private Climber climb;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -124,6 +129,20 @@ public class RobotContainer {
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
                 climb = new Climber(new ClimberIO.Empty());
         }
+        autoFactory = new AutoFactory(swerve::getPose, // A function that returns the current robot
+                                                       // pose
+            swerve::resetOdometry, // A function that resets the current robot pose to the provided
+                                   // Pose2d
+            swerve::followTrajectory, // The drive subsystem trajectory follower
+            true, // If alliance flipping should be enabled
+            swerve // The drive subsystem
+        );
+        AutoCommandFactory autos =
+            new AutoCommandFactory(autoFactory, swerve, elevator, coralScoring);
+        autoChooser = new AutoChooser();
+        autoChooser.addRoutine("Resnick", autos::resnick);
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+        RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
 
         /* Default Commands */
         leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed).ignoringDisable(true));

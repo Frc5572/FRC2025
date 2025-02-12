@@ -4,6 +4,8 @@ package frc.robot.subsystems.swerve;
 import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -31,6 +33,9 @@ public class Swerve extends SubsystemBase {
     private SwerveInputsAutoLogged inputs = new SwerveInputsAutoLogged();
     private SwerveIO swerveIO;
     private final RobotState state;
+    private final PIDController xController = new PIDController(1.0, 0.0, 0.0);
+    private final PIDController yController = new PIDController(1.0, 0.0, 0.0);
+    private final PIDController headingController = new PIDController(1.0, 0.0, 0.0);
 
     /**
      * Swerve Subsystem
@@ -45,6 +50,7 @@ public class Swerve extends SubsystemBase {
         swerveIO.updateInputs(inputs);
 
         state.init(getModulePositions(), getGyroYaw());
+        headingController.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     /**
@@ -264,5 +270,19 @@ public class Swerve extends SubsystemBase {
             double rotation = raxis * Constants.Swerve.maxAngularVelocity;
             this.drive(translation, rotation, fieldRelative, openLoop);
         });
+    }
+
+    public void followTrajectory(SwerveSample sample) {
+        // Get the current pose of the robot
+        Pose2d pose = getPose();
+
+        // Generate the next speeds for the robot
+        ChassisSpeeds speeds =
+            new ChassisSpeeds(sample.vx + xController.calculate(pose.getX(), sample.x),
+                sample.vy + yController.calculate(pose.getY(), sample.y), sample.omega
+                    + headingController.calculate(pose.getRotation().getRadians(), sample.heading));
+
+        // Apply the generated speeds
+        setModuleStates(speeds);
     }
 }
