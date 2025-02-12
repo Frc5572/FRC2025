@@ -126,17 +126,7 @@ public class Viz2025 implements Drawable {
     /** Publish all values to Logger */
     @Override
     public void drawImpl() {
-        if (elevatorHeight > 0.1) {
-            algaeDropped = true;
-        }
-        if (algaeDropped && algaeAngle < 90.0) {
-            algaeAngularVelocity += 0.5;
-            algaeAngle += algaeAngularVelocity;
-        }
-        if (algaeAngle > 90.0) {
-            algaeAngle = 90.0;
-            algaeAngularVelocity = 0.0;
-        }
+        algaeAngle = 90.0;
         mechanisms[STAGE2_ID] =
             new Pose3d(new Translation3d(0, 0, Math.min(elevatorHeight, 0.862013 - 0.173028)),
                 Rotation3d.kZero);

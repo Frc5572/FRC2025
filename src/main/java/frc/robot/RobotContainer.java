@@ -1,5 +1,7 @@
 package frc.robot;
 
+
+import static edu.wpi.first.units.Units.Inches;
 import java.util.ArrayList;
 import java.util.List;
 import org.ironmaple.simulation.SimulatedArena;
@@ -9,6 +11,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -29,7 +32,9 @@ import frc.robot.subsystems.coral.CoralScoringReal;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIO;
 import frc.robot.subsystems.elevator.ElevatorReal;
+import frc.robot.subsystems.elevator.ElevatorSim;
 import frc.robot.subsystems.elevator_algae.ElevatorAlgae;
+import frc.robot.subsystems.elevator_algae.ElevatorAlgaeIO;
 import frc.robot.subsystems.elevator_algae.ElevatorAlgaeReal;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
@@ -70,17 +75,18 @@ public class RobotContainer {
     private final RobotState state;
 
     /* Subsystems */
-    private ElevatorAlgae s_ElevatorAlgae;
+    private ElevatorAlgae algae;
     private LEDs leds = new LEDs();
     private Elevator elevator;
-    private final Swerve s_Swerve;
-    private final Vision s_Vision;
+    private final Swerve swerve;
+    private final Vision vision;
     private CoralScoring coralScoring;
     private Climber climb;
 
     /* Triggers */
     private Trigger algaeInIntake = new Trigger(() -> s_ElevatorAlgae.hasAlgae());
     private Trigger manualMode = new Trigger(() -> OperatorStates.manualModeEnabled());
+
 
 
     /**
@@ -92,41 +98,39 @@ public class RobotContainer {
         state = new RobotState(vis);
         switch (runtimeType) {
             case kReal:
-                elevator = new Elevator(new ElevatorReal());
-                s_Swerve = new Swerve(state, new SwerveReal());
-                s_Vision = new Vision(state, VisionReal::new);
-                coralScoring = new CoralScoring(new CoralScoringReal());
-                s_ElevatorAlgae = new ElevatorAlgae(new ElevatorAlgaeReal());
+                elevator = new Elevator(new ElevatorReal(), vis);
+                swerve = new Swerve(state, new SwerveReal());
+                vision = new Vision(state, VisionReal::new);
+                coralScoring = new CoralScoring(new CoralScoringReal(), vis);
+                algae = new ElevatorAlgae(new ElevatorAlgaeReal(), vis);
                 climb = new Climber(new ClimberReal());
                 break;
             case kSimulation:
                 driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
                     new Pose2d(3, 3, Rotation2d.kZero));
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
-                s_Swerve = new Swerve(state, new SwerveSim(driveSimulation));
-                s_Vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
-                elevator = new Elevator(new ElevatorIO() {});
-                coralScoring = new CoralScoring(new CoralScoringIO() {});
+                swerve = new Swerve(state, new SwerveSim(driveSimulation));
+                vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
+                elevator = new Elevator(new ElevatorSim(), vis);
+                coralScoring = new CoralScoring(new CoralScoringIO.Empty(), vis);
+                algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
                 climb = new Climber(new ClimberIO.Empty());
                 break;
             default:
-                elevator = new Elevator(new ElevatorIO() {});
-                s_Swerve = new Swerve(state, new SwerveIO.Empty() {});
-                s_Vision = new Vision(state, VisionIO::empty);
-                coralScoring = new CoralScoring(new CoralScoringIO() {});
+                elevator = new Elevator(new ElevatorIO.Empty(), vis);
+                swerve = new Swerve(state, new SwerveIO.Empty());
+                vision = new Vision(state, VisionIO::empty);
+                coralScoring = new CoralScoring(new CoralScoringIO.Empty(), vis);
+                algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
                 climb = new Climber(new ClimberIO.Empty());
         }
 
         /* Default Commands */
-        s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
-            Constants.Swerve.isOpenLoop));
         leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed).ignoringDisable(true));
         /* Button and Trigger Bindings */
 
-        configureButtonBindings(runtimeType);
         configureTriggerBindings();
 
-        configureTriggerBindings();
         if (runtimeType == RobotRunType.kSimulation) {
             maybeController("Driver", driver, this::setupDriver);
         } else {
@@ -136,6 +140,7 @@ public class RobotContainer {
         maybeController("Alt Operator", altOperator, this::setupAltOperatorController);
     }
 
+    private List<Runnable> controllerSetups = new ArrayList<>();
 
 
     private List<Runnable> controllerSetups = new ArrayList<>();

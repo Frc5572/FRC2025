@@ -15,8 +15,23 @@ public interface ElevatorAlgaeIO {
         boolean beamBrakeStatus;
     }
 
-    public default void setAlgaeMotorVoltage(double voltage) {}
+    public void setAlgaeMotorVoltage(double voltage);
 
-    public default void updateInputs(AlgaeIOInputs inputs) {}
+    public void updateInputs(AlgaeIOInputs inputs);
+
+    /** Empty Algae implementation (for replay) */
+    public static class Empty implements ElevatorAlgaeIO {
+
+        @Override
+        public void setAlgaeMotorVoltage(double voltage) {
+
+        }
+
+        @Override
+        public void updateInputs(AlgaeIOInputs inputs) {
+
+        }
+
+    }
 
 }
