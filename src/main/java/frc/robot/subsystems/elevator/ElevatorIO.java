@@ -23,13 +23,37 @@ public interface ElevatorIO {
         public AngularVelocity velocity;
     }
 
-    public default void updateInputs(ElevatorInputs inputs) {}
+    public void updateInputs(ElevatorInputs inputs);
 
+    public void setVoltage(double volts);
 
-    public default void setVoltage(double volts) {}
+    public void setPositon(double position);
 
-    public default void setPositon(double position) {}
+    public void resetHome();
 
-    public default void resetHome() {}
+    /** Empty Elevator implementation (for replay) */
+    public static class Empty implements ElevatorIO {
+
+        @Override
+        public void updateInputs(ElevatorInputs inputs) {
+
+        }
+
+        @Override
+        public void setVoltage(double volts) {
+
+        }
+
+        @Override
+        public void setPositon(double position) {
+
+        }
+
+        @Override
+        public void resetHome() {
+
+        }
+
+    }
 
 }

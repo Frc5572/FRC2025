@@ -20,8 +20,23 @@ public interface CoralScoringIO {
         public boolean grabingBeamBrakeRight;
     }
 
-    public default void updateInputs(CoralScoringInputs inputs) {}
+    public void updateInputs(CoralScoringInputs inputs);
 
-    public default void setCoralScoringMotorPercentage(double percent) {}
+    public void setCoralScoringMotorPercentage(double percent);
+
+    /** Empty Coral Scoring implementation (for replay) */
+    public static class Empty implements CoralScoringIO {
+
+        @Override
+        public void updateInputs(CoralScoringInputs inputs) {
+
+        }
+
+        @Override
+        public void setCoralScoringMotorPercentage(double percent) {
+
+        }
+
+    }
 
 }
