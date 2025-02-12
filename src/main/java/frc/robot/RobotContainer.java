@@ -1,5 +1,6 @@
 package frc.robot;
 
+
 import static edu.wpi.first.units.Units.Inches;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,8 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,10 +18,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.lib.util.ScoringLocation.AlgaeHeight;
-import frc.lib.util.ScoringLocation.CoralHeight;
 import frc.lib.util.ScoringLocation.Height;
-import frc.lib.util.ScoringLocation.HeightMode;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
@@ -57,8 +57,6 @@ public class RobotContainer {
 
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
-    public final CommandXboxController backUpOperator =
-        new CommandXboxController(Constants.operatorId);
     public final CommandXboxController pitController =
         new CommandXboxController(Constants.PIT_CONTROLLER_ID);
     public final CommandXboxController altOperator =
@@ -83,11 +81,13 @@ public class RobotContainer {
     private final Swerve swerve;
     private final Vision vision;
     private CoralScoring coralScoring;
+    private Climber climb;
 
     /* Triggers */
-    private Trigger algaeInIntake = new Trigger(() -> algae.hasAlgae());
+    private Trigger algaeInIntake = new Trigger(() -> s_ElevatorAlgae.hasAlgae());
+    private Trigger manualMode = new Trigger(() -> OperatorStates.manualModeEnabled());
 
-    private Climber climb;
+
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -130,6 +130,7 @@ public class RobotContainer {
         /* Button and Trigger Bindings */
 
         configureTriggerBindings();
+
         if (runtimeType == RobotRunType.kSimulation) {
             maybeController("Driver", driver, this::setupDriver);
         } else {
@@ -138,6 +139,9 @@ public class RobotContainer {
         maybeController("Pit Controller", pitController, this::setupPitController);
         maybeController("Alt Operator", altOperator, this::setupAltOperatorController);
     }
+
+    private List<Runnable> controllerSetups = new ArrayList<>();
+
 
     private List<Runnable> controllerSetups = new ArrayList<>();
 
@@ -163,48 +167,45 @@ public class RobotContainer {
         controllerSetups.clear();
     }
 
+    /**
+     * Use this method to vol your button->command mappings. Buttons can be created by instantiating
+     * a {@link GenericHID} or one of its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or
+     * {@link XboxController}), and then passing it to a
+     * {@link edu1.wpi.first.wpilibj2.command.button.JoystickButton}.
+     */
+
     private void setupDriver() {
-        swerve.setDefaultCommand(swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
+        s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
-        driver.rightTrigger().whileTrue(algae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
-        driver.leftTrigger()
-            .whileTrue(algae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
-        driver.y().onTrue(new InstantCommand(() -> swerve.resetFieldRelativeOffset()));
-        driver.povDown().onTrue(elevator.home());
-        driver.povLeft().onTrue(elevator.p0());
-        driver.leftTrigger().onTrue(elevator.p2());
-        driver.povUp().whileTrue(elevator.moveUp());
-        driver.povRight().whileTrue(elevator.moveDown());
-        driver.povDown().onTrue(elevator.home());
-        driver.povLeft().onTrue(elevator.p0());
-        driver.a().whileTrue(
-            elevator.moveTo(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
-        driver.povUp().whileTrue(elevator.moveUp());
-        driver.povRight().whileTrue(elevator.moveDown());
-        driver.x().whileTrue(coralScoring.runScoringMotor(2));
-        driver.rightStick().whileTrue(climb.runClimberMotorCommand());
+        driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
         driver.x().onTrue(new InstantCommand(() -> {
-            swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
+            s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
         }));
         driver.y().whileTrue(coralScoring.runScoringMotor(2));
         driver.rightBumper().whileTrue(climb.runClimberMotorCommand());
     }
 
     private void setupAltOperatorController() {
-        altOperator.povUp().whileTrue(Commands.runOnce(() -> Height.incrementState()));
-        altOperator.povDown().whileTrue(Commands.runOnce(() -> Height.decrementState()));
-        altOperator.povDown().and(isCoralTrigger)
-            .onTrue(Commands.runOnce(() -> CoralHeight.decrementState()));
-        altOperator.povUp().and(isCoralTrigger)
-            .onTrue(Commands.runOnce(() -> CoralHeight.incrementState()));
-        altOperator.povUp().and(isAlgaeTrigger)
-            .onTrue(Commands.runOnce(() -> AlgaeHeight.incrementState()));
-        altOperator.povDown().and(isAlgaeTrigger)
-            .onTrue(Commands.runOnce(() -> AlgaeHeight.decrementState()));
-        altOperator.povLeft().onTrue(Commands.runOnce(() -> HeightMode.decrementState()));
-        altOperator.povRight().onTrue(Commands.runOnce(() -> HeightMode.incrementState()));
-        altOperator.a().whileTrue(elevator.altOpBinds());
+        // elevator
+        altOperator.povUp().and(manualMode.negate())
+            .whileTrue(Commands.runOnce(() -> Height.incrementState()));
+        altOperator.povDown().and(manualMode.negate())
+            .whileTrue(Commands.runOnce(() -> Height.decrementState()));
+        altOperator.a().and(manualMode.negate()).whileTrue(elevator.altOpBinds());
         altOperator.y().onTrue(elevator.home());
+
+        // coral and algae
+        altOperator.x().whileTrue(coralScoring.runScoringMotor(2));
+        altOperator.rightTrigger()
+            .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
+        altOperator.leftTrigger()
+            .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
+
+        // manual mode
+        altOperator.start().onTrue(Commands.runOnce(() -> {
+            OperatorStates.toggleManualMode();
+        }).ignoringDisable(true));
+        manualMode.onTrue(elevator.manualMove(altOperator));
     }
 
     private void setupPitController() {
@@ -212,7 +213,13 @@ public class RobotContainer {
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());
     }
 
-    private void configureTriggerBindings() {
+    private void configureButtonBindings(RobotRunType runtimeType) {}
+
+    /**
+     * Triggers
+     */
+
+    public void configureTriggerBindings() {
         coralScoring.intakedCoralRight.onTrue(leds.setLEDsSolid(Color.kRed).withTimeout(5));
         coralScoring.intakedCoralRight.onTrue(coralScoring.runPreScoringMotor(2));
         coralScoring.outtakedCoral.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
@@ -222,22 +229,6 @@ public class RobotContainer {
         coralScoring.outtakedCoral.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
         climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());
     }
-
-
-
-    // trigger
-    public Trigger isCoralTrigger = new Trigger(() -> isCoral());
-    public Trigger isAlgaeTrigger = new Trigger(() -> isAlgae());
-
-    public boolean isCoral() {
-        return HeightMode.getCurrentHeightMode() == HeightMode.kCoral;
-    }
-
-    public boolean isAlgae() {
-
-        return HeightMode.getCurrentHeightMode() == HeightMode.kAlgae;
-    }
-
 
     /**
      * Gets the user's selected autonomous command.

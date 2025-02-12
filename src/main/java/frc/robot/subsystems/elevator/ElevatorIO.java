@@ -56,4 +56,6 @@ public interface ElevatorIO {
 
     }
 
+    public default void setPower(double power) {}
+
 }
