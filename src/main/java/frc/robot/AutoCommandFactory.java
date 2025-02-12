@@ -5,6 +5,7 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.coral.CoralScoring;
 import frc.robot.subsystems.elevator.Elevator;
@@ -41,11 +42,12 @@ public class AutoCommandFactory {
             .onTrue(Commands.sequence(
                 swerve.runOnce(swerve::setMotorsZero)
                     .alongWith(Commands.waitTime(Seconds.of(0.01))),
-                elevator.p4(), coral.runScoringMotor(0.5), elevator.p0(), Score1ToFeeder.cmd()));
-        // Score1ToFeeder.active().onTrue(elevator.home());
+                elevator.p4(), coral.runScoringMotor(0.5), elevator.p0(),
+                new ProxyCommand(Score1ToFeeder.cmd())));
+        Score1ToFeeder.active().onTrue(elevator.home());
         Score1ToFeeder.done().onTrue(Commands.sequence(
             swerve.runOnce(swerve::setMotorsZero).alongWith(Commands.waitTime(Seconds.of(0.01))),
-            FeederToScore2.cmd()));
+            new ProxyCommand(FeederToScore2.cmd())));
         FeederToScore2.done().onTrue(
             swerve.runOnce(swerve::setMotorsZero).alongWith(Commands.waitTime(Seconds.of(0.01))));
 
