@@ -1,6 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,16 +8,11 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.lib.util.ScoringLocation.AlgaeHeight;
-import frc.lib.util.ScoringLocation.CoralHeight;
-import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.ScoringLocation.HeightMode;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
@@ -167,50 +161,24 @@ public class RobotContainer {
     private void setupDriver() {
         swerve.setDefaultCommand(swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
-        driver.rightTrigger().whileTrue(algae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
-        driver.leftTrigger()
-            .whileTrue(algae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
-        driver.y().onTrue(new InstantCommand(() -> swerve.resetFieldRelativeOffset()));
-        driver.povDown().onTrue(elevator.home());
-        driver.povLeft().onTrue(elevator.p0());
-        driver.leftTrigger().onTrue(elevator.p2());
-        driver.povUp().whileTrue(elevator.moveUp());
-        driver.povRight().whileTrue(elevator.moveDown());
-        driver.povDown().onTrue(elevator.home());
-        driver.povLeft().onTrue(elevator.p0());
-        driver.a().whileTrue(
-            elevator.moveTo(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
-        driver.povUp().whileTrue(elevator.moveUp());
-        driver.povRight().whileTrue(elevator.moveDown());
-        driver.x().whileTrue(coralScoring.runScoringMotor(2));
-        driver.rightStick().whileTrue(climb.runClimberMotorCommand());
-        driver.x().onTrue(new InstantCommand(() -> {
-            swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
-        }));
-        driver.y().whileTrue(coralScoring.runScoringMotor(2));
-        driver.rightBumper().whileTrue(climb.runClimberMotorCommand());
     }
 
     private void setupAltOperatorController() {
-        altOperator.povUp().whileTrue(Commands.runOnce(() -> Height.incrementState()));
-        altOperator.povDown().whileTrue(Commands.runOnce(() -> Height.decrementState()));
-        altOperator.povDown().and(isCoralTrigger)
-            .onTrue(Commands.runOnce(() -> CoralHeight.decrementState()));
-        altOperator.povUp().and(isCoralTrigger)
-            .onTrue(Commands.runOnce(() -> CoralHeight.incrementState()));
-        altOperator.povUp().and(isAlgaeTrigger)
-            .onTrue(Commands.runOnce(() -> AlgaeHeight.incrementState()));
-        altOperator.povDown().and(isAlgaeTrigger)
-            .onTrue(Commands.runOnce(() -> AlgaeHeight.decrementState()));
-        altOperator.povLeft().onTrue(Commands.runOnce(() -> HeightMode.decrementState()));
-        altOperator.povRight().onTrue(Commands.runOnce(() -> HeightMode.incrementState()));
-        altOperator.a().whileTrue(elevator.altOpBinds());
-        altOperator.y().onTrue(elevator.home());
+        altOperator.a().onTrue(swerve.moveAndAvoidReef(() -> {
+            return new Pose2d(1.06, 1.01, Rotation2d.fromDegrees(52.67));
+        }, false, 0.1, 2).andThen(Commands.runOnce(() -> {
+            System.out.println("done");
+        })).andThen(swerve.stop()));
+        altOperator.b().onTrue(swerve.moveAndAvoidReef(() -> {
+            return new Pose2d(5.04, 5.31, Rotation2d.fromDegrees(-120.02));
+        }, false, 0.1, 2).andThen(Commands.runOnce(() -> {
+            System.out.println("done");
+        })).andThen(swerve.stop()));
+        altOperator.a().negate().and(altOperator.b().negate()).whileTrue(swerve.stop());
     }
 
     private void setupPitController() {
-        pitController.y().whileTrue(climb.resetClimberCommand());
-        pitController.leftBumper().whileTrue(climb.resetClimberCommand());
+
     }
 
     private void configureTriggerBindings() {

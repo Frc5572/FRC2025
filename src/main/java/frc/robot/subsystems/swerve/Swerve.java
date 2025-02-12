@@ -1,7 +1,6 @@
 
 package frc.robot.subsystems.swerve;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -16,8 +15,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -207,7 +204,7 @@ public class Swerve extends SubsystemBase {
      * Sets motors to 0 or inactive.
      */
     public void setMotorsZero() {
-        System.out.println("Setting Zero!!!!!!");
+        // System.out.println("Setting Zero!!!!!!");
         setModuleStates(new ChassisSpeeds(0, 0, 0));
     }
 
@@ -232,19 +229,6 @@ public class Swerve extends SubsystemBase {
             positions[mod.moduleNumber] = mod.getPosition();
         }
         return positions;
-    }
-
-    /**
-     * Determine whether or not to flight the auto path
-     *
-     * @return True if flip path to Red Alliance, False if Blue
-     */
-    public static boolean shouldFlipPath() {
-        Optional<Alliance> ally = DriverStation.getAlliance();
-        if (ally.isPresent()) {
-            return ally.get() == Alliance.Red;
-        }
-        return false;
     }
 
     /**
@@ -290,6 +274,10 @@ public class Swerve extends SubsystemBase {
         ChassisSpeeds ctrlEffort =
             holonomicDriveController.calculate(getPose(), pose, 0, pose.getRotation());
         setModuleStates(ctrlEffort);
+    }
+
+    public Command stop() {
+        return this.runOnce(() -> this.setMotorsZero());
     }
 
     public Command moveAndAvoidReef(Supplier<Pose2d> pose2dSupplier, boolean flipForRed, double tol,
