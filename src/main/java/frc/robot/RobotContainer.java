@@ -1,6 +1,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import java.util.ArrayList;
 import java.util.List;
 import org.ironmaple.simulation.SimulatedArena;
@@ -15,9 +16,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.lib.util.ScoringLocation.AlgaeHeight;
-import frc.lib.util.ScoringLocation.CoralHeight;
-import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.ScoringLocation.HeightMode;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
@@ -107,7 +105,7 @@ public class RobotContainer {
                 break;
             case kSimulation:
                 driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
-                    new Pose2d(3, 3, Rotation2d.kZero));
+                    new Pose2d(1, 3, Rotation2d.kZero));
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
                 swerve = new Swerve(state, new SwerveSim(driveSimulation));
                 vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
@@ -166,6 +164,25 @@ public class RobotContainer {
     private void setupDriver() {
         swerve.setDefaultCommand(swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
+
+    }
+
+    private void setupAltOperatorController() {
+        altOperator.a().onTrue(swerve.moveAndAvoidReef(() -> {
+            return new Pose2d(1.06, 1.01, Rotation2d.fromDegrees(52.67));
+        }, false, 0.1, 2).andThen(Commands.runOnce(() -> {
+            System.out.println("done");
+        })).andThen(swerve.stop()));
+        altOperator.b().onTrue(swerve.moveAndAvoidReef(() -> {
+            return new Pose2d(5.04, 5.31, Rotation2d.fromDegrees(-120.02));
+        }, false, 0.1, 2).andThen(Commands.runOnce(() -> {
+            System.out.println("done");
+        })).andThen(swerve.stop()));
+        altOperator.a().negate().and(altOperator.b().negate()).whileTrue(swerve.stop());
+    }
+
+    private void setupPitController() {
+
         driver.rightTrigger().whileTrue(algae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
         driver.leftTrigger()
             .whileTrue(algae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
@@ -188,28 +205,6 @@ public class RobotContainer {
         }));
         driver.y().whileTrue(coralScoring.runScoringMotor(2));
         driver.rightBumper().whileTrue(climb.runClimberMotorCommand());
-    }
-
-    private void setupAltOperatorController() {
-        altOperator.povUp().whileTrue(Commands.runOnce(() -> Height.incrementState()));
-        altOperator.povDown().whileTrue(Commands.runOnce(() -> Height.decrementState()));
-        altOperator.povDown().and(isCoralTrigger)
-            .onTrue(Commands.runOnce(() -> CoralHeight.decrementState()));
-        altOperator.povUp().and(isCoralTrigger)
-            .onTrue(Commands.runOnce(() -> CoralHeight.incrementState()));
-        altOperator.povUp().and(isAlgaeTrigger)
-            .onTrue(Commands.runOnce(() -> AlgaeHeight.incrementState()));
-        altOperator.povDown().and(isAlgaeTrigger)
-            .onTrue(Commands.runOnce(() -> AlgaeHeight.decrementState()));
-        altOperator.povLeft().onTrue(Commands.runOnce(() -> HeightMode.decrementState()));
-        altOperator.povRight().onTrue(Commands.runOnce(() -> HeightMode.incrementState()));
-        altOperator.a().whileTrue(elevator.altOpBinds());
-        altOperator.y().onTrue(elevator.home());
-    }
-
-    private void setupPitController() {
-        pitController.y().whileTrue(climb.resetClimberCommand());
-        pitController.leftBumper().whileTrue(climb.resetClimberCommand());
     }
 
     private void configureTriggerBindings() {
@@ -245,7 +240,9 @@ public class RobotContainer {
      * @return Returns autonomous command selected.
      */
     public Command getAutonomousCommand() {
-        return null;
+        return swerve.moveAndAvoidReef(
+            () -> new Pose2d(FieldConstants.fieldLength.in(Meters) - 1, 3, Rotation2d.kZero), false,
+            0.1, 1);
     }
 
     /**
@@ -258,7 +255,7 @@ public class RobotContainer {
     /** Start simulation */
     public void startSimulation() {
         if (driveSimulation != null) {
-            SimulatedArena.getInstance().resetFieldForAuto();
+            // SimulatedArena.getInstance().resetFieldForAuto();
         }
     }
 
