@@ -66,7 +66,7 @@ public class RobotContainer {
     public final CommandXboxController altOperator =
         new CommandXboxController(Constants.ALT_OPERATOR_ID);
     public final CommandXboxController operator = new CommandXboxController(1);
-    private AutoFactory factory;
+    private AutoFactory autoFactory;
     private AutoChooser autoChooser = new AutoChooser();
 
     /** Simulation */
@@ -125,9 +125,13 @@ public class RobotContainer {
                 coralScoring = new CoralScoring(new CoralScoringIO() {});
                 climb = new Climber(new ClimberIO.Empty());
         }
-        test test = new test(s_Swerve);
-        autoChooser.addCmd("test", test::cmd);
 
+        test test = new test(s_Swerve);
+
+        autoFactory = new AutoFactory(s_Swerve::getPose, s_Swerve::resetOdometry,
+            s_Swerve::followTrajectory, true, s_Swerve);
+        autoChooser.addCmd("test", test::cmd);
+        SmartDashboard.putData("Auto Chooser", autoChooser);
         /* Default Commands */
         s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
