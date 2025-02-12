@@ -1,7 +1,6 @@
 package frc.robot;
 
 
-import static edu.wpi.first.units.Units.Inches;
 import java.util.ArrayList;
 import java.util.List;
 import org.ironmaple.simulation.SimulatedArena;
@@ -11,7 +10,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -84,7 +82,7 @@ public class RobotContainer {
     private Climber climb;
 
     /* Triggers */
-    private Trigger algaeInIntake = new Trigger(() -> s_ElevatorAlgae.hasAlgae());
+    private Trigger algaeInIntake = new Trigger(() -> algae.hasAlgae());
     private Trigger manualMode = new Trigger(() -> OperatorStates.manualModeEnabled());
 
 
@@ -143,8 +141,6 @@ public class RobotContainer {
     private List<Runnable> controllerSetups = new ArrayList<>();
 
 
-    private List<Runnable> controllerSetups = new ArrayList<>();
-
     private void maybeController(String name, CommandXboxController xboxController,
         Runnable setupFun) {
         Runnable runner = () -> {
@@ -175,11 +171,11 @@ public class RobotContainer {
      */
 
     private void setupDriver() {
-        s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
+        swerve.setDefaultCommand(swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
-        driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
+        driver.y().onTrue(new InstantCommand(() -> swerve.resetFieldRelativeOffset()));
         driver.x().onTrue(new InstantCommand(() -> {
-            s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
+            swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
         }));
         driver.y().whileTrue(coralScoring.runScoringMotor(2));
         driver.rightBumper().whileTrue(climb.runClimberMotorCommand());
@@ -196,10 +192,9 @@ public class RobotContainer {
 
         // coral and algae
         altOperator.x().whileTrue(coralScoring.runScoringMotor(2));
-        altOperator.rightTrigger()
-            .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
+        altOperator.rightTrigger().whileTrue(algae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
         altOperator.leftTrigger()
-            .whileTrue(s_ElevatorAlgae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
+            .whileTrue(algae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
 
         // manual mode
         altOperator.start().onTrue(Commands.runOnce(() -> {
