@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -26,10 +27,15 @@ public class AutoCommandFactory {
         this.coral = coral;
     }
 
+    private Command stopRobot() {
+        return swerve.runOnce(swerve::setMotorsZero).alongWith(Commands.waitTime(Seconds.of(0.01)));
+    }
+
     public AutoRoutine resnick() {
+
         AutoRoutine routine = autoFactory.newRoutine("Resnick");
 
-        Trigger haveCoral = routine.observe(coral.intakedCoralRight);
+        Trigger haveCoral = routine.observe(coral.intakedCoralRight).or(() -> Robot.isSimulation());
 
         AutoTrajectory startToScore1 = routine.trajectory("Resnick", 0);
         AutoTrajectory Score1ToFeeder = routine.trajectory("Resnick", 1);
@@ -38,18 +44,14 @@ public class AutoCommandFactory {
         routine.active()
             .onTrue(Commands.sequence(startToScore1.resetOdometry(), startToScore1.cmd()));
         startToScore1.active().onTrue(elevator.p0());
-        startToScore1.done()
-            .onTrue(Commands.sequence(
-                swerve.runOnce(swerve::setMotorsZero)
-                    .alongWith(Commands.waitTime(Seconds.of(0.01))),
-                elevator.p4(), coral.runScoringMotor(0.5), elevator.p0(),
-                new ProxyCommand(Score1ToFeeder.cmd())));
+        startToScore1.done().onTrue(Commands.sequence(stopRobot(), elevator.p4(),
+            coral.runScoringMotor(0.5), elevator.p0(), new ProxyCommand(Score1ToFeeder.cmd())));
         Score1ToFeeder.active().onTrue(elevator.home());
-        Score1ToFeeder.done().onTrue(Commands.sequence(
-            swerve.runOnce(swerve::setMotorsZero).alongWith(Commands.waitTime(Seconds.of(0.01))),
-            new ProxyCommand(FeederToScore2.cmd())));
-        FeederToScore2.done().onTrue(
-            swerve.runOnce(swerve::setMotorsZero).alongWith(Commands.waitTime(Seconds.of(0.01))));
+        Score1ToFeeder.done().and(haveCoral)
+            .onTrue(Commands.sequence(stopRobot(), new ProxyCommand(FeederToScore2.cmd())));
+        FeederToScore2.active().onTrue(elevator.p0());
+        FeederToScore2.done().onTrue(Commands.sequence(stopRobot(), elevator.p4(),
+            coral.runScoringMotor(0.5), elevator.p0()));
 
         return routine;
     }
