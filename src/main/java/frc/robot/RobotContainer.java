@@ -1,6 +1,7 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Inches;
+import java.util.ArrayList;
+import java.util.List;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -8,7 +9,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -125,8 +125,42 @@ public class RobotContainer {
 
         configureButtonBindings(runtimeType);
         configureTriggerBindings();
+
+        configureTriggerBindings();
+        if (runtimeType == RobotRunType.kSimulation) {
+            maybeController("Driver", driver, this::setupDriver);
+        } else {
+            setupDriver();
+        }
+        maybeController("Pit Controller", pitController, this::setupPitController);
+        maybeController("Alt Operator", altOperator, this::setupAltOperatorController);
     }
 
+
+
+    private List<Runnable> controllerSetups = new ArrayList<>();
+
+    private void maybeController(String name, CommandXboxController xboxController,
+        Runnable setupFun) {
+        Runnable runner = () -> {
+            System.out.println("Setting up buttons for " + name);
+            setupFun.run();
+        };
+        if (xboxController.isConnected()) {
+            runner.run();
+        } else {
+            new Trigger(xboxController::isConnected)
+                .onTrue(Commands.runOnce(() -> controllerSetups.add(runner)).ignoringDisable(true));
+        }
+    }
+
+    /** Setup buttons for newly attached controllers */
+    public void queryControllers() {
+        for (var setup : controllerSetups) {
+            setup.run();
+        }
+        controllerSetups.clear();
+    }
 
     /**
      * Use this method to vol your button->command mappings. Buttons can be created by instantiating
@@ -134,25 +168,19 @@ public class RobotContainer {
      * {@link XboxController}), and then passing it to a
      * {@link edu1.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
-    private void configureButtonBindings(RobotRunType runtimeType) {
 
-        // driver binds
+    private void setupDriver() {
+        s_Swerve.setDefaultCommand(s_Swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
+            Constants.Swerve.isOpenLoop));
         driver.y().onTrue(new InstantCommand(() -> s_Swerve.resetFieldRelativeOffset()));
-        driver.povDown().onTrue(elevator.home());
-        driver.povLeft().onTrue(elevator.p0());
-        driver.a().whileTrue(
-            elevator.moveTo(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
-        driver.povUp().whileTrue(elevator.moveUp());
-        driver.povRight().whileTrue(elevator.moveDown());
-        driver.rightStick().whileTrue(climb.runClimberMotorCommand());
         driver.x().onTrue(new InstantCommand(() -> {
             s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
         }));
         driver.y().whileTrue(coralScoring.runScoringMotor(2));
         driver.rightBumper().whileTrue(climb.runClimberMotorCommand());
+    }
 
-        // alt operator controls
-
+    private void setupAltOperatorController() {
         // elevator
         altOperator.povUp().and(manualMode.negate())
             .whileTrue(Commands.runOnce(() -> Height.incrementState()));
@@ -173,11 +201,14 @@ public class RobotContainer {
             OperatorStates.toggleManualMode();
         }).ignoringDisable(true));
         manualMode.onTrue(elevator.manualMove(altOperator));
+    }
 
-        // pit controller
+    private void setupPitController() {
         pitController.y().whileTrue(climb.resetClimberCommand());
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());
     }
+
+    private void configureButtonBindings(RobotRunType runtimeType) {}
 
     /**
      * Triggers
