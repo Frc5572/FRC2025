@@ -53,4 +53,46 @@ public class AutoCommandFactory {
 
         return routine;
     }
+
+    public AutoRoutine watson() {
+        AutoRoutine routine = autoFactory.newRoutine("Watson");
+
+        Trigger haveCoral = routine.observe(coral.intakedCoralRight);
+
+        AutoTrajectory startToScore1 = routine.trajectory("Watson1", 0);
+        AutoTrajectory Score1ToFeeder = routine.trajectory("Watson2", 0);
+        AutoTrajectory FeederToScore2 = routine.trajectory("Watson3", 0);
+        AutoTrajectory Score2ToFeeder = routine.trajectory("Watson4", 0);
+
+        routine.active()
+            .onTrue(Commands.sequence(startToScore1.resetOdometry(), startToScore1.cmd()));
+        startToScore1.active().onTrue(elevator.p0());
+        startToScore1.done().onTrue(Commands.sequence(
+            swerve.moveToPose(() -> Score1ToFeeder.getInitialPose().get(), false, 0.1, 1)
+                .withTimeout(1),
+            swerve.runOnce(swerve::setMotorsZero).alongWith(Commands.waitTime(Seconds.of(0.01))),
+            elevator.p4(), coral.runScoringMotor(0.5), elevator.p0(),
+            new ProxyCommand(Score1ToFeeder.cmd())));
+        Score1ToFeeder.active().onTrue(Commands.waitSeconds(0.5).andThen(elevator.home()));
+        Score1ToFeeder.done().onTrue(Commands.sequence(
+            swerve.moveToPose(() -> FeederToScore2.getInitialPose().get(), false, 0.1, 1)
+                .withTimeout(1),
+            swerve.runOnce(swerve::setMotorsZero).alongWith(Commands.waitTime(Seconds.of(0.01))),
+            Commands.waitSeconds(2), new ProxyCommand(FeederToScore2.cmd())));
+        FeederToScore2.active().onTrue(Commands.waitSeconds(0.5).andThen(elevator.p0()));
+        FeederToScore2.done().onTrue(Commands.sequence(
+            swerve.moveToPose(() -> Score2ToFeeder.getInitialPose().get(), false, 0.1, 1)
+                .withTimeout(1),
+            swerve.runOnce(swerve::setMotorsZero).alongWith(Commands.waitTime(Seconds.of(0.01))),
+            elevator.p4(), coral.runScoringMotor(0.5), elevator.p0(),
+            new ProxyCommand(Score2ToFeeder.cmd())));
+        Score2ToFeeder.active().onTrue(Commands.waitSeconds(0.5).andThen(elevator.home()));
+        Score2ToFeeder.done().onTrue(Commands.sequence(
+            swerve.moveToPose(() -> FeederToScore2.getInitialPose().get(), false, 0.1, 1)
+                .withTimeout(1),
+            swerve.runOnce(swerve::setMotorsZero).alongWith(Commands.waitTime(Seconds.of(0.01))),
+            Commands.waitSeconds(2), new ProxyCommand(FeederToScore2.cmd())));
+
+        return routine;
+    }
 }
