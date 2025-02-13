@@ -213,9 +213,9 @@ public class RobotContainer {
             .onTrue(Commands.runOnce(() -> AlgaeHeight.incrementState()).ignoringDisable(true));
         altOperator.povDown().and(HeightMode.algaeMode)
             .onTrue(Commands.runOnce(() -> AlgaeHeight.decrementState()).ignoringDisable(true));
-        altOperator.povLeft()
-            .onTrue(Commands.runOnce(() -> HeightMode.decrementState()).ignoringDisable(true));
         altOperator.povRight()
+            .onTrue(Commands.runOnce(() -> HeightMode.decrementState()).ignoringDisable(true));
+        altOperator.povLeft()
             .onTrue(Commands.runOnce(() -> HeightMode.incrementState()).ignoringDisable(true));
         altOperator.y().onTrue(elevator.home());
         altOperator.x().whileTrue(coralScoring.runScoringMotor(2));

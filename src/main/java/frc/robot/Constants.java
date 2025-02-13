@@ -76,7 +76,7 @@ public final class Constants {
 
     // pit and alt operator controllers
     public static final int PIT_CONTROLLER_ID = 3;
-    public static final int ALT_OPERATOR_ID = 4;
+    public static final int ALT_OPERATOR_ID = 2;
 
 
 
