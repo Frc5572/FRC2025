@@ -3,14 +3,14 @@
  "version":1,
  "snapshot":{
   "waypoints":[
-    {"x":7.558075904846191, "y":6.21054220199585, "heading":-1.5707963267948966, "intervals":41, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":3.7454311847686768, "y":5.818973541259766, "heading":0.0, "intervals":20, "split":false, "fixTranslation":true, "fixHeading":false, "overrideIntervals":false},
-    {"x":3.9721291065216064, "y":5.344968795776367, "heading":-2.166995468092377, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":false, "overrideIntervals":false}],
+    {"x":7.55808, "y":6.21054, "heading":-1.5708, "intervals":41, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":3.74543, "y":5.81897, "heading":0.0, "intervals":20, "split":false, "fixTranslation":true, "fixHeading":false, "overrideIntervals":false},
+    {"x":3.97213, "y":5.34497, "heading":-2.167, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":false, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"first", "to":"last", "data":{"type":"KeepInRectangle", "props":{"x":0.0, "y":0.0, "w":17.548, "h":8.052}}, "enabled":false},
-    {"from":0, "to":1, "data":{"type":"KeepOutCircle", "props":{"x":4.513346925377846, "y":4.018733405973762, "r":1.1}}, "enabled":true},
-    {"from":1, "to":2, "data":{"type":"PointAt", "props":{"x":4.240044593811035, "y":4.7060933113098145, "tolerance":0.017453292519943295, "flip":false}}, "enabled":true},
+    {"from":0, "to":1, "data":{"type":"KeepOutCircle", "props":{"x":4.51335, "y":4.01873, "r":1.1}}, "enabled":true},
+    {"from":1, "to":2, "data":{"type":"PointAt", "props":{"x":4.24004, "y":4.70609, "tolerance":0.01745, "flip":false}}, "enabled":true},
     {"from":2, "to":2, "data":{"type":"MaxVelocity", "props":{"max":0.8}}, "enabled":true},
     {"from":2, "to":2, "data":{"type":"MaxAcceleration", "props":{"max":0.0}}, "enabled":true}],
   "targetDt":0.05

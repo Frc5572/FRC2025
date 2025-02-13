@@ -142,6 +142,8 @@ public class RobotContainer {
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Resnick", autos::resnick);
         autoChooser.addRoutine("Watson", autos::watson);
+        autoChooser.addRoutine("jace", autos::jace);
+        autoChooser.addRoutine("jace test", autos::jacetest);
         SmartDashboard.putData("Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler()
             .andThen(Commands.runOnce(() -> swerve.setMotorsZero())));

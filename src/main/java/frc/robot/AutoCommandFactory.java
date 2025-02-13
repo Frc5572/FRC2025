@@ -95,4 +95,69 @@ public class AutoCommandFactory {
 
         return routine;
     }
+
+    public AutoRoutine jace() {
+        AutoRoutine routine = autoFactory.newRoutine("jace1");
+
+        AutoTrajectory start = routine.trajectory("jace1", 0);
+        AutoTrajectory routine2 = routine.trajectory("jace2", 0);
+
+        routine.active().onTrue(Commands.sequence(start.resetOdometry(), start.cmd()));
+        start.active().onTrue(elevator.p0());
+        start.done().onTrue(Commands.sequence(
+            swerve.moveToPose(() -> routine2.getInitialPose().get(), false, 0.1, 1.0)
+                .withTimeout(1),
+            swerve.runOnce(swerve::setMotorsZero).alongWith(Commands.waitTime(Seconds.of(0.01))),
+            elevator.p4(), coral.runScoringMotor(0.5), elevator.p0(),
+            new ProxyCommand(routine2.cmd())));
+        routine2.active().onTrue(elevator.p4());
+        routine2.done();
+        return routine;
+    }
+
+    public AutoRoutine jacetest() {
+        AutoRoutine routine = autoFactory.newRoutine("jacetest");
+
+        AutoTrajectory start = routine.trajectory("jaceTest1", 0);
+        AutoTrajectory goToReef = routine.trajectory("jaceTest2", 0);
+        AutoTrajectory lowerElevator1 = routine.trajectory("jaceTest3", 0);
+        AutoTrajectory feed1 = routine.trajectory("jaceTest4", 0);
+        AutoTrajectory goToReef2 = routine.trajectory("jaceTest5", 0);
+        AutoTrajectory lowerElevator2 = routine.trajectory("jaceTest6", 0);
+
+        routine.active().onTrue(Commands.sequence(start.resetOdometry(), start.cmd()));
+        start.active().onChange(elevator.home());
+        start.done()
+            .onTrue(Commands.sequence(
+                swerve.moveToPose(() -> goToReef.getInitialPose().get(), false, 0.1, 1.0),
+                swerve.runOnce(swerve::setMotorsZero), elevator.p4(),
+                new ProxyCommand(goToReef.cmd())));
+        goToReef.active().onChange(elevator.p4());
+        goToReef.done()
+            .onTrue(Commands.sequence(
+                swerve.moveToPose(() -> lowerElevator1.getInitialPose().get(), false, 0.1, 1),
+                swerve.runOnce(swerve::setMotorsZero), elevator.p4(), coral.runScoringMotor(0.5),
+                new ProxyCommand(lowerElevator1.cmd())));
+        lowerElevator1.active().onTrue(elevator.p4());
+        lowerElevator1.done()
+            .onTrue(Commands.sequence(
+                swerve.moveToPose(() -> feed1.getInitialPose().get(), false, 0.1, 1),
+                swerve.runOnce(swerve::setMotorsZero), elevator.home(),
+                new ProxyCommand(feed1.cmd())));;
+        feed1.active().onTrue(elevator.home());
+        feed1.done()
+            .onTrue(Commands.sequence(
+                swerve.moveToPose(() -> goToReef2.getInitialPose().get(), false, 0.1, 1),
+                swerve.runOnce(swerve::setMotorsZero), elevator.p4(), coral.runScoringMotor(0.5),
+                new ProxyCommand(goToReef2.cmd())));;
+        goToReef2.active().onTrue(elevator.p4());
+        goToReef2.done()
+            .onTrue(Commands.sequence(
+                swerve.moveToPose(() -> lowerElevator2.getInitialPose().get(), false, 0.1, 1),
+                swerve.runOnce(swerve::setMotorsZero), elevator.p4(), coral.runScoringMotor(0.5),
+                new ProxyCommand(lowerElevator2.cmd())));;
+        lowerElevator2.active().onTrue(elevator.p4());
+        lowerElevator2.done();
+        return routine;
+    }
 }
