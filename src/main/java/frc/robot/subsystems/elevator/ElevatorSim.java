@@ -1,4 +1,4 @@
-package frc.robot.subsystems.elevator;
+package frc.robot.subsystems.Elevator;
 
 import static edu.wpi.first.units.Units.Inches;
 import edu.wpi.first.math.util.Units;

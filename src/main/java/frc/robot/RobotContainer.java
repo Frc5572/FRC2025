@@ -30,6 +30,7 @@ import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Elevator.ElevatorIO;
 import frc.robot.subsystems.Elevator.ElevatorReal;
+import frc.robot.subsystems.Elevator.ElevatorSim;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberReal;
@@ -205,8 +206,6 @@ public class RobotContainer {
     }
 
     private void setupAltOperatorController() {
-        altOperator.povUp().whileTrue(Commands.runOnce(() -> Height.incrementState()));
-        altOperator.povDown().whileTrue(Commands.runOnce(() -> Height.decrementState()));
         altOperator.povDown().and(isCoralTrigger)
             .onTrue(Commands.runOnce(() -> CoralHeight.decrementState()));
         altOperator.povUp().and(isCoralTrigger)
@@ -218,7 +217,7 @@ public class RobotContainer {
         altOperator.povLeft().onTrue(Commands.runOnce(() -> HeightMode.decrementState()));
         altOperator.povRight().onTrue(Commands.runOnce(() -> HeightMode.incrementState()));
         altOperator.y().onTrue(elevator.home());
-        altOperator.a().whileTrue(elevator.goToHeight(() -> {
+        altOperator.a().whileTrue(elevator.moveTo(() -> {
             switch (HeightMode.getCurrentHeightMode()) {
                 case kAlgae:
                     switch (CoralHeight.getCurrentState()) {

@@ -45,7 +45,7 @@ public class CoralScoring extends SubsystemBase {
     public void periodic() {
         io.updateInputs(coralScoringAutoLogged);
         Logger.processInputs("Coral Scoring", coralScoringAutoLogged);
-        viz.setHasCoral(getScoringBeamBrakeStatus());
+        viz.setHasCoral(getOuttakeBeamBrakeStatus());
         if (getIntakeBrakeStatus()) {
             haveCoral.setString(Color.kGreen.toHexString());
 
@@ -75,7 +75,7 @@ public class CoralScoring extends SubsystemBase {
      * Runs Pre Scoring Motor
      */
     public Command runPreScoringMotor(double scoringSpeed) {
-        return motorStartEndCommand(scoringSpeed).until(() -> getScoringBeamBrakeStatus());
+        return motorStartEndCommand(scoringSpeed).until(() -> getOuttakeBeamBrakeStatus());
     }
 
     /**
