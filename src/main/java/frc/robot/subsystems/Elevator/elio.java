@@ -8,7 +8,7 @@ import edu.wpi.first.units.measure.Voltage;
 /**
  * Elevator IO Class for Elevator
  */
-public interface ElevatorIO {
+public interface elio {
 
     /**
      * Inputs Class for Elevator
@@ -32,7 +32,7 @@ public interface ElevatorIO {
     public void resetHome();
 
     /** Empty Elevator implementation (for replay) */
-    public static class Empty implements ElevatorIO {
+    public static class Empty implements elio {
 
         @Override
         public void updateInputs(ElevatorInputs inputs) {

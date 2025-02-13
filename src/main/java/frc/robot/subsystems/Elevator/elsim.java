@@ -4,7 +4,7 @@ import static edu.wpi.first.units.Units.Inches;
 import edu.wpi.first.math.util.Units;
 
 /** Simulator for Elevator */
-public class ElevatorSim implements ElevatorIO {
+public class elsim implements elio {
 
     private static final double simkP = 19 / 48.0;
     private static final double distancePerVoltPerSecond = 12;
@@ -19,7 +19,7 @@ public class ElevatorSim implements ElevatorIO {
     private double offset = 0;
 
     /** Simulator for Elevator */
-    public ElevatorSim() {
+    public elsim() {
         currentPoint = 0;
     }
 
