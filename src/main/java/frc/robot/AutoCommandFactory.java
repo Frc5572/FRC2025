@@ -124,6 +124,8 @@ public class AutoCommandFactory {
         AutoTrajectory feed1 = routine.trajectory("jaceTest4", 0);
         AutoTrajectory goToReef2 = routine.trajectory("jaceTest5", 0);
         AutoTrajectory lowerElevator2 = routine.trajectory("jaceTest6", 0);
+        AutoTrajectory feed2 = routine.trajectory("jaceTest7", 0);
+        AutoTrajectory goToReef3 = routine.trajectory("jaceTest8", 0);
 
         routine.active().onTrue(Commands.sequence(start.resetOdometry(), start.cmd()));
         start.active().onChange(elevator.home());
@@ -148,7 +150,7 @@ public class AutoCommandFactory {
         feed1.done()
             .onTrue(Commands.sequence(
                 swerve.moveToPose(() -> goToReef2.getInitialPose().get(), false, 0.1, 1),
-                swerve.runOnce(swerve::setMotorsZero), elevator.p4(), coral.runScoringMotor(0.5),
+                swerve.runOnce(swerve::setMotorsZero), elevator.p4(),
                 new ProxyCommand(goToReef2.cmd())));;
         goToReef2.active().onTrue(elevator.p4());
         goToReef2.done()
@@ -157,7 +159,19 @@ public class AutoCommandFactory {
                 swerve.runOnce(swerve::setMotorsZero), elevator.p4(), coral.runScoringMotor(0.5),
                 new ProxyCommand(lowerElevator2.cmd())));;
         lowerElevator2.active().onTrue(elevator.p4());
-        lowerElevator2.done();
+        lowerElevator2.done()
+            .onTrue(Commands.sequence(
+                swerve.moveToPose(() -> feed2.getInitialPose().get(), false, 0.1, 1),
+                swerve.runOnce(swerve::setMotorsZero), elevator.home(),
+                new ProxyCommand(feed2.cmd())));;
+        feed2.active().onTrue(elevator.home());
+        feed2.done()
+            .onTrue(Commands.sequence(
+                swerve.moveToPose(() -> goToReef3.getInitialPose().get(), false, 0.1, 1),
+                swerve.runOnce(swerve::setMotorsZero), elevator.p4(), coral.runScoringMotor(0.5),
+                new ProxyCommand(goToReef3.cmd())));
+        goToReef3.active().onTrue(elevator.p4());
+        goToReef3.done();
         return routine;
     }
 }

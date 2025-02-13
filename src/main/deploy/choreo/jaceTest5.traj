@@ -15,14 +15,14 @@
  },
  "params":{
   "waypoints":[
-    {"x":{"exp":"4.071386814117432 m", "val":4.071386814117432}, "y":{"exp":"5.614196300506592 m", "val":5.614196300506592}, "heading":{"exp":"-1.1232764727290647 rad", "val":-1.1232764727290647}, "intervals":14, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"4.209646224975586 m", "val":4.209646224975586}, "y":{"exp":"5.353039741516113 m", "val":5.353039741516113}, "heading":{"exp":"-1.1071480969991998 rad", "val":-1.1071480969991998}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
+    {"x":{"exp":"4.209646224975586 m", "val":4.209646224975586}, "y":{"exp":"5.353039741516113 m", "val":5.353039741516113}, "heading":{"exp":"-1.1071480969991998 rad", "val":-1.1071480969991998}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"4.071386814117432 m", "val":4.071386814117432}, "y":{"exp":"5.614196300506592 m", "val":5.614196300506592}, "heading":{"exp":"-1.1232764727290647 rad", "val":-1.1232764727290647}, "intervals":14, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"first", "to":"last", "data":{"type":"KeepInRectangle", "props":{"x":{"exp":"0 m", "val":0.0}, "y":{"exp":"0 m", "val":0.0}, "w":{"exp":"17.548 m", "val":17.548}, "h":{"exp":"8.052 m", "val":8.052}}}, "enabled":true},
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
-    {"from":0, "to":1, "data":{"type":"MaxVelocity", "props":{"max":{"exp":"0.5 m / s", "val":0.5}}}, "enabled":true},
-    {"from":1, "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true}],
+    {"from":1, "to":0, "data":{"type":"MaxVelocity", "props":{"max":{"exp":"0.5 m / s", "val":0.5}}}, "enabled":true},
+    {"from":0, "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true}],
   "targetDt":{
    "exp":"0.05 s",
    "val":0.05
