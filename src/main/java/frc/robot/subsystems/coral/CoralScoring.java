@@ -7,23 +7,28 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.viz.Viz2025;
 import frc.robot.RobotContainer;
 
 /**
- * Coral Scoring Subsystems
+ * Coral Scoring Subsystem
  */
 public class CoralScoring extends SubsystemBase {
     private CoralScoringIO io;
     private CoralScoringInputsAutoLogged coralScoringAutoLogged =
         new CoralScoringInputsAutoLogged();
+    private final Viz2025 viz;
     public Trigger intakedCoralRight = new Trigger(() -> getIntakeBrakeStatus());
     public Trigger outtakedCoral = new Trigger(() -> getOuttakeBeamBrakeStatus());
+
 
     private GenericEntry haveCoral =
         RobotContainer.mainDriverTab.add("Is Coral State", Color.kRed.toHexString())
             .withWidget("Single Color View").withPosition(4, 2).withSize(3, 2).getEntry();
 
-    public CoralScoring(CoralScoringIO io) {
+    /** Coral Scoring subsystem */
+    public CoralScoring(CoralScoringIO io, Viz2025 viz) {
+        this.viz = viz;
         this.io = io;
         io.updateInputs(coralScoringAutoLogged);
     }
@@ -40,6 +45,7 @@ public class CoralScoring extends SubsystemBase {
     public void periodic() {
         io.updateInputs(coralScoringAutoLogged);
         Logger.processInputs("Coral Scoring", coralScoringAutoLogged);
+        viz.setHasCoral(getScoringBeamBrakeStatus());
         if (getIntakeBrakeStatus()) {
             haveCoral.setString(Color.kGreen.toHexString());
 
@@ -69,8 +75,7 @@ public class CoralScoring extends SubsystemBase {
      * Runs Pre Scoring Motor
      */
     public Command runPreScoringMotor(double scoringSpeed) {
-        return motorStartEndCommand(scoringSpeed).until(() -> getOuttakeBeamBrakeStatus())
-            .withTimeout(10);
+        return motorStartEndCommand(scoringSpeed).until(() -> getScoringBeamBrakeStatus());
     }
 
     /**
