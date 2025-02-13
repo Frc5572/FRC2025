@@ -205,14 +205,14 @@ public class RobotContainer {
     }
 
     private void setupAltOperatorController() {
-        altOperator.povDown().and(HeightMode.coralMode)
-            .onTrue(Commands.runOnce(() -> CoralHeight.decrementState()).ignoringDisable(true));
         altOperator.povUp().and(HeightMode.coralMode)
             .onTrue(Commands.runOnce(() -> CoralHeight.incrementState()).ignoringDisable(true));
         altOperator.povUp().and(HeightMode.algaeMode)
             .onTrue(Commands.runOnce(() -> AlgaeHeight.incrementState()).ignoringDisable(true));
         altOperator.povDown().and(HeightMode.algaeMode)
             .onTrue(Commands.runOnce(() -> AlgaeHeight.decrementState()).ignoringDisable(true));
+        altOperator.povDown().and(HeightMode.coralMode)
+            .onTrue(Commands.runOnce(() -> CoralHeight.decrementState()).ignoringDisable(true));
         altOperator.povRight()
             .onTrue(Commands.runOnce(() -> HeightMode.decrementState()).ignoringDisable(true));
         altOperator.povLeft()

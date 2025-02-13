@@ -240,8 +240,8 @@ public final class Constants {
 
             public static final DCMotor driveMotor = DCMotor.getKrakenX60(1);
             public static final DCMotor angleMotor = DCMotor.getFalcon500(1);
-            public static final Voltage driveFrictionVoltage = Volts.of(0);
-            public static final Voltage angleFrictionVoltage = Volts.of(0);
+            public static final Voltage driveFrictionVoltage = Volts.of(0.15);
+            public static final Voltage angleFrictionVoltage = Volts.of(0.35);
             public static final double wheelCoeffFriction = 1.2;
             public static final MomentOfInertia angleMomentOfInertia =
                 KilogramSquareMeters.of(0.02);
