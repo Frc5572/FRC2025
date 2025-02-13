@@ -1,10 +1,13 @@
 package frc.robot.subsystems.coral;
 
 import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.RobotContainer;
 
 /**
  * Coral Scoring Subsystems
@@ -13,20 +16,23 @@ public class CoralScoring extends SubsystemBase {
     private CoralScoringIO io;
     private CoralScoringInputsAutoLogged coralScoringAutoLogged =
         new CoralScoringInputsAutoLogged();
-    public Trigger intakedCoralRight = new Trigger(() -> getGrabingRightBeamBrakeStatus());
-    public Trigger outtakedCoral = new Trigger(() -> getScoringBeamBrakeStatus());
+    public Trigger intakedCoralRight = new Trigger(() -> getIntakeBrakeStatus());
+    public Trigger outtakedCoral = new Trigger(() -> getOuttakeBeamBrakeStatus());
 
+    private GenericEntry haveCoral =
+        RobotContainer.mainDriverTab.add("Is Coral State", Color.kRed.toHexString())
+            .withWidget("Single Color View").withPosition(4, 2).withSize(3, 2).getEntry();
 
     public CoralScoring(CoralScoringIO io) {
         this.io = io;
         io.updateInputs(coralScoringAutoLogged);
     }
 
-    public boolean getScoringBeamBrakeStatus() {
+    public boolean getOuttakeBeamBrakeStatus() {
         return coralScoringAutoLogged.scoringBeamBrake;
     }
 
-    public boolean getGrabingRightBeamBrakeStatus() {
+    public boolean getIntakeBrakeStatus() {
         return coralScoringAutoLogged.grabingBeamBrakeRight;
     }
 
@@ -34,6 +40,12 @@ public class CoralScoring extends SubsystemBase {
     public void periodic() {
         io.updateInputs(coralScoringAutoLogged);
         Logger.processInputs("Coral Scoring", coralScoringAutoLogged);
+        if (getIntakeBrakeStatus()) {
+            haveCoral.setString(Color.kGreen.toHexString());
+
+        } else {
+            haveCoral.setString(Color.kRed.toHexString());
+        }
     }
 
     public void setScoringMotor(double percentage) {
@@ -57,7 +69,7 @@ public class CoralScoring extends SubsystemBase {
      * Runs Pre Scoring Motor
      */
     public Command runPreScoringMotor(double scoringSpeed) {
-        return motorStartEndCommand(scoringSpeed).until(() -> getScoringBeamBrakeStatus())
+        return motorStartEndCommand(scoringSpeed).until(() -> getOuttakeBeamBrakeStatus())
             .withTimeout(10);
     }
 
@@ -66,7 +78,7 @@ public class CoralScoring extends SubsystemBase {
      */
     public Command runScoringMotor(double scoringSpeed) {
         return motorStartEndCommand(scoringSpeed).withDeadline(
-            Commands.waitUntil(() -> !getScoringBeamBrakeStatus()).andThen(Commands.waitSeconds(2)))
+            Commands.waitUntil(() -> !getOuttakeBeamBrakeStatus()).andThen(Commands.waitSeconds(2)))
             .withTimeout(10);
     }
 

@@ -12,7 +12,13 @@ public class ScoringLocation {
      * set of height modes
      */
     public enum HeightMode {
-        kAlgae, kCoral;
+        kAlgae("Algae"), kCoral("Coral");
+
+        public final String displayName;
+
+        HeightMode(String displayName) {
+            this.displayName = displayName;
+        }
 
         /**
          *
@@ -60,7 +66,13 @@ public class ScoringLocation {
      * algae height states
      */
     public enum AlgaeHeight {
-        Klevel1, Klevel2;
+        Klevel1("Lower"), Klevel2("upper");
+
+        public final String displayName;
+
+        AlgaeHeight(String displayName) {
+            this.displayName = displayName;
+        }
 
         /**
          *
@@ -107,7 +119,13 @@ public class ScoringLocation {
      * Coral height states
      */
     public enum CoralHeight {
-        Klevel1, Klevel2, Klevel3, Klevel4;
+        Klevel1("level 1"), Klevel2("level 2"), Klevel3("level 3"), Klevel4("level 4");
+
+        public final String displayName;
+
+        CoralHeight(String displayName) {
+            this.displayName = displayName;
+        }
 
         /**
          *

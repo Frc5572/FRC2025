@@ -6,10 +6,14 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.ScoringLocation;
 import frc.lib.util.ScoringLocation.AlgaeHeight;
 import frc.lib.util.ScoringLocation.CoralHeight;
 import frc.lib.util.ScoringLocation.HeightMode;
@@ -63,6 +68,15 @@ public class RobotContainer {
 
     /** Simulation */
     private SwerveDriveSimulation driveSimulation;
+    /** ShuffleBoard */
+    public static ShuffleboardTab mainDriverTab = Shuffleboard.getTab("Main Driver");
+
+    public GenericEntry coralState =
+        mainDriverTab.add("Coral State", ScoringLocation.CoralHeight.getCurrentState().displayName)
+            .withWidget(BuiltInWidgets.kTextView).withPosition(5, 0).withSize(3, 2).getEntry();
+    public GenericEntry algaeState = mainDriverTab
+        .add("Algae State", ScoringLocation.AlgaeHeight.getCurrentHeightMode().displayName)
+        .withWidget(BuiltInWidgets.kTextView).withPosition(2, 0).withSize(3, 2).getEntry();
 
 
     /** Visualization */
@@ -188,13 +202,13 @@ public class RobotContainer {
         coralScoring.intakedCoralRight.onTrue(coralScoring.runPreScoringMotor(2));
         coralScoring.outtakedCoral
             .onTrue(leds.blinkLEDs(LEDPattern.solid(Color.kCyan)).withTimeout(5));
-        climb.resetButton.onTrue(climb.restEncoder());
+        // climb.resetButton.onTrue(climb.restEncoder());
         // driver controls
         driver.x().onTrue(new InstantCommand(() -> {
             s_Swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
         }));
         driver.y().whileTrue(coralScoring.runScoringMotor(2));
-        driver.rightBumper().whileTrue(climb.runClimberMotorCommand());
+        // driver.rightBumper().whileTrue(climb.runClimberMotorCommand());
 
         // alt operator controls
         altOperator.povDown().and(isCoralTrigger)
@@ -242,7 +256,7 @@ public class RobotContainer {
         }));
 
         // pit controller
-        pitController.leftBumper().whileTrue(climb.resetClimberCommand());
+        // pitController.leftBumper().whileTrue(climb.resetClimberCommand());
     }
 
 
