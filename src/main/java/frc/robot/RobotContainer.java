@@ -223,10 +223,10 @@ public class RobotContainer {
         altOperator.leftTrigger()
             .whileTrue(algae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
 
-        altOperator.a().and(HeightMode.algaeMode).and(AlgaeHeight.level1).whileTrue(elevator.p1());
-        altOperator.a().and(HeightMode.algaeMode).and(AlgaeHeight.level2).whileTrue(elevator.p1());
-        altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level1).whileTrue(elevator.p1());
-        altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level2).whileTrue(elevator.p2());
+        altOperator.a().and(HeightMode.algaeMode).and(AlgaeHeight.level1).whileTrue(elevator.p0());
+        altOperator.a().and(HeightMode.algaeMode).and(AlgaeHeight.level2).whileTrue(elevator.p2());
+        altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level1).whileTrue(elevator.p0());
+        altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level2).whileTrue(elevator.p1());
         altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level3).whileTrue(elevator.p3());
         altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level4).whileTrue(elevator.p4());
         // altOperator.a().whileTrue(elevator.moveTo(() -> {
