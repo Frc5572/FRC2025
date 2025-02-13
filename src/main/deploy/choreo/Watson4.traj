@@ -3,17 +3,17 @@
  "version":1,
  "snapshot":{
   "waypoints":[
-    {"x":3.1889913082122803, "y":4.3318, "heading":0.0, "intervals":11, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":2.344026803970337, "y":4.293915748596191, "heading":0.0, "intervals":29, "split":false, "fixTranslation":false, "fixHeading":false, "overrideIntervals":false},
-    {"x":2.096719980239868, "y":6.725764751434326, "heading":-0.8760576712953463, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":false, "overrideIntervals":false}],
+    {"x":3.18899, "y":4.3318, "heading":0.0, "intervals":11, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":2.34403, "y":4.29392, "heading":0.0, "intervals":29, "split":false, "fixTranslation":false, "fixHeading":false, "overrideIntervals":false},
+    {"x":2.09672, "y":6.72576, "heading":-0.87606, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":false, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"first", "to":"last", "data":{"type":"KeepInRectangle", "props":{"x":0.0, "y":0.0, "w":17.548, "h":8.052}}, "enabled":true},
-    {"from":1, "to":1, "data":{"type":"KeepInRectangle", "props":{"x":0.0, "y":2.988289050757885, "w":3.370022177696228, "h":1.948008842766285}}, "enabled":true},
+    {"from":1, "to":1, "data":{"type":"KeepInRectangle", "props":{"x":0.0, "y":2.98829, "w":3.37002, "h":1.94801}}, "enabled":true},
     {"from":2, "to":2, "data":{"type":"MaxVelocity", "props":{"max":6.0}}, "enabled":true},
     {"from":2, "to":2, "data":{"type":"MaxAcceleration", "props":{"max":0.0}}, "enabled":true},
     {"from":2, "to":2, "data":{"type":"MaxAngularVelocity", "props":{"max":0.0}}, "enabled":true},
-    {"from":1, "to":2, "data":{"type":"PointAt", "props":{"x":4.13700008392334, "y":3.9641733169555664, "tolerance":0.017453292519943295, "flip":false}}, "enabled":true}],
+    {"from":1, "to":2, "data":{"type":"PointAt", "props":{"x":4.137, "y":3.96417, "tolerance":0.01745, "flip":false}}, "enabled":true}],
   "targetDt":0.05
  },
  "params":{

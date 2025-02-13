@@ -95,4 +95,21 @@ public class AutoCommandFactory {
 
         return routine;
     }
+
+    public AutoRoutine test() {
+        AutoRoutine routine = autoFactory.newRoutine("test");
+
+        // Trigger haveCoral = routine.observe(coral.intakedCoralRight);
+
+        AutoTrajectory part1 = routine.trajectory("Test", 0);
+        AutoTrajectory part2 = routine.trajectory("Test", 1);
+        AutoTrajectory part3 = routine.trajectory("Test", 2);
+
+        routine.active().onTrue(Commands.sequence(part1.resetOdometry(), part1.cmd()));
+        part1.done().onTrue(part2.cmd());
+        part2.done().onTrue(part3.cmd());
+
+
+        return routine;
+    }
 }
