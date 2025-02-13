@@ -58,6 +58,25 @@ public class Elevator extends SubsystemBase {
      * @return elevator at l2
      *
      */
+    public Command p0() {
+        return moveTo(() -> Constants.Elevator.P0);
+    }
+
+    public Command p1() {
+        return moveTo(() -> Constants.Elevator.P1);
+    }
+
+    public Command p2() {
+        return moveTo(() -> Constants.Elevator.P2);
+    }
+
+    public Command p3() {
+        return moveTo(() -> Constants.Elevator.P3);
+    }
+
+    public Command p4() {
+        return moveTo(() -> Constants.Elevator.P4);
+    }
 
 
     /**

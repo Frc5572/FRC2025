@@ -2,6 +2,7 @@ package frc.robot.subsystems.elevator_algae;
 
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -26,9 +27,8 @@ public class ElevatorAlgae extends SubsystemBase {
         io.updateInputs(inputs);
     }
 
-    private GenericEntry haveAlgae =
-        RobotContainer.mainDriverTab.add("have Algae", Color.kBlack.toHexString())
-            .withWidget("Single Color View").withPosition(3, 4).withSize(3, 2).getEntry();
+    private GenericEntry haveAlgae = RobotContainer.mainDriverTab.add("Have Algae", false)
+        .withWidget(BuiltInWidgets.kBooleanBox).withPosition(8, 2).withSize(2, 2).getEntry();
 
     @Override
     public void periodic() {

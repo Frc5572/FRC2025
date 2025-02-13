@@ -23,8 +23,8 @@ public class CoralScoring extends SubsystemBase {
 
 
     private GenericEntry haveCoral =
-        RobotContainer.mainDriverTab.add("have Coral", Color.kBlack.toHexString())
-            .withWidget("Single Color View").withPosition(5, 4).withSize(3, 2).getEntry();
+        RobotContainer.mainDriverTab.add("Have Coral", Color.kBlack.toHexString())
+            .withWidget("Single Color View").withPosition(8, 0).withSize(3, 2).getEntry();
 
     /** Coral Scoring subsystem */
     public CoralScoring(CoralScoringIO io, Viz2025 viz) {
@@ -46,11 +46,12 @@ public class CoralScoring extends SubsystemBase {
         io.updateInputs(coralScoringAutoLogged);
         Logger.processInputs("Coral Scoring", coralScoringAutoLogged);
         viz.setHasCoral(getOuttakeBeamBrakeStatus());
-        if (getIntakeBrakeStatus()) {
-            haveCoral.setString(Color.kGreen.toHexString());
-
-        } else if (!getIntakeBrakeStatus()) {
+        if (getIntakeBrakeStatus() && getOuttakeBeamBrakeStatus()) {
             haveCoral.setString(Color.kRed.toHexString());
+        } else if (getIntakeBrakeStatus()) {
+            haveCoral.setString(Color.kBlue.toHexString());
+        } else if (getOuttakeBeamBrakeStatus()) {
+            haveCoral.setString(Color.kGreen.toHexString());
         } else {
             haveCoral.setString(Color.kBlack.toHexString());
         }

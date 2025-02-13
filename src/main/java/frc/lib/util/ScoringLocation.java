@@ -1,5 +1,7 @@
 package frc.lib.util;
 
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 /** Scoring Locations for the 2025 game Reefscape */
 public class ScoringLocation {
 
@@ -20,13 +22,18 @@ public class ScoringLocation {
             this.displayName = displayName;
         }
 
+        public static Trigger coralMode =
+            new Trigger(() -> getCurrentHeightMode() == HeightMode.kCoral);
+        public static Trigger algaeMode =
+            new Trigger(() -> getCurrentHeightMode() == HeightMode.kAlgae);
+
         /**
          *
          * @return increments state
          */
         public HeightMode increment() {
             int new_ordinal = this.ordinal() + 1;
-            if (new_ordinal >= CoralHeight.values().length) {
+            if (new_ordinal >= HeightMode.values().length) {
                 return this;
             }
             return HeightMode.values()[new_ordinal];
@@ -38,7 +45,7 @@ public class ScoringLocation {
          */
         public HeightMode decrement() {
             int new_ordinal = this.ordinal() - 1;
-            if (new_ordinal >= CoralHeight.values().length) {
+            if (new_ordinal < 0) {
                 return this;
             }
             return HeightMode.values()[new_ordinal];
@@ -66,7 +73,7 @@ public class ScoringLocation {
      * algae height states
      */
     public enum AlgaeHeight {
-        Klevel1("Lower"), Klevel2("upper");
+        Klevel1("Lower"), Klevel2("Upper");
 
         public final String displayName;
 
@@ -74,13 +81,18 @@ public class ScoringLocation {
             this.displayName = displayName;
         }
 
+        public static Trigger level1 =
+            new Trigger(() -> getCurrentHeightMode() == AlgaeHeight.Klevel1);
+        public static Trigger level2 =
+            new Trigger(() -> getCurrentHeightMode() == AlgaeHeight.Klevel2);
+
         /**
          *
          * @return increments aglae state
          */
         public AlgaeHeight increment() {
             int new_ordinal = this.ordinal() + 1;
-            if (new_ordinal >= CoralHeight.values().length) {
+            if (new_ordinal >= AlgaeHeight.values().length) {
                 return this;
             }
             return AlgaeHeight.values()[new_ordinal];
@@ -92,7 +104,7 @@ public class ScoringLocation {
          */
         public AlgaeHeight decrement() {
             int new_ordinal = this.ordinal() - 1;
-            if (new_ordinal >= CoralHeight.values().length) {
+            if (new_ordinal < 0) {
                 return this;
             }
             return AlgaeHeight.values()[new_ordinal];
@@ -126,6 +138,11 @@ public class ScoringLocation {
         CoralHeight(String displayName) {
             this.displayName = displayName;
         }
+
+        public static Trigger level1 = new Trigger(() -> getCurrentState() == CoralHeight.Klevel1);
+        public static Trigger level2 = new Trigger(() -> getCurrentState() == CoralHeight.Klevel2);
+        public static Trigger level3 = new Trigger(() -> getCurrentState() == CoralHeight.Klevel3);
+        public static Trigger level4 = new Trigger(() -> getCurrentState() == CoralHeight.Klevel4);
 
         /**
          *
