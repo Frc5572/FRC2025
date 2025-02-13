@@ -19,7 +19,7 @@ import frc.robot.Constants;
 /**
  * Real Class for Elevator
  */
-public class elreal implements elio {
+public class elevatorReal implements elevatorIO {
     private final TalonFX rightElevatorMotor = new TalonFX(Constants.Elevator.RIGHT_ID);
     private final TalonFX leftElevatorMotor = new TalonFX(Constants.Elevator.LEFT_ID);
     private final DigitalInput limitSwitch = new DigitalInput(Constants.Elevator.LIMIT_ID);
@@ -31,7 +31,7 @@ public class elreal implements elio {
     private StatusSignal<AngularVelocity> elevatorVelocity = rightElevatorMotor.getVelocity();
 
     /** Real Elevator Initializer */
-    public elreal() {
+    public elevatorReal() {
         configMotors();
     }
 

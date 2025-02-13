@@ -15,14 +15,14 @@ import frc.robot.Constants;
 /**
  * Elevator Subsystem
  */
-public class el extends SubsystemBase {
-    elio io;
+public class elevator extends SubsystemBase {
+    elevatorIO io;
     private final Viz2025 viz;
 
     private ElevatorInputsAutoLogged inputs = new ElevatorInputsAutoLogged();
 
     /** Elevator Subsystem */
-    public el(elio io, Viz2025 viz) {
+    public elevator(elevatorIO io, Viz2025 viz) {
         this.viz = viz;
         this.io = io;
         io.updateInputs(inputs);
