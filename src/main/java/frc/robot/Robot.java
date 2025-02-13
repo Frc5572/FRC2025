@@ -16,6 +16,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.lib.util.ScoringLocation;
+import frc.lib.util.ScoringLocation.HeightMode;
 
 /**
  * Runs tasks on Roborio in this file.
@@ -120,6 +122,9 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().run();
         robotContainer.updateSimulation();
         robotContainer.updateViz();
+        robotContainer.isCoralMode
+            .setBoolean(ScoringLocation.HeightMode.getCurrentHeightMode() == HeightMode.kCoral);
+
     }
 
     @Override

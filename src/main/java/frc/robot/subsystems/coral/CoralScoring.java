@@ -23,8 +23,8 @@ public class CoralScoring extends SubsystemBase {
 
 
     private GenericEntry haveCoral =
-        RobotContainer.mainDriverTab.add("Is Coral State", Color.kRed.toHexString())
-            .withWidget("Single Color View").withPosition(4, 2).withSize(3, 2).getEntry();
+        RobotContainer.mainDriverTab.add("have Coral", Color.kBlack.toHexString())
+            .withWidget("Single Color View").withPosition(5, 4).withSize(3, 2).getEntry();
 
     /** Coral Scoring subsystem */
     public CoralScoring(CoralScoringIO io, Viz2025 viz) {
@@ -49,8 +49,10 @@ public class CoralScoring extends SubsystemBase {
         if (getIntakeBrakeStatus()) {
             haveCoral.setString(Color.kGreen.toHexString());
 
-        } else {
+        } else if (!getIntakeBrakeStatus()) {
             haveCoral.setString(Color.kRed.toHexString());
+        } else {
+            haveCoral.setString(Color.kBlack.toHexString());
         }
     }
 

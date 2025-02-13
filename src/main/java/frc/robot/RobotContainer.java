@@ -3,6 +3,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Inches;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -81,7 +82,10 @@ public class RobotContainer {
     public GenericEntry algaeState = mainDriverTab
         .add("Algae State", ScoringLocation.AlgaeHeight.getCurrentHeightMode().displayName)
         .withWidget(BuiltInWidgets.kTextView).withPosition(2, 0).withSize(3, 2).getEntry();
-
+    public GenericEntry isCoralMode = RobotContainer.mainDriverTab.add("Is Coral Mode", true)
+        .withWidget(BuiltInWidgets.kBooleanBox)
+        .withProperties(Map.of("true_color", 0xff00ffff, "false_color", 0xff770000))
+        .withPosition(5, 2).withSize(2, 2).getEntry();;
 
     /** Visualization */
     private final FieldViz fieldVis;
