@@ -1,4 +1,4 @@
-package frc.robot.subsystems.Elevator;
+package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
@@ -15,14 +15,14 @@ import frc.robot.Constants;
 /**
  * Elevator Subsystem
  */
-public class elevator extends SubsystemBase {
-    elevatorIO io;
+public class Elevator extends SubsystemBase {
+    ElevatorIO io;
     private final Viz2025 viz;
 
     private ElevatorInputsAutoLogged inputs = new ElevatorInputsAutoLogged();
 
     /** Elevator Subsystem */
-    public elevator(elevatorIO io, Viz2025 viz) {
+    public Elevator(ElevatorIO io, Viz2025 viz) {
         this.viz = viz;
         this.io = io;
         io.updateInputs(inputs);

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.Elevator;
+package frc.robot.subsystems.elevator;
 
 import org.littletonrobotics.junction.AutoLog;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -8,7 +8,7 @@ import edu.wpi.first.units.measure.Voltage;
 /**
  * Elevator IO Class for Elevator
  */
-public interface elevatorIO {
+public interface ElevatorIO {
 
     /**
      * Inputs Class for Elevator
@@ -32,7 +32,7 @@ public interface elevatorIO {
     public void resetHome();
 
     /** Empty Elevator implementation (for replay) */
-    public static class Empty implements elevatorIO {
+    public static class Empty implements ElevatorIO {
 
         @Override
         public void updateInputs(ElevatorInputs inputs) {

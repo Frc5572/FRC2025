@@ -1,4 +1,4 @@
-package frc.robot.subsystems.Elevator;
+package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
@@ -19,7 +19,7 @@ import frc.robot.Constants;
 /**
  * Real Class for Elevator
  */
-public class elevatorReal implements elevatorIO {
+public class ElevatorReal implements ElevatorIO {
     private final TalonFX rightElevatorMotor = new TalonFX(Constants.Elevator.RIGHT_ID);
     private final TalonFX leftElevatorMotor = new TalonFX(Constants.Elevator.LEFT_ID);
     private final DigitalInput limitSwitch = new DigitalInput(Constants.Elevator.LIMIT_ID);
@@ -31,7 +31,7 @@ public class elevatorReal implements elevatorIO {
     private StatusSignal<AngularVelocity> elevatorVelocity = rightElevatorMotor.getVelocity();
 
     /** Real Elevator Initializer */
-    public elevatorReal() {
+    public ElevatorReal() {
         configMotors();
     }
 
