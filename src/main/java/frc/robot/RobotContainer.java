@@ -273,7 +273,7 @@ public class RobotContainer {
 
     private void configureTriggerBindings() {
         coralScoring.coralAtIntake.onTrue(leds.setLEDsSolid(Color.kRed).withTimeout(5));
-        coralScoring.coralAtIntake.onTrue(coralScoring.runPreScoringMotor(2));
+        // coralScoring.coralAtIntake.onTrue(coralScoring.runPreScoringMotor(2));
         coralScoring.coralOuttaken.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
         climb.resetButton.onTrue(climb.restEncoder());
         algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan));
