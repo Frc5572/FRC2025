@@ -115,6 +115,7 @@ public class RobotContainer {
 
     /* Triggers */
     private Trigger algaeInIntake = new Trigger(() -> algae.hasAlgae());
+    private Trigger coralInIntake = new Trigger(() -> coralScoring.getIntakeBrakeStatus());
 
     private Climber climb;
 
@@ -280,6 +281,7 @@ public class RobotContainer {
         coralScoring.coralOuttaken.negate().whileTrue(coralScoring.runPreScoringMotor(.1));
         coralScoring.coralOuttaken.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
         climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());
+        coralInIntake.onTrue(elevator.p0());
     }
 
     /**
