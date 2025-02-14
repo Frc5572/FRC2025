@@ -126,7 +126,9 @@ public class AutoCommandFactory {
         // AutoTrajectory lowerElevator2 = routine.trajectory("jaceTest6", 0);
         AutoTrajectory feed2 = routine.trajectory("jaceTest7", 0);
         AutoTrajectory goToReef3 = routine.trajectory("jaceTest8", 0);
-        AutoTrajectory lowerElevator3 = routine.trajectory("jaceTest9", 0);
+        // AutoTrajectory lowerElevator3 = routine.trajectory("jaceTest9", 0);
+        AutoTrajectory feed4 = routine.trajectory("jaceTest9", 0);
+        AutoTrajectory goToReef4 = routine.trajectory("jaceTest10", 0);
 
         routine.active().onTrue(Commands.sequence(start.resetOdometry(), start.cmd()));
         start.active().onChange(elevator.home());
@@ -172,13 +174,17 @@ public class AutoCommandFactory {
                 swerve.runOnce(swerve::setMotorsZero), elevator.p4(), coral.runScoringMotor(0.5),
                 new ProxyCommand(goToReef3.cmd())));
         goToReef3.active().onTrue(elevator.p4());
-        goToReef3.done()
+        goToReef3.done().onTrue(Commands.sequence(
+            swerve.moveToPose(() -> feed4.getInitialPose().get(), false, 0.1, 1),
+            swerve.runOnce(swerve::setMotorsZero), elevator.p4(), new ProxyCommand(feed4.cmd())));
+        feed4.active().onTrue(elevator.home());
+        feed4.done()
             .onTrue(Commands.sequence(
-                swerve.moveToPose(() -> goToReef3.getInitialPose().get(), false, 0.1, 1),
-                swerve.runOnce(swerve::setMotorsZero), elevator.home(),
-                new ProxyCommand(lowerElevator3.cmd())));
-        lowerElevator3.active().onTrue(elevator.p4());
-        lowerElevator3.done();;
+                swerve.moveToPose(() -> goToReef4.getInitialPose().get(), false, 0.1, 1),
+                swerve.runOnce(swerve::setMotorsZero), elevator.p4(),
+                new ProxyCommand(goToReef4.cmd())));;;
+        goToReef4.active().onTrue(elevator.p4());
+        goToReef4.done();
         return routine;
     }
 }
