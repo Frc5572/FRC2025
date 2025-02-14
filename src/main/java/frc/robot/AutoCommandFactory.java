@@ -135,30 +135,47 @@ public class AutoCommandFactory {
         AutoTrajectory part12 = routine.trajectory("middleBot", 11);
         AutoTrajectory part13 = routine.trajectory("middleBot", 12);
         AutoTrajectory part14 = routine.trajectory("middleBot", 13);
+        AutoTrajectory part15 = routine.trajectory("middleBot", 14);
+        AutoTrajectory part16 = routine.trajectory("middleBot", 15);
+        AutoTrajectory part17 = routine.trajectory("middleBot", 16);
         // AutoTrajectory part15 = routine.trajectory("middleBot", 14);
         // AutoTrajectory part16 = routine.trajectory("middleBot", 15);
 
 
-        routine.active().onTrue(Commands.sequence(part1.resetOdometry(), part1.cmd()));
+        routine.active()
+            .onTrue(Commands.sequence(Commands.waitSeconds(4), part1.resetOdometry(), part1.cmd()));
         part1.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero),
-            Commands.waitSeconds(0.5), elevator.p0(), Commands.waitSeconds(0.2), part2.cmd()));
+            Commands.waitSeconds(0.5), elevator.home(), Commands.waitSeconds(0.2), part2.cmd()));
         part1.active().onTrue(elevator.p4());
         // part2.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero),
         // Commands.waitSeconds(3), part3.cmd()));
         part2.done().onTrue(part3.cmd());
         // part2.active().onTrue(elevator.p0());
         part3.done().onTrue(part4.cmd());
-        part4.done().onTrue(part5.cmd());
+        part4.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero),
+            Commands.sequence(Commands.waitSeconds(1)), part5.cmd()));
         part5.done().onTrue(part6.cmd());
-        part6.done().onTrue(part7.cmd());
+        part5.done().onTrue(elevator.p4());
+        part6.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero),
+            Commands.sequence(Commands.waitSeconds(0.5), elevator.home(), part7.cmd())));
+        // part6.done().onTrue(part7.cmd());
+        // part6.active().onTrue(Commands.sequence(Commands.waitSeconds(0.2), elevator.home()));
         part7.done().onTrue(part8.cmd());
         part8.done().onTrue(part9.cmd());
-        part9.done().onTrue(part10.cmd());
+        // part9.done().onTrue(part10.cmd());
+        part9.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero),
+            Commands.sequence(Commands.waitSeconds(1)), part10.cmd()));
         part10.done().onTrue(part11.cmd());
-        part11.done().onTrue(part12.cmd());
+        part10.done().onTrue(elevator.p4());
+        part11.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero),
+            Commands.sequence(Commands.waitSeconds(0.5), elevator.home(), part12.cmd())));
         part12.done().onTrue(part13.cmd());
+        // part13.done().onTrue(part14.cmd());
         part13.done().onTrue(part14.cmd());
-        part14.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero)));
+        part14.done().onTrue(part15.cmd());
+        part15.done().onTrue(part16.cmd());
+        part16.done().onTrue(Commands.sequence(elevator.p4(), part17.cmd()));
+        part17.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero)));
         // part15.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero)));
         // part2.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero),
         // Commands.waitSeconds(3), part3.cmd()));
