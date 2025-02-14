@@ -384,7 +384,7 @@ public final class Constants {
      */
     public static final class CoralScoringConstants {
         public static final int Scoring_Beam_Brake_DIO_Port = 0;
-        public static final int Coral_Touch_Sensor_DIO_Port = 3;
+        public static final int Intake_Beam_Brake_DIO_Port = 3;
         public static final int Random_Touch_Sensor = 1;
     }
 }

@@ -18,8 +18,8 @@ public class CoralScoring extends SubsystemBase {
     private CoralScoringInputsAutoLogged coralScoringAutoLogged =
         new CoralScoringInputsAutoLogged();
     private final Viz2025 viz;
-    public Trigger intakedCoralRight = new Trigger(() -> getIntakeBrakeStatus());
-    public Trigger outtakedCoral = new Trigger(() -> getOuttakeBeamBrakeStatus());
+    public Trigger coralAtIntake = new Trigger(() -> getIntakeBrakeStatus());
+    public Trigger coralOuttaken = new Trigger(() -> getOuttakeBeamBrakeStatus());
 
 
     private GenericEntry haveCoral =
@@ -38,7 +38,7 @@ public class CoralScoring extends SubsystemBase {
     }
 
     public boolean getIntakeBrakeStatus() {
-        return coralScoringAutoLogged.grabingBeamBrakeRight;
+        return coralScoringAutoLogged.intakeBeamBrake;
     }
 
     @Override

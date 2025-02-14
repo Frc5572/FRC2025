@@ -10,8 +10,8 @@ import frc.robot.Constants;
 public class CoralScoringSim implements CoralScoringIO {
     private final DigitalInput scoringBeamBrake =
         new DigitalInput(Constants.CoralScoringConstants.Scoring_Beam_Brake_DIO_Port);
-    private final DigitalInput coralTouchSensor =
-        new DigitalInput(Constants.CoralScoringConstants.Coral_Touch_Sensor_DIO_Port);
+    private final DigitalInput intakeBeamBrake =
+        new DigitalInput(Constants.CoralScoringConstants.Intake_Beam_Brake_DIO_Port);
 
     /**
      * Coral Scoring Real
@@ -24,7 +24,7 @@ public class CoralScoringSim implements CoralScoringIO {
 
     public void updateInputs(CoralScoringInputs inputs) {
         inputs.scoringBeamBrake = !scoringBeamBrake.get();
-        inputs.grabingBeamBrakeRight = coralTouchSensor.get();
+        inputs.intakeBeamBrake = !intakeBeamBrake.get();
     }
 
     public void setCoralScoringMotorPercentage(double percent) {}

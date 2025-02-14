@@ -17,7 +17,7 @@ public interface CoralScoringIO {
     public static class CoralScoringInputs {
         public double scoringRPM;
         public boolean scoringBeamBrake;
-        public boolean grabingBeamBrakeRight;
+        public boolean intakeBeamBrake;
     }
 
     public void updateInputs(CoralScoringInputs inputs);
