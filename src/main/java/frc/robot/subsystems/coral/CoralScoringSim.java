@@ -27,6 +27,6 @@ public class CoralScoringSim implements CoralScoringIO {
         inputs.intakeBeamBrake = !intakeBeamBrake.get();
     }
 
-    public void setCoralScoringMotorPercentage(double percent) {}
+    public void setCoralSpeed(double percent) {}
 
 }

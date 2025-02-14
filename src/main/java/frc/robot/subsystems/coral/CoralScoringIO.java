@@ -22,7 +22,7 @@ public interface CoralScoringIO {
 
     public void updateInputs(CoralScoringInputs inputs);
 
-    public void setCoralScoringMotorPercentage(double percent);
+    public void setCoralSpeed(double speed);
 
     /** Empty Coral Scoring implementation (for replay) */
     public static class Empty implements CoralScoringIO {
@@ -33,7 +33,7 @@ public interface CoralScoringIO {
         }
 
         @Override
-        public void setCoralScoringMotorPercentage(double percent) {
+        public void setCoralSpeed(double speed) {
 
         }
 

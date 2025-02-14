@@ -272,13 +272,13 @@ public class RobotContainer {
     }
 
     private void configureTriggerBindings() {
-        coralScoring.coralAtIntake.onTrue(leds.setLEDsSolid(Color.kRed).withTimeout(5));
+        coralScoring.coralAtIntake.onTrue(leds.setLEDsSolid(Color.kOrange).withTimeout(5));
         // coralScoring.coralAtIntake.onTrue(coralScoring.runPreScoringMotor(2));
-        coralScoring.coralOuttaken.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
+        coralScoring.coralAtOuttake.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
         climb.resetButton.onTrue(climb.restEncoder());
         algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan));
-        coralScoring.coralOuttaken.negate().whileTrue(coralScoring.runPreScoringMotor(.1));
-        coralScoring.coralOuttaken.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
+        coralScoring.coralAtOuttake.negate().debounce(1.5)
+            .whileTrue(coralScoring.runPreScoringMotor(.1));
         climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());
     }
 

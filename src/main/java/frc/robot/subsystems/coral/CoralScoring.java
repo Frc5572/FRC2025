@@ -19,7 +19,7 @@ public class CoralScoring extends SubsystemBase {
         new CoralScoringInputsAutoLogged();
     private final Viz2025 viz;
     public Trigger coralAtIntake = new Trigger(() -> getIntakeBrakeStatus());
-    public Trigger coralOuttaken = new Trigger(() -> getOuttakeBeamBrakeStatus());
+    public Trigger coralAtOuttake = new Trigger(() -> getOuttakeBeamBrakeStatus());
 
 
     private GenericEntry haveCoral =
@@ -47,19 +47,19 @@ public class CoralScoring extends SubsystemBase {
         Logger.processInputs("Coral Scoring", coralScoringAutoLogged);
         viz.setHasCoral(getOuttakeBeamBrakeStatus());
         if (getIntakeBrakeStatus() && getOuttakeBeamBrakeStatus()) {
-            haveCoral.setString(Color.kRed.toHexString());
-        } else if (getIntakeBrakeStatus()) {
             haveCoral.setString(Color.kBlue.toHexString());
+        } else if (getIntakeBrakeStatus()) {
+            haveCoral.setString(Color.kOrange.toHexString());
         } else if (getOuttakeBeamBrakeStatus()) {
-            haveCoral.setString(Color.kGreen.toHexString());
+            haveCoral.setString(Color.kPurple.toHexString());
         } else {
             haveCoral.setString(Color.kBlack.toHexString());
         }
     }
 
-    public void setScoringMotor(double percentage) {
-        Logger.recordOutput("Scoring Percentage", percentage);
-        io.setCoralScoringMotorPercentage(percentage);
+    public void setCoralSpeed(double speed) {
+        Logger.recordOutput("Scoring Percentage", speed);
+        io.setCoralSpeed(speed);
     }
 
     /**
@@ -68,9 +68,9 @@ public class CoralScoring extends SubsystemBase {
 
     private Command motorStartEndCommand(double scoringSpeed) {
         return Commands.startEnd(() -> {
-            setScoringMotor(scoringSpeed);
+            setCoralSpeed(scoringSpeed);
         }, () -> {
-            setScoringMotor(0);
+            setCoralSpeed(0);
         }, this);
     }
 

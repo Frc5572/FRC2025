@@ -42,7 +42,7 @@ public class CoralScoringReal implements CoralScoringIO {
         inputs.intakeBeamBrake = !intakeBeamBrake.get();
     }
 
-    public void setCoralScoringMotorPercentage(double percent) {
+    public void setCoralSpeed(double percent) {
         coralScoringMotor.set(percent);
     }
 
