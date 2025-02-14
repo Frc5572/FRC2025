@@ -96,7 +96,7 @@ public class RobotContainer {
     public GenericEntry isCoralMode = RobotContainer.mainDriverTab.add("Elevator Mode", true)
         .withWidget(BuiltInWidgets.kBooleanBox)
         .withProperties(Map.of("true_color", 0xffffffff, "false_color", 0xff0af0c3))
-        .withPosition(6, 0).withSize(2, 2).getEntry();;
+        .withPosition(6, 0).withSize(2, 2).getEntry();
 
     /** Visualization */
     private final FieldViz fieldVis;
