@@ -31,6 +31,8 @@ public interface ElevatorIO {
 
     public void resetHome();
 
+    public void setPositonMagic(double position);
+
     /** Empty Elevator implementation (for replay) */
     public static class Empty implements ElevatorIO {
 
@@ -54,6 +56,8 @@ public interface ElevatorIO {
 
         }
 
+        @Override
+        public void setPositonMagic(double position) {}
     }
 
 }

@@ -54,4 +54,10 @@ public class ElevatorSim implements ElevatorIO {
         offset = -currentPoint;
     }
 
+    @Override
+    public void setPositonMagic(double position) {
+        currentTarget = Units.metersToInches(position);
+        isPositionControl = true;
+    }
+
 }

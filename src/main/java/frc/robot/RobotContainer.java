@@ -1,5 +1,6 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -204,6 +206,11 @@ public class RobotContainer {
         driver.rightTrigger().whileTrue(climb.runClimberMotorCommand());
         driver.leftTrigger()
             .whileTrue(climb.runClimberMotorCommand(() -> Constants.Climb.RESET_VOLTAGE));
+        SmartDashboard.putNumber("elevatorTargetHeight", 20);
+
+        // remove later
+        driver.a().whileTrue(elevator
+            .moveToMagic(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
     }
 
     private void setupAltOperatorController() {

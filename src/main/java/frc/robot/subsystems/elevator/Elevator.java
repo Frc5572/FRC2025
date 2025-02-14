@@ -101,4 +101,11 @@ public class Elevator extends SubsystemBase {
     public Command moveDown() {
         return runEnd(() -> io.setVoltage(-1.0), () -> io.setVoltage(0));
     }
+
+    public Command moveToMagic(Supplier<Distance> height) {
+        return run(() -> {
+            Logger.recordOutput("targetHeight", height.get().in(Meters));
+            io.setPositon(height.get().in(Meters));
+        }).until(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1);
+    }
 }

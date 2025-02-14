@@ -6,6 +6,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -29,6 +30,7 @@ public class ElevatorReal implements ElevatorIO {
     private StatusSignal<Angle> elevatorPosition = rightElevatorMotor.getPosition();
     private StatusSignal<Voltage> elevatorVoltage = rightElevatorMotor.getMotorVoltage();
     private StatusSignal<AngularVelocity> elevatorVelocity = rightElevatorMotor.getVelocity();
+    private final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
 
     /** Real Elevator Initializer */
     public ElevatorReal() {
@@ -64,6 +66,9 @@ public class ElevatorReal implements ElevatorIO {
         rightElevatorConf.Slot0.kV = Constants.Elevator.KV;
         rightElevatorConf.Slot0.kA = Constants.Elevator.KA;
         rightElevatorConf.Slot0.kG = Constants.Elevator.KG;
+        rightElevatorConf.MotionMagic.MotionMagicCruiseVelocity = 0.0;
+        rightElevatorConf.MotionMagic.MotionMagicAcceleration = 0.0;
+        rightElevatorConf.MotionMagic.MotionMagicJerk = 0.0;
 
         // left
         leftElevatorConf.Slot0.kP = Constants.Elevator.KP;
@@ -73,6 +78,10 @@ public class ElevatorReal implements ElevatorIO {
         leftElevatorConf.Slot0.kV = Constants.Elevator.KV;
         leftElevatorConf.Slot0.kA = Constants.Elevator.KA;
         leftElevatorConf.Slot0.kG = Constants.Elevator.KG;
+        leftElevatorConf.MotionMagic.MotionMagicCruiseVelocity = 0.0;
+        leftElevatorConf.MotionMagic.MotionMagicAcceleration = 0.0;
+        leftElevatorConf.MotionMagic.MotionMagicJerk = 0.0;
+
 
         rightElevatorMotor.getConfigurator().apply(rightElevatorConf);
         leftElevatorMotor.getConfigurator().apply(leftElevatorConf);
@@ -84,6 +93,10 @@ public class ElevatorReal implements ElevatorIO {
 
     public void setPositon(double position) {
         rightElevatorMotor.setControl(positionVoltage.withPosition(position));
+    }
+
+    public void setPositonMagic(double position) {
+        rightElevatorMotor.setControl(m_request.withPosition(position));
     }
 
 
