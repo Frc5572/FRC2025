@@ -76,7 +76,7 @@ public final class Constants {
 
     // pit and alt operator controllers
     public static final int PIT_CONTROLLER_ID = 3;
-    public static final int ALT_OPERATOR_ID = 4;
+    public static final int ALT_OPERATOR_ID = 2;
 
 
 
@@ -240,8 +240,8 @@ public final class Constants {
 
             public static final DCMotor driveMotor = DCMotor.getKrakenX60(1);
             public static final DCMotor angleMotor = DCMotor.getFalcon500(1);
-            public static final Voltage driveFrictionVoltage = Volts.of(0);
-            public static final Voltage angleFrictionVoltage = Volts.of(0);
+            public static final Voltage driveFrictionVoltage = Volts.of(0.15);
+            public static final Voltage angleFrictionVoltage = Volts.of(0.35);
             public static final double wheelCoeffFriction = 1.2;
             public static final MomentOfInertia angleMomentOfInertia =
                 KilogramSquareMeters.of(0.02);
@@ -384,7 +384,7 @@ public final class Constants {
      */
     public static final class CoralScoringConstants {
         public static final int Scoring_Beam_Brake_DIO_Port = 0;
-        public static final int Coral_Touch_Sensor_DIO_Port = 3;
+        public static final int Intake_Beam_Brake_DIO_Port = 3;
         public static final int Random_Touch_Sensor = 1;
     }
 }

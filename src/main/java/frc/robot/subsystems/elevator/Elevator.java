@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Constants;
 
@@ -79,6 +78,7 @@ public class Elevator extends SubsystemBase {
         return moveTo(() -> Constants.Elevator.P4);
     }
 
+
     /**
      * sets height of elevator
      *
@@ -101,35 +101,4 @@ public class Elevator extends SubsystemBase {
     public Command moveDown() {
         return runEnd(() -> io.setVoltage(-1.0), () -> io.setVoltage(0));
     }
-
-    /**
-     * moves elevator
-     *
-     * @return new elevator position
-     */
-    public Command altOpBinds() {
-
-        return moveTo(() -> {
-            var height = Height.getCurrentState();
-            Logger.recordOutput(Constants.Elevator.heightName, height.name);
-            switch (height) {
-                case kHome:
-                    return Constants.Elevator.HOME;
-                case KPosition0:
-                    return Constants.Elevator.P0;
-                case KPosition1:
-                    return Constants.Elevator.P1;
-                case KPosition2:
-                    return Constants.Elevator.P2;
-                case KPosition3:
-                    return Constants.Elevator.P3;
-                case kPosition4:
-                    return Constants.Elevator.P4;
-                default:
-                    break;
-            }
-            return Constants.Elevator.HOME;
-        });
-    }
-
 }
