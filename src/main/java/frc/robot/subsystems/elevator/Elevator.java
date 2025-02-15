@@ -114,7 +114,12 @@ public class Elevator extends SubsystemBase {
     }
 
 
-
+    /**
+     * moves elevator with motion magic
+     *
+     * @param height
+     * @return elevator moved
+     */
     public Command moveToMagic(Supplier<Distance> height) {
         return run(() -> {
             Logger.recordOutput("targetHeight", height.get().in(Meters));
