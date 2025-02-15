@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Constants;
 
@@ -91,6 +92,10 @@ public class Elevator extends SubsystemBase {
             Logger.recordOutput("targetHeight", height.get().in(Meters));
             io.setPositon(height.get().in(Meters));
         }).until(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1);
+    }
+
+    public Command manualMove(CommandXboxController leftStick) {
+        return run(() -> io.setPower(leftStick.getLeftY()));
     }
 
     public Command moveUp() {
