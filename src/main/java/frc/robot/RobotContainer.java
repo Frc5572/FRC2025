@@ -200,7 +200,9 @@ public class RobotContainer {
         driver.x().onTrue(new InstantCommand(() -> { // sim only
             swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
         }));
-        driver.rightTrigger().whileTrue(climb.runClimberMotorCommand());
+        driver.rightTrigger().onTrue(climb.runClimberMotorCommand(climb.passedFeederAngle()));
+        driver.rightBumper().and(climb.passedFeederAngle())
+            .onTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
         driver.leftTrigger()
             .whileTrue(climb.runClimberMotorCommand(() -> Constants.Climb.RESET_VOLTAGE));
     }

@@ -42,11 +42,10 @@ public class Climber extends SubsystemBase {
      *
      * @return Set Motor Voltage until reached certain angle
      */
-    public Command runClimberMotorCommand() { // run
+    public Command runClimberMotorCommand(BooleanSupplier angle) { // run
         return Commands.runEnd(() -> setClimberMotorVoltage(Constants.Climb.VOLTAGE), () -> {
             setClimberMotorVoltage(0);
-            System.out.println("Climber Done!");
-        }, this).until(passedMaxAngle()).unless(passedMaxAngle());
+        }, this).until(angle).unless(angle);
     }
 
     /**
@@ -54,7 +53,7 @@ public class Climber extends SubsystemBase {
      * @return Set Motor Voltage until reached certain angle
      */
     public Command runClimberMotorCommand(DoubleSupplier volts) { // run
-        return Commands.runEnd(() -> setClimberMotorVoltage(volts.getAsDouble() * 3), () -> {
+        return Commands.runEnd(() -> setClimberMotorVoltage(volts.getAsDouble() * 6), () -> {
             setClimberMotorVoltage(0);
             System.out.println("Climber Done!");
         }, this).until(passedMaxAngle()).unless(passedMaxAngle());
@@ -71,6 +70,28 @@ public class Climber extends SubsystemBase {
 
         // Constants.Climb.GEAR_RATIO >= Constants.Climb.MAX_ANGLE.in(Degrees);
 
+    }
+
+
+    /**
+     *
+     * @return Climber Position
+     */
+    public BooleanSupplier passedClimbAngle() { // degrees
+        return () -> climberAutoLogged.climberPosition
+            .baseUnitMagnitude() >= Constants.Climb.CLIMB_ANGLE.baseUnitMagnitude();
+
+        // Constants.Climb.GEAR_RATIO >= Constants.Climb.MAX_ANGLE.in(Degrees);
+
+    }
+
+    /**
+     *
+     * @return Climber Position
+     */
+    public BooleanSupplier passedFeederAngle() { // degrees
+        return () -> climberAutoLogged.climberPosition
+            .baseUnitMagnitude() >= Constants.Climb.FEEDER_ANGLE.baseUnitMagnitude();
     }
 
     /**
