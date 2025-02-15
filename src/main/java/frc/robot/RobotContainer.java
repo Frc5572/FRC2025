@@ -29,6 +29,7 @@ import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberReal;
+import frc.robot.subsystems.climber.ClimberSim;
 import frc.robot.subsystems.coral.CoralScoring;
 import frc.robot.subsystems.coral.CoralScoringIO;
 import frc.robot.subsystems.coral.CoralScoringReal;
@@ -132,7 +133,7 @@ public class RobotContainer {
                 vision = new Vision(state, VisionReal::new);
                 coralScoring = new CoralScoring(new CoralScoringReal(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeReal(), vis);
-                climb = new Climber(new ClimberReal());
+                climb = new Climber(new ClimberReal(), vis);
                 break;
 
             case kSimulation:
@@ -144,7 +145,7 @@ public class RobotContainer {
                 elevator = new Elevator(new ElevatorSim(), vis);
                 coralScoring = new CoralScoring(new CoralScoringSim(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
-                climb = new Climber(new ClimberIO.Empty());
+                climb = new Climber(new ClimberSim(), vis);
                 break;
             default:
                 elevator = new Elevator(new ElevatorIO.Empty(), vis);
@@ -152,7 +153,7 @@ public class RobotContainer {
                 vision = new Vision(state, VisionIO::empty);
                 coralScoring = new CoralScoring(new CoralScoringIO.Empty(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
-                climb = new Climber(new ClimberIO.Empty());
+                climb = new Climber(new ClimberIO.Empty(), vis);
         }
 
         /* Default Commands */
@@ -230,45 +231,12 @@ public class RobotContainer {
         altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level2).whileTrue(elevator.p1());
         altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level3).whileTrue(elevator.p3());
         altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level4).whileTrue(elevator.p4());
-        // altOperator.a().whileTrue(elevator.moveTo(() -> {
-        // switch (HeightMode.getCurrentHeightMode()) {
-        // case kAlgae:
-        // switch (CoralHeight.getCurrentState()) {
-        // case Klevel1:
-        // return Constants.Elevator.P1;
-        // case Klevel2:
-        // return Constants.Elevator.P1;
-
-        // case Klevel3:
-        // return Constants.Elevator.P1;
-
-        // case Klevel4:
-        // return Constants.Elevator.P1;
-        // default:
-        // return null;
-        // }
-
-        // case kCoral:
-        // switch (AlgaeHeight.getCurrentHeightMode()) {
-        // case Klevel1:
-        // return Constants.Elevator.P1;
-
-
-        // case Klevel2:
-        // return Constants.Elevator.P1;
-        // default:
-        // return null;
-        // }
-        // default:
-        // return null;
-        // }
-        // }));
     }
 
     private void setupPitController() {
         pitController.y().whileTrue(climb.resetClimberCommand());
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());
-        pitController.x().whileTrue(climb.runClimberMotorCommand(() -> pitController.getLeftY()));
+        pitController.x().whileTrue(climb.runClimberMotorCommand(() -> -pitController.getLeftY()));
     }
 
     private void configureTriggerBindings() {
