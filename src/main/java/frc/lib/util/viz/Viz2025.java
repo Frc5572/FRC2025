@@ -1,5 +1,6 @@
 package frc.lib.util.viz;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import org.littletonrobotics.junction.Logger;
@@ -15,6 +16,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
 /** Visualization of the 2025 Robot */
@@ -59,12 +61,21 @@ public class Viz2025 implements Drawable {
             mechanisms[i] = new Pose3d();
         }
         this.reset(Pose2d.kZero);
+        // SmartDashboard.setDefaultNumber("ClimberX", 0.505);
+        SmartDashboard.setDefaultNumber("ClimberZ", -0.055);
     }
 
     /** Set the angle of the climber, with 0 being straight up and down. */
     public void setClimberAngle(Angle angle) {
-        mechanisms[CLIMBER_ID] = new Pose3d(Translation3d.kZero,
-            new Rotation3d(Radians.of(0.0), angle.div(300), Radians.of(0.0)));
+        Angle visAngle = angle.div(300);
+        SmartDashboard.putNumber("Real Angle", angle.in(Degrees));
+        // SmartDashboard.putNumber("ClimberX", -visAngle.in(Radians) * 0.531);
+        SmartDashboard.putNumber("ASDFDSF", visAngle.in(Radians));
+        // SmartDashboard.putNumber("SIN", Math.sin(visAngle.in(Radians)));
+        Translation3d trans = new Translation3d(-visAngle.in(Radians) * 0.505, 0,
+            -SmartDashboard.getNumber("ClimberZ", 0) * visAngle.in(Radians));
+        mechanisms[CLIMBER_ID] =
+            new Pose3d(trans, new Rotation3d(Radians.of(0.0), visAngle, Radians.of(0.0)));
     }
 
     /** Show coral in the coral scorer. */
