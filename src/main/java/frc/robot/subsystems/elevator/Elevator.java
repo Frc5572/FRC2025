@@ -117,7 +117,7 @@ public class Elevator extends SubsystemBase {
     /**
      * moves elevator with motion magic
      *
-     * @param height
+     * @param height desired height
      * @return elevator moved
      */
     public Command moveToMagic(Supplier<Distance> height) {
@@ -127,6 +127,11 @@ public class Elevator extends SubsystemBase {
         }).until(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 0.2);
     }
 
+    /**
+     * selects height
+     *
+     * @return seleceted height
+     */
     public Command heightSelector() {
         return moveToMagic(() -> {
             var height = Height.getCurrentState();
