@@ -57,9 +57,9 @@ public class CoralScoring extends SubsystemBase {
         }
     }
 
-    public void setCoralSpeed(double speed) {
-        Logger.recordOutput("Scoring Percentage", speed);
-        io.setCoralSpeed(speed);
+    public void setCoralPercent(double percentage) {
+        Logger.recordOutput("Scoring Percentage", percentage);
+        io.setCoralPercent(percentage);
     }
 
     /**
@@ -68,9 +68,9 @@ public class CoralScoring extends SubsystemBase {
 
     private Command motorStartEndCommand(double scoringSpeed) {
         return Commands.startEnd(() -> {
-            setCoralSpeed(scoringSpeed);
+            setCoralPercent(scoringSpeed);
         }, () -> {
-            setCoralSpeed(0);
+            setCoralPercent(0);
         }, this);
     }
 
