@@ -31,6 +31,7 @@ public class Swerve extends SubsystemBase {
     private SwerveInputsAutoLogged inputs = new SwerveInputsAutoLogged();
     private SwerveIO swerveIO;
     private final RobotState state;
+    private double setSpeedMultiplier = 1;
 
     /**
      * Swerve Subsystem
@@ -237,6 +238,14 @@ public class Swerve extends SubsystemBase {
         return false;
     }
 
+    public void setSpeedMultiplier(double multipier) {
+        setSpeedMultiplier = multipier;
+    }
+
+    public double getSpeedMultiplier() {
+        return setSpeedMultiplier;
+    }
+
     /**
      * Creates a command for driving the swerve drive during tele-op
      *
@@ -245,9 +254,9 @@ public class Swerve extends SubsystemBase {
      * @param openLoop Open or closed loop system
      */
     public Command teleOpDrive(CommandXboxController controller, boolean fieldRelative,
-        boolean openLoop) {
+        boolean openLoop, double setSpeedMultiplier) {
         return this.run(() -> {
-            double speedMultiplier = 1;
+            double speedMultiplier = setSpeedMultiplier;
             double yaxis = -controller.getLeftY() * speedMultiplier;
             double xaxis = -controller.getLeftX() * speedMultiplier;
             double raxis = -controller.getRightX() * speedMultiplier;
@@ -265,4 +274,6 @@ public class Swerve extends SubsystemBase {
             this.drive(translation, rotation, fieldRelative, openLoop);
         });
     }
+
+
 }

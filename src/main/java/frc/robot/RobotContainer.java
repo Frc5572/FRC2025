@@ -118,7 +118,6 @@ public class RobotContainer {
     /* Triggers */
     private Trigger algaeInIntake = new Trigger(() -> algae.hasAlgae());
     private Trigger coralInIntake = new Trigger(() -> coralScoring.getIntakeBrakeStatus());
-
     private Climber climb;
 
     /**
@@ -157,6 +156,10 @@ public class RobotContainer {
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
                 climb = new Climber(new ClimberIO.Empty());
         }
+
+        new Trigger(() -> elevator.hightNotHome())
+            .onTrue(new InstantCommand(() -> swerve.setSpeedMultiplier(0.5)))
+            .onFalse(new InstantCommand(() -> swerve.setSpeedMultiplier(1)));
 
         /* Default Commands */
         leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed).ignoringDisable(true));
@@ -197,8 +200,11 @@ public class RobotContainer {
     }
 
     private void setupDriver() {
+
+
         swerve.setDefaultCommand(swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
-            Constants.Swerve.isOpenLoop));
+            Constants.Swerve.isOpenLoop, swerve.getSpeedMultiplier()));
+
         driver.y().onTrue(new InstantCommand(() -> swerve.resetFieldRelativeOffset()));
         driver.x().onTrue(new InstantCommand(() -> { // sim only
             swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));

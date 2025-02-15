@@ -78,6 +78,9 @@ public class Elevator extends SubsystemBase {
         return moveTo(() -> Constants.Elevator.P4);
     }
 
+    public boolean hightNotHome() {
+        return (inputs.position).in(Inches) >= (Constants.Elevator.P0).in(Inches);
+    }
 
     /**
      * sets height of elevator
