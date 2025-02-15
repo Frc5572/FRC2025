@@ -83,20 +83,6 @@ public class RobotContainer {
         .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min_value ", 1, "max_value",
             4, "divisions", 4, "Show Text", false, "orientation", "vertical"))
         .withPosition(2, 1).withSize(2, 3).getEntry();
-    // public GenericEntry algaeState = mainDriverTab
-    // .add("Algae State", ScoringLocation.AlgaeHeight.getCurrentHeightMode().displayName)
-    // .withWidget(BuiltInWidgets.kTextView).withPosition(4, 0).withSize(2, 1).getEntry();
-
-    // public GenericEntry algaeWidget = mainDriverTab
-    // .add("Algae Level", ScoringLocation.CoralHeight.getCurrentState().ordinal() + 1)
-    // .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min_value ", 1, "max_value",
-    // 2, "divisions", 1, "Show Text", false, "orientation", "vertical"))
-    // .withPosition(4, 1).withSize(2, 3).getEntry();
-
-    // public GenericEntry isCoralMode = RobotContainer.mainDriverTab.add("Elevator Mode", true)
-    // .withWidget(BuiltInWidgets.kBooleanBox)
-    // .withProperties(Map.of("true_color", 0xffffffff, "false_color", 0xff0af0c3))
-    // .withPosition(6, 0).withSize(2, 2).getEntry();
 
     /** Visualization */
     private final FieldViz fieldVis;
@@ -238,18 +224,6 @@ public class RobotContainer {
     }
 
     private void setupAltOperatorController() {
-        // altOperator.povUp().and(HeightMode.coralMode)
-        // .onTrue(Commands.runOnce(() -> CoralHeight.incrementState()).ignoringDisable(true));
-        // altOperator.povUp().and(HeightMode.algaeMode)
-        // .onTrue(Commands.runOnce(() -> AlgaeHeight.incrementState()).ignoringDisable(true));
-        // altOperator.povDown().and(HeightMode.algaeMode)
-        // .onTrue(Commands.runOnce(() -> AlgaeHeight.decrementState()).ignoringDisable(true));
-        // altOperator.povDown().and(HeightMode.coralMode)
-        // .onTrue(Commands.runOnce(() -> CoralHeight.decrementState()).ignoringDisable(true));
-        // altOperator.povRight()
-        // .onTrue(Commands.runOnce(() -> HeightMode.decrementState()).ignoringDisable(true));
-        // altOperator.povLeft()
-        // .onTrue(Commands.runOnce(() -> HeightMode.incrementState()).ignoringDisable(true));
         altOperator.y().onTrue(elevator.home());
         altOperator.x().whileTrue(coralScoring.runScoringMotor(2));
         altOperator.rightTrigger().whileTrue(algae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
@@ -261,12 +235,6 @@ public class RobotContainer {
         }).ignoringDisable(true));
         manualMode.onTrue(elevator.manualMove(altOperator));
 
-        // altOperator.a().and(HeightMode.algaeMode).and(AlgaeHeight.level1).whileTrue(elevator.p0());
-        // altOperator.a().and(HeightMode.algaeMode).and(AlgaeHeight.level2).whileTrue(elevator.p2());
-        // altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level1).whileTrue(elevator.p0());
-        // altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level2).whileTrue(elevator.p1());
-        // altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level3).whileTrue(elevator.p3());
-        // altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level4).whileTrue(elevator.p4());
 
         altOperator.a().and(manualMode).whileTrue(elevator.heightSelector());
         altOperator.povUp().and(manualMode)
@@ -276,42 +244,6 @@ public class RobotContainer {
             .onTrue(Commands.runOnce(() -> frc.lib.util.ScoringLocation.Height.decrementState())
                 .ignoringDisable(true));
         altOperator.b().whileTrue(elevator.p0());
-
-
-        // altOperator.a().whileTrue(elevator.moveTo(() -> {
-        // switch (HeightMode.getCurrentHeightMode()) {
-        // case kAlgae:
-        // switch (CoralHeight.getCurrentState()) {
-        // case Klevel1:
-        // return Constants.Elevator.P1;
-        // case Klevel2:
-        // return Constants.Elevator.P1;
-
-        // case Klevel3:
-        // return Constants.Elevator.P1;
-
-        // case Klevel4:
-        // return Constants.Elevator.P1;
-        // default:
-        // return null;
-        // }
-
-        // case kCoral:
-        // switch (AlgaeHeight.getCurrentHeightMode()) {
-        // case Klevel1:
-        // return Constants.Elevator.P1;
-
-
-        // case Klevel2:
-        // return Constants.Elevator.P1;
-        // default:
-        // return null;
-        // }
-        // default:
-        // return null;
-        // }
-        // }));
-
     }
 
     private void setupPitController() {
