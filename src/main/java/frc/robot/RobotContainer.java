@@ -68,12 +68,8 @@ public class RobotContainer {
     public final CommandXboxController altOperator =
         new CommandXboxController(Constants.ALT_OPERATOR_ID);
     public final CommandXboxController operator = new CommandXboxController(1);
-    public static ShuffleboardTab mainDriverTab = Shuffleboard.getTab("Main Driver");
 
 
-    public GenericEntry coralState =
-        mainDriverTab.add("Height", ScoringLocation.Height.getCurrentState().name)
-            .withWidget(BuiltInWidgets.kTextView).withPosition(5, 0).withSize(3, 2).getEntry();
     /** Simulation */
     private SwerveDriveSimulation driveSimulation;
     /** ShuffleBoard */
