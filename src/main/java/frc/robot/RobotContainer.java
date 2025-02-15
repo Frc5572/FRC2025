@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.ScoringLocation;
-import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
@@ -76,28 +75,28 @@ public class RobotContainer {
     /** ShuffleBoard */
     public static ShuffleboardTab mainDriverTab = Shuffleboard.getTab("Main Driver");
 
-    public GenericEntry coralState =
-        mainDriverTab.add("Coral State", ScoringLocation.CoralHeight.getCurrentState().displayName)
+    public GenericEntry heightState =
+        mainDriverTab.add("Coral State", ScoringLocation.Height.getCurrentState().displayName)
             .withWidget(BuiltInWidgets.kTextView).withPosition(2, 0).withSize(2, 1).getEntry();
-    public GenericEntry coralWidget = mainDriverTab
+    public GenericEntry heightWidget = mainDriverTab
         .add("Coral Level", ScoringLocation.CoralHeight.getCurrentState().ordinal() + 1)
         .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min_value ", 1, "max_value",
             4, "divisions", 4, "Show Text", false, "orientation", "vertical"))
         .withPosition(2, 1).withSize(2, 3).getEntry();
-    public GenericEntry algaeState = mainDriverTab
-        .add("Algae State", ScoringLocation.AlgaeHeight.getCurrentHeightMode().displayName)
-        .withWidget(BuiltInWidgets.kTextView).withPosition(4, 0).withSize(2, 1).getEntry();
+    // public GenericEntry algaeState = mainDriverTab
+    // .add("Algae State", ScoringLocation.AlgaeHeight.getCurrentHeightMode().displayName)
+    // .withWidget(BuiltInWidgets.kTextView).withPosition(4, 0).withSize(2, 1).getEntry();
 
-    public GenericEntry algaeWidget = mainDriverTab
-        .add("Algae Level", ScoringLocation.CoralHeight.getCurrentState().ordinal() + 1)
-        .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min_value ", 1, "max_value",
-            2, "divisions", 1, "Show Text", false, "orientation", "vertical"))
-        .withPosition(4, 1).withSize(2, 3).getEntry();
+    // public GenericEntry algaeWidget = mainDriverTab
+    // .add("Algae Level", ScoringLocation.CoralHeight.getCurrentState().ordinal() + 1)
+    // .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min_value ", 1, "max_value",
+    // 2, "divisions", 1, "Show Text", false, "orientation", "vertical"))
+    // .withPosition(4, 1).withSize(2, 3).getEntry();
 
-    public GenericEntry isCoralMode = RobotContainer.mainDriverTab.add("Elevator Mode", true)
-        .withWidget(BuiltInWidgets.kBooleanBox)
-        .withProperties(Map.of("true_color", 0xffffffff, "false_color", 0xff0af0c3))
-        .withPosition(6, 0).withSize(2, 2).getEntry();
+    // public GenericEntry isCoralMode = RobotContainer.mainDriverTab.add("Elevator Mode", true)
+    // .withWidget(BuiltInWidgets.kBooleanBox)
+    // .withProperties(Map.of("true_color", 0xffffffff, "false_color", 0xff0af0c3))
+    // .withPosition(6, 0).withSize(2, 2).getEntry();
 
     /** Visualization */
     private final FieldViz fieldVis;
@@ -271,9 +270,11 @@ public class RobotContainer {
 
         altOperator.a().and(manualMode).whileTrue(elevator.heightSelector());
         altOperator.povUp().and(manualMode)
-            .onTrue(Commands.runOnce(() -> Height.incrementState()).ignoringDisable(true));
+            .onTrue(Commands.runOnce(() -> frc.lib.util.ScoringLocation.Height.incrementState())
+                .ignoringDisable(true));
         altOperator.povDown().and(manualMode)
-            .onTrue(Commands.runOnce(() -> Height.decrementState()).ignoringDisable(true));
+            .onTrue(Commands.runOnce(() -> frc.lib.util.ScoringLocation.Height.decrementState())
+                .ignoringDisable(true));
         altOperator.b().whileTrue(elevator.p0());
 
 
