@@ -1,6 +1,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Radians;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -209,12 +210,20 @@ public class RobotContainer {
         driver.x().onTrue(new InstantCommand(() -> { // sim only
             swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
         }));
-        driver.rightTrigger().whileTrue(climb.runClimberMotorCommand());
-        driver.leftTrigger()
-            .whileTrue(climb.runClimberMotorCommand(() -> Constants.Climb.RESET_VOLTAGE));
-        SmartDashboard.putNumber("elevatorTargetHeight", 20);
+        driver.rightTrigger().and(climb.reachedClimberStart.negate())
+            .onTrue(climb
+                .runClimberMotorCommand(Constants.Climb.PRE_CLIMB_VOLTAGE,
+                    () -> climb.getClimberPosition()
+                        .in(Radians) >= Constants.Climb.CLIMBER_OUT_ANGLE.in(Radians))
+                .andThen(climb.runClimberMotorCommand(Constants.Climb.RESET_VOLTAGE,
+                    () -> climb.getClimberPosition()
+                        .in(Radians) <= Constants.Climb.CLIMBER_START_ANGLE.in(Radians))));
+
+        driver.rightTrigger().and(climb.reachedClimberStart)
+            .onTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
 
         // remove later
+        SmartDashboard.putNumber("elevatorTargetHeight", 20);
         driver.a().whileTrue(elevator
             .moveToMagic(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
     }
@@ -282,7 +291,7 @@ public class RobotContainer {
     private void setupPitController() {
         pitController.y().whileTrue(climb.resetClimberCommand());
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());
-        pitController.x().whileTrue(climb.runClimberMotorCommand(() -> pitController.getLeftY()));
+        pitController.x().whileTrue(climb.manualClimb(() -> pitController.getLeftY()));
     }
 
     private void configureTriggerBindings() {
