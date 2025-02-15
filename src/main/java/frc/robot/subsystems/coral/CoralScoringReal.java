@@ -20,8 +20,8 @@ public class CoralScoringReal implements CoralScoringIO {
     public final RelativeEncoder coralScoringRelativeEnc = coralScoringMotor.getEncoder();
     private final DigitalInput scoringBeamBrake =
         new DigitalInput(Constants.CoralScoringConstants.Scoring_Beam_Brake_DIO_Port);
-    private final DigitalInput coralTouchSensor =
-        new DigitalInput(Constants.CoralScoringConstants.Coral_Touch_Sensor_DIO_Port);
+    private final DigitalInput intakeBeamBrake =
+        new DigitalInput(Constants.CoralScoringConstants.Intake_Beam_Brake_DIO_Port);
     SparkMaxConfig motorConfig = new SparkMaxConfig();
 
     /**
@@ -39,7 +39,7 @@ public class CoralScoringReal implements CoralScoringIO {
 
     public void updateInputs(CoralScoringInputs inputs) {
         inputs.scoringBeamBrake = !scoringBeamBrake.get();
-        inputs.grabingBeamBrakeRight = coralTouchSensor.get();
+        inputs.intakeBeamBrake = !intakeBeamBrake.get();
     }
 
     public void setCoralScoringMotorPercentage(double percent) {
