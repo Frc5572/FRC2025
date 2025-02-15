@@ -254,7 +254,7 @@ public class Swerve extends SubsystemBase {
      * @param openLoop Open or closed loop system
      */
     public Command teleOpDrive(CommandXboxController controller, boolean fieldRelative,
-        boolean openLoop, double setSpeedMultiplier) {
+        boolean openLoop) {
         return this.run(() -> {
             double speedMultiplier = setSpeedMultiplier;
             double yaxis = -controller.getLeftY() * speedMultiplier;

@@ -11,7 +11,7 @@ public class CoralScoringSim implements CoralScoringIO {
     private final DigitalInput scoringBeamBrake =
         new DigitalInput(Constants.CoralScoringConstants.Scoring_Beam_Brake_DIO_Port);
     private final DigitalInput intakeBeamBrake =
-        new DigitalInput(Constants.CoralScoringConstants.Coral_Touch_Sensor_DIO_Port);
+        new DigitalInput(Constants.CoralScoringConstants.Intake_Beam_Breake_DIO_Port);
 
     /**
      * Coral Scoring Real

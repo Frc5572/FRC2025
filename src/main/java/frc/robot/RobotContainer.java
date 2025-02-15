@@ -203,7 +203,7 @@ public class RobotContainer {
 
 
         swerve.setDefaultCommand(swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
-            Constants.Swerve.isOpenLoop, swerve.getSpeedMultiplier()));
+            Constants.Swerve.isOpenLoop));
 
         driver.y().onTrue(new InstantCommand(() -> swerve.resetFieldRelativeOffset()));
         driver.x().onTrue(new InstantCommand(() -> { // sim only
