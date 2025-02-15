@@ -10,7 +10,6 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
@@ -24,8 +23,7 @@ public class ElevatorReal implements ElevatorIO {
     private final TalonFX rightElevatorMotor = new TalonFX(Constants.Elevator.RIGHT_ID);
     private final TalonFX leftElevatorMotor = new TalonFX(Constants.Elevator.LEFT_ID);
     private final DigitalInput limitSwitch = new DigitalInput(Constants.Elevator.LIMIT_ID);
-    private final TalonFXConfiguration rightElevatorConf = new TalonFXConfiguration();
-    private final TalonFXConfiguration leftElevatorConf = new TalonFXConfiguration();
+    private final TalonFXConfiguration elevatorConf = new TalonFXConfiguration();
     private final PositionVoltage positionVoltage = new PositionVoltage(0.0).withSlot(0);
     private StatusSignal<Angle> elevatorPosition = rightElevatorMotor.getPosition();
     private StatusSignal<Voltage> elevatorVoltage = rightElevatorMotor.getMotorVoltage();
@@ -43,48 +41,31 @@ public class ElevatorReal implements ElevatorIO {
         // left conf
 
         leftElevatorMotor.setControl(new Follower(rightElevatorMotor.getDeviceID(), true));
-        leftElevatorMotor.setNeutralMode(NeutralModeValue.Brake);
-        leftElevatorConf.Feedback.SensorToMechanismRatio =
-            Constants.Elevator.SensorToMechanismRatio;
 
         // right conf
-        rightElevatorConf.MotorOutput.NeutralMode = Constants.Elevator.BREAK;
-        leftElevatorConf.MotorOutput.NeutralMode = Constants.Elevator.BREAK;
+        elevatorConf.MotorOutput.NeutralMode = Constants.Elevator.BREAK;
 
-        rightElevatorConf.Feedback.SensorToMechanismRatio =
-            Constants.Elevator.SensorToMechanismRatio;
+        elevatorConf.Feedback.SensorToMechanismRatio = Constants.Elevator.SensorToMechanismRatio;
 
 
         // PID and feedforward
 
         // right
-        rightElevatorConf.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        rightElevatorConf.Slot0.kP = Constants.Elevator.KP;
-        rightElevatorConf.Slot0.kI = Constants.Elevator.KI;
-        rightElevatorConf.Slot0.kD = Constants.Elevator.KD;
-        rightElevatorConf.Slot0.kS = Constants.Elevator.KS;
-        rightElevatorConf.Slot0.kV = Constants.Elevator.KV;
-        rightElevatorConf.Slot0.kA = Constants.Elevator.KA;
-        rightElevatorConf.Slot0.kG = Constants.Elevator.KG;
-        rightElevatorConf.MotionMagic.MotionMagicCruiseVelocity = 0.0;
-        rightElevatorConf.MotionMagic.MotionMagicAcceleration = 0.0;
-        rightElevatorConf.MotionMagic.MotionMagicJerk = 0.0;
-
-        // left
-        leftElevatorConf.Slot0.kP = Constants.Elevator.KP;
-        leftElevatorConf.Slot0.kI = Constants.Elevator.KI;
-        leftElevatorConf.Slot0.kD = Constants.Elevator.KD;
-        leftElevatorConf.Slot0.kS = Constants.Elevator.KS;
-        leftElevatorConf.Slot0.kV = Constants.Elevator.KV;
-        leftElevatorConf.Slot0.kA = Constants.Elevator.KA;
-        leftElevatorConf.Slot0.kG = Constants.Elevator.KG;
-        leftElevatorConf.MotionMagic.MotionMagicCruiseVelocity = 0.0;
-        leftElevatorConf.MotionMagic.MotionMagicAcceleration = 0.0;
-        leftElevatorConf.MotionMagic.MotionMagicJerk = 0.0;
+        elevatorConf.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        elevatorConf.Slot0.kP = Constants.Elevator.KP;
+        elevatorConf.Slot0.kI = Constants.Elevator.KI;
+        elevatorConf.Slot0.kD = Constants.Elevator.KD;
+        elevatorConf.Slot0.kS = Constants.Elevator.KS;
+        elevatorConf.Slot0.kV = Constants.Elevator.KV;
+        elevatorConf.Slot0.kA = Constants.Elevator.KA;
+        elevatorConf.Slot0.kG = Constants.Elevator.KG;
+        elevatorConf.MotionMagic.MotionMagicCruiseVelocity = Constants.Elevator.CVeleocity;
+        elevatorConf.MotionMagic.MotionMagicAcceleration = Constants.Elevator.Acceleration;
+        elevatorConf.MotionMagic.MotionMagicJerk = Constants.Elevator.Jerk;
 
 
-        rightElevatorMotor.getConfigurator().apply(rightElevatorConf);
-        leftElevatorMotor.getConfigurator().apply(leftElevatorConf);
+        rightElevatorMotor.getConfigurator().apply(elevatorConf);
+        leftElevatorMotor.getConfigurator().apply(elevatorConf);
     }
 
     public void setVoltage(double volts) {

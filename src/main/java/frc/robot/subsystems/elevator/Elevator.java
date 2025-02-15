@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Constants;
 
@@ -46,9 +47,11 @@ public class Elevator extends SubsystemBase {
      *
      */
     public Command home() {
-        Command slowLower = Commands.runEnd(() -> io.setVoltage(-0.7), () -> io.setVoltage(0.0));
-        return moveTo(() -> Constants.Elevator.HOME).until(() -> inputs.position.in(Inches) < 5.0)
-            .andThen(slowLower).until(() -> (inputs.limitSwitch == true)).alongWith(
+        Command slowLower = Commands.runEnd(() -> io.setVoltage(-1.4), () -> io.setVoltage(0.0));
+        return moveToMagic(() -> Constants.Elevator.HOME)
+            .until(() -> inputs.position.in(Inches) < 5.0).andThen(slowLower)
+            .until(() -> (inputs.limitSwitch == true || inputs.position.in(Inches) < 0.2))
+            .alongWith(
                 Commands.runOnce(() -> Logger.recordOutput(Constants.Elevator.heightName, "home")));
     }
 
@@ -59,23 +62,23 @@ public class Elevator extends SubsystemBase {
      *
      */
     public Command p0() {
-        return moveTo(() -> Constants.Elevator.P0);
+        return moveToMagic(() -> Constants.Elevator.P0);
     }
 
     public Command p1() {
-        return moveTo(() -> Constants.Elevator.P1);
+        return moveToMagic(() -> Constants.Elevator.P1);
     }
 
     public Command p2() {
-        return moveTo(() -> Constants.Elevator.P2);
+        return moveToMagic(() -> Constants.Elevator.P2);
     }
 
     public Command p3() {
-        return moveTo(() -> Constants.Elevator.P3);
+        return moveToMagic(() -> Constants.Elevator.P3);
     }
 
     public Command p4() {
-        return moveTo(() -> Constants.Elevator.P4);
+        return moveToMagic(() -> Constants.Elevator.P4);
     }
 
     public boolean hightNotHome() {
@@ -108,7 +111,15 @@ public class Elevator extends SubsystemBase {
     public Command moveToMagic(Supplier<Distance> height) {
         return run(() -> {
             Logger.recordOutput("targetHeight", height.get().in(Meters));
-            io.setPositon(height.get().in(Meters));
-        }).until(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1);
+            io.setPositonMagic(height.get().in(Meters));
+        }).until(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 0.2);
+    }
+
+    public Command heightSelector() {
+        return moveToMagic(() -> {
+            var height = Height.getCurrentState();
+            Logger.recordOutput(Constants.Elevator.heightName, height.displayName);
+            return height.height;
+        });
     }
 }
