@@ -60,4 +60,6 @@ public interface ElevatorIO {
         public void setPositonMagic(double position) {}
     }
 
+    public default void setPower(double power) {}
+
 }

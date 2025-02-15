@@ -72,6 +72,10 @@ public class ElevatorReal implements ElevatorIO {
         rightElevatorMotor.setVoltage(volts);
     }
 
+    public void setPower(double power) {
+        rightElevatorMotor.set(power);;
+    }
+
     public void setPositon(double position) {
         rightElevatorMotor.setControl(positionVoltage.withPosition(position));
     }

@@ -11,6 +11,8 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -62,8 +64,6 @@ public class RobotContainer {
 
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
-    public final CommandXboxController backUpOperator =
-        new CommandXboxController(Constants.operatorId);
     public final CommandXboxController pitController =
         new CommandXboxController(Constants.PIT_CONTROLLER_ID);
     public final CommandXboxController altOperator =
@@ -113,11 +113,13 @@ public class RobotContainer {
     private final Swerve swerve;
     private final Vision vision;
     private CoralScoring coralScoring;
+    private Climber climb;
 
     /* Triggers */
     private Trigger algaeInIntake = new Trigger(() -> algae.hasAlgae());
-    // private Trigger coralInIntake = new Trigger(() -> coralScoring.getIntakeBrakeStatus());
-    private Climber climb;
+    private Trigger manualMode = new Trigger(() -> OperatorStates.manualModeEnabled());
+
+
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -165,6 +167,7 @@ public class RobotContainer {
         /* Button and Trigger Bindings */
 
         configureTriggerBindings();
+
         if (runtimeType == RobotRunType.kSimulation) {
             maybeController("Driver", driver, this::setupDriver);
         } else {
@@ -175,6 +178,7 @@ public class RobotContainer {
     }
 
     private List<Runnable> controllerSetups = new ArrayList<>();
+
 
     private void maybeController(String name, CommandXboxController xboxController,
         Runnable setupFun) {
@@ -198,6 +202,13 @@ public class RobotContainer {
         controllerSetups.clear();
     }
 
+    /**
+     * Use this method to vol your button->command mappings. Buttons can be created by instantiating
+     * a {@link GenericHID} or one of its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or
+     * {@link XboxController}), and then passing it to a
+     * {@link edu1.wpi.first.wpilibj2.command.button.JoystickButton}.
+     */
+
     private void setupDriver() {
 
 
@@ -205,7 +216,9 @@ public class RobotContainer {
             Constants.Swerve.isOpenLoop));
 
         driver.y().onTrue(new InstantCommand(() -> swerve.resetFieldRelativeOffset()));
+
         driver.x().onTrue(new InstantCommand(() -> { // sim only
+
             swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
         }));
         driver.rightTrigger().and(climb.reachedClimberStart.negate())
@@ -244,6 +257,11 @@ public class RobotContainer {
         altOperator.rightTrigger().whileTrue(algae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
         altOperator.leftTrigger()
             .whileTrue(algae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
+        // manual mode
+        altOperator.start().onTrue(Commands.runOnce(() -> {
+            OperatorStates.toggleManualMode();
+        }).ignoringDisable(true));
+        manualMode.onTrue(elevator.manualMove(altOperator));
 
         // altOperator.a().and(HeightMode.algaeMode).and(AlgaeHeight.level1).whileTrue(elevator.p0());
         // altOperator.a().and(HeightMode.algaeMode).and(AlgaeHeight.level2).whileTrue(elevator.p2());
@@ -252,12 +270,14 @@ public class RobotContainer {
         // altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level3).whileTrue(elevator.p3());
         // altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level4).whileTrue(elevator.p4());
 
-        altOperator.a().whileTrue(elevator.heightSelector());
-        altOperator.povUp()
+        altOperator.a().and(manualMode).whileTrue(elevator.heightSelector());
+        altOperator.povUp().and(manualMode)
             .onTrue(Commands.runOnce(() -> Height.incrementState()).ignoringDisable(true));
-        altOperator.povDown()
+        altOperator.povDown().and(manualMode)
             .onTrue(Commands.runOnce(() -> Height.decrementState()).ignoringDisable(true));
         altOperator.b().whileTrue(elevator.p0());
+
+
         // altOperator.a().whileTrue(elevator.moveTo(() -> {
         // switch (HeightMode.getCurrentHeightMode()) {
         // case kAlgae:
@@ -291,6 +311,7 @@ public class RobotContainer {
         // return null;
         // }
         // }));
+
     }
 
     private void setupPitController() {

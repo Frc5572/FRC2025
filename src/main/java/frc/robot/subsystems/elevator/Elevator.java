@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Constants;
@@ -99,6 +100,10 @@ public class Elevator extends SubsystemBase {
         }).until(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1);
     }
 
+    public Command manualMove(CommandXboxController leftStick) {
+        return run(() -> io.setPower(leftStick.getLeftY()));
+    }
+
     public Command moveUp() {
         return runEnd(() -> io.setVoltage(SmartDashboard.getNumber("elevatorVoltage", 1.0)),
             () -> io.setVoltage(0));
@@ -107,6 +112,8 @@ public class Elevator extends SubsystemBase {
     public Command moveDown() {
         return runEnd(() -> io.setVoltage(-1.0), () -> io.setVoltage(0));
     }
+
+
 
     public Command moveToMagic(Supplier<Distance> height) {
         return run(() -> {
