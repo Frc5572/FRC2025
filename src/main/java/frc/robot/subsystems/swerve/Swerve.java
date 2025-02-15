@@ -238,8 +238,8 @@ public class Swerve extends SubsystemBase {
         return false;
     }
 
-    public void setSpeedMultiplier(double multipier) {
-        setSpeedMultiplier = multipier;
+    public void setSpeedMultiplier(double multiplier) {
+        setSpeedMultiplier = multiplier;
     }
 
     public double getSpeedMultiplier() {

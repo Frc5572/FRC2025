@@ -130,7 +130,7 @@ public class Elevator extends SubsystemBase {
     /**
      * selects height
      *
-     * @return seleceted height
+     * @return selected height
      */
     public Command heightSelector() {
         return moveToMagic(() -> {
