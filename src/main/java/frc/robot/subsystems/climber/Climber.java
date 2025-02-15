@@ -1,8 +1,10 @@
 package frc.robot.subsystems.climber;
 
+import static edu.wpi.first.units.Units.Radians;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -16,6 +18,7 @@ public class Climber extends SubsystemBase {
     private ClimberIO io;
     private ClimberInputsAutoLogged climberAutoLogged = new ClimberInputsAutoLogged();
     public Trigger resetButton = new Trigger(() -> getClimberTouchSensorStatus());
+    public Trigger reachedClimberStart = new Trigger(() -> reachedClimberStart());
 
     public Climber(ClimberIO io) {
         this.io = io;
@@ -25,6 +28,7 @@ public class Climber extends SubsystemBase {
     public void periodic() {
         io.updateInputs(climberAutoLogged);
         Logger.processInputs("Climber", climberAutoLogged);
+        Logger.recordOutput("/Climber/Climber Near Climber Start", reachedClimberStart);
     }
 
     public void setClimberMotorVoltage(double voltage) {
@@ -36,14 +40,12 @@ public class Climber extends SubsystemBase {
         return climberAutoLogged.climberTouchSensor;
     }
 
-
-
     /**
      *
      * @return Set Motor Voltage until reached certain angle
      */
-    public Command runClimberMotorCommand(BooleanSupplier angle) { // run
-        return Commands.runEnd(() -> setClimberMotorVoltage(Constants.Climb.VOLTAGE), () -> {
+    public Command runClimberMotorCommand(double voltage, BooleanSupplier angle) { // run
+        return Commands.runEnd(() -> setClimberMotorVoltage(voltage), () -> {
             setClimberMotorVoltage(0);
         }, this).until(angle).unless(angle);
     }
@@ -52,7 +54,17 @@ public class Climber extends SubsystemBase {
      *
      * @return Set Motor Voltage until reached certain angle
      */
-    public Command runClimberMotorCommand(DoubleSupplier volts) { // run
+    public Command runClimberMotorCommand(BooleanSupplier angle) { // run
+        return Commands.runEnd(() -> setClimberMotorVoltage(Constants.Climb.CLIMB_VOLTAGE), () -> {
+            setClimberMotorVoltage(0);
+        }, this).until(angle).unless(angle);
+    }
+
+    /**
+     *
+     * @return Set Motor Voltage until reached certain angle
+     */
+    public Command manualClimb(DoubleSupplier volts) { // run
         return Commands.runEnd(() -> setClimberMotorVoltage(volts.getAsDouble() * 6), () -> {
             setClimberMotorVoltage(0);
             System.out.println("Climber Done!");
@@ -67,9 +79,6 @@ public class Climber extends SubsystemBase {
     public BooleanSupplier passedMaxAngle() { // degrees
         return () -> climberAutoLogged.climberPosition
             .baseUnitMagnitude() >= Constants.Climb.MAX_ANGLE.baseUnitMagnitude();
-
-        // Constants.Climb.GEAR_RATIO >= Constants.Climb.MAX_ANGLE.in(Degrees);
-
     }
 
 
@@ -80,18 +89,15 @@ public class Climber extends SubsystemBase {
     public BooleanSupplier passedClimbAngle() { // degrees
         return () -> climberAutoLogged.climberPosition
             .baseUnitMagnitude() >= Constants.Climb.CLIMB_ANGLE.baseUnitMagnitude();
-
-        // Constants.Climb.GEAR_RATIO >= Constants.Climb.MAX_ANGLE.in(Degrees);
-
     }
 
     /**
      *
      * @return Climber Position
      */
-    public BooleanSupplier passedFeederAngle() { // degrees
-        return () -> climberAutoLogged.climberPosition
-            .baseUnitMagnitude() >= Constants.Climb.FEEDER_ANGLE.baseUnitMagnitude();
+    public Boolean reachedClimberStart() { // degrees
+        return climberAutoLogged.climberPosition
+            .in(Radians) >= Constants.Climb.CLIMBER_START_ANGLE.in(Radians) - 20;
     }
 
     /**
@@ -105,6 +111,10 @@ public class Climber extends SubsystemBase {
 
     public Command restEncoder() {
         return Commands.runOnce(() -> io.setEncoderPoisiton(0.0)).ignoringDisable(true);
+    }
+
+    public Angle getClimberPosition() {
+        return climberAutoLogged.climberPosition;
     }
 
 
