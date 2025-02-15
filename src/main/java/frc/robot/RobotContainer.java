@@ -120,7 +120,6 @@ public class RobotContainer {
     private Trigger manualMode = new Trigger(() -> OperatorStates.manualModeEnabled());
 
 
-
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -329,7 +328,10 @@ public class RobotContainer {
         coralScoring.coralOuttaken.negate().whileTrue(coralScoring.runPreScoringMotor(.1));
         coralScoring.coralOuttaken.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
         climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());
-        // coralInIntake.onTrue(elevator.p0());
+
+        coralScoring.coralOuttaken.onTrue(elevator.p0());
+        // coralScoring.coralOuttaken.and(() -> Constants.).onFalse(elevator.p0());
+
     }
 
     /**
