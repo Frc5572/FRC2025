@@ -194,8 +194,8 @@ public class ScoringLocation {
      * Coral height states
      */
     public enum Height {
-        KP0("positon 0", Constants.Elevator.P0), KP1("position 1", Constants.Elevator.P1), KP2(
-            "positon 2", Constants.Elevator.P2), KP3("position 3",
+        KP0("position 0", Constants.Elevator.P0), KP1("position 1", Constants.Elevator.P1), KP2(
+            "position 2", Constants.Elevator.P2), KP3("position 3",
                 Constants.Elevator.P3), KP4("position 4", Constants.Elevator.P4);
 
         public final String displayName;
