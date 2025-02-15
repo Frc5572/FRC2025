@@ -121,7 +121,6 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().run();
         robotContainer.updateSimulation();
         robotContainer.updateViz();
-        // robotContainer.isCoralMode.setBoolean(ScoringLocation.HeightMode.coralMode.getAsBoolean());
         robotContainer.heightState.setString(Height.getCurrentState().displayName);
         robotContainer.heightWidget.setInteger(Height.getCurrentState().ordinal() + 1);
         // robotContainer.algaeState.setString(AlgaeHeight.getCurrentHeightMode().displayName);
