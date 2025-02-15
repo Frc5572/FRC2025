@@ -79,7 +79,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean hightNotHome() {
-        return (inputs.position).in(Inches) >= (Constants.Elevator.P0).in(Inches);
+        return (inputs.position).in(Inches) >= (Constants.Elevator.P1).in(Inches);
     }
 
     /**
