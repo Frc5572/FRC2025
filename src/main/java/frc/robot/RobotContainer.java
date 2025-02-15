@@ -8,6 +8,7 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -22,6 +23,7 @@ import frc.lib.util.ScoringLocation;
 import frc.lib.util.ScoringLocation.AlgaeHeight;
 import frc.lib.util.ScoringLocation.CoralHeight;
 import frc.lib.util.ScoringLocation.HeightMode;
+import frc.lib.util.Tuples.Tuple2;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
@@ -197,9 +199,18 @@ public class RobotContainer {
         swerve.setDefaultCommand(swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
         driver.y().onTrue(new InstantCommand(() -> swerve.resetFieldRelativeOffset()));
-        driver.x().onTrue(new InstantCommand(() -> { // sim only
-            swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
-        }));
+        driver.x().whileTrue(
+            swerve.runOnce(() -> swerve.resetOdometry(new Pose2d(3, 3, Rotation2d.kZero)))
+                .andThen(elevator.home())
+                .andThen(elevator.p0().alongWith(swerve.moveToPoseWithLocalTag(() -> {
+                    return new Tuple2<Pose2d, Integer>(new Pose2d(3.7248222827911377,
+                        2.748249053955078, Rotation2d.fromRadians(1.0222466383759201)), 17);
+                }, false, Units.inchesToMeters(8), 15))
+                    .andThen(elevator.p4().alongWith(swerve.moveToPoseWithLocalTag(() -> {
+                        return new Tuple2<Pose2d, Integer>(new Pose2d(3.869084358215332,
+                            2.9543378353118896, Rotation2d.fromRadians(1.0222466383759201)), 17);
+                    }, false, Units.inchesToMeters(4), 1).withTimeout(0.4)
+                        .andThen(swerve.stop())))));
         driver.rightTrigger().whileTrue(climb.runClimberMotorCommand());
         driver.leftTrigger()
             .whileTrue(climb.runClimberMotorCommand(() -> Constants.Climb.RESET_VOLTAGE));

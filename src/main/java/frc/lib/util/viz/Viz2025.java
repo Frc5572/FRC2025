@@ -2,6 +2,7 @@ package frc.lib.util.viz;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
+import java.util.stream.Stream;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -155,6 +156,8 @@ public class Viz2025 implements Drawable {
         } else {
             Logger.recordOutput(prefix + "Viz/HeldAlgae", invisible);
         }
+        Logger.recordOutput(prefix + "Viz/CameraOverrides", Stream.of(Constants.Vision.cameras)
+            .map(cam -> new Pose3d(actualPose).plus(cam.robotToCamera())).toArray(Pose3d[]::new));
     }
 
 }

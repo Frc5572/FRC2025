@@ -1,17 +1,26 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Meters;
+import java.util.Optional;
 import java.util.stream.Stream;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.targeting.PhotonPipelineResult;
+import edu.wpi.first.math.MathSharedStore;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.lib.math.Circle;
 import frc.lib.math.Hexagon;
 import frc.lib.math.Penetration;
 import frc.lib.math.Rectangle;
@@ -23,6 +32,17 @@ import frc.robot.subsystems.swerve.Swerve;
 public class RobotState {
 
     private final Viz2025 vis;
+    private int currentTarget = 17;
+    private boolean isInitialized = false;
+
+    private final Vector<N3> globalUncertainty = VecBuilder.fill(
+        Constants.StateEstimator.globalVisionTrust, Constants.StateEstimator.globalVisionTrust,
+        Constants.StateEstimator.globalVisionTrustRotation);
+    private final Vector<N3> localUncertainty = VecBuilder.fill(
+        Constants.StateEstimator.localVisionTrust, Constants.StateEstimator.localVisionTrust, 1000);
+
+    private final TimeInterpolatableBuffer<Rotation2d> rotationBuffer =
+        TimeInterpolatableBuffer.createBuffer(1.5);
 
     public RobotState(Viz2025 vis) {
         this.vis = vis;
@@ -37,9 +57,9 @@ public class RobotState {
     public void init(SwerveModulePosition[] positions, Rotation2d gyroYaw) {
         swerveOdometry = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, gyroYaw,
             positions, new Pose2d());
-        swerveOdometry.setVisionMeasurementStdDevs(VecBuilder.fill(
-            Constants.StateEstimator.visionTrust, Constants.StateEstimator.visionTrust,
-            Constants.StateEstimator.visionTrustRotation));
+        rotationBuffer.clear();
+        isInitialized = false;
+        SmartDashboard.putNumber("cameraOffset", 0.0);
     }
 
     /**
@@ -48,6 +68,24 @@ public class RobotState {
      */
     public void resetPose(Pose2d pose, SwerveModulePosition[] positions, Rotation2d gyroYaw) {
         swerveOdometry.resetPosition(gyroYaw, positions, pose);
+        rotationBuffer.clear();
+        rotationBuffer.getInternalBuffer().clear();
+    }
+
+    private Optional<Rotation2d> sampleRotationAt(double timestampSeconds) {
+        if (rotationBuffer.getInternalBuffer().isEmpty()) {
+            return Optional.empty();
+        }
+
+        double oldestOdometryTimestamp = rotationBuffer.getInternalBuffer().firstKey();
+        double newestOdometryTimestamp = rotationBuffer.getInternalBuffer().lastKey();
+        if (oldestOdometryTimestamp > timestampSeconds) {
+            return Optional.empty();
+        }
+        timestampSeconds =
+            MathUtil.clamp(timestampSeconds, oldestOdometryTimestamp, newestOdometryTimestamp);
+
+        return rotationBuffer.getSample(timestampSeconds);
     }
 
     /**
@@ -58,20 +96,72 @@ public class RobotState {
     }
 
     /**
+     * Set local target fiducial id. If 0, use global instead.
+     */
+    public void setLocalTarget(int id) {
+        currentTarget = id;
+    }
+
+    /**
      * Add information from cameras.
      */
     public void addVisionObservation(PhotonPipelineResult result, Transform3d robotToCamera,
         int whichCamera) {
-        if (result.multitagResult.isPresent()) {
+        if (whichCamera == 0 && result.multitagResult.isPresent()) {
             Transform3d best = result.multitagResult.get().estimatedPose.best;
             Pose3d cameraPose =
                 new Pose3d().plus(best).relativeTo(Constants.Vision.fieldLayout.getOrigin());
             Pose3d robotPose = cameraPose.plus(robotToCamera.inverse());
             Pose2d robotPose2d = robotPose.toPose2d();
             Logger.recordOutput("State/GlobalVisionEstimate", robotPose);
-            swerveOdometry.addVisionMeasurement(robotPose2d, result.getTimestampSeconds());
+            if (!isInitialized) {
+                swerveOdometry.resetPose(robotPose2d);
+                isInitialized = true;
+            } else if (currentTarget == 0) {
+                // swerveOdometry.addVisionMeasurement(robotPose2d, result.getTimestampSeconds(),
+                // globalUncertainty);
+            }
+        }
+        if (whichCamera == 1) {
+            for (var target : result.targets) {
+                if (target.fiducialId == currentTarget) {
+                    double dist =
+                        target.getBestCameraToTarget().getTranslation().toTranslation2d().getNorm();
+                    localCircle.setRadius(dist - Constants.Vision.cameras[whichCamera].offset());
+                    localCircle.setCenter(Constants.Vision.fieldLayout.getTagPose(target.fiducialId)
+                        .get().getTranslation().toTranslation2d());
+                    localCircle.draw();
+                    Optional<Rotation2d> maybeRobotYaw =
+                        sampleRotationAt(result.getTimestampSeconds());
+                    Rotation2d robotYaw;
+                    if (maybeRobotYaw.isPresent()) {
+                        robotYaw = maybeRobotYaw.get();
+                    } else {
+                        continue;
+                    }
+                    Rotation2d yaw = Rotation2d.fromDegrees(robotYaw.getDegrees() + target.getYaw()
+                        + 180 + Units.radiansToDegrees(robotToCamera.getRotation().getZ()));
+                    Logger.recordOutput("State/LocalYaw", yaw);
+                    xCircle.setCenter(localCircle.getVertex(yaw));
+                    xCircle.draw();
+                    Pose2d robotPose2d = new Pose2d(
+                        xCircle.getCenter().minus(
+                            robotToCamera.getTranslation().toTranslation2d().rotateBy(robotYaw)),
+                        robotYaw);
+                    if (Constants.shouldDrawStuff) {
+                        Logger.recordOutput("State/LocalPose", robotPose2d);
+                    }
+                    swerveOdometry.addVisionMeasurement(robotPose2d, result.getTimestampSeconds(),
+                        localUncertainty);
+                }
+            }
         }
     }
+
+    private final Circle localCircle =
+        new Circle("State/LocalEstimationDistance", new Translation2d(), 0);
+    private final Circle xCircle =
+        new Circle("State/LocalEstimationPose", new Translation2d(), Units.inchesToMeters(2));
 
     /**
      * Add information from swerve drive.
@@ -79,6 +169,8 @@ public class RobotState {
     public void addSwerveObservation(SwerveModulePosition[] positions, Rotation2d gyroYaw) {
         swerveOdometry.update(gyroYaw, positions);
         constrain(positions, gyroYaw);
+        rotationBuffer.addSample(MathSharedStore.getTimestamp(),
+            getGlobalPoseEstimate().getRotation());
         vis.setDrivetrainState(swerveOdometry.getEstimatedPosition(),
             Stream.of(positions).map(x -> x.angle).toArray(this::swerveRotationsArray));
     }

@@ -1,9 +1,14 @@
 
 package frc.robot.subsystems.swerve;
 
+import static edu.wpi.first.units.Units.Meters;
 import java.util.Optional;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -11,12 +16,16 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.lib.math.Rectangle;
+import frc.lib.util.AllianceFlipUtil;
+import frc.lib.util.Tuples.Tuple2;
 import frc.lib.util.swerve.SwerveModule;
 import frc.robot.Constants;
 import frc.robot.RobotState;
@@ -264,5 +273,95 @@ public class Swerve extends SubsystemBase {
             double rotation = raxis * Constants.Swerve.maxAngularVelocity;
             this.drive(translation, rotation, fieldRelative, openLoop);
         });
+    }
+
+    public Command stop() {
+        return this.runOnce(this::setMotorsZero);
+    }
+
+    private final HolonomicDriveController holonomicDriveController = new HolonomicDriveController(
+        new PIDController(Constants.SwerveTransformPID.PID_XKP,
+            Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
+        new PIDController(Constants.SwerveTransformPID.PID_XKP,
+            Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
+        new ProfiledPIDController(Constants.SwerveTransformPID.PID_TKP,
+            Constants.SwerveTransformPID.PID_TKI, Constants.SwerveTransformPID.PID_TKD,
+            new TrapezoidProfile.Constraints(Constants.SwerveTransformPID.MAX_ANGULAR_VELOCITY,
+                Constants.SwerveTransformPID.MAX_ANGULAR_ACCELERATION)));
+
+    private void moveToPose(Pose2d pose) {
+        ChassisSpeeds ctrlEffort =
+            holonomicDriveController.calculate(getPose(), pose, 0, pose.getRotation());
+        setModuleStates(ctrlEffort);
+    }
+
+    /**
+     * Move to a position.
+     *
+     * @param pose2dSupplier pose to target
+     * @param flipForRed if true, {@code pose2dSupplier} provides pose in terms of blue side, and
+     *        the pose is flipped if the robot's alliance is red.
+     * @param tol X-Y error allowed in meters
+     * @param rotTol angle error allowed in degrees
+     */
+    public Command moveToPose(Supplier<Pose2d> pose2dSupplier, boolean flipForRed, double tol,
+        double rotTol) {
+        return moveToPoseWithLocalTag(() -> new Tuple2<>(pose2dSupplier.get(), 0), flipForRed, tol,
+            rotTol);
+    }
+
+    /**
+     * Move to a position using local-only odometry.
+     *
+     * @param pose2dAndTagSupplier pose to target and tag to use for local localization
+     * @param flipForRed if true, {@code pose2dSupplier} provides pose in terms of blue side, and
+     *        the pose is flipped if the robot's alliance is red.
+     * @param tol X-Y error allowed in meters
+     * @param rotTol angle error allowed in degrees
+     */
+    public Command moveToPoseWithLocalTag(Supplier<Tuple2<Pose2d, Integer>> pose2dAndTagSupplier,
+        boolean flipForRed, double tol, double rotTol) {
+        Command c = new Command() {
+
+            private Pose2d pose2d;
+            private final Rectangle robotTarget = new Rectangle("moveToPose/target", new Pose2d(),
+                Constants.Swerve.bumperFront.in(Meters) * 2,
+                Constants.Swerve.bumperRight.in(Meters) * 2);
+
+            @Override
+            public void initialize() {
+                var x = pose2dAndTagSupplier.get();
+                pose2d = x._0();
+                if (flipForRed) {
+                    pose2d = AllianceFlipUtil.apply(pose2d);
+                    state.setLocalTarget(AllianceFlipUtil.applyAprilTag(x._1()));
+                } else {
+                    state.setLocalTarget(x._1());
+                }
+                robotTarget.setPose(pose2d);
+                robotTarget.draw();
+            }
+
+            @Override
+            public void execute() {
+                moveToPose(pose2d);
+            }
+
+            @Override
+            public void end(boolean interrupted) {
+                state.setLocalTarget(0);
+            }
+
+            @Override
+            public boolean isFinished() {
+                Pose2d poseError = Pose2d.kZero.plus(pose2d.minus(getPose()));
+                final var eTranslate = poseError.getTranslation();
+                final var eRotate = poseError.getRotation();
+                return Math.abs(eTranslate.getX()) < tol && Math.abs(eTranslate.getY()) < tol
+                    && Math.abs(eRotate.getDegrees()) < rotTol;
+            }
+        };
+        c.addRequirements(this);
+        return c;
     }
 }

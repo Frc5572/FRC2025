@@ -45,7 +45,7 @@ import edu.wpi.first.units.measure.Voltage;
  */
 public final class Constants {
 
-    public static final boolean shouldDrawStuff = false;
+    public static final boolean shouldDrawStuff = true;
 
     /**
      * Stick Deadband
@@ -353,18 +353,27 @@ public final class Constants {
         public static final record CameraConstants(String name, int height, int width,
             Rotation2d horizontalFieldOfView, Frequency framesPerSecond, Time latencyAvg,
             Time latencyStdDev, double calibErrorAvg, double calibErrorStdDev,
-            Transform3d robotToCamera) {
+            Transform3d robotToCamera, double offset) {
             public double centerPixelYawRads() {
                 return robotToCamera.getRotation().getZ();
             }
         }
 
         public static final CameraConstants[] cameras = new CameraConstants[] {
-            new CameraConstants("cam0", 800, 1280, Rotation2d.fromDegrees(100), Hertz.of(20),
+            new CameraConstants("cam0", 800, 1280, Rotation2d.fromDegrees(70), Hertz.of(20),
                 Seconds.of(0.3), Seconds.of(0.02), 0.25, 0.08,
+                new Transform3d(new Translation3d(Units.inchesToMeters(11),
+                    -Units.inchesToMeters(12), Units.inchesToMeters(10)),
+                    new Rotation3d(Math.PI, 0, 0)),
+                Units.inchesToMeters(1.6)),
+            new CameraConstants("cam1", 480, 640, Rotation2d.fromDegrees(120), Hertz.of(65),
+                Seconds.of(0.15), Seconds.of(0.02), 0.25, 0.08,
                 new Transform3d(
-                    new Translation3d(Units.inchesToMeters(11), -Units.inchesToMeters(12), 0),
-                    new Rotation3d(Math.PI, 0, 0)))};
+                    new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(12),
+                        Units.inchesToMeters(10)),
+                    new Rotation3d(Math.PI, -Units.degreesToRadians(5),
+                        -Units.degreesToRadians(10))),
+                Units.inchesToMeters(0.0))};
 
         public static final double zMargin = 0.75;
         public static final double fieldBorderMargin = 0.5;
@@ -375,8 +384,9 @@ public final class Constants {
     public static class StateEstimator {
         public static final boolean keepInField = true;
         public static final boolean keepOutOfReefs = true;
-        public static final double visionTrust = 0.02;
-        public static final double visionTrustRotation = 0.02;
+        public static final double globalVisionTrust = 0.5;
+        public static final double globalVisionTrustRotation = 0.5;
+        public static final double localVisionTrust = 0.02;
     }
 
     /**
@@ -386,6 +396,23 @@ public final class Constants {
         public static final int Scoring_Beam_Brake_DIO_Port = 0;
         public static final int Intake_Beam_Brake_DIO_Port = 3;
         public static final int Random_Touch_Sensor = 1;
+    }
+
+
+
+    /**
+     * MoveToPos constants.
+     */
+    public static class SwerveTransformPID {
+        public static final double PID_XKP = 7.0;
+        public static final double PID_XKI = 0.2;
+        public static final double PID_XKD = 0.0;
+        public static final double PID_TKP = 7.0;
+        public static final double PID_TKI = 0.1;
+        public static final double PID_TKD = 0.0;
+
+        public static final double MAX_ANGULAR_VELOCITY = 9.0;
+        public static final double MAX_ANGULAR_ACCELERATION = 9 * 5;
     }
 }
 
