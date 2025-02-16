@@ -22,7 +22,7 @@ public class Elevator extends SubsystemBase {
     ElevatorIO io;
     private final Viz2025 viz;
     private ElevatorInputsAutoLogged inputs = new ElevatorInputsAutoLogged();
-    public Trigger elevatorHeight = new Trigger(() -> hightNotHome());
+    public Trigger elevatorHeight = new Trigger(() -> hightAboveP0());
 
     /** Elevator Subsystem */
     public Elevator(ElevatorIO io, Viz2025 viz) {
@@ -83,7 +83,7 @@ public class Elevator extends SubsystemBase {
         return moveTo(() -> Constants.Elevator.P4);
     }
 
-    public boolean hightNotHome() {
+    public boolean hightAboveP0() {
         return (inputs.position).in(Inches) >= (Constants.Elevator.P1).in(Inches);
     }
 
