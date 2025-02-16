@@ -76,13 +76,13 @@ public class RobotContainer {
     public static ShuffleboardTab mainDriverTab = Shuffleboard.getTab("Main Driver");
 
     public GenericEntry heightState =
-        mainDriverTab.add("Coral State", ScoringLocation.Height.getCurrentState().displayName)
+        mainDriverTab.add("Elevator Height", ScoringLocation.Height.getCurrentState().displayName)
             .withWidget(BuiltInWidgets.kTextView).withPosition(2, 0).withSize(2, 1).getEntry();
-    public GenericEntry heightWidget = mainDriverTab
-        .add("Coral Level", ScoringLocation.CoralHeight.getCurrentState().ordinal() + 1)
-        .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min_value ", 1, "max_value",
-            4, "divisions", 4, "Show Text", false, "orientation", "vertical"))
-        .withPosition(2, 1).withSize(2, 3).getEntry();
+    public GenericEntry heightWidget =
+        mainDriverTab.add("Coral Level", ScoringLocation.Height.getCurrentState().ordinal() + 1)
+            .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min_value ", 1,
+                "max_value", 4, "divisions", 4, "Show Text", false, "orientation", "vertical"))
+            .withPosition(2, 1).withSize(2, 3).getEntry();
 
     /** Visualization */
     private final FieldViz fieldVis;
