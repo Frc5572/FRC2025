@@ -1,27 +1,30 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 /**
  * changes operator states from normal to manual
  */
 public class OperatorStates {
+    public Trigger manualModeCheck = new Trigger(() -> manualModeEnabled());
 
-    private OperatorStates() {}
+    public OperatorStates() {}
 
-    public static boolean manualMode = false;
+    public boolean manualMode = false;
 
-    public static boolean manualModeEnabled() {
+    public boolean manualModeEnabled() {
         return manualMode;
     }
 
-    public static void toggleManualMode() {
+    public void toggleManualMode() {
         manualMode = !manualMode;
     }
 
-    public static void enableManualMode() {
+    public void enableManualMode() {
         manualMode = true;
     }
 
-    public static void diableManualMode() {
+    public void diableManualMode() {
         manualMode = false;
     }
 }

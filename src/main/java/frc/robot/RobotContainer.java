@@ -99,11 +99,10 @@ public class RobotContainer {
     private final Vision vision;
     private CoralScoring coralScoring;
     private Climber climb;
+    private OperatorStates operatorStates = new OperatorStates();
 
     /* Triggers */
     private Trigger algaeInIntake = new Trigger(() -> algae.hasAlgae());
-    private Trigger manualMode = new Trigger(() -> OperatorStates.manualModeEnabled());
-
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -222,16 +221,16 @@ public class RobotContainer {
             .whileTrue(algae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
         // manual mode
         altOperator.start().onTrue(Commands.runOnce(() -> {
-            OperatorStates.toggleManualMode();
+            operatorStates.toggleManualMode();
         }).ignoringDisable(true));
-        manualMode.onTrue(elevator.manualMove(altOperator));
+        operatorStates.manualModeCheck.onTrue(elevator.manualMove(altOperator));
 
 
-        altOperator.a().and(manualMode).whileTrue(elevator.heightSelector());
-        altOperator.povUp().and(manualMode)
+        altOperator.a().and(operatorStates.manualModeCheck).whileTrue(elevator.heightSelector());
+        altOperator.povUp().and(operatorStates.manualModeCheck)
             .onTrue(Commands.runOnce(() -> frc.lib.util.ScoringLocation.Height.incrementState())
                 .ignoringDisable(true));
-        altOperator.povDown().and(manualMode)
+        altOperator.povDown().and(operatorStates.manualModeCheck)
             .onTrue(Commands.runOnce(() -> frc.lib.util.ScoringLocation.Height.decrementState())
                 .ignoringDisable(true));
         altOperator.b().whileTrue(elevator.p0());
