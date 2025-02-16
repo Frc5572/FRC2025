@@ -142,10 +142,6 @@ public class RobotContainer {
                 climb = new Climber(new ClimberIO.Empty());
         }
 
-        new Trigger(() -> elevator.hightNotHome())
-            .onTrue(new InstantCommand(() -> swerve.setSpeedMultiplier(0.5)))
-            .onFalse(new InstantCommand(() -> swerve.setSpeedMultiplier(1)));
-
         /* Default Commands */
         leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed).ignoringDisable(true));
         /* Button and Trigger Bindings */
@@ -261,8 +257,10 @@ public class RobotContainer {
         coralScoring.coralOuttaken.negate().whileTrue(coralScoring.runPreScoringMotor(.1));
         coralScoring.coralOuttaken.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
         climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());
-
         coralScoring.coralOuttaken.onTrue(elevator.p0());
+        elevator.elevatorHeight.onTrue(new InstantCommand(() -> swerve.setSpeedMultiplier(0.5)));
+        elevator.elevatorHeight.onFalse(new InstantCommand(() -> swerve.setSpeedMultiplier(1)));
+
     }
 
     /**

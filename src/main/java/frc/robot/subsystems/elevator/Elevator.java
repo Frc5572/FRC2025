@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Constants;
@@ -20,8 +21,8 @@ import frc.robot.Constants;
 public class Elevator extends SubsystemBase {
     ElevatorIO io;
     private final Viz2025 viz;
-
     private ElevatorInputsAutoLogged inputs = new ElevatorInputsAutoLogged();
+    public Trigger elevatorHeight = new Trigger(() -> hightNotHome());
 
     /** Elevator Subsystem */
     public Elevator(ElevatorIO io, Viz2025 viz) {
