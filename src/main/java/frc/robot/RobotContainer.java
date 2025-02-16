@@ -216,11 +216,6 @@ public class RobotContainer {
 
         driver.rightTrigger().and(climb.reachedClimberStart)
             .onTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
-
-        // remove later
-        SmartDashboard.putNumber("elevatorTargetHeight", 20);
-        driver.a().whileTrue(elevator
-            .moveToMagic(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
     }
 
     private void setupAltOperatorController() {
@@ -250,6 +245,11 @@ public class RobotContainer {
         pitController.y().whileTrue(climb.resetClimberCommand());
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());
         pitController.x().whileTrue(climb.manualClimb(() -> pitController.getLeftY()));
+
+        // remove later
+        SmartDashboard.putNumber("elevatorTargetHeight", 20);
+        driver.a().whileTrue(elevator
+            .moveToMagic(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
     }
 
     private void configureTriggerBindings() {
@@ -263,8 +263,6 @@ public class RobotContainer {
         climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());
 
         coralScoring.coralOuttaken.onTrue(elevator.p0());
-        // coralScoring.coralOuttaken.and(() -> Constants.).onFalse(elevator.p0());
-
     }
 
     /**

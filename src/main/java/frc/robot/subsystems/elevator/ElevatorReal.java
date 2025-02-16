@@ -76,10 +76,6 @@ public class ElevatorReal implements ElevatorIO {
         rightElevatorMotor.set(power);;
     }
 
-    public void setPositon(double position) {
-        rightElevatorMotor.setControl(positionVoltage.withPosition(position));
-    }
-
     public void setPositonMagic(double position) {
         rightElevatorMotor.setControl(m_request.withPosition(position));
     }

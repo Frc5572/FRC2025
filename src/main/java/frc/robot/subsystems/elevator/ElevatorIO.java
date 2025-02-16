@@ -47,11 +47,6 @@ public interface ElevatorIO {
         }
 
         @Override
-        public void setPositon(double position) {
-
-        }
-
-        @Override
         public void resetHome() {
 
         }
