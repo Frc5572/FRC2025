@@ -129,17 +129,13 @@ public class RobotContainer {
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
                 climb = new Climber(new ClimberIO.Empty());
         }
-        autoFactory = new AutoFactory(swerve::getPose, // A function that returns the current robot
-                                                       // pose
-            swerve::resetOdometry, // A function that resets the current robot pose to the provided
-                                   // Pose2d
-            swerve::followTrajectory, // The drive subsystem trajectory follower
-            true, // If alliance flipping should be enabled
-            swerve // The drive subsystem
-        );
+        autoFactory = new AutoFactory(swerve::getPose, swerve::resetOdometry,
+            swerve::followTrajectory, true, swerve);
+
         AutoCommandFactory autos =
-            new AutoCommandFactory(autoFactory, swerve, elevator, coralScoring);
+            new AutoCommandFactory(autoFactory, swerve, elevator, coralScoring, leds);
         autoChooser = new AutoChooser();
+        autoChooser.addRoutine("Example", autos::example);
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler()
@@ -236,11 +232,11 @@ public class RobotContainer {
     private void configureTriggerBindings() {
         coralScoring.intakedCoralRight.onTrue(leds.setLEDsSolid(Color.kRed).withTimeout(5));
         coralScoring.intakedCoralRight.onTrue(coralScoring.runPreScoringMotor(2));
-        coralScoring.outtakedCoral.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
+        coralScoring.outtakedCoral.onTrue(leds.blinkLEDs(Color.kCyan, 5));
         climb.resetButton.onTrue(climb.restEncoder());
-        algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan));
+        algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan, 5));
         coralScoring.outtakedCoral.negate().whileTrue(coralScoring.runPreScoringMotor(.1));
-        coralScoring.outtakedCoral.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
+        coralScoring.outtakedCoral.onTrue(leds.blinkLEDs(Color.kCyan, 5));
         climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());
     }
 

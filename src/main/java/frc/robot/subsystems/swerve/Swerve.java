@@ -2,7 +2,6 @@
 package frc.robot.subsystems.swerve;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import choreo.trajectory.SwerveSample;
@@ -23,7 +22,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.lib.math.AllianceFlipUtil;
 import frc.lib.util.swerve.SwerveModule;
 import frc.robot.Constants;
 import frc.robot.RobotState;
@@ -38,9 +36,15 @@ public class Swerve extends SubsystemBase {
     private SwerveInputsAutoLogged inputs = new SwerveInputsAutoLogged();
     private SwerveIO swerveIO;
     private final RobotState state;
-    private final PIDController xController = new PIDController(1.0, 0.0, 0.0);
-    private final PIDController yController = new PIDController(1.0, 0.0, 0.0);
-    private final PIDController headingController = new PIDController(1.0, 0.0, 0.0);
+    private final HolonomicDriveController holonomicDriveController = new HolonomicDriveController(
+        new PIDController(Constants.SwerveTransformPID.PID_XKP,
+            Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
+        new PIDController(Constants.SwerveTransformPID.PID_YKP,
+            Constants.SwerveTransformPID.PID_YKI, Constants.SwerveTransformPID.PID_YKD),
+        new ProfiledPIDController(Constants.SwerveTransformPID.PID_TKP,
+            Constants.SwerveTransformPID.PID_TKI, Constants.SwerveTransformPID.PID_TKD,
+            new TrapezoidProfile.Constraints(Constants.SwerveTransformPID.MAX_ANGULAR_VELOCITY,
+                Constants.SwerveTransformPID.MAX_ANGULAR_ACCELERATION)));
 
     /**
      * Swerve Subsystem
@@ -279,6 +283,11 @@ public class Swerve extends SubsystemBase {
         });
     }
 
+    /**
+     * Follow Choreo Trajectory
+     *
+     * @param sample Swerve Sample
+     */
     public void followTrajectory(SwerveSample sample) {
         // Get the current pose of the robot
         Pose2d pose = getPose();
@@ -295,66 +304,14 @@ public class Swerve extends SubsystemBase {
             state.getGlobalPoseEstimate().getRotation()));
     }
 
-    private final HolonomicDriveController holonomicDriveController = new HolonomicDriveController(
-        new PIDController(Constants.SwerveTransformPID.PID_XKP,
-            Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
-        new PIDController(Constants.SwerveTransformPID.PID_YKP,
-            Constants.SwerveTransformPID.PID_YKI, Constants.SwerveTransformPID.PID_YKD),
-        new ProfiledPIDController(Constants.SwerveTransformPID.PID_TKP,
-            Constants.SwerveTransformPID.PID_TKI, Constants.SwerveTransformPID.PID_TKD,
-            new TrapezoidProfile.Constraints(Constants.SwerveTransformPID.MAX_ANGULAR_VELOCITY,
-                Constants.SwerveTransformPID.MAX_ANGULAR_ACCELERATION)));
-
-    private void moveToPose(Pose2d pose) {
+    /**
+     * Move to a Pose2d
+     *
+     * @param pose Desired Pose2d
+     */
+    public void moveToPose(Pose2d pose) {
         ChassisSpeeds ctrlEffort =
             holonomicDriveController.calculate(getPose(), pose, 0, pose.getRotation());
         setModuleStates(ctrlEffort);
-    }
-
-    /**
-     * Move to a position.
-     *
-     * @param pose2dSupplier pose to target
-     * @param flipForRed if true, {@code pose2dSupplier} provides pose in terms of blue side, and
-     *        the pose is flipped if the robot's alliance is red.
-     * @param tol X-Y error allowed in meters
-     * @param rotTol angle error allowed in degrees
-     */
-    public Command moveToPose(Supplier<Pose2d> pose2dSupplier, boolean flipForRed, double tol,
-        double rotTol) {
-
-        Command c = new Command() {
-
-            private Pose2d pose2d;
-
-            @Override
-            public void initialize() {
-                pose2d = pose2dSupplier.get();
-                if (flipForRed) {
-                    pose2d = AllianceFlipUtil.apply(pose2d);
-                }
-            }
-
-            @Override
-            public void execute() {
-                moveToPose(pose2d);
-            }
-
-            @Override
-            public void end(boolean interrupted) {
-                setMotorsZero();
-            }
-
-            @Override
-            public boolean isFinished() {
-                Pose2d poseError = Pose2d.kZero.plus(pose2d.minus(getPose()));
-                final var eTranslate = poseError.getTranslation();
-                final var eRotate = poseError.getRotation();
-                return Math.abs(eTranslate.getX()) < tol && Math.abs(eTranslate.getY()) < tol
-                    && Math.abs(eRotate.getDegrees()) < rotTol;
-            }
-        };
-        c.addRequirements(this);
-        return c;
     }
 }

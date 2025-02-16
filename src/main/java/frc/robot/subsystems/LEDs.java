@@ -44,7 +44,17 @@ public class LEDs extends SubsystemBase {
     public Command blinkLEDs(Color mainColor) {
         LEDPattern colorToPattern = LEDPattern.solid(mainColor);
         LEDPattern blinkPattern = colorToPattern.blink(Seconds.of(1));
-        return run(() -> blinkPattern.applyTo(buffer)).withTimeout(2);
+        return run(() -> blinkPattern.applyTo(buffer));
+    }
+
+    /**
+     *
+     * @param mainColor color to blink (on and off)
+     * @param timeout Number of seconds to blink
+     * @return sets leds to blink
+     */
+    public Command blinkLEDs(Color mainColor, double timeout) {
+        return blinkLEDs(mainColor).withTimeout(timeout);
     }
 
     /**
