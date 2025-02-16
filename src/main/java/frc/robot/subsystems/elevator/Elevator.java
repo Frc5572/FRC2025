@@ -49,8 +49,8 @@ public class Elevator extends SubsystemBase {
      */
     public Command home() {
         Command slowLower = Commands.runEnd(() -> io.setVoltage(-1.4), () -> io.setVoltage(0.0));
-        return moveToMagic(() -> Constants.Elevator.HOME)
-            .until(() -> inputs.position.in(Inches) < 5.0).andThen(slowLower)
+        return moveTo(() -> Constants.Elevator.HOME).until(() -> inputs.position.in(Inches) < 5.0)
+            .andThen(slowLower)
             .until(() -> (inputs.limitSwitch == true || inputs.position.in(Inches) < 0.2))
             .alongWith(
                 Commands.runOnce(() -> Logger.recordOutput(Constants.Elevator.heightName, "home")));
@@ -63,23 +63,23 @@ public class Elevator extends SubsystemBase {
      *
      */
     public Command p0() {
-        return moveToMagic(() -> Constants.Elevator.P0);
+        return moveTo(() -> Constants.Elevator.P0);
     }
 
     public Command p1() {
-        return moveToMagic(() -> Constants.Elevator.P1);
+        return moveTo(() -> Constants.Elevator.P1);
     }
 
     public Command p2() {
-        return moveToMagic(() -> Constants.Elevator.P2);
+        return moveTo(() -> Constants.Elevator.P2);
     }
 
     public Command p3() {
-        return moveToMagic(() -> Constants.Elevator.P3);
+        return moveTo(() -> Constants.Elevator.P3);
     }
 
     public Command p4() {
-        return moveToMagic(() -> Constants.Elevator.P4);
+        return moveTo(() -> Constants.Elevator.P4);
     }
 
     public boolean hightNotHome() {
@@ -113,27 +113,13 @@ public class Elevator extends SubsystemBase {
         return runEnd(() -> io.setVoltage(-1.0), () -> io.setVoltage(0));
     }
 
-
-    /**
-     * moves elevator with motion magic
-     *
-     * @param height desired height
-     * @return elevator moved
-     */
-    public Command moveToMagic(Supplier<Distance> height) {
-        return run(() -> {
-            Logger.recordOutput("targetHeight", height.get().in(Meters));
-            io.setPositonMagic(height.get().in(Meters));
-        }).until(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 0.2);
-    }
-
     /**
      * selects height
      *
      * @return selected height
      */
     public Command heightSelector() {
-        return moveToMagic(() -> {
+        return moveTo(() -> {
             var height = Height.getCurrentState();
             Logger.recordOutput(Constants.Elevator.heightName, height.displayName);
             return height.height;

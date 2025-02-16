@@ -248,8 +248,8 @@ public class RobotContainer {
 
         // remove later
         SmartDashboard.putNumber("elevatorTargetHeight", 20);
-        driver.a().whileTrue(elevator
-            .moveToMagic(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
+        driver.a().whileTrue(
+            elevator.moveTo(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
     }
 
     private void configureTriggerBindings() {
