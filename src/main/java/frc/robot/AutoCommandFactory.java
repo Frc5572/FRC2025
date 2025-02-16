@@ -41,6 +41,11 @@ public class AutoCommandFactory {
         this.leds = leds;
     }
 
+    /**
+     * Example Auto Routine
+     *
+     * @return Auto Routine
+     */
     public AutoRoutine example() {
         AutoRoutine routine = autoFactory.newRoutine("Example");
         MoveToPose testMTP =

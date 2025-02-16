@@ -34,8 +34,8 @@ public class MoveToPose extends Command {
      * @param swerve Swerve Subsystem
      * @param pose2dSupplier Pose2d Supplier
      * @param flipForRed Whether to flip the pose2d for red alliance
-     * @param tol Translational Tollerance
-     * @param rotTol Rotational Tollerance
+     * @param tol Translational Tolerance
+     * @param rotTol Rotational Tolerance
      */
     public MoveToPose(Swerve swerve, Supplier<Pose2d> pose2dSupplier, boolean flipForRed,
         double tol, double rotTol) {
@@ -53,8 +53,8 @@ public class MoveToPose extends Command {
      * @param swerve Swerve Subsystem
      * @param pose2dSupplier Pose2d Supplier
      * @param flipForRed Whether to flip the pose2d for red alliance
-     * @param tol Translational Tollerance
-     * @param rotTol Rotational Tollerance
+     * @param tol Translational Tolerance
+     * @param rotTol Rotational Tolerance
      * @param autoRoutine Choreo AutoRoutine to integrate command
      */
     public MoveToPose(Swerve swerve, Supplier<Pose2d> pose2dSupplier, boolean flipForRed,
