@@ -1,5 +1,6 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Radians;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -211,9 +212,17 @@ public class RobotContainer {
                             2.9543378353118896, Rotation2d.fromRadians(1.0222466383759201)), 17);
                     }, false, Units.inchesToMeters(4), 1).withTimeout(0.4)
                         .andThen(swerve.stop())))));
-        driver.rightTrigger().whileTrue(climb.runClimberMotorCommand());
-        driver.leftTrigger()
-            .whileTrue(climb.runClimberMotorCommand(() -> Constants.Climb.RESET_VOLTAGE));
+        driver.rightTrigger().and(climb.reachedClimberStart.negate())
+            .onTrue(climb
+                .runClimberMotorCommand(Constants.Climb.PRE_CLIMB_VOLTAGE,
+                    () -> climb.getClimberPosition()
+                        .in(Radians) >= Constants.Climb.CLIMBER_OUT_ANGLE.in(Radians))
+                .andThen(climb.runClimberMotorCommand(Constants.Climb.RESET_VOLTAGE,
+                    () -> climb.getClimberPosition()
+                        .in(Radians) <= Constants.Climb.CLIMBER_START_ANGLE.in(Radians))));
+
+        driver.rightTrigger().and(climb.reachedClimberStart)
+            .onTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
     }
 
     private void setupAltOperatorController() {
@@ -279,7 +288,7 @@ public class RobotContainer {
     private void setupPitController() {
         pitController.y().whileTrue(climb.resetClimberCommand());
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());
-        pitController.x().whileTrue(climb.runClimberMotorCommand(() -> pitController.getLeftY()));
+        pitController.x().whileTrue(climb.manualClimb(() -> pitController.getLeftY()));
     }
 
     private void configureTriggerBindings() {
