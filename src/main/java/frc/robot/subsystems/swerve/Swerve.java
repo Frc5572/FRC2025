@@ -59,7 +59,6 @@ public class Swerve extends SubsystemBase {
         swerveIO.updateInputs(inputs);
 
         state.init(getModulePositions(), getGyroYaw());
-        headingController.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     /**

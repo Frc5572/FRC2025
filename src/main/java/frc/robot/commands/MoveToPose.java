@@ -10,6 +10,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.math.AllianceFlipUtil;
 import frc.robot.subsystems.swerve.Swerve;
 
+/**
+ * Move to Pose2d
+ */
 public class MoveToPose extends Command {
 
     private EventLoop eventLoop = CommandScheduler.getInstance().getDefaultButtonLoop();
@@ -25,6 +28,15 @@ public class MoveToPose extends Command {
     /** If the trajectory ran to completion */
     private boolean isCompleted = false;
 
+    /**
+     * Move to a specified Pose2d command
+     *
+     * @param swerve Swerve Subsystem
+     * @param pose2dSupplier Pose2d Supplier
+     * @param flipForRed Whether to flip the pose2d for red alliance
+     * @param tol Translational Tollerance
+     * @param rotTol Rotational Tollerance
+     */
     public MoveToPose(Swerve swerve, Supplier<Pose2d> pose2dSupplier, boolean flipForRed,
         double tol, double rotTol) {
         this.swerve = swerve;
@@ -35,6 +47,16 @@ public class MoveToPose extends Command {
         addRequirements(swerve);
     }
 
+    /**
+     * Move to a specified Pose2d command
+     *
+     * @param swerve Swerve Subsystem
+     * @param pose2dSupplier Pose2d Supplier
+     * @param flipForRed Whether to flip the pose2d for red alliance
+     * @param tol Translational Tollerance
+     * @param rotTol Rotational Tollerance
+     * @param autoRoutine Choreo AutoRoutine to integrate command
+     */
     public MoveToPose(Swerve swerve, Supplier<Pose2d> pose2dSupplier, boolean flipForRed,
         double tol, double rotTol, AutoRoutine autoRoutine) {
         this(swerve, pose2dSupplier, flipForRed, tol, rotTol);
