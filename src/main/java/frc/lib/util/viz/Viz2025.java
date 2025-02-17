@@ -15,7 +15,6 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
 /** Visualization of the 2025 Robot */
@@ -60,8 +59,6 @@ public class Viz2025 implements Drawable {
             mechanisms[i] = new Pose3d();
         }
         this.reset(Pose2d.kZero);
-        // SmartDashboard.setDefaultNumber("ClimberX", 0.505);
-        SmartDashboard.setDefaultNumber("ClimberZ", -0.055);
     }
 
     /** Set the angle of the climber, with 0 being straight up and down. */
