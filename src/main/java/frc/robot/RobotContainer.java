@@ -1,12 +1,15 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Radians;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
+import choreo.auto.AutoChooser;
+import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.GenericEntry;
@@ -14,11 +17,13 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.ScoringLocation;
 import frc.lib.util.ScoringLocation.AlgaeHeight;
@@ -61,6 +66,9 @@ import frc.robot.subsystems.vision.VisionSimPhoton;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+    private final AutoFactory autoFactory;
+    private final AutoChooser autoChooser;
+
 
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
@@ -115,11 +123,11 @@ public class RobotContainer {
     private final Swerve swerve;
     private final Vision vision;
     private CoralScoring coralScoring;
+    private Climber climb;
 
     /* Triggers */
     private Trigger algaeInIntake = new Trigger(() -> algae.hasAlgae());
 
-    private Climber climb;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -157,6 +165,18 @@ public class RobotContainer {
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
                 climb = new Climber(new ClimberIO.Empty(), vis);
         }
+        autoFactory = new AutoFactory(swerve::getPose, swerve::resetOdometry,
+            swerve::followTrajectory, true, swerve);
+
+        AutoCommandFactory autos =
+            new AutoCommandFactory(autoFactory, swerve, elevator, coralScoring, leds);
+        autoChooser = new AutoChooser();
+        autoChooser.addRoutine("Example", autos::example);
+
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+        RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler()
+            .andThen(Commands.runOnce(() -> swerve.setMotorsZero())));
+        RobotModeTriggers.disabled().onTrue(Commands.runOnce(() -> swerve.setMotorsZero()));
 
         Timer timer = new Timer();
         timer.start();
@@ -210,9 +230,17 @@ public class RobotContainer {
         driver.x().onTrue(new InstantCommand(() -> { // sim only
             swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
         }));
-        driver.rightTrigger().whileTrue(climb.runClimberMotorCommand());
-        driver.leftTrigger()
-            .whileTrue(climb.runClimberMotorCommand(() -> Constants.Climb.RESET_VOLTAGE));
+        driver.rightTrigger().and(climb.reachedClimberStart.negate())
+            .onTrue(climb
+                .runClimberMotorCommand(Constants.Climb.PRE_CLIMB_VOLTAGE,
+                    () -> climb.getClimberPosition()
+                        .in(Radians) >= Constants.Climb.CLIMBER_OUT_ANGLE.in(Radians))
+                .andThen(climb.runClimberMotorCommand(Constants.Climb.RESET_VOLTAGE,
+                    () -> climb.getClimberPosition()
+                        .in(Radians) <= Constants.Climb.CLIMBER_START_ANGLE.in(Radians))));
+
+        driver.rightTrigger().and(climb.reachedClimberStart)
+            .onTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
     }
 
     private void setupAltOperatorController() {
@@ -245,17 +273,17 @@ public class RobotContainer {
     private void setupPitController() {
         pitController.y().whileTrue(climb.resetClimberCommand());
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());
-        pitController.x().whileTrue(climb.runClimberMotorCommand(() -> -pitController.getLeftY()));
+        pitController.x().whileTrue(climb.manualClimb(() -> pitController.getLeftY()));
     }
 
     private void configureTriggerBindings() {
         coralScoring.coralAtIntake.onTrue(leds.setLEDsSolid(Color.kRed).withTimeout(5));
         // coralScoring.coralAtIntake.onTrue(coralScoring.runPreScoringMotor(2));
-        coralScoring.coralOuttaken.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
+        coralScoring.coralOuttaken.onTrue(leds.blinkLEDs(Color.kCyan, 5));
         climb.resetButton.onTrue(climb.restEncoder());
         algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan));
         coralScoring.coralOuttaken.negate().whileTrue(coralScoring.runPreScoringMotor(.1));
-        coralScoring.coralOuttaken.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
+        coralScoring.coralOuttaken.onTrue(leds.blinkLEDs(Color.kCyan, 5));
         climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());
     }
 
