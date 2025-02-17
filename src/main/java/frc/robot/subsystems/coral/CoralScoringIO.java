@@ -1,6 +1,7 @@
 package frc.robot.subsystems.coral;
 
 import org.littletonrobotics.junction.AutoLog;
+import edu.wpi.first.units.measure.AngularVelocity;
 
 /**
  * Coral Scoring IO
@@ -15,7 +16,7 @@ public interface CoralScoringIO {
     @AutoLog
 
     public static class CoralScoringInputs {
-        public double scoringRPM;
+        public AngularVelocity scoringRPM;
         public boolean outtakeBeamBreak;
         public boolean intakeBeamBreak;
     }

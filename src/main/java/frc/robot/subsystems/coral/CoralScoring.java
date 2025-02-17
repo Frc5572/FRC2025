@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.viz.Viz2025;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
 
 /**
@@ -50,6 +51,15 @@ public class CoralScoring extends SubsystemBase {
      */
     public boolean getIntakeBeamBreakStatus() {
         return inputs.intakeBeamBreak;
+    }
+
+    /**
+     * Coral Motor Active. Motor if speed is greater than 2 RPM.
+     *
+     * @return Status of Coral Motor
+     */
+    public boolean getCoralMotorActiveStatus() {
+        return inputs.scoringRPM.baseUnitMagnitude() > 2;
     }
 
     @Override
@@ -96,23 +106,20 @@ public class CoralScoring extends SubsystemBase {
     /**
      * Runs Pre Scoring Motor
      *
-     * @param power Power to apply to motor
-     *
      * @return Command
      */
-    public Command runPreScoringMotor(double power) {
-        return motorStartEndCommand(power).until(() -> getOuttakeBeamBreakStatus());
+    public Command runCoralIntake() {
+        return motorStartEndCommand(Constants.CoralScoringConstants.INTAKE_POWER)
+            .until(() -> getOuttakeBeamBreakStatus());
     }
 
     /**
      * Sets motor speed to score.
      *
-     * @param power Power to apply to motor
-     *
      * @return Command
      */
-    public Command runScoringMotor(double power) {
-        return motorStartEndCommand(power).withDeadline(
+    public Command runCoralOuttake() {
+        return motorStartEndCommand(Constants.CoralScoringConstants.OUTTAKE_POWER).withDeadline(
             Commands.waitUntil(() -> !getOuttakeBeamBreakStatus()).andThen(Commands.waitSeconds(2)))
             .withTimeout(10);
     }

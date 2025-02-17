@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.ScoringLocation;
 import frc.lib.util.ScoringLocation.AlgaeHeight;
@@ -219,7 +220,8 @@ public class RobotContainer {
         altOperator.povLeft()
             .onTrue(Commands.runOnce(() -> HeightMode.incrementState()).ignoringDisable(true));
         altOperator.y().onTrue(elevator.home());
-        altOperator.x().whileTrue(coralScoring.runScoringMotor(2));
+        altOperator.x().and(coralScoring.coralAtOuttake.debounce(.5))
+            .whileTrue(coralScoring.runCoralOuttake());
         altOperator.rightTrigger().whileTrue(algae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
         altOperator.leftTrigger()
             .whileTrue(algae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
@@ -241,11 +243,13 @@ public class RobotContainer {
     private void configureTriggerBindings() {
         // Coral
         coralScoring.coralAtIntake.onTrue(leds.setLEDsSolid(Color.kOrange).withTimeout(5));
-        coralScoring.coralAtOuttake.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
-        coralScoring.coralAtOuttake.negate().debounce(1.5)
-            .whileTrue(coralScoring.runPreScoringMotor(.1));
+        coralScoring.coralAtOuttake.onTrue(leds.blinkLEDs(Color.kCyan, 5));
+        coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
+        RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
+        // coralScoring.coralAtIntake.debounce(.25)
+        // .onTrue(coralScoring.runCoralIntake().withTimeout(30));
         // Algae
-        algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan));
+        algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan, 2));
         // Climb
         climb.resetButton.onTrue(climb.restEncoder());
         climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());

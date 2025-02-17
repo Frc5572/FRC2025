@@ -1,5 +1,6 @@
 package frc.robot.subsystems.coral;
 
+import static edu.wpi.first.units.Units.RPM;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -29,6 +30,7 @@ public class CoralScoringReal implements CoralScoringIO {
      */
     public CoralScoringReal() {
         motorConfig.idleMode(IdleMode.kBrake);
+        motorConfig.encoder.velocityConversionFactor(1 / 4);
         coralScoringMotor.configure(motorConfig, ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters);
     }
@@ -40,6 +42,7 @@ public class CoralScoringReal implements CoralScoringIO {
     public void updateInputs(CoralScoringInputs inputs) {
         inputs.outtakeBeamBreak = !outtakeBeamBreak.get();
         inputs.intakeBeamBreak = !intakeBeamBreak.get();
+        inputs.scoringRPM = RPM.of(coralScoringRelativeEnc.getVelocity());
     }
 
     public void setCoralPower(double percent) {
