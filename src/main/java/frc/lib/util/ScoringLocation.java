@@ -163,6 +163,7 @@ public class ScoringLocation {
     public enum ElevatorHeight {
         CoralL1, CoralL2, CoralL3, CoralL4, AlgaeL2, AlgaeL3;
 
+        /** Deserialize from integer */
         public static ElevatorHeight fromInt(int i) {
             switch (i) {
                 case 1:
