@@ -45,7 +45,7 @@ public class LEDs extends SubsystemBase {
     public Command blinkLEDs(Color mainColor) {
         LEDPattern colorToPattern = LEDPattern.solid(mainColor);
         LEDPattern blinkPattern = colorToPattern.blink(Seconds.of(.5));
-        return run(() -> blinkPattern.applyTo(buffer));
+        return run(() -> blinkPattern.applyTo(buffer)).ignoringDisable(true);
     }
 
     /**
@@ -69,7 +69,7 @@ public class LEDs extends SubsystemBase {
      */
     public Command setLEDsSolid(Color color) {
         LEDPattern solidPattern = LEDPattern.solid(color);
-        return run(() -> solidPattern.applyTo(buffer));
+        return run(() -> solidPattern.applyTo(buffer)).ignoringDisable(true);
     }
 
     /**
@@ -82,7 +82,7 @@ public class LEDs extends SubsystemBase {
      */
     public Command setLEDsGradient(Color color, Color color2) {
         LEDPattern gradientPattern = LEDPattern.gradient(GradientType.kContinuous, color, color2);
-        return run(() -> gradientPattern.applyTo(buffer));
+        return run(() -> gradientPattern.applyTo(buffer)).ignoringDisable(true);
     }
 
     /**
@@ -95,6 +95,6 @@ public class LEDs extends SubsystemBase {
     public Command setLEDsBreathe(Color color) {
         LEDPattern base = LEDPattern.solid(color);
         LEDPattern breathe = base.breathe(Seconds.of(2));
-        return run(() -> breathe.applyTo(buffer));
+        return run(() -> breathe.applyTo(buffer)).ignoringDisable(true);
     }
 }

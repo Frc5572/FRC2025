@@ -176,7 +176,7 @@ public class RobotContainer {
         RobotModeTriggers.disabled().onTrue(Commands.runOnce(() -> swerve.setMotorsZero()));
 
         /* Default Commands */
-        leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed).ignoringDisable(true));
+        leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed));
         /* Button and Trigger Bindings */
 
         configureTriggerBindings();
