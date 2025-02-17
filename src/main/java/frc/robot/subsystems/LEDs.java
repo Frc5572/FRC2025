@@ -36,23 +36,36 @@ public class LEDs extends SubsystemBase {
     }
 
     /**
+     * Blink LEDs
      *
      * @param mainColor color to blink (on and off)
-     * @param timeout amount of time to blink
      *
-     * @return sets leds to blink
+     * @return Command to blink leds
      */
-    public Command blinkLEDs(Color mainColor, double timeout) {
+    public Command blinkLEDs(Color mainColor) {
         LEDPattern colorToPattern = LEDPattern.solid(mainColor);
         LEDPattern blinkPattern = colorToPattern.blink(Seconds.of(.5));
-        return run(() -> blinkPattern.applyTo(buffer)).withTimeout(timeout);
+        return run(() -> blinkPattern.applyTo(buffer));
     }
 
     /**
+     * Blink LEDs for a certain timeout
+     *
+     * @param mainColor color to blink (on and off)
+     * @param timeout Number of seconds to blink
+     *
+     * @return Command to blink leds
+     */
+    public Command blinkLEDs(Color mainColor, double timeout) {
+        return blinkLEDs(mainColor).withTimeout(timeout);
+    }
+
+    /**
+     * Set LEDs to solid color
      *
      * @param color color to set the leds to solidly
      *
-     * @return sets leds to a solid color
+     * @return Command to set leds to a solid color
      */
     public Command setLEDsSolid(Color color) {
         LEDPattern solidPattern = LEDPattern.solid(color);
@@ -60,6 +73,7 @@ public class LEDs extends SubsystemBase {
     }
 
     /**
+     * Set LEDs to color gradient
      *
      * @param color first color for gradient
      * @param color2 second color for gradient
@@ -72,6 +86,7 @@ public class LEDs extends SubsystemBase {
     }
 
     /**
+     * Set LEDs to breathe
      *
      * @param color Color to set leds to
      *
