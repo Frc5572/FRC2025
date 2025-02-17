@@ -8,6 +8,8 @@ import java.util.Map;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
+import choreo.auto.AutoChooser;
+import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.GenericEntry;
@@ -22,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.ScoringLocation;
 import frc.lib.util.viz.FieldViz;
@@ -60,6 +63,9 @@ import frc.robot.subsystems.vision.VisionSimPhoton;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+    private final AutoFactory autoFactory;
+    private final AutoChooser autoChooser;
+
 
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
@@ -101,6 +107,7 @@ public class RobotContainer {
     private Climber climb;
     private OperatorStates operatorStates = new OperatorStates();
 
+
     /* Triggers */
     private Trigger algaeInIntake = new Trigger(() -> algae.hasAlgae());
 
@@ -140,6 +147,18 @@ public class RobotContainer {
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
                 climb = new Climber(new ClimberIO.Empty());
         }
+        autoFactory = new AutoFactory(swerve::getPose, swerve::resetOdometry,
+            swerve::followTrajectory, true, swerve);
+
+        AutoCommandFactory autos =
+            new AutoCommandFactory(autoFactory, swerve, elevator, coralScoring, leds);
+        autoChooser = new AutoChooser();
+        autoChooser.addRoutine("Example", autos::example);
+
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+        RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler()
+            .andThen(Commands.runOnce(() -> swerve.setMotorsZero())));
+        RobotModeTriggers.disabled().onTrue(Commands.runOnce(() -> swerve.setMotorsZero()));
 
         /* Default Commands */
         leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed).ignoringDisable(true));
@@ -250,11 +269,11 @@ public class RobotContainer {
     private void configureTriggerBindings() {
         coralScoring.coralAtIntake.onTrue(leds.setLEDsSolid(Color.kRed).withTimeout(5));
         // coralScoring.coralAtIntake.onTrue(coralScoring.runPreScoringMotor(2));
-        coralScoring.coralOuttaken.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
+        coralScoring.coralOuttaken.onTrue(leds.blinkLEDs(Color.kCyan, 5));
         climb.resetButton.onTrue(climb.restEncoder());
         algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan));
         coralScoring.coralOuttaken.negate().whileTrue(coralScoring.runPreScoringMotor(.1));
-        coralScoring.coralOuttaken.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
+        coralScoring.coralOuttaken.onTrue(leds.blinkLEDs(Color.kCyan, 5));
         climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());
         coralScoring.coralOuttaken.onTrue(elevator.p0());
         elevator.elevatorHeight.onTrue(new InstantCommand(() -> swerve.setSpeedMultiplier(0.5)));

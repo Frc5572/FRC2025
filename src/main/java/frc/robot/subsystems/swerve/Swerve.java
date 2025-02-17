@@ -4,6 +4,10 @@ package frc.robot.subsystems.swerve;
 import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -11,6 +15,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -32,6 +37,16 @@ public class Swerve extends SubsystemBase {
     private SwerveIO swerveIO;
     private final RobotState state;
     private double setSpeedMultiplier = 1;
+    private final HolonomicDriveController holonomicDriveController = new HolonomicDriveController(
+        new PIDController(Constants.SwerveTransformPID.PID_XKP,
+            Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
+        new PIDController(Constants.SwerveTransformPID.PID_YKP,
+            Constants.SwerveTransformPID.PID_YKI, Constants.SwerveTransformPID.PID_YKD),
+        new ProfiledPIDController(Constants.SwerveTransformPID.PID_TKP,
+            Constants.SwerveTransformPID.PID_TKI, Constants.SwerveTransformPID.PID_TKD,
+            new TrapezoidProfile.Constraints(Constants.SwerveTransformPID.MAX_ANGULAR_VELOCITY,
+                Constants.SwerveTransformPID.MAX_ANGULAR_ACCELERATION)));
+
 
     /**
      * Swerve Subsystem
@@ -85,6 +100,8 @@ public class Swerve extends SubsystemBase {
      * @param chassisSpeeds The desired Chassis Speeds
      */
     public void setModuleStates(ChassisSpeeds chassisSpeeds) {
+        Logger.recordOutput("Swerve/Velocity",
+            Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond));
         ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
         SwerveModuleState[] swerveModuleStates =
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(targetSpeeds);
@@ -275,5 +292,37 @@ public class Swerve extends SubsystemBase {
         });
     }
 
+
+    /**
+     * Follow Choreo Trajectory
+     *
+     * @param sample Swerve Sample
+     */
+    public void followTrajectory(SwerveSample sample) {
+        // Get the current pose of the robot
+        Pose2d pose = getPose();
+
+        // Generate the next speeds for the robot
+        ChassisSpeeds speeds = new ChassisSpeeds(
+            sample.vx + holonomicDriveController.getXController().calculate(pose.getX(), sample.x),
+            sample.vy + holonomicDriveController.getYController().calculate(pose.getY(), sample.y),
+            sample.omega + holonomicDriveController.getThetaController()
+                .calculate(pose.getRotation().getRadians(), sample.heading));
+
+        // Apply the generated speeds
+        setModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
+            state.getGlobalPoseEstimate().getRotation()));
+    }
+
+    /**
+     * Move to a Pose2d
+     *
+     * @param pose Desired Pose2d
+     */
+    public void moveToPose(Pose2d pose) {
+        ChassisSpeeds ctrlEffort =
+            holonomicDriveController.calculate(getPose(), pose, 0, pose.getRotation());
+        setModuleStates(ctrlEffort);
+    }
 
 }
