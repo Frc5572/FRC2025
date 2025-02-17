@@ -67,7 +67,7 @@ public class Viz2025 implements Drawable {
     /** Set the angle of the climber, with 0 being straight up and down. */
     public void setClimberAngle(Angle angle) {
         mechanisms[CLIMBER_ID] = new Pose3d(new Translation3d(-0.280502, 0, 0.461962),
-            new Rotation3d(Radians.of(0.0), angle, Radians.of(0.0)));
+            new Rotation3d(Radians.of(0.0), angle.div(300), Radians.of(0.0)));
     }
 
     /** Show coral in the coral scorer. */
