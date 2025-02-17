@@ -138,6 +138,8 @@ public class AutoCommandFactory {
         AutoTrajectory part15 = routine.trajectory("middleBot", 14);
         AutoTrajectory part16 = routine.trajectory("middleBot", 15);
         AutoTrajectory part17 = routine.trajectory("middleBot", 16);
+        AutoTrajectory part18 = routine.trajectory("middleBot", 17);
+        AutoTrajectory part19 = routine.trajectory("middleBot", 18);
         // AutoTrajectory part15 = routine.trajectory("middleBot", 14);
         // AutoTrajectory part16 = routine.trajectory("middleBot", 15);
 
@@ -175,7 +177,9 @@ public class AutoCommandFactory {
         part14.done().onTrue(part15.cmd());
         part15.done().onTrue(part16.cmd());
         part16.done().onTrue(Commands.sequence(elevator.p4(), part17.cmd()));
-        part17.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero)));
+        part17.done().onTrue(part18.cmd());
+        part18.done().onTrue(part19.cmd());
+        part19.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero)));
         // part15.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero)));
         // part2.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero),
         // Commands.waitSeconds(3), part3.cmd()));
