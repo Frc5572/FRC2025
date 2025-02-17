@@ -76,7 +76,7 @@ public final class Constants {
 
     // pit and alt operator controllers
     public static final int PIT_CONTROLLER_ID = 3;
-    public static final int ALT_OPERATOR_ID = 4;
+    public static final int ALT_OPERATOR_ID = 2;
 
 
 
@@ -119,10 +119,14 @@ public final class Constants {
         public static final int LEFT_TALON_FX_ID = 3;
         public static final int RIGHT_TALON_FX_ID = 12;
         public static final int TOUCH_SENSOR_CHANNEL = 2;
-        public static final Angle MAX_ANGLE = Radians.of(250);
+        public static final Angle CLIMB_ANGLE = Radians.of(550);
+        public static final Angle MAX_ANGLE = Radians.of(703);
+        public static final Angle CLIMBER_OUT_ANGLE = Radians.of(260);
+        public static final Angle CLIMBER_START_ANGLE = Radians.of(140);
         public static final double GEAR_RATIO = 1;
-        public static final double VOLTAGE = 4;
-        public static final double RESET_VOLTAGE = -4;
+        public static final double CLIMB_VOLTAGE = 3.0;
+        public static final double PRE_CLIMB_VOLTAGE = 5.5;
+        public static final double RESET_VOLTAGE = -5.5;
 
     }
 
@@ -240,8 +244,8 @@ public final class Constants {
 
             public static final DCMotor driveMotor = DCMotor.getKrakenX60(1);
             public static final DCMotor angleMotor = DCMotor.getFalcon500(1);
-            public static final Voltage driveFrictionVoltage = Volts.of(0);
-            public static final Voltage angleFrictionVoltage = Volts.of(0);
+            public static final Voltage driveFrictionVoltage = Volts.of(0.15);
+            public static final Voltage angleFrictionVoltage = Volts.of(0.35);
             public static final double wheelCoeffFriction = 1.2;
             public static final MomentOfInertia angleMomentOfInertia =
                 KilogramSquareMeters.of(0.02);
@@ -347,7 +351,7 @@ public final class Constants {
     public static class Vision {
 
         public static final AprilTagFieldLayout fieldLayout =
-            AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+            AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
 
         /** Constants for an individual camera. */
         public static final record CameraConstants(String name, int height, int width,
@@ -384,8 +388,27 @@ public final class Constants {
      */
     public static final class CoralScoringConstants {
         public static final int Scoring_Beam_Brake_DIO_Port = 0;
-        public static final int Coral_Touch_Sensor_DIO_Port = 3;
+        public static final int Intake_Beam_Brake_DIO_Port = 3;
         public static final int Random_Touch_Sensor = 1;
+    }
+
+    /**
+     * MoveToPos constants.
+     */
+    public static class SwerveTransformPID {
+        public static final double PID_XKP = 5.0;
+        public static final double PID_XKI = 0.5;
+        public static final double PID_XKD = 0.0;
+        public static final double PID_YKP = 3.5;
+        public static final double PID_YKI = 0.5;
+        public static final double PID_YKD = 0.0;
+        public static final double PID_TKP = 3.0;
+        public static final double PID_TKI = 0.1;
+        public static final double PID_TKD = 0.0;
+
+        public static final double MAX_ANGULAR_VELOCITY = 9.0;
+        public static final double MAX_ANGULAR_ACCELERATION = 9 * 5;
+        public static final double STD_DEV_MOD = 2.0;
     }
 }
 

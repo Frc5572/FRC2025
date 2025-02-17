@@ -1,5 +1,7 @@
 package frc.lib.util;
 
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 /** Scoring Locations for the 2025 game Reefscape */
 public class ScoringLocation {
 
@@ -50,7 +52,18 @@ public class ScoringLocation {
      * set of height modes
      */
     public enum HeightMode {
-        kAlgae, kCoral;
+        kAlgae("Algae"), kCoral("Coral");
+
+        public final String displayName;
+
+        HeightMode(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public static Trigger coralMode =
+            new Trigger(() -> getCurrentHeightMode() == HeightMode.kCoral);
+        public static Trigger algaeMode =
+            new Trigger(() -> getCurrentHeightMode() == HeightMode.kAlgae);
 
         /**
          *
@@ -58,7 +71,7 @@ public class ScoringLocation {
          */
         public HeightMode increment() {
             int new_ordinal = this.ordinal() + 1;
-            if (new_ordinal >= Height.values().length) {
+            if (new_ordinal >= HeightMode.values().length) {
                 return this;
             }
             return HeightMode.values()[new_ordinal];
@@ -70,7 +83,7 @@ public class ScoringLocation {
          */
         public HeightMode decrement() {
             int new_ordinal = this.ordinal() - 1;
-            if (new_ordinal >= Height.values().length) {
+            if (new_ordinal < 0) {
                 return this;
             }
             return HeightMode.values()[new_ordinal];
@@ -94,12 +107,22 @@ public class ScoringLocation {
         }
     }
 
-
     /**
      * algae height states
      */
     public enum AlgaeHeight {
-        Klevel1, Klevel2;
+        Klevel1("Lower"), Klevel2("Upper");
+
+        public final String displayName;
+
+        AlgaeHeight(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public static Trigger level1 =
+            new Trigger(() -> getCurrentHeightMode() == AlgaeHeight.Klevel1);
+        public static Trigger level2 =
+            new Trigger(() -> getCurrentHeightMode() == AlgaeHeight.Klevel2);
 
         /**
          *
@@ -107,7 +130,7 @@ public class ScoringLocation {
          */
         public AlgaeHeight increment() {
             int new_ordinal = this.ordinal() + 1;
-            if (new_ordinal >= CoralHeight.values().length) {
+            if (new_ordinal >= AlgaeHeight.values().length) {
                 return this;
             }
             return AlgaeHeight.values()[new_ordinal];
@@ -119,7 +142,7 @@ public class ScoringLocation {
          */
         public AlgaeHeight decrement() {
             int new_ordinal = this.ordinal() - 1;
-            if (new_ordinal >= CoralHeight.values().length) {
+            if (new_ordinal < 0) {
                 return this;
             }
             return AlgaeHeight.values()[new_ordinal];
@@ -146,7 +169,18 @@ public class ScoringLocation {
      * Coral height states
      */
     public enum CoralHeight {
-        Klevel1, Klevel2, Klevel3, Klevel4;
+        Klevel1("level 1"), Klevel2("level 2"), Klevel3("level 3"), Klevel4("level 4");
+
+        public final String displayName;
+
+        CoralHeight(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public static Trigger level1 = new Trigger(() -> getCurrentState() == CoralHeight.Klevel1);
+        public static Trigger level2 = new Trigger(() -> getCurrentState() == CoralHeight.Klevel2);
+        public static Trigger level3 = new Trigger(() -> getCurrentState() == CoralHeight.Klevel3);
+        public static Trigger level4 = new Trigger(() -> getCurrentState() == CoralHeight.Klevel4);
 
         /** Deserialize from integer */
         public static CoralHeight fromInt(int id) {
@@ -195,62 +229,6 @@ public class ScoringLocation {
 
         /** Get currently tracked state. */
         public static CoralHeight getCurrentState() {
-            return currentState;
-        }
-
-        /** Advance state forward by one. */
-        public static void incrementState() {
-            currentState = currentState.increment();
-        }
-
-        /** Advance state backwards by one. */
-        public static void decrementState() {
-            currentState = currentState.decrement();
-        }
-    }
-
-    /**
-     * Coral height states
-     */
-    public enum Height {
-        kHome("Home"), KPosition0("P0"), KPosition1("P1"), KPosition2("P2"), KPosition3(
-            "P3"), kPosition4("P4");
-
-        public final String name;
-
-        Height(String name) {
-            this.name = name;
-        }
-
-        /**
-         *
-         * @return increments coral state
-         */
-        public Height increment() {
-            int new_ordinal = this.ordinal() + 1;
-            if (new_ordinal >= Height.values().length) {
-                return this;
-            }
-            return Height.values()[new_ordinal];
-        }
-
-        /**
-         *
-         * @return decrements coral state
-         */
-        public Height decrement() {
-            int new_ordinal = this.ordinal() - 1;
-            if (new_ordinal < 0) {
-                return this;
-            }
-            return Height.values()[new_ordinal];
-
-        }
-
-        public static Height currentState = Height.kHome;
-
-        /** Get currently tracked state. */
-        public static Height getCurrentState() {
             return currentState;
         }
 
