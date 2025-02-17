@@ -86,11 +86,14 @@ public class Viz2025 implements Drawable {
         if (alliance.isPresent()) {
             if (alliance.get() == Alliance.Red) {
                 mechanisms[RED_BUMPER] = useBumper;
-                mechanisms[BLUE_BUMPER] = Pose3d.kZero;
+                mechanisms[BLUE_BUMPER] = invisible;
             } else {
                 mechanisms[BLUE_BUMPER] = useBumper;
-                mechanisms[RED_BUMPER] = Pose3d.kZero;
+                mechanisms[RED_BUMPER] = invisible;
             }
+        } else {
+            mechanisms[BLUE_BUMPER] = invisible;
+            mechanisms[RED_BUMPER] = invisible;
         }
         this.estimatedPose = estimatedPose;
         if (RobotBase.isReal()) {
