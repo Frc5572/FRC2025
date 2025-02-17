@@ -230,39 +230,6 @@ public class RobotContainer {
         altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level2).whileTrue(elevator.p1());
         altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level3).whileTrue(elevator.p3());
         altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level4).whileTrue(elevator.p4());
-        // altOperator.a().whileTrue(elevator.moveTo(() -> {
-        // switch (HeightMode.getCurrentHeightMode()) {
-        // case kAlgae:
-        // switch (CoralHeight.getCurrentState()) {
-        // case Klevel1:
-        // return Constants.Elevator.P1;
-        // case Klevel2:
-        // return Constants.Elevator.P1;
-
-        // case Klevel3:
-        // return Constants.Elevator.P1;
-
-        // case Klevel4:
-        // return Constants.Elevator.P1;
-        // default:
-        // return null;
-        // }
-
-        // case kCoral:
-        // switch (AlgaeHeight.getCurrentHeightMode()) {
-        // case Klevel1:
-        // return Constants.Elevator.P1;
-
-
-        // case Klevel2:
-        // return Constants.Elevator.P1;
-        // default:
-        // return null;
-        // }
-        // default:
-        // return null;
-        // }
-        // }));
     }
 
     private void setupPitController() {
@@ -272,14 +239,15 @@ public class RobotContainer {
     }
 
     private void configureTriggerBindings() {
-        coralScoring.coralAtIntake.onTrue(leds.setLEDsSolid(Color.kOrange).withTimeout(5)
-            .alongWith(coralScoring.runPreScoringMotor(.1)));
-        // coralScoring.coralAtIntake.onTrue(coralScoring.runPreScoringMotor(2));
+        // Coral
+        coralScoring.coralAtIntake.onTrue(leds.setLEDsSolid(Color.kOrange).withTimeout(5));
         coralScoring.coralAtOuttake.onTrue(leds.blinkLEDs(Color.kCyan).withTimeout(5));
-        climb.resetButton.onTrue(climb.restEncoder());
+        coralScoring.coralAtOuttake.negate().debounce(1.5)
+            .whileTrue(coralScoring.runPreScoringMotor(.1));
+        // Algae
         algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan));
-        // coralScoring.coralAtOuttake.negate().debounce(1.5)
-        // .whileTrue(coralScoring.runPreScoringMotor(.1));
+        // Climb
+        climb.resetButton.onTrue(climb.restEncoder());
         climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());
     }
 

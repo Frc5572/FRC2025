@@ -16,13 +16,13 @@ public interface CoralScoringIO {
 
     public static class CoralScoringInputs {
         public double scoringRPM;
-        public boolean scoringBeamBrake;
-        public boolean intakeBeamBrake;
+        public boolean outtakeBeamBreak;
+        public boolean intakeBeamBreak;
     }
 
     public void updateInputs(CoralScoringInputs inputs);
 
-    public void setCoralSpeed(double speed);
+    public void setCoralPower(double power);
 
     /** Empty Coral Scoring implementation (for replay) */
     public static class Empty implements CoralScoringIO {
@@ -33,7 +33,7 @@ public interface CoralScoringIO {
         }
 
         @Override
-        public void setCoralSpeed(double speed) {
+        public void setCoralPower(double power) {
 
         }
 

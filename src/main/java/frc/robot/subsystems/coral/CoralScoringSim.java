@@ -8,10 +8,10 @@ import frc.robot.Constants;
  */
 
 public class CoralScoringSim implements CoralScoringIO {
-    private final DigitalInput scoringBeamBrake =
-        new DigitalInput(Constants.CoralScoringConstants.Scoring_Beam_Brake_DIO_Port);
-    private final DigitalInput intakeBeamBrake =
-        new DigitalInput(Constants.CoralScoringConstants.Intake_Beam_Brake_DIO_Port);
+    private final DigitalInput outtakeBeamBreak =
+        new DigitalInput(Constants.CoralScoringConstants.OUTTAKE_BEAM_BREAK_DIO_PORT);
+    private final DigitalInput intakeBeamBreak =
+        new DigitalInput(Constants.CoralScoringConstants.INTAKE_BEAM_BREAK_DIO_PORT);
 
     /**
      * Coral Scoring Real
@@ -23,10 +23,10 @@ public class CoralScoringSim implements CoralScoringIO {
      */
 
     public void updateInputs(CoralScoringInputs inputs) {
-        inputs.scoringBeamBrake = !scoringBeamBrake.get();
-        inputs.intakeBeamBrake = !intakeBeamBrake.get();
+        inputs.outtakeBeamBreak = !outtakeBeamBreak.get();
+        inputs.intakeBeamBreak = !intakeBeamBreak.get();
     }
 
-    public void setCoralSpeed(double percent) {}
+    public void setCoralPower(double percent) {}
 
 }
