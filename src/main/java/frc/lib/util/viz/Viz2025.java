@@ -1,6 +1,5 @@
 package frc.lib.util.viz;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import org.littletonrobotics.junction.Logger;
@@ -67,15 +66,8 @@ public class Viz2025 implements Drawable {
 
     /** Set the angle of the climber, with 0 being straight up and down. */
     public void setClimberAngle(Angle angle) {
-        Angle visAngle = angle.div(300);
-        SmartDashboard.putNumber("Real Angle", angle.in(Degrees));
-        // SmartDashboard.putNumber("ClimberX", -visAngle.in(Radians) * 0.531);
-        SmartDashboard.putNumber("ASDFDSF", visAngle.in(Radians));
-        // SmartDashboard.putNumber("SIN", Math.sin(visAngle.in(Radians)));
-        Translation3d trans = new Translation3d(-visAngle.in(Radians) * 0.505, 0,
-            -SmartDashboard.getNumber("ClimberZ", 0) * visAngle.in(Radians));
-        mechanisms[CLIMBER_ID] =
-            new Pose3d(trans, new Rotation3d(Radians.of(0.0), visAngle, Radians.of(0.0)));
+        mechanisms[CLIMBER_ID] = new Pose3d(new Translation3d(-0.280502, 0, 0.461962),
+            new Rotation3d(Radians.of(0.0), angle, Radians.of(0.0)));
     }
 
     /** Show coral in the coral scorer. */
