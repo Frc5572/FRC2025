@@ -303,7 +303,7 @@
         const CTRL_ID = "/web/ctrl";
         const RESP_ID = "/web/resp";
 
-        const id_names = ["reef-a", "reef-b", "reef-c", "reef-d", "reef-e", "reef-f", "p0l", "p0r", "p1l", "p1r", "p2", "p3l", "p3r", "p4", "p5l", "p5r", "fdrl", "fdrf", "fdrr"];
+        const id_names = ["reef-a", "reef-b", "reef-c", "reef-d", "reef-e", "reef-f", "p0l", "p0r", "p1l", "p1r", "p2", "p3l", "p3r", "p4", "p5l", "p5r", "fdrl", "fdrf", "fdrr", "confx", "confy"];
 
         let client = new NT4_Client(
             window.location.hostname,
@@ -320,7 +320,6 @@
                 // Topic data
                 if (topic.name == RESP_ID) {
                     for (let i = 0; i < id_names.length; i++) {
-                        console.log(id_names[i]);
                         document.getElementById(id_names[i] + "").style = ((value[i] & 0x1) != 0) ? "" : "display: none";
                         let cross = document.getElementById(id_names[i] + "cross");
                         if (cross != null) {
@@ -503,7 +502,6 @@
                 let t1 = y > M1 * x + B1;
                 let t2 = y > M2 * x + B2;
                 let t3 = y > MID_Y;
-                console.log(t1, t2, t3)
                 if (t3) {
                     if (!t1) {
                         client.addSample(CTRL_ID, "reef-c")

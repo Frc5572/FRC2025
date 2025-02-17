@@ -47,8 +47,8 @@ public class WebController {
                 if (value.startsWith("reef-")) {
                     value = value.substring(5);
                     bay = value.charAt(0);
-                    createResponse();
                     checkReefLocation();
+                    createResponse();
                 } else if (value.startsWith("p")) {
                     value = value.substring(1);
                     height = Integer.parseInt(value.substring(0, 1));
@@ -58,8 +58,8 @@ public class WebController {
                     } else {
                         right = false;
                     }
-                    createResponse();
                     checkReefLocation();
+                    createResponse();
                 } else if (value.startsWith("fdr")) {
                     value = value.substring(3);
                     fdr = value.charAt(0);
@@ -84,12 +84,15 @@ public class WebController {
                         case 'c':
                             // IDK what this is for
                             break;
+                        default:
+                            break;
                     }
                 }
             });
+        createResponse();
     }
 
-    private final long[] response_values = new long[19];
+    private final long[] response_values = new long[21];
     private static final boolean[] empty = new boolean[10];
 
     private static int encode_height(int height, boolean right) {
@@ -150,6 +153,9 @@ public class WebController {
         response_values[16] = (fdr == 'l') ? 1 : 0;
         response_values[17] = (fdr == 'f') ? 1 : 0;
         response_values[18] = (fdr == 'r') ? 1 : 0;
+        // Confirmation
+        response_values[19] = (hasReefLocation.getAsBoolean() ? 0 : 2);
+        response_values[20] = (hasReefLocation.getAsBoolean() ? 0 : 2);
 
         response.set(response_values);
     }

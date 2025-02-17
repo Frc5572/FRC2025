@@ -159,6 +159,7 @@ public class ScoringLocation {
         }
     }
 
+    /** All elevator heights (except home). */
     public enum ElevatorHeight {
         CoralL1, CoralL2, CoralL3, CoralL4, AlgaeL2, AlgaeL3;
 
