@@ -36,12 +36,6 @@ public class ScoringLocation {
                     return CoralLocation.K;
                 case 11:
                     return CoralLocation.L;
-                case 12:
-                    return CoralLocation.LeftFeeder;
-                case 13:
-                    return CoralLocation.RightFeeder;
-                case 14:
-                    return CoralLocation.Processor;
                 default:
                     return null;
             }
@@ -162,6 +156,27 @@ public class ScoringLocation {
 
         public static AlgaeHeight getCurrentHeightMode() {
             return currentState;
+        }
+    }
+
+    public enum ElevatorHeight {
+        CoralL1, CoralL2, CoralL3, CoralL4, AlgaeL2, AlgaeL3;
+
+        public static ElevatorHeight fromInt(int i) {
+            switch (i) {
+                case 1:
+                    return CoralL2;
+                case 2:
+                    return AlgaeL2;
+                case 3:
+                    return CoralL3;
+                case 4:
+                    return AlgaeL3;
+                case 5:
+                    return CoralL4;
+                default:
+                    return CoralL1;
+            }
         }
     }
 
