@@ -53,15 +53,6 @@ public class CoralScoring extends SubsystemBase {
         return inputs.intakeBeamBreak;
     }
 
-    /**
-     * Coral Motor Active. Motor if speed is greater than 2 RPM.
-     *
-     * @return Status of Coral Motor
-     */
-    public boolean getCoralMotorActiveStatus() {
-        return inputs.scoringRPM.baseUnitMagnitude() > 2;
-    }
-
     @Override
     public void periodic() {
         io.updateInputs(inputs);
