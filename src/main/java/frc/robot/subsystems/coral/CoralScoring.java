@@ -25,21 +25,28 @@ public class CoralScoring extends SubsystemBase {
         RobotContainer.mainDriverTab.add("Have Coral", Color.kBlack.toHexString())
             .withWidget("Single Color View").withPosition(8, 0).withSize(3, 2).getEntry();
 
-    /** Coral Scoring subsystem */
+    /**
+     * Coral Scoring subsystem
+     */
     public CoralScoring(CoralScoringIO io, Viz2025 viz) {
         this.viz = viz;
         this.io = io;
         io.updateInputs(inputs);
     }
 
+    /**
+     * Get outtake beambreak status
+     *
+     * @return Status of beambreak at outtake
+     */
     public boolean getOuttakeBeamBreakStatus() {
         return inputs.outtakeBeamBreak;
     }
 
     /**
-     * Get intake beam
+     * Get intake beambreak status
      *
-     * @return
+     * @return Status of beambreak at intake
      */
     public boolean getIntakeBeamBreakStatus() {
         return inputs.intakeBeamBreak;
