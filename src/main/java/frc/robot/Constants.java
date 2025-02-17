@@ -351,7 +351,7 @@ public final class Constants {
     public static class Vision {
 
         public static final AprilTagFieldLayout fieldLayout =
-            AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+            AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
 
         /** Constants for an individual camera. */
         public static final record CameraConstants(String name, int height, int width,
