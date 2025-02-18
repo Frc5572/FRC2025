@@ -11,6 +11,11 @@ import frc.robot.subsystems.coral.CoralScoring;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.swerve.Swerve;
 
+/**
+ * Creates a command for driving the swerve drive during tele-op
+ *
+ *
+ */
 public class AutoCommandFactory {
 
     AutoFactory autoFactory;
@@ -18,6 +23,10 @@ public class AutoCommandFactory {
     Elevator elevator;
     CoralScoring coral;
 
+    /**
+     * Creates a command for driving the swerve drive during tele-op
+     *
+     */
     public AutoCommandFactory(AutoFactory autoFactory, Swerve swerve, Elevator elevator,
         CoralScoring coral) {
         this.autoFactory = autoFactory;
@@ -26,14 +35,18 @@ public class AutoCommandFactory {
         this.coral = coral;
     }
 
+    /**
+     * Creates a command for driving the swerve drive during tele-op
+     *
+     */
     public AutoRoutine resnick() {
         AutoRoutine routine = autoFactory.newRoutine("Resnick");
 
         Trigger haveCoral = routine.observe(coral.intakedCoralRight);
 
         AutoTrajectory startToScore1 = routine.trajectory("Resnick", 0);
-        AutoTrajectory Score1ToFeeder = routine.trajectory("Resnick", 1);
-        AutoTrajectory FeederToScore2 = routine.trajectory("Resnick", 2);
+        AutoTrajectory score1ToFeeder = routine.trajectory("Resnick", 1);
+        AutoTrajectory feederToScore2 = routine.trajectory("Resnick", 2);
 
         routine.active()
             .onTrue(Commands.sequence(startToScore1.resetOdometry(), startToScore1.cmd()));
@@ -43,17 +56,21 @@ public class AutoCommandFactory {
                 swerve.runOnce(swerve::setMotorsZero)
                     .alongWith(Commands.waitTime(Seconds.of(0.01))),
                 elevator.p4(), coral.runScoringMotor(0.5), elevator.p0(),
-                new ProxyCommand(Score1ToFeeder.cmd())));
-        Score1ToFeeder.active().onTrue(elevator.home());
-        Score1ToFeeder.done().onTrue(Commands.sequence(
+                new ProxyCommand(score1ToFeeder.cmd())));
+        score1ToFeeder.active().onTrue(elevator.home());
+        score1ToFeeder.done().onTrue(Commands.sequence(
             swerve.runOnce(swerve::setMotorsZero).alongWith(Commands.waitTime(Seconds.of(0.01))),
-            new ProxyCommand(FeederToScore2.cmd())));
-        FeederToScore2.done().onTrue(
+            new ProxyCommand(feederToScore2.cmd())));
+        feederToScore2.done().onTrue(
             swerve.runOnce(swerve::setMotorsZero).alongWith(Commands.waitTime(Seconds.of(0.01))));
 
         return routine;
     }
 
+    /**
+     * Creates a command for driving the swerve drive during tele-op
+     *
+     */
     public AutoRoutine watson() {
         AutoRoutine routine = autoFactory.newRoutine("Watson");
 
@@ -96,10 +113,12 @@ public class AutoCommandFactory {
         return routine;
     }
 
+    /**
+     * Creates a command for driving the swerve drive during tele-op
+     *
+     */
     public AutoRoutine test() {
         AutoRoutine routine = autoFactory.newRoutine("test");
-
-        // Trigger haveCoral = routine.observe(coral.intakedCoralRight);
 
         AutoTrajectory part1 = routine.trajectory("Test", 0);
         AutoTrajectory part2 = routine.trajectory("Test", 1);
@@ -110,16 +129,17 @@ public class AutoCommandFactory {
         part1.done().onTrue(part2.cmd());
         part2.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero),
             Commands.waitSeconds(3), part3.cmd()));
-        // part3.done().onTrue(part4.cmd());
 
 
         return routine;
     }
 
+    /**
+     * Creates a command for driving the swerve drive during tele-op
+     *
+     */
     public AutoRoutine middleBot() {
         AutoRoutine routine = autoFactory.newRoutine("middleBot");
-
-        // Trigger haveCoral = routine.observe(coral.intakedCoralRight);
 
         AutoTrajectory part1 = routine.trajectory("middleBot", 0);
         AutoTrajectory part2 = routine.trajectory("middleBot", 1);
@@ -140,8 +160,6 @@ public class AutoCommandFactory {
         AutoTrajectory part17 = routine.trajectory("middleBot", 16);
         AutoTrajectory part18 = routine.trajectory("middleBot", 17);
         AutoTrajectory part19 = routine.trajectory("middleBot", 18);
-        // AutoTrajectory part15 = routine.trajectory("middleBot", 14);
-        // AutoTrajectory part16 = routine.trajectory("middleBot", 15);
 
 
         routine.active()
@@ -149,10 +167,7 @@ public class AutoCommandFactory {
         part1.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero),
             Commands.waitSeconds(0.5), elevator.home(), Commands.waitSeconds(0.2), part2.cmd()));
         part1.active().onTrue(elevator.p4());
-        // part2.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero),
-        // Commands.waitSeconds(3), part3.cmd()));
         part2.done().onTrue(part3.cmd());
-        // part2.active().onTrue(elevator.p0());
         part3.done().onTrue(part4.cmd());
         part4.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero),
             Commands.sequence(Commands.waitSeconds(1)), part5.cmd()));
@@ -160,11 +175,8 @@ public class AutoCommandFactory {
         part5.done().onTrue(elevator.p4());
         part6.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero),
             Commands.sequence(Commands.waitSeconds(0.5), elevator.home(), part7.cmd())));
-        // part6.done().onTrue(part7.cmd());
-        // part6.active().onTrue(Commands.sequence(Commands.waitSeconds(0.2), elevator.home()));
         part7.done().onTrue(part8.cmd());
         part8.done().onTrue(part9.cmd());
-        // part9.done().onTrue(part10.cmd());
         part9.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero),
             Commands.sequence(Commands.waitSeconds(1)), part10.cmd()));
         part10.done().onTrue(part11.cmd());
@@ -172,7 +184,6 @@ public class AutoCommandFactory {
         part11.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero),
             Commands.sequence(Commands.waitSeconds(0.5), elevator.home(), part12.cmd())));
         part12.done().onTrue(part13.cmd());
-        // part13.done().onTrue(part14.cmd());
         part13.done().onTrue(part14.cmd());
         part14.done().onTrue(part15.cmd());
         part15.done().onTrue(part16.cmd());
@@ -180,11 +191,6 @@ public class AutoCommandFactory {
         part17.done().onTrue(part18.cmd());
         part18.done().onTrue(part19.cmd());
         part19.done().onTrue((swerve.runOnce(swerve::setMotorsZero)));
-        // part15.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero)));
-        // part2.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero),
-        // Commands.waitSeconds(3), part3.cmd()));
-
-
 
         return routine;
     }

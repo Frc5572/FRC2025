@@ -279,6 +279,11 @@ public class Swerve extends SubsystemBase {
         });
     }
 
+    /**
+     * Creates a command for the trajectory for the swerve
+     *
+     * @param pose The position of the robot
+     */
     public void followTrajectory(SwerveSample sample) {
         // Get the current pose of the robot
         Pose2d pose = getPose();
