@@ -29,9 +29,11 @@ import frc.lib.util.ScoringLocation.AlgaeHeight;
 import frc.lib.util.ScoringLocation.CoralHeight;
 import frc.lib.util.ScoringLocation.HeightMode;
 import frc.lib.util.Tuples.Tuple2;
+import frc.lib.util.WebController;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
+import frc.robot.commands.MoveToPoseWithLocalTag;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIO;
@@ -71,13 +73,13 @@ public class RobotContainer {
 
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
+    public final WebController operator = new WebController(5800);
     public final CommandXboxController backUpOperator =
         new CommandXboxController(Constants.operatorId);
     public final CommandXboxController pitController =
         new CommandXboxController(Constants.PIT_CONTROLLER_ID);
     public final CommandXboxController altOperator =
         new CommandXboxController(Constants.ALT_OPERATOR_ID);
-    public final CommandXboxController operator = new CommandXboxController(1);
 
 
     /** Simulation */
@@ -242,6 +244,12 @@ public class RobotContainer {
 
         driver.rightTrigger().and(climb.reachedClimberStart)
             .onTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
+
+        driver.a().and(operator.hasReefLocation())
+            .whileTrue(new MoveToPoseWithLocalTag(swerve, () -> {
+                return new Tuple2<Pose2d, Integer>(operator.getDesiredLocation().pose,
+                    operator.getDesiredLocation().tag);
+            }, true, Units.inchesToMeters(4), 2));
     }
 
     private void setupAltOperatorController() {
