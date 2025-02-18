@@ -129,14 +129,8 @@ public class RobotContainer {
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
                 climb = new Climber(new ClimberIO.Empty());
         }
-        autoFactory = new AutoFactory(swerve::getPose, // A function that returns the current robot
-                                                       // pose
-            swerve::resetOdometry, // A function that resets the current robot pose to the provided
-                                   // Pose2d
-            swerve::followTrajectory, // The drive subsystem trajectory follower
-            true, // If alliance flipping should be enabled
-            swerve // The drive subsystem
-        );
+        autoFactory = new AutoFactory(swerve::getPose, swerve::resetOdometry,
+            swerve::followTrajectory, true, swerve);
         AutoCommandFactory autos =
             new AutoCommandFactory(autoFactory, swerve, elevator, coralScoring);
         autoChooser = new AutoChooser();
