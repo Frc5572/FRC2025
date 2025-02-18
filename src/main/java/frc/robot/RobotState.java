@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.wpilibj.Timer;
 import frc.lib.math.Hexagon;
 import frc.lib.math.Penetration;
 import frc.lib.math.Rectangle;
@@ -42,12 +43,15 @@ public class RobotState {
             Constants.StateEstimator.visionTrustRotation));
     }
 
+    private double visionCutoff = 0;
+
     /**
      * Use prior information to set the pose. Should only be used at the start of the program, or
      * start of individual autonomous routines.
      */
     public void resetPose(Pose2d pose, SwerveModulePosition[] positions, Rotation2d gyroYaw) {
         swerveOdometry.resetPosition(gyroYaw, positions, pose);
+        visionCutoff = Timer.getFPGATimestamp();
     }
 
     /**
@@ -62,6 +66,9 @@ public class RobotState {
      */
     public void addVisionObservation(PhotonPipelineResult result, Transform3d robotToCamera,
         int whichCamera) {
+        if (result.getTimestampSeconds() < visionCutoff) {
+            return;
+        }
         if (result.multitagResult.isPresent()) {
             Transform3d best = result.multitagResult.get().estimatedPose.best;
             Pose3d cameraPose =
