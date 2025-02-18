@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -39,7 +40,17 @@ public class Swerve extends SubsystemBase {
     private double fieldOffset;
     private SwerveInputsAutoLogged inputs = new SwerveInputsAutoLogged();
     private SwerveIO swerveIO;
-    private final RobotState state;
+    public final RobotState state;
+
+    private final HolonomicDriveController holonomicDriveController = new HolonomicDriveController(
+        new PIDController(Constants.SwerveTransformPID.PID_XKP,
+            Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
+        new PIDController(Constants.SwerveTransformPID.PID_XKP,
+            Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
+        new ProfiledPIDController(Constants.SwerveTransformPID.PID_TKP,
+            Constants.SwerveTransformPID.PID_TKI, Constants.SwerveTransformPID.PID_TKD,
+            new TrapezoidProfile.Constraints(Constants.SwerveTransformPID.MAX_ANGULAR_VELOCITY,
+                Constants.SwerveTransformPID.MAX_ANGULAR_ACCELERATION)));
 
     /**
      * Swerve Subsystem
@@ -93,6 +104,8 @@ public class Swerve extends SubsystemBase {
      * @param chassisSpeeds The desired Chassis Speeds
      */
     public void setModuleStates(ChassisSpeeds chassisSpeeds) {
+        Logger.recordOutput("Swerve/Velocity",
+            Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond));
         ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
         SwerveModuleState[] swerveModuleStates =
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(targetSpeeds);
@@ -275,39 +288,41 @@ public class Swerve extends SubsystemBase {
         });
     }
 
+
     public Command stop() {
         return this.runOnce(this::setMotorsZero);
     }
 
-    private final HolonomicDriveController holonomicDriveController = new HolonomicDriveController(
-        new PIDController(Constants.SwerveTransformPID.PID_XKP,
-            Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
-        new PIDController(Constants.SwerveTransformPID.PID_XKP,
-            Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
-        new ProfiledPIDController(Constants.SwerveTransformPID.PID_TKP,
-            Constants.SwerveTransformPID.PID_TKI, Constants.SwerveTransformPID.PID_TKD,
-            new TrapezoidProfile.Constraints(Constants.SwerveTransformPID.MAX_ANGULAR_VELOCITY,
-                Constants.SwerveTransformPID.MAX_ANGULAR_ACCELERATION)));
+    /**
+     * Follow Choreo Trajectory
+     *
+     * @param sample Swerve Sample
+     */
+    public void followTrajectory(SwerveSample sample) {
+        // Get the current pose of the robot
+        Pose2d pose = getPose();
 
-    private void moveToPose(Pose2d pose) {
-        ChassisSpeeds ctrlEffort =
-            holonomicDriveController.calculate(getPose(), pose, 0, pose.getRotation());
-        setModuleStates(ctrlEffort);
+        // Generate the next speeds for the robot
+        ChassisSpeeds speeds = new ChassisSpeeds(
+            sample.vx + holonomicDriveController.getXController().calculate(pose.getX(), sample.x),
+            sample.vy + holonomicDriveController.getYController().calculate(pose.getY(), sample.y),
+            sample.omega + holonomicDriveController.getThetaController()
+                .calculate(pose.getRotation().getRadians(), sample.heading));
+
+        // Apply the generated speeds
+        setModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
+            state.getGlobalPoseEstimate().getRotation()));
     }
 
     /**
-     * Move to a position.
+     * Move to a Pose2d
      *
-     * @param pose2dSupplier pose to target
-     * @param flipForRed if true, {@code pose2dSupplier} provides pose in terms of blue side, and
-     *        the pose is flipped if the robot's alliance is red.
-     * @param tol X-Y error allowed in meters
-     * @param rotTol angle error allowed in degrees
+     * @param pose Desired Pose2d
      */
-    public Command moveToPose(Supplier<Pose2d> pose2dSupplier, boolean flipForRed, double tol,
-        double rotTol) {
-        return moveToPoseWithLocalTag(() -> new Tuple2<>(pose2dSupplier.get(), 0), flipForRed, tol,
-            rotTol);
+    public void moveToPose(Pose2d pose) {
+        ChassisSpeeds ctrlEffort = holonomicDriveController.calculate(state.getGlobalPoseEstimate(),
+            pose, 0, state.getGlobalPoseEstimate().getRotation());
+        setModuleStates(ctrlEffort);
     }
 
     /**

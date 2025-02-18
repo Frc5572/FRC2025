@@ -19,6 +19,7 @@ import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.math.Circle;
 import frc.lib.math.Hexagon;
@@ -62,12 +63,15 @@ public class RobotState {
         SmartDashboard.putNumber("cameraOffset", 0.0);
     }
 
+    private double visionCutoff = 0;
+
     /**
      * Use prior information to set the pose. Should only be used at the start of the program, or
      * start of individual autonomous routines.
      */
     public void resetPose(Pose2d pose, SwerveModulePosition[] positions, Rotation2d gyroYaw) {
         swerveOdometry.resetPosition(gyroYaw, positions, pose);
+        visionCutoff = Timer.getFPGATimestamp();
         rotationBuffer.clear();
         rotationBuffer.getInternalBuffer().clear();
     }
@@ -107,6 +111,9 @@ public class RobotState {
      */
     public void addVisionObservation(PhotonPipelineResult result, Transform3d robotToCamera,
         int whichCamera) {
+        if (result.getTimestampSeconds() < visionCutoff) {
+            return;
+        }
         if (whichCamera == 0 && result.multitagResult.isPresent()) {
             Transform3d best = result.multitagResult.get().estimatedPose.best;
             Pose3d cameraPose =
