@@ -179,7 +179,7 @@ public class AutoCommandFactory {
         part16.done().onTrue(Commands.sequence(elevator.p4(), part17.cmd()));
         part17.done().onTrue(part18.cmd());
         part18.done().onTrue(part19.cmd());
-        part19.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero)));
+        part19.done().onTrue((swerve.runOnce(swerve::setMotorsZero)));
         // part15.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero)));
         // part2.done().onTrue(Commands.sequence(swerve.runOnce(swerve::setMotorsZero),
         // Commands.waitSeconds(3), part3.cmd()));
