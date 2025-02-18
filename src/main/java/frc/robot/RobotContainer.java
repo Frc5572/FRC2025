@@ -219,14 +219,14 @@ public class RobotContainer {
         driver.x().onTrue(new InstantCommand(() -> { // sim only
             swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
         }));
-        driver.rightTrigger().and(climb.reachedClimberStart.negate())
-            .onTrue(climb
-                .runClimberMotorCommand(Constants.Climb.PRE_CLIMB_VOLTAGE,
-                    () -> climb.getClimberPosition()
-                        .in(Radians) >= Constants.Climb.CLIMBER_OUT_ANGLE.in(Radians))
-                .andThen(climb.runClimberMotorCommand(Constants.Climb.RESET_VOLTAGE,
-                    () -> climb.getClimberPosition()
-                        .in(Radians) <= Constants.Climb.CLIMBER_START_ANGLE.in(Radians))));
+        // driver.rightTrigger().and(climb.reachedClimberStart.negate())
+        // .onTrue(climb
+        // .runClimberMotorCommand(Constants.Climb.PRE_CLIMB_VOLTAGE,
+        // () -> climb.getClimberPosition()
+        // .in(Radians) >= Constants.Climb.CLIMBER_OUT_ANGLE.in(Radians))
+        // .andThen(climb.runClimberMotorCommand(Constants.Climb.RESET_VOLTAGE,
+        // () -> climb.getClimberPosition()
+        // .in(Radians) <= Constants.Climb.CLIMBER_START_ANGLE.in(Radians))));
 
         driver.rightTrigger().and(climb.reachedClimberStart)
             .onTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
