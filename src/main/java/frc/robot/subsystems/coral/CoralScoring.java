@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.viz.Viz2025;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
 
 /**
@@ -15,92 +16,102 @@ import frc.robot.RobotContainer;
  */
 public class CoralScoring extends SubsystemBase {
     private CoralScoringIO io;
-    private CoralScoringInputsAutoLogged coralScoringAutoLogged =
-        new CoralScoringInputsAutoLogged();
+    private CoralScoringInputsAutoLogged inputs = new CoralScoringInputsAutoLogged();
     private final Viz2025 viz;
-    public Trigger coralAtIntake = new Trigger(() -> getIntakeBrakeStatus());
-    public Trigger coralAtOuttake = new Trigger(() -> getOuttakeBeamBrakeStatus());
+    public Trigger coralAtIntake = new Trigger(() -> getIntakeBeamBreakStatus());
+    public Trigger coralAtOuttake = new Trigger(() -> getOuttakeBeamBreakStatus());
 
 
     private GenericEntry haveCoral =
         RobotContainer.mainDriverTab.add("Have Coral", Color.kBlack.toHexString())
             .withWidget("Single Color View").withPosition(8, 0).withSize(3, 2).getEntry();
 
-    /** Coral Scoring subsystem */
+    /**
+     * Coral Scoring subsystem
+     */
     public CoralScoring(CoralScoringIO io, Viz2025 viz) {
         this.viz = viz;
         this.io = io;
-        io.updateInputs(coralScoringAutoLogged);
+        io.updateInputs(inputs);
     }
 
-    public boolean getOuttakeBeamBrakeStatus() {
-        return coralScoringAutoLogged.scoringBeamBrake;
+    /**
+     * Get outtake beambreak status
+     *
+     * @return Status of beambreak at outtake
+     */
+    public boolean getOuttakeBeamBreakStatus() {
+        return inputs.outtakeBeamBreak;
     }
 
-    public boolean getIntakeBrakeStatus() {
-        return coralScoringAutoLogged.intakeBeamBrake;
+    /**
+     * Get intake beambreak status
+     *
+     * @return Status of beambreak at intake
+     */
+    public boolean getIntakeBeamBreakStatus() {
+        return inputs.intakeBeamBreak;
     }
 
     @Override
     public void periodic() {
-        io.updateInputs(coralScoringAutoLogged);
-        Logger.processInputs("Coral Scoring", coralScoringAutoLogged);
-        viz.setHasCoral(getOuttakeBeamBrakeStatus());
-        if (getIntakeBrakeStatus() && getOuttakeBeamBrakeStatus()) {
+        io.updateInputs(inputs);
+        Logger.processInputs("Coral", inputs);
+        viz.setHasCoral(getOuttakeBeamBreakStatus());
+        if (getIntakeBeamBreakStatus() && getOuttakeBeamBreakStatus()) {
             haveCoral.setString(Color.kBlue.toHexString());
-        } else if (getIntakeBrakeStatus()) {
+        } else if (getIntakeBeamBreakStatus()) {
             haveCoral.setString(Color.kOrange.toHexString());
-        } else if (getOuttakeBeamBrakeStatus()) {
+        } else if (getOuttakeBeamBreakStatus()) {
             haveCoral.setString(Color.kPurple.toHexString());
         } else {
             haveCoral.setString(Color.kBlack.toHexString());
         }
     }
 
-    public void setCoralPercent(double percentage) {
-        Logger.recordOutput("Scoring Percentage", percentage);
-        io.setCoralPercent(percentage);
+    /**
+     * Set motor power
+     *
+     * @param power power to apply to motor
+     */
+    public void setCoralPower(double power) {
+        Logger.recordOutput("Coral/Power", power);
+        io.setCoralPower(power);
     }
 
     /**
      * Command that returns a command
+     *
+     * @param power Power to apply to motor
+     *
+     * @return Command
      */
-
-    private Command motorStartEndCommand(double scoringSpeed) {
+    private Command motorStartEndCommand(double power) {
         return Commands.startEnd(() -> {
-            setCoralPercent(scoringSpeed);
+            setCoralPower(power);
         }, () -> {
-            setCoralPercent(0);
+            setCoralPower(0);
         }, this);
     }
 
     /**
      * Runs Pre Scoring Motor
+     *
+     * @return Command
      */
-    public Command runPreScoringMotor(double scoringSpeed) {
-        return motorStartEndCommand(scoringSpeed).until(() -> getOuttakeBeamBrakeStatus());
+    public Command runCoralIntake() {
+        return motorStartEndCommand(Constants.CoralScoringConstants.INTAKE_POWER)
+            .until(() -> getOuttakeBeamBreakStatus());
     }
 
     /**
      * Sets motor speed to score.
+     *
+     * @return Command
      */
-    public Command runScoringMotor(double scoringSpeed) {
-        return motorStartEndCommand(scoringSpeed).withDeadline(
-            Commands.waitUntil(() -> !getOuttakeBeamBrakeStatus()).andThen(Commands.waitSeconds(2)))
+    public Command runCoralOuttake() {
+        return motorStartEndCommand(Constants.CoralScoringConstants.OUTTAKE_POWER).withDeadline(
+            Commands.waitUntil(() -> !getOuttakeBeamBreakStatus()).andThen(Commands.waitSeconds(2)))
             .withTimeout(10);
     }
-
-    // Consolidates scoring motor
-    // public Command runCoralOuttakeMotor(double scoringSpeed) {
-    // Command scoringMotorRun = motorStartEndCommand(scoringSpeed).withDeadline(
-    // Commands.waitUntil(() -> !getScoringBeamBrakeStatus()).andThen(Commands.waitSeconds(2)))
-    // .withTimeout(10);
-    // Command preScoringMotorRun = motorStartEndCommand(scoringSpeed)
-    // .until(() -> getScoringBeamBrakeStatus()).withTimeout(10);
-    // return Commands.either(scoringMotorRun, preScoringMotorRun,
-    // () -> getScoringBeamBrakeStatus());
-    // }
-
-
-
 }
