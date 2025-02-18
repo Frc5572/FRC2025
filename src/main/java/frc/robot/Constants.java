@@ -64,14 +64,16 @@ public final class Constants {
     /**
      * Current threshold that indicates an algae is in possestion
      */
-    public static final double HAS_ALGAE_CURRENT_THRESHOLD = 100;
+    public static final double HAS_ALGAE_CURRENT_THRESHOLD = 110;
 
     /**
      * Algae misc values
      */
     public static final class Algae {
-        public static final int VOLTAGE = 2;
-        public static final int NEGATIVE_VOLTAGE = -2;
+        public static final double VOLTAGE = 3;
+        public static final double NEGATIVE_VOLTAGE = -3;
+        public static final double SMALLER_VOLTAGE = 1;
+        public static final double SMALLER_NEGATIVE_VOLTAGE = -1;
     }
 
     // pit and alt operator controllers
@@ -409,6 +411,8 @@ public final class Constants {
         public static final double MAX_ANGULAR_VELOCITY = 9.0;
         public static final double MAX_ANGULAR_ACCELERATION = 9 * 5;
         public static final double STD_DEV_MOD = 2.0;
+
+        public static final Rotation2d CIRCLE_REEF_LOOKAHEAD_ANGLE = Rotation2d.fromDegrees(15);
     }
 }
 

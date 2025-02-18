@@ -59,4 +59,13 @@ public class ElevatorAlgae extends SubsystemBase {
         return runEnd(() -> setAlgaeMotorVoltage(speed), () -> setAlgaeMotorVoltage(0));
         // .until(() -> hasAlgae());
     }
+
+    /**
+     * Keeps algae intake motor running even after it has intaked an algae, but it lowers the speed
+     */
+    public Command setMotorVoltageHasAlgaeCommand(double speed, double smallerSpeed) {
+        return setMotorVoltageCommand(speed).until(() -> hasAlgae())
+            .andThen(() -> setAlgaeMotorVoltage(smallerSpeed));
+
+    }
 }

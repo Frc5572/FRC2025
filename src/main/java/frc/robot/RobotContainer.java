@@ -1,6 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Radians;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -305,6 +304,8 @@ public class RobotContainer {
         coralScoring.coralOuttaken.onTrue(leds.blinkLEDs(Color.kCyan, 5));
         climb.resetButton.onTrue(climb.restEncoder());
         algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan));
+        HeightMode.algaeMode.whileTrue(algae.setMotorVoltageHasAlgaeCommand(Constants.Algae.VOLTAGE,
+            Constants.Algae.SMALLER_VOLTAGE));
         coralScoring.coralOuttaken.negate().whileTrue(coralScoring.runPreScoringMotor(.1));
         coralScoring.coralOuttaken.onTrue(leds.blinkLEDs(Color.kCyan, 5));
         climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());
