@@ -55,9 +55,7 @@ public class Elevator extends SubsystemBase {
     public Command home() {
         Command slowLower = Commands.runEnd(() -> io.setVoltage(-1.4), () -> io.setVoltage(0.0));
         return moveTo(() -> Constants.Elevator.HOME).until(() -> inputs.position.in(Inches) < 5.0)
-            .andThen(slowLower)
-            .until(() -> (inputs.limitSwitch == true || inputs.position.in(Inches) < 0.2))
-            .alongWith(
+            .andThen(slowLower).until(() -> (inputs.limitSwitch == true)).alongWith(
                 Commands.runOnce(() -> Logger.recordOutput(Constants.Elevator.heightName, "home")));
     }
 

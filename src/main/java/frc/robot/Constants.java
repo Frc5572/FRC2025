@@ -395,8 +395,8 @@ public final class Constants {
     public static final class CoralScoringConstants {
         public static final int OUTTAKE_BEAM_BREAK_DIO_PORT = 0;
         public static final int INTAKE_BEAM_BREAK_DIO_PORT = 3;
-        public static final double INTAKE_POWER = 0.1;
-        public static final double OUTTAKE_POWER = 2.0;
+        public static final double INTAKE_POWER = 0.3;
+        public static final double OUTTAKE_POWER = 1.0;
     }
 
     /**

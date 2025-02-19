@@ -3,7 +3,9 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Radians;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -160,13 +162,15 @@ public class RobotContainer {
     }
 
     private List<Runnable> controllerSetups = new ArrayList<>();
-
+    private final Set<String> seenController = new HashSet<>();
 
     private void maybeController(String name, CommandXboxController xboxController,
         Runnable setupFun) {
         Runnable runner = () -> {
-            System.out.println("Setting up buttons for " + name);
-            setupFun.run();
+            if (seenController.add(name)) {
+                System.out.println("Setting up buttons for " + name);
+                setupFun.run();
+            }
         };
         if (xboxController.isConnected()) {
             runner.run();
@@ -266,7 +270,8 @@ public class RobotContainer {
         // Climb
         climb.resetButton.onTrue(climb.restEncoder().ignoringDisable(true));
         climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());
-        coralScoring.coralAtOuttake.and(RobotModeTriggers.teleop()).onTrue(elevator.p0());
+        // coralScoring.coralAtOuttake.and(RobotModeTriggers.teleop()).onTrue(elevator.p0());
+
         elevator.hightAboveP0.or(climb.reachedClimberStart)
             .onTrue(new InstantCommand(() -> swerve.setSpeedMultiplier(0.25)).ignoringDisable(true))
             .onFalse(
