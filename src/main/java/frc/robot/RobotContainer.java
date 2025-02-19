@@ -34,6 +34,7 @@ import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberReal;
+import frc.robot.subsystems.climber.ClimberSim;
 import frc.robot.subsystems.coral.CoralScoring;
 import frc.robot.subsystems.coral.CoralScoringIO;
 import frc.robot.subsystems.coral.CoralScoringReal;
@@ -140,7 +141,7 @@ public class RobotContainer {
                 vision = new Vision(state, VisionReal::new);
                 coralScoring = new CoralScoring(new CoralScoringReal(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeReal(), vis);
-                climb = new Climber(new ClimberReal());
+                climb = new Climber(new ClimberReal(), vis);
                 break;
 
             case kSimulation:
@@ -152,7 +153,7 @@ public class RobotContainer {
                 elevator = new Elevator(new ElevatorSim(), vis);
                 coralScoring = new CoralScoring(new CoralScoringSim(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
-                climb = new Climber(new ClimberIO.Empty());
+                climb = new Climber(new ClimberSim(), vis);
                 break;
             default:
                 elevator = new Elevator(new ElevatorIO.Empty(), vis);
@@ -160,7 +161,7 @@ public class RobotContainer {
                 vision = new Vision(state, VisionIO::empty);
                 coralScoring = new CoralScoring(new CoralScoringIO.Empty(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
-                climb = new Climber(new ClimberIO.Empty());
+                climb = new Climber(new ClimberIO.Empty(), vis);
         }
         autoFactory = new AutoFactory(swerve::getPose, swerve::resetOdometry,
             swerve::followTrajectory, true, swerve);

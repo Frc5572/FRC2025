@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.viz.Viz2025;
 import frc.robot.Constants;
 
 /**
@@ -17,18 +18,20 @@ import frc.robot.Constants;
 public class Climber extends SubsystemBase {
     private ClimberIO io;
     private ClimberInputsAutoLogged climberAutoLogged = new ClimberInputsAutoLogged();
+    private final Viz2025 viz;
     public Trigger resetButton = new Trigger(() -> getClimberTouchSensorStatus());
     public Trigger reachedClimberStart = new Trigger(() -> reachedClimberStart());
 
-    public Climber(ClimberIO io) {
+    public Climber(ClimberIO io, Viz2025 viz) {
         this.io = io;
+        this.viz = viz;
     }
 
     @Override
     public void periodic() {
         io.updateInputs(climberAutoLogged);
         Logger.processInputs("Climber", climberAutoLogged);
-        Logger.recordOutput("/Climber/Climber Near Climber Start", reachedClimberStart);
+        viz.setClimberAngle(climberAutoLogged.climberPosition);
     }
 
     public void setClimberMotorVoltage(double voltage) {
