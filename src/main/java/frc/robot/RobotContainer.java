@@ -253,21 +253,24 @@ public class RobotContainer {
 
     private void configureTriggerBindings() {
         // Coral
-        coralScoring.coralAtIntake.onTrue(leds.setLEDsSolid(Color.kOrange).withTimeout(5));
-        coralScoring.coralAtOuttake.onTrue(leds.blinkLEDs(Color.kCyan, 5));
-        coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
+        coralScoring.coralAtIntake
+            .onTrue(leds.setLEDsSolid(Color.kOrange).withTimeout(5).ignoringDisable(true));
+        coralScoring.coralAtOuttake.onTrue(leds.blinkLEDs(Color.kCyan, 5).ignoringDisable(true));
+        coralScoring.coralAtOuttake.negate().debounce(1.0)
+            .whileTrue(coralScoring.runCoralIntake().ignoringDisable(true));
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
         // coralScoring.coralAtIntake.debounce(.25)
         // .onTrue(coralScoring.runCoralIntake().withTimeout(30));
         // Algae
-        algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan, 2));
+        algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan, 2).ignoringDisable(true));
         // Climb
-        climb.resetButton.onTrue(climb.restEncoder());
+        climb.resetButton.onTrue(climb.restEncoder().ignoringDisable(true));
         climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());
         coralScoring.coralAtOuttake.and(RobotModeTriggers.teleop()).onTrue(elevator.p0());
         elevator.hightAboveP0.or(climb.reachedClimberStart)
-            .onTrue(new InstantCommand(() -> swerve.setSpeedMultiplier(0.25)))
-            .onFalse(new InstantCommand(() -> swerve.setSpeedMultiplier(1.0)));
+            .onTrue(new InstantCommand(() -> swerve.setSpeedMultiplier(0.25)).ignoringDisable(true))
+            .onFalse(
+                new InstantCommand(() -> swerve.setSpeedMultiplier(1.0)).ignoringDisable(true));
 
     }
 
