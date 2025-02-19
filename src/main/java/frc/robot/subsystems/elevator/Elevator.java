@@ -84,7 +84,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean hightAboveP0() {
-        return (inputs.position).in(Inches) >= (Constants.Elevator.P1).in(Inches);
+        return (inputs.position).in(Inches) >= (Constants.Elevator.P0).in(Inches) + 5;
     }
 
     /**

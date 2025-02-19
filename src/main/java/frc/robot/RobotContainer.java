@@ -234,8 +234,7 @@ public class RobotContainer {
 
     private void setupAltOperatorController() {
         altOperator.y().onTrue(elevator.home());
-        altOperator.x().and(coralScoring.coralAtOuttake.debounce(.5))
-            .whileTrue(coralScoring.runCoralOuttake());
+        altOperator.x().and(coralScoring.coralAtOuttake).whileTrue(coralScoring.runCoralOuttake());
         altOperator.rightTrigger().whileTrue(algae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
         altOperator.leftTrigger()
             .whileTrue(algae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
@@ -246,11 +245,12 @@ public class RobotContainer {
         operatorStates.manualModeCheck.onTrue(elevator.manualMove(altOperator));
 
 
-        altOperator.a().and(operatorStates.manualModeCheck).whileTrue(elevator.heightSelector());
-        altOperator.povUp().and(operatorStates.manualModeCheck)
+        altOperator.a().and(operatorStates.manualModeCheck.negate())
+            .whileTrue(elevator.heightSelector());
+        altOperator.povUp().and(operatorStates.manualModeCheck.negate())
             .onTrue(Commands.runOnce(() -> frc.lib.util.ScoringLocation.Height.incrementState())
                 .ignoringDisable(true));
-        altOperator.povDown().and(operatorStates.manualModeCheck)
+        altOperator.povDown().and(operatorStates.manualModeCheck.negate())
             .onTrue(Commands.runOnce(() -> frc.lib.util.ScoringLocation.Height.decrementState())
                 .ignoringDisable(true));
         altOperator.b().whileTrue(elevator.p0());
@@ -280,9 +280,9 @@ public class RobotContainer {
         // Climb
         climb.resetButton.onTrue(climb.restEncoder());
         climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());
-        coralScoring.coralAtOuttake.onTrue(elevator.p0());
-        elevator.elevatorHeight.onTrue(new InstantCommand(() -> swerve.setSpeedMultiplier(0.5)));
-        elevator.elevatorHeight.onFalse(new InstantCommand(() -> swerve.setSpeedMultiplier(1)));
+        coralScoring.coralAtOuttake.and(RobotModeTriggers.teleop()).onTrue(elevator.p0());
+        elevator.elevatorHeight.onTrue(new InstantCommand(() -> swerve.setSpeedMultiplier(0.25)))
+            .onFalse(new InstantCommand(() -> swerve.setSpeedMultiplier(1)));
 
     }
 

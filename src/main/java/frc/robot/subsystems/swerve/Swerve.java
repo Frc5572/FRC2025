@@ -273,10 +273,9 @@ public class Swerve extends SubsystemBase {
     public Command teleOpDrive(CommandXboxController controller, boolean fieldRelative,
         boolean openLoop) {
         return this.run(() -> {
-            double speedMultiplier = setSpeedMultiplier;
-            double yaxis = -controller.getLeftY() * speedMultiplier;
-            double xaxis = -controller.getLeftX() * speedMultiplier;
-            double raxis = -controller.getRightX() * speedMultiplier;
+            double yaxis = -controller.getLeftY();
+            double xaxis = -controller.getLeftX();
+            double raxis = -controller.getRightX();
             /* Deadbands */
             yaxis = (Math.abs(yaxis) < Constants.STICK_DEADBAND) ? 0
                 : (yaxis - Constants.STICK_DEADBAND) / (1.0 - Constants.STICK_DEADBAND);
@@ -285,9 +284,9 @@ public class Swerve extends SubsystemBase {
             xaxis *= xaxis * Math.signum(xaxis);
             yaxis *= yaxis * Math.signum(yaxis);
             raxis = (Math.abs(raxis) < Constants.STICK_DEADBAND) ? 0 : raxis;
-            Translation2d translation =
-                new Translation2d(yaxis, xaxis).times(Constants.Swerve.maxSpeed);
-            double rotation = raxis * Constants.Swerve.maxAngularVelocity;
+            Translation2d translation = new Translation2d(yaxis, xaxis)
+                .times(Constants.Swerve.maxSpeed).times(setSpeedMultiplier);
+            double rotation = raxis * Constants.Swerve.maxAngularVelocity * setSpeedMultiplier;
             this.drive(translation, rotation, fieldRelative, openLoop);
         });
     }

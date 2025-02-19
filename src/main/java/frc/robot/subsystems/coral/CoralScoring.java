@@ -18,8 +18,8 @@ public class CoralScoring extends SubsystemBase {
     private CoralScoringIO io;
     private CoralScoringInputsAutoLogged inputs = new CoralScoringInputsAutoLogged();
     private final Viz2025 viz;
-    public Trigger coralAtIntake = new Trigger(() -> getIntakeBeamBreakStatus());
-    public Trigger coralAtOuttake = new Trigger(() -> getOuttakeBeamBreakStatus());
+    public Trigger coralAtIntake = new Trigger(() -> getIntakeBeamBreakStatus()).debounce(.25);
+    public Trigger coralAtOuttake = new Trigger(() -> getOuttakeBeamBreakStatus()).debounce(.25);
 
 
     private GenericEntry haveCoral =
