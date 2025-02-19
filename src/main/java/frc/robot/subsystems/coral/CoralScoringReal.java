@@ -18,10 +18,10 @@ public class CoralScoringReal implements CoralScoringIO {
     private final SparkMax coralScoringMotor = new SparkMax(
         Constants.Motors.PrimaryCoralScoring.Coral_Scoring_NEO_ID, MotorType.kBrushless);
     public final RelativeEncoder coralScoringRelativeEnc = coralScoringMotor.getEncoder();
-    private final DigitalInput scoringBeamBrake =
-        new DigitalInput(Constants.CoralScoringConstants.Scoring_Beam_Brake_DIO_Port);
-    private final DigitalInput intakeBeamBrake =
-        new DigitalInput(Constants.CoralScoringConstants.Intake_Beam_Breake_DIO_Port);
+    private final DigitalInput outtakeBeamBreak =
+        new DigitalInput(Constants.CoralScoringConstants.OUTTAKE_BEAM_BREAK_DIO_PORT);
+    private final DigitalInput intakeBeamBreak =
+        new DigitalInput(Constants.CoralScoringConstants.INTAKE_BEAM_BREAK_DIO_PORT);
     SparkMaxConfig motorConfig = new SparkMaxConfig();
 
     /**
@@ -38,11 +38,11 @@ public class CoralScoringReal implements CoralScoringIO {
      */
 
     public void updateInputs(CoralScoringInputs inputs) {
-        inputs.scoringBeamBrake = !scoringBeamBrake.get();
-        inputs.intakeBeamBrake = !intakeBeamBrake.get();
+        inputs.outtakeBeamBreak = !outtakeBeamBreak.get();
+        inputs.intakeBeamBreak = !intakeBeamBreak.get();
     }
 
-    public void setCoralScoringMotorPercentage(double percent) {
+    public void setCoralPower(double percent) {
         coralScoringMotor.set(percent);
     }
 

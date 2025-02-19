@@ -106,7 +106,7 @@ public final class Constants {
      */
     public static final class LEDs {
         public static final int LED_PORT = 0;
-        public static final int LED_LENGTH = 123;
+        public static final int LED_LENGTH = 60;
     }
 
 
@@ -393,9 +393,10 @@ public final class Constants {
      * Primary Coral Scoring Constants
      */
     public static final class CoralScoringConstants {
-        public static final int Scoring_Beam_Brake_DIO_Port = 0;
-        public static final int Intake_Beam_Breake_DIO_Port = 3;
-        public static final int Random_Touch_Sensor = 1;
+        public static final int OUTTAKE_BEAM_BREAK_DIO_PORT = 0;
+        public static final int INTAKE_BEAM_BREAK_DIO_PORT = 3;
+        public static final double INTAKE_POWER = 0.1;
+        public static final double OUTTAKE_POWER = 2.0;
     }
 
     /**
