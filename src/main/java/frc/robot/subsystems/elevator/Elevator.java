@@ -22,7 +22,7 @@ public class Elevator extends SubsystemBase {
     ElevatorIO io;
     private final Viz2025 viz;
     private ElevatorInputsAutoLogged inputs = new ElevatorInputsAutoLogged();
-    public Trigger elevatorHeight = new Trigger(() -> hightAboveP0());
+    public Trigger hightAboveP0 = new Trigger(() -> hightAboveP0());
 
     /** Elevator Subsystem */
     public Elevator(ElevatorIO io, Viz2025 viz) {

@@ -265,7 +265,8 @@ public class RobotContainer {
         climb.resetButton.onTrue(climb.restEncoder());
         climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());
         coralScoring.coralAtOuttake.and(RobotModeTriggers.teleop()).onTrue(elevator.p0());
-        elevator.elevatorHeight.onTrue(new InstantCommand(() -> swerve.setSpeedMultiplier(0.25)))
+        elevator.hightAboveP0.or(climb.reachedClimberStart)
+            .onTrue(new InstantCommand(() -> swerve.setSpeedMultiplier(0.25)))
             .onFalse(new InstantCommand(() -> swerve.setSpeedMultiplier(1.0)));
 
     }
