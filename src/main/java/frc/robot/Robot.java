@@ -14,9 +14,10 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import edu.wpi.first.net.WebServer;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.lib.util.ScoringLocation.Height;
 
 /**
  * Runs tasks on Roborio in this file.
@@ -46,6 +47,7 @@ public class Robot extends LoggedRobot {
      */
     @Override
     public void robotInit() {
+        WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
         // Record metadata
         Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
         Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -121,10 +123,6 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().run();
         robotContainer.updateSimulation();
         robotContainer.updateViz();
-        robotContainer.heightState.setString(Height.getCurrentState().displayName);
-        robotContainer.heightWidget.setInteger(Height.getCurrentState().ordinal() + 1);
-        // robotContainer.algaeState.setString(AlgaeHeight.getCurrentHeightMode().displayName);
-        // robotContainer.algaeWidget.setInteger(AlgaeHeight.getCurrentHeightMode().ordinal() + 1);
     }
 
     @Override

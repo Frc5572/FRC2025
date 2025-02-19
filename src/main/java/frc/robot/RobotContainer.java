@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Radians;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -12,12 +11,8 @@ import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.lib.util.ScoringLocation;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
@@ -79,17 +73,6 @@ public class RobotContainer {
 
     /** Simulation */
     private SwerveDriveSimulation driveSimulation;
-    /** ShuffleBoard */
-    public static ShuffleboardTab mainDriverTab = Shuffleboard.getTab("Main Driver");
-
-    public GenericEntry heightState =
-        mainDriverTab.add("Elevator Height", ScoringLocation.Height.getCurrentState().displayName)
-            .withWidget(BuiltInWidgets.kTextView).withPosition(2, 0).withSize(2, 1).getEntry();
-    public GenericEntry heightWidget =
-        mainDriverTab.add("Coral Level", ScoringLocation.Height.getCurrentState().ordinal() + 1)
-            .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min_value ", 1,
-                "max_value", 4, "divisions", 4, "Show Text", false, "orientation", "vertical"))
-            .withPosition(2, 1).withSize(2, 3).getEntry();
 
     /** Visualization */
     private final FieldViz fieldVis;
@@ -156,7 +139,7 @@ public class RobotContainer {
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Example", autos::example);
 
-        SmartDashboard.putData("Auto Chooser", autoChooser);
+        SmartDashboard.putData("Dashboard/Auto/Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler()
             .andThen(Commands.runOnce(() -> swerve.setMotorsZero())));
         RobotModeTriggers.disabled().onTrue(Commands.runOnce(() -> swerve.setMotorsZero()));
