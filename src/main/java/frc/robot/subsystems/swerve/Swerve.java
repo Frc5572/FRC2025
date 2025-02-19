@@ -320,8 +320,11 @@ public class Swerve extends SubsystemBase {
      * @param pose Desired Pose2d
      */
     public void moveToPose(Pose2d pose) {
+        if (Constants.shouldDrawStuff) {
+            Logger.recordOutput("Swerve/moveToPoseTarget", pose);
+        }
         ChassisSpeeds ctrlEffort = holonomicDriveController.calculate(state.getGlobalPoseEstimate(),
-            pose, 0, state.getGlobalPoseEstimate().getRotation());
+            pose, 0, pose.getRotation());
         setModuleStates(ctrlEffort);
     }
 
