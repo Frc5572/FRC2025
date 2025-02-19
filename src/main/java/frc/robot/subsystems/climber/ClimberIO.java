@@ -1,5 +1,6 @@
 package frc.robot.subsystems.climber;
 
+import static edu.wpi.first.units.Units.Radians;
 import org.littletonrobotics.junction.AutoLog;
 import edu.wpi.first.units.measure.Angle;
 
@@ -12,7 +13,7 @@ public interface ClimberIO {
      */
     @AutoLog
     public static class ClimberInputs {
-        public Angle climberPosition;
+        public Angle climberPosition = Radians.of(0);
         public boolean climberTouchSensor;
 
 
@@ -44,5 +45,4 @@ public interface ClimberIO {
         }
 
     }
-
 }

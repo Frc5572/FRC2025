@@ -27,6 +27,7 @@ import frc.lib.util.ScoringLocation;
 import frc.lib.util.ScoringLocation.AlgaeHeight;
 import frc.lib.util.ScoringLocation.CoralHeight;
 import frc.lib.util.ScoringLocation.HeightMode;
+import frc.lib.util.WebController;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
@@ -70,13 +71,13 @@ public class RobotContainer {
 
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
+    public final WebController operator = new WebController(5800);
     public final CommandXboxController backUpOperator =
         new CommandXboxController(Constants.operatorId);
     public final CommandXboxController pitController =
         new CommandXboxController(Constants.PIT_CONTROLLER_ID);
     public final CommandXboxController altOperator =
         new CommandXboxController(Constants.ALT_OPERATOR_ID);
-    public final CommandXboxController operator = new CommandXboxController(1);
 
 
     /** Simulation */
