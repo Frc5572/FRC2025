@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -36,7 +37,7 @@ public class Swerve extends SubsystemBase {
     private SwerveInputsAutoLogged inputs = new SwerveInputsAutoLogged();
     private SwerveIO swerveIO;
     private final RobotState state;
-    private double setSpeedMultiplier = 1;
+    private double setSpeedMultiplier = 1.0;
     private final HolonomicDriveController holonomicDriveController = new HolonomicDriveController(
         new PIDController(Constants.SwerveTransformPID.PID_XKP,
             Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
@@ -277,10 +278,8 @@ public class Swerve extends SubsystemBase {
             double xaxis = -controller.getLeftX();
             double raxis = -controller.getRightX();
             /* Deadbands */
-            yaxis = (Math.abs(yaxis) < Constants.STICK_DEADBAND) ? 0
-                : (yaxis - Constants.STICK_DEADBAND) / (1.0 - Constants.STICK_DEADBAND);
-            xaxis = (Math.abs(xaxis) < Constants.STICK_DEADBAND) ? 0
-                : (xaxis - Constants.STICK_DEADBAND) / (1.0 - Constants.STICK_DEADBAND);
+            yaxis = MathUtil.applyDeadband(yaxis, 0.1);
+            xaxis = MathUtil.applyDeadband(xaxis, 0.1);
             xaxis *= xaxis * Math.signum(xaxis);
             yaxis *= yaxis * Math.signum(yaxis);
             raxis = (Math.abs(raxis) < Constants.STICK_DEADBAND) ? 0 : raxis;
