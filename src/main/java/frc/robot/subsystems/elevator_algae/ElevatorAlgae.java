@@ -49,8 +49,17 @@ public class ElevatorAlgae extends SubsystemBase {
         return inputs.algaeMotorCurrent > Constants.HAS_ALGAE_CURRENT_THRESHOLD;
     }
 
-    public Command setMotorVoltageCommand(double speed) { // set motor speed Command
+    public Command runAlgaeMotor(double speed) { // set motor speed Command
         return runEnd(() -> setAlgaeMotorVoltage(speed), () -> setAlgaeMotorVoltage(0));
         // .until(() -> hasAlgae());
+    }
+
+    /**
+     * Keeps algae intake motor running even after it has intaked an algae, but it lowers the speed
+     */
+    public Command algaeIntakeCommand() {
+        return runAlgaeMotor(Constants.Algae.VOLTAGE).until(() -> hasAlgae())
+            .andThen(() -> setAlgaeMotorVoltage(Constants.Algae.SMALLER_VOLTAGE));
+
     }
 }

@@ -219,9 +219,8 @@ public class RobotContainer {
     private void setupAltOperatorController() {
         altOperator.y().onTrue(elevator.home());
         altOperator.x().and(coralScoring.coralAtOuttake).whileTrue(coralScoring.runCoralOuttake());
-        altOperator.rightTrigger().whileTrue(algae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
-        altOperator.leftTrigger()
-            .whileTrue(algae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
+        // altOperator.rightTrigger().whileTrue(algae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
+        altOperator.leftTrigger().whileTrue(algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE));
         // manual mode
         altOperator.start().onTrue(
             Commands.runOnce(() -> operatorStates.toggleManualMode()).ignoringDisable(true));
@@ -259,6 +258,7 @@ public class RobotContainer {
         // Algae
         algaeInIntake.and(coralScoring.coralAtOuttake.negate())
             .onTrue(leds.blinkLEDs(Color.kCyan, 2));
+        elevator.heightEqualToP0.or(elevator.heightEqualToP3).whileTrue(algae.algaeIntakeCommand());
         // Climb
         climb.resetButton.onTrue(climb.resetEncoder());
         // coralScoring.coralAtOuttake.and(RobotModeTriggers.teleop()).onTrue(elevator.p0());
@@ -306,5 +306,3 @@ public class RobotContainer {
         }
     }
 }
-
-

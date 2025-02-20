@@ -72,6 +72,8 @@ public final class Constants {
     public static final class Algae {
         public static final int VOLTAGE = 2;
         public static final int NEGATIVE_VOLTAGE = -2;
+        public static final double SMALLER_VOLTAGE = 1;
+        public static final double SMALLER_NEGATIVE_VOLTAGE = -1;
     }
 
     // pit and alt operator controllers

@@ -23,6 +23,8 @@ public class Elevator extends SubsystemBase {
     private final Viz2025 viz;
     private ElevatorInputsAutoLogged inputs = new ElevatorInputsAutoLogged();
     public Trigger hightAboveP0 = new Trigger(() -> hightAboveP0());
+    public Trigger heightEqualToP0 = new Trigger(() -> heightEqualToP0());
+    public Trigger heightEqualToP3 = new Trigger(() -> heightEqualToP3());
 
     /** Elevator Subsystem */
     public Elevator(ElevatorIO io, Viz2025 viz) {
@@ -87,6 +89,14 @@ public class Elevator extends SubsystemBase {
 
     public boolean hightAboveP0() {
         return (inputs.position).in(Inches) >= (Constants.Elevator.P0).in(Inches) + 5;
+    }
+
+    public boolean heightEqualToP0() {
+        return inputs.position.isNear(Constants.Elevator.P0, Inches.of(6));
+    }
+
+    public boolean heightEqualToP3() {
+        return inputs.position.isNear(Constants.Elevator.P3, Inches.of(6));
     }
 
     /**
