@@ -16,4 +16,6 @@ permissions:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   code-checks:
-    uses: Frc5572/Workflows/.github/workflows/frc-checks.yml@main
+    uses: Frc5572/Workflows/.github/workflows/frc-checks.yml@codespell-input
+    with:
+      codespell_ignore: .codespellignore
