@@ -219,7 +219,7 @@ public class RobotContainer {
     private void setupAltOperatorController() {
         altOperator.y().onTrue(elevator.home());
         altOperator.x().and(coralScoring.coralAtOuttake).whileTrue(coralScoring.runCoralOuttake());
-        // altOperator.rightTrigger().whileTrue(algae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
+        // altOperator.rightTrigger().whileTrue(algae.runAlgaeMotor(Constants.Algae.VOLTAGE));
         altOperator.leftTrigger().whileTrue(algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE));
         // manual mode
         altOperator.start().onTrue(
