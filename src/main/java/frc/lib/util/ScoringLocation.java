@@ -82,6 +82,7 @@ public class ScoringLocation {
             this.height = height;
         }
 
+        /** Deserialize from integer */
         public static Height fromInt(int value) {
             switch (value) {
                 case 0:
