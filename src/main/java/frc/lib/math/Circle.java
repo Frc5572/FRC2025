@@ -89,4 +89,25 @@ public class Circle implements ConvexShape, Drawable {
         return center.plus(new Translation2d(radius + extra, rotation));
     }
 
+    /**
+     * Get angles for points that are both tangent to the circle and colinear with a given point.
+     */
+    public RotationInterval circleTangentAngles(Translation2d p) {
+        Translation2d diff = p.minus(center);
+        double d = diff.getNorm();
+        double det = radius / d;
+        if (det > 1.0 || det < -1.0) {
+            var angle = getAngle(p);
+            return new RotationInterval(angle.minus(Rotation2d.fromDegrees(5)),
+                angle.plus(Rotation2d.fromDegrees(5)));
+        }
+        double dtheta = Math.acos(det);
+        if (dtheta < 0.0) {
+            dtheta = -dtheta;
+        }
+
+        Rotation2d dAngle = Rotation2d.fromRadians(dtheta);
+        return RotationInterval.acute(diff.getAngle().plus(dAngle), diff.getAngle().minus(dAngle));
+    }
+
 }
