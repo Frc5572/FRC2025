@@ -225,7 +225,7 @@ public class RobotContainer {
             .whileTrue(new MoveToPoseWithLocalTag(swerve, () -> {
                 return new Tuple2<Pose2d, Integer>(operator.getDesiredLocation().pose,
                     operator.getDesiredLocation().tag);
-            }, true, Units.inchesToMeters(4), 2));
+            }, () -> 0.5, true, Units.inchesToMeters(4), 2));
     }
 
     private void setupAltOperatorController() {

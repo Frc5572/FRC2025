@@ -326,13 +326,28 @@ public class Swerve extends SubsystemBase {
      *
      * @param pose Desired Pose2d
      */
-    public void moveToPose(Pose2d pose) {
+    public void moveToPose(Pose2d pose, double maxSpeed) {
         if (Constants.shouldDrawStuff) {
             Logger.recordOutput("Swerve/moveToPoseTarget", pose);
         }
         ChassisSpeeds ctrlEffort = holonomicDriveController.calculate(state.getGlobalPoseEstimate(),
             pose, 0, pose.getRotation());
+        double speed = Math.hypot(ctrlEffort.vxMetersPerSecond, ctrlEffort.vyMetersPerSecond);
+        if (speed > maxSpeed) {
+            double mul = maxSpeed / speed;
+            ctrlEffort.vxMetersPerSecond *= mul;
+            ctrlEffort.vyMetersPerSecond *= mul;
+        }
         setModuleStates(ctrlEffort);
+    }
+
+    /**
+     * Move to a Pose2d
+     *
+     * @param pose Desired Pose2d
+     */
+    public void moveToPose(Pose2d pose) {
+        moveToPose(pose, Constants.Swerve.maxSpeed);
     }
 
 }

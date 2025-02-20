@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import choreo.auto.AutoRoutine;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -9,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.AllianceFlipUtil;
 import frc.lib.util.Tuples.Tuple2;
+import frc.robot.Constants;
 import frc.robot.subsystems.swerve.Swerve;
 
 /**
@@ -34,19 +36,39 @@ public class MoveToPoseWithLocalTag extends Command {
      *
      * @param swerve Swerve Subsystem
      * @param pose2dAndTagSupplier Pose2d and tag id Supplier
+     * @param maxSpeedSupplier maximum speed to move at
      * @param flipForRed Whether to flip the pose2d for red alliance
      * @param tol Translational Tolerance
      * @param rotTol Rotational Tolerance
      */
     public MoveToPoseWithLocalTag(Swerve swerve,
-        Supplier<Tuple2<Pose2d, Integer>> pose2dAndTagSupplier, boolean flipForRed, double tol,
-        double rotTol) {
+        Supplier<Tuple2<Pose2d, Integer>> pose2dAndTagSupplier, DoubleSupplier maxSpeedSupplier,
+        boolean flipForRed, double tol, double rotTol) {
         this.swerve = swerve;
         this.pose2dAndTagSupplier = pose2dAndTagSupplier;
         this.flipForRed = flipForRed;
         this.tol = tol;
         this.rotTol = rotTol;
         addRequirements(swerve);
+    }
+
+    /**
+     * Move to a specified Pose2d command
+     *
+     * @param swerve Swerve Subsystem
+     * @param pose2dAndTagSupplier Pose2d and tag id Supplier
+     * @param maxSpeedSupplier maximum speed to move at
+     * @param flipForRed Whether to flip the pose2d for red alliance
+     * @param tol Translational Tolerance
+     * @param rotTol Rotational Tolerance
+     * @param autoRoutine Choreo AutoRoutine to integrate command
+     */
+    public MoveToPoseWithLocalTag(Swerve swerve,
+        Supplier<Tuple2<Pose2d, Integer>> pose2dAndTagSupplier, DoubleSupplier maxSpeedSupplier,
+        boolean flipForRed, double tol, double rotTol, AutoRoutine autoRoutine) {
+        this(swerve, pose2dAndTagSupplier, maxSpeedSupplier, flipForRed, tol, rotTol);
+        this.autoRoutine = autoRoutine;
+        this.eventLoop = autoRoutine.loop();
     }
 
     /**
@@ -62,7 +84,8 @@ public class MoveToPoseWithLocalTag extends Command {
     public MoveToPoseWithLocalTag(Swerve swerve,
         Supplier<Tuple2<Pose2d, Integer>> pose2dAndTagSupplier, boolean flipForRed, double tol,
         double rotTol, AutoRoutine autoRoutine) {
-        this(swerve, pose2dAndTagSupplier, flipForRed, tol, rotTol);
+        this(swerve, pose2dAndTagSupplier, () -> Constants.Swerve.maxSpeed, flipForRed, tol,
+            rotTol);
         this.autoRoutine = autoRoutine;
         this.eventLoop = autoRoutine.loop();
     }
