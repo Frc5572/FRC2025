@@ -213,6 +213,7 @@ public class Swerve extends SubsystemBase {
         state.addSwerveObservation(getModulePositions(), getGyroYaw());
         Logger.processInputs("Swerve", inputs);
         field.setRobotPose(getPose());
+        SmartDashboard.putNumber("SpeedMultiplier", setSpeedMultiplier);
     }
 
     /**

@@ -217,7 +217,7 @@ public class RobotContainer {
                         .in(Radians) <= Constants.Climb.CLIMBER_START_ANGLE.in(Radians))));
 
         driver.rightTrigger().and(climb.reachedClimberStart)
-            .onTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
+            .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
     }
 
     private void setupAltOperatorController() {
@@ -257,23 +257,22 @@ public class RobotContainer {
 
     private void configureTriggerBindings() {
         // Coral
-        coralScoring.coralAtIntake
-            .onTrue(leds.setLEDsSolid(Color.kOrange).withTimeout(5).ignoringDisable(true));
-        coralScoring.coralAtOuttake.onTrue(leds.blinkLEDs(Color.kCyan, 5).ignoringDisable(true));
+        coralScoring.coralAtIntake.whileTrue(leds.setLEDsSolid(Color.kOrange));
+        coralScoring.coralAtOuttake.whileTrue(leds.setLEDsSolid(Color.kCyan));
         coralScoring.coralAtOuttake.negate().debounce(1.0)
-            .whileTrue(coralScoring.runCoralIntake().ignoringDisable(true));
+            .whileTrue(coralScoring.runCoralIntake().ignoringDisable(true)); // TDOD
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
         // coralScoring.coralAtIntake.debounce(.25)
         // .onTrue(coralScoring.runCoralIntake().withTimeout(30));
         // Algae
-        algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan, 2).ignoringDisable(true));
+        algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan, 2).ignoringDisable(true)); // TDOD
         // Climb
-        climb.resetButton.onTrue(climb.restEncoder().ignoringDisable(true));
+        climb.resetButton.onTrue(climb.restEncoder().ignoringDisable(true)); // TDOD
         climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());
         // coralScoring.coralAtOuttake.and(RobotModeTriggers.teleop()).onTrue(elevator.p0());
 
         elevator.hightAboveP0.or(climb.reachedClimberStart)
-            .onTrue(new InstantCommand(() -> swerve.setSpeedMultiplier(0.25)).ignoringDisable(true))
+            .onTrue(new InstantCommand(() -> swerve.setSpeedMultiplier(0.15)).ignoringDisable(true))
             .onFalse(
                 new InstantCommand(() -> swerve.setSpeedMultiplier(1.0)).ignoringDisable(true));
 

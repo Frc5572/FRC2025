@@ -5,6 +5,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -32,6 +33,7 @@ public class Climber extends SubsystemBase {
         io.updateInputs(climberAutoLogged);
         Logger.processInputs("Climber", climberAutoLogged);
         viz.setClimberAngle(climberAutoLogged.climberPosition);
+        SmartDashboard.putBoolean("Climber Out", reachedClimberStart());
     }
 
     public void setClimberMotorVoltage(double voltage) {
