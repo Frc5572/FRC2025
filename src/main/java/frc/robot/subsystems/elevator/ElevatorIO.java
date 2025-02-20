@@ -27,9 +27,11 @@ public interface ElevatorIO {
 
     public void setVoltage(double volts);
 
+    public void resetHome();
+
     public void setPositon(double position);
 
-    public void resetHome();
+    public default void setPower(double power) {}
 
     /** Empty Elevator implementation (for replay) */
     public static class Empty implements ElevatorIO {
@@ -45,15 +47,14 @@ public interface ElevatorIO {
         }
 
         @Override
-        public void setPositon(double position) {
-
-        }
-
-        @Override
         public void resetHome() {
 
         }
 
+        @Override
+        public void setPositon(double position) {}
+
     }
+
 
 }

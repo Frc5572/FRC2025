@@ -1,9 +1,11 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Radians;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -11,22 +13,17 @@ import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.lib.util.ScoringLocation;
-import frc.lib.util.ScoringLocation.AlgaeHeight;
-import frc.lib.util.ScoringLocation.CoralHeight;
-import frc.lib.util.ScoringLocation.HeightMode;
+import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
@@ -70,8 +67,6 @@ public class RobotContainer {
 
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
-    public final CommandXboxController backUpOperator =
-        new CommandXboxController(Constants.operatorId);
     public final CommandXboxController pitController =
         new CommandXboxController(Constants.PIT_CONTROLLER_ID);
     public final CommandXboxController altOperator =
@@ -81,31 +76,6 @@ public class RobotContainer {
 
     /** Simulation */
     private SwerveDriveSimulation driveSimulation;
-    /** ShuffleBoard */
-    public static ShuffleboardTab mainDriverTab = Shuffleboard.getTab("Main Driver");
-
-    public GenericEntry coralState =
-        mainDriverTab.add("Coral State", ScoringLocation.CoralHeight.getCurrentState().displayName)
-            .withWidget(BuiltInWidgets.kTextView).withPosition(2, 0).withSize(2, 1).getEntry();
-    public GenericEntry coralWidget = mainDriverTab
-        .add("Coral Level", ScoringLocation.CoralHeight.getCurrentState().ordinal() + 1)
-        .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min_value ", 1, "max_value",
-            4, "divisions", 4, "Show Text", false, "orientation", "vertical"))
-        .withPosition(2, 1).withSize(2, 3).getEntry();
-    public GenericEntry algaeState = mainDriverTab
-        .add("Algae State", ScoringLocation.AlgaeHeight.getCurrentHeightMode().displayName)
-        .withWidget(BuiltInWidgets.kTextView).withPosition(4, 0).withSize(2, 1).getEntry();
-
-    public GenericEntry algaeWidget = mainDriverTab
-        .add("Algae Level", ScoringLocation.CoralHeight.getCurrentState().ordinal() + 1)
-        .withWidget(BuiltInWidgets.kNumberBar).withProperties(Map.of("min_value ", 1, "max_value",
-            2, "divisions", 1, "Show Text", false, "orientation", "vertical"))
-        .withPosition(4, 1).withSize(2, 3).getEntry();
-
-    public GenericEntry isCoralMode = RobotContainer.mainDriverTab.add("Elevator Mode", true)
-        .withWidget(BuiltInWidgets.kBooleanBox)
-        .withProperties(Map.of("true_color", 0xffffffff, "false_color", 0xff0af0c3))
-        .withPosition(6, 0).withSize(2, 2).getEntry();
 
     /** Visualization */
     private final FieldViz fieldVis;
@@ -122,10 +92,11 @@ public class RobotContainer {
     private final Vision vision;
     private CoralScoring coralScoring;
     private Climber climb;
+    private OperatorStates operatorStates = new OperatorStates();
+
 
     /* Triggers */
     private Trigger algaeInIntake = new Trigger(() -> algae.hasAlgae());
-
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -171,7 +142,7 @@ public class RobotContainer {
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Example", autos::example);
 
-        SmartDashboard.putData("Auto Chooser", autoChooser);
+        SmartDashboard.putData("Dashboard/Auto/Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler()
             .andThen(Commands.runOnce(() -> swerve.setMotorsZero())));
         RobotModeTriggers.disabled().onTrue(Commands.runOnce(() -> swerve.setMotorsZero()));
@@ -181,6 +152,7 @@ public class RobotContainer {
         /* Button and Trigger Bindings */
 
         configureTriggerBindings();
+
         if (runtimeType == RobotRunType.kSimulation) {
             maybeController("Driver", driver, this::setupDriver);
         } else {
@@ -191,12 +163,15 @@ public class RobotContainer {
     }
 
     private List<Runnable> controllerSetups = new ArrayList<>();
+    private final Set<String> seenController = new HashSet<>();
 
     private void maybeController(String name, CommandXboxController xboxController,
         Runnable setupFun) {
         Runnable runner = () -> {
-            System.out.println("Setting up buttons for " + name);
-            setupFun.run();
+            if (seenController.add(name)) {
+                System.out.println("Setting up buttons for " + name);
+                setupFun.run();
+            }
         };
         if (xboxController.isConnected()) {
             runner.run();
@@ -214,13 +189,20 @@ public class RobotContainer {
         controllerSetups.clear();
     }
 
+    /**
+     * Use this method to vol your button->command mappings. Buttons can be created by instantiating
+     * a {@link GenericHID} or one of its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or
+     * {@link XboxController}), and then passing it to a
+     * {@link edu1.wpi.first.wpilibj2.command.button.JoystickButton}.
+     */
+
     private void setupDriver() {
+
+
         swerve.setDefaultCommand(swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
-        driver.y().onTrue(new InstantCommand(() -> swerve.resetFieldRelativeOffset()));
-        driver.x().onTrue(new InstantCommand(() -> { // sim only
-            swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
-        }));
+
+        driver.y().onTrue(Commands.runOnce(() -> swerve.resetFieldRelativeOffset()));
         driver.rightTrigger().and(climb.reachedClimberStart.negate())
             .onTrue(climb
                 .runClimberMotorCommand(Constants.Climb.PRE_CLIMB_VOLTAGE,
@@ -231,56 +213,59 @@ public class RobotContainer {
                         .in(Radians) <= Constants.Climb.CLIMBER_START_ANGLE.in(Radians))));
 
         driver.rightTrigger().and(climb.reachedClimberStart)
-            .onTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
+            .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
     }
 
     private void setupAltOperatorController() {
-        altOperator.povUp().and(HeightMode.coralMode)
-            .onTrue(Commands.runOnce(() -> CoralHeight.incrementState()).ignoringDisable(true));
-        altOperator.povUp().and(HeightMode.algaeMode)
-            .onTrue(Commands.runOnce(() -> AlgaeHeight.incrementState()).ignoringDisable(true));
-        altOperator.povDown().and(HeightMode.algaeMode)
-            .onTrue(Commands.runOnce(() -> AlgaeHeight.decrementState()).ignoringDisable(true));
-        altOperator.povDown().and(HeightMode.coralMode)
-            .onTrue(Commands.runOnce(() -> CoralHeight.decrementState()).ignoringDisable(true));
-        altOperator.povRight()
-            .onTrue(Commands.runOnce(() -> HeightMode.decrementState()).ignoringDisable(true));
-        altOperator.povLeft()
-            .onTrue(Commands.runOnce(() -> HeightMode.incrementState()).ignoringDisable(true));
         altOperator.y().onTrue(elevator.home());
-        altOperator.x().and(coralScoring.coralAtOuttake.debounce(.5))
-            .whileTrue(coralScoring.runCoralOuttake());
+        altOperator.x().and(coralScoring.coralAtOuttake).whileTrue(coralScoring.runCoralOuttake());
         altOperator.rightTrigger().whileTrue(algae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
         altOperator.leftTrigger()
             .whileTrue(algae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
+        // manual mode
+        altOperator.start().onTrue(
+            Commands.runOnce(() -> operatorStates.toggleManualMode()).ignoringDisable(true));
+        operatorStates.manualModeCheck.onTrue(elevator.manualMove(altOperator));
 
-        altOperator.a().and(HeightMode.algaeMode).and(AlgaeHeight.level1).whileTrue(elevator.p0());
-        altOperator.a().and(HeightMode.algaeMode).and(AlgaeHeight.level2).whileTrue(elevator.p2());
-        altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level1).whileTrue(elevator.p0());
-        altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level2).whileTrue(elevator.p1());
-        altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level3).whileTrue(elevator.p3());
-        altOperator.a().and(HeightMode.coralMode).and(CoralHeight.level4).whileTrue(elevator.p4());
+
+        altOperator.a().and(operatorStates.manualModeCheck.negate())
+            .whileTrue(elevator.heightSelector());
+        altOperator.povUp().and(operatorStates.manualModeCheck.negate())
+            .onTrue(Commands.runOnce(() -> Height.incrementState()).ignoringDisable(true));
+        altOperator.povDown().and(operatorStates.manualModeCheck.negate())
+            .onTrue(Commands.runOnce(() -> Height.decrementState()).ignoringDisable(true));
+        altOperator.b().whileTrue(elevator.p0());
     }
 
     private void setupPitController() {
         pitController.y().whileTrue(climb.resetClimberCommand());
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());
         pitController.x().whileTrue(climb.manualClimb(() -> pitController.getLeftY()));
+        pitController.start().and(RobotBase::isSimulation).onTrue(
+            Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero))));
+        // remove later
+        SmartDashboard.putNumber("elevatorTargetHeight", 20);
+        driver.a().whileTrue(
+            elevator.moveTo(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
+        climb.resetButton.and(pitController.y()).onTrue(climb.resetEncoder());
     }
 
     private void configureTriggerBindings() {
         // Coral
-        coralScoring.coralAtIntake.onTrue(leds.setLEDsSolid(Color.kOrange).withTimeout(5));
-        coralScoring.coralAtOuttake.onTrue(leds.blinkLEDs(Color.kCyan, 5));
+        coralScoring.coralAtIntake.whileTrue(leds.setLEDsSolid(Color.kOrange));
+        coralScoring.coralAtOuttake.whileTrue(leds.setLEDsSolid(Color.kCyan));
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
-        // coralScoring.coralAtIntake.debounce(.25)
-        // .onTrue(coralScoring.runCoralIntake().withTimeout(30));
         // Algae
-        algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan, 2));
+        algaeInIntake.and(coralScoring.coralAtOuttake.negate())
+            .onTrue(leds.blinkLEDs(Color.kCyan, 2));
         // Climb
-        climb.resetButton.onTrue(climb.restEncoder());
-        climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());
+        climb.resetButton.onTrue(climb.resetEncoder());
+        // coralScoring.coralAtOuttake.and(RobotModeTriggers.teleop()).onTrue(elevator.p0());
+        elevator.hightAboveP0.or(climb.reachedClimberStart)
+            .onTrue(Commands.runOnce(() -> swerve.setSpeedMultiplier(0.15)).ignoringDisable(true))
+            .onFalse(Commands.runOnce(() -> swerve.setSpeedMultiplier(1.0)).ignoringDisable(true));
+
     }
 
     /**

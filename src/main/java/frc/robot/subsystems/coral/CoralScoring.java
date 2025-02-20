@@ -1,7 +1,7 @@
 package frc.robot.subsystems.coral;
 
 import org.littletonrobotics.junction.Logger;
-import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
 
 /**
  * Coral Scoring Subsystem
@@ -18,13 +17,8 @@ public class CoralScoring extends SubsystemBase {
     private CoralScoringIO io;
     private CoralScoringInputsAutoLogged inputs = new CoralScoringInputsAutoLogged();
     private final Viz2025 viz;
-    public Trigger coralAtIntake = new Trigger(() -> getIntakeBeamBreakStatus());
-    public Trigger coralAtOuttake = new Trigger(() -> getOuttakeBeamBreakStatus());
-
-
-    private GenericEntry haveCoral =
-        RobotContainer.mainDriverTab.add("Have Coral", Color.kBlack.toHexString())
-            .withWidget("Single Color View").withPosition(8, 0).withSize(3, 2).getEntry();
+    public Trigger coralAtIntake = new Trigger(() -> getIntakeBeamBreakStatus()).debounce(.25);
+    public Trigger coralAtOuttake = new Trigger(() -> getOuttakeBeamBreakStatus()).debounce(.25);
 
     /**
      * Coral Scoring subsystem
@@ -58,15 +52,15 @@ public class CoralScoring extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Coral", inputs);
         viz.setHasCoral(getOuttakeBeamBreakStatus());
+        Color temp = Color.kBlack;
         if (getIntakeBeamBreakStatus() && getOuttakeBeamBreakStatus()) {
-            haveCoral.setString(Color.kBlue.toHexString());
+            temp = Color.kBlue;
         } else if (getIntakeBeamBreakStatus()) {
-            haveCoral.setString(Color.kOrange.toHexString());
+            temp = Color.kOrange;
         } else if (getOuttakeBeamBreakStatus()) {
-            haveCoral.setString(Color.kPurple.toHexString());
-        } else {
-            haveCoral.setString(Color.kBlack.toHexString());
+            temp = Color.kPurple;
         }
+        SmartDashboard.putString("Dashboard/Main Driver/Have Coral", temp.toHexString());
     }
 
     /**
