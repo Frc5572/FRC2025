@@ -13,7 +13,7 @@ import io.javalin.http.staticfiles.Location;
 /** Controller via HTTP. */
 public class WebController {
 
-    private ScoringLocation.ElevatorHeight currentHeight = null;
+    private ScoringLocation.Height currentHeight = null;
     private ScoringLocation.CoralLocation currentLocation = null;
     private char bay = ' ';
     private boolean right = false;
@@ -164,7 +164,7 @@ public class WebController {
         if (bay >= 'a' && bay <= 'f' && height >= 0 && height <= 5) {
             currentLocation =
                 ScoringLocation.CoralLocation.fromInt(2 * (int) (bay - 'a') + (right ? 1 : 0));
-            currentHeight = ScoringLocation.ElevatorHeight.fromInt(height);
+            currentHeight = ScoringLocation.Height.fromInt(height);
         }
     }
 
@@ -172,7 +172,7 @@ public class WebController {
         return hasReefLocation;
     }
 
-    public ScoringLocation.ElevatorHeight getDesiredHeight() {
+    public ScoringLocation.Height getDesiredHeight() {
         return currentHeight;
     }
 

@@ -8,7 +8,7 @@ public class FieldViz implements Drawable {
 
     /** Put coral on the reef */
     public void scoreCoral(Alliance alliance, ScoringLocation.CoralLocation branch,
-        ScoringLocation.CoralHeight height) {
+        ScoringLocation.Height height) {
         // TODO
     }
 

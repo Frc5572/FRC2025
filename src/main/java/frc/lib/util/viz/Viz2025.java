@@ -64,8 +64,8 @@ public class Viz2025 implements Drawable {
 
     /** Set the angle of the climber, with 0 being straight up and down. */
     public void setClimberAngle(Angle angle) {
-        mechanisms[CLIMBER_ID] = new Pose3d(Translation3d.kZero,
-            new Rotation3d(Radians.of(0.0), angle, Radians.of(0.0)));
+        mechanisms[CLIMBER_ID] = new Pose3d(new Translation3d(-0.280502, 0, 0.461962),
+            new Rotation3d(Radians.of(0.0), angle.div(300), Radians.of(0.0)));
     }
 
     /** Show coral in the coral scorer. */
@@ -84,11 +84,14 @@ public class Viz2025 implements Drawable {
         if (alliance.isPresent()) {
             if (alliance.get() == Alliance.Red) {
                 mechanisms[RED_BUMPER] = useBumper;
-                mechanisms[BLUE_BUMPER] = Pose3d.kZero;
+                mechanisms[BLUE_BUMPER] = invisible;
             } else {
                 mechanisms[BLUE_BUMPER] = useBumper;
-                mechanisms[RED_BUMPER] = Pose3d.kZero;
+                mechanisms[RED_BUMPER] = invisible;
             }
+        } else {
+            mechanisms[BLUE_BUMPER] = invisible;
+            mechanisms[RED_BUMPER] = invisible;
         }
         this.estimatedPose = estimatedPose;
         if (RobotBase.isReal()) {

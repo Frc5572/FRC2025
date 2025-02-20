@@ -5,10 +5,12 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.viz.Viz2025;
 import frc.robot.Constants;
 
 /**
@@ -17,18 +19,21 @@ import frc.robot.Constants;
 public class Climber extends SubsystemBase {
     private ClimberIO io;
     private ClimberInputsAutoLogged climberAutoLogged = new ClimberInputsAutoLogged();
+    private final Viz2025 viz;
     public Trigger resetButton = new Trigger(() -> getClimberTouchSensorStatus());
     public Trigger reachedClimberStart = new Trigger(() -> reachedClimberStart());
 
-    public Climber(ClimberIO io) {
+    public Climber(ClimberIO io, Viz2025 viz) {
         this.io = io;
+        this.viz = viz;
     }
 
     @Override
     public void periodic() {
         io.updateInputs(climberAutoLogged);
         Logger.processInputs("Climber", climberAutoLogged);
-        Logger.recordOutput("/Climber/Climber Near Climber Start", reachedClimberStart);
+        viz.setClimberAngle(climberAutoLogged.climberPosition);
+        SmartDashboard.putBoolean("Climber Out", reachedClimberStart());
     }
 
     public void setClimberMotorVoltage(double voltage) {
@@ -109,7 +114,7 @@ public class Climber extends SubsystemBase {
             () -> setClimberMotorVoltage(0)).until(resetButton).unless(resetButton);
     }
 
-    public Command restEncoder() {
+    public Command resetEncoder() {
         return Commands.runOnce(() -> io.setEncoderPoisiton(0.0)).ignoringDisable(true);
     }
 
