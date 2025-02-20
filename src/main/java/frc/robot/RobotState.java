@@ -33,7 +33,7 @@ import frc.robot.subsystems.swerve.Swerve;
 public class RobotState {
 
     private final Viz2025 vis;
-    private int currentTarget = 17;
+    private int currentTarget = 0;
     private boolean isInitialized = false;
 
     private final Vector<N3> globalUncertainty = VecBuilder.fill(
@@ -125,8 +125,8 @@ public class RobotState {
                 swerveOdometry.resetPose(robotPose2d);
                 isInitialized = true;
             } else if (currentTarget == 0) {
-                // swerveOdometry.addVisionMeasurement(robotPose2d, result.getTimestampSeconds(),
-                // globalUncertainty);
+                swerveOdometry.addVisionMeasurement(robotPose2d, result.getTimestampSeconds(),
+                    globalUncertainty);
             }
         }
         if (whichCamera == 1) {
@@ -146,7 +146,7 @@ public class RobotState {
                     } else {
                         continue;
                     }
-                    Rotation2d yaw = Rotation2d.fromDegrees(robotYaw.getDegrees() + target.getYaw()
+                    Rotation2d yaw = Rotation2d.fromDegrees(robotYaw.getDegrees() - target.getYaw()
                         + 180 + Units.radiansToDegrees(robotToCamera.getRotation().getZ()));
                     Logger.recordOutput("State/LocalYaw", yaw);
                     xCircle.setCenter(localCircle.getVertex(yaw));

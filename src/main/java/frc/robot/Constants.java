@@ -422,6 +422,8 @@ public final class Constants {
         public static final double MAX_ANGULAR_VELOCITY = 9.0;
         public static final double MAX_ANGULAR_ACCELERATION = 9 * 5;
     }
+
+    public static final Rotation2d CIRCLE_REEF_LOOKAHEAD_ANGLE = Rotation2d.fromDegrees(15);
 }
 
 
