@@ -146,7 +146,7 @@ public class MoveAndAvoidReef extends Command implements Drawable {
         return isDone(swerve.state.getGlobalPoseEstimate(), pose2d, tol, rotTol);
     }
 
-    private static final double driveCircleRadius =
+    public static final double driveCircleRadius =
         FieldConstants.Reef.circumscribedRadius.in(Meters) + Math.hypot(
             Constants.Swerve.bumperFront.in(Meters), Constants.Swerve.bumperRight.in(Meters));
     private static final Circle redDriveCircle = new Circle("avoidReef/redDriveCircle",

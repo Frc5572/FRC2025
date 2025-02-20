@@ -13,6 +13,7 @@ import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -30,6 +31,7 @@ import frc.lib.util.WebController;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
+import frc.robot.commands.MoveAndAvoidReef;
 import frc.robot.commands.MoveToPoseWithLocalTag;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.climber.Climber;
@@ -71,7 +73,7 @@ public class RobotContainer {
 
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
-    public final WebController operator = new WebController(5800);
+    public final WebController operator = new WebController(5801);
     public final CommandXboxController backUpOperator =
         new CommandXboxController(Constants.operatorId);
     public final CommandXboxController pitController =
@@ -221,11 +223,32 @@ public class RobotContainer {
         driver.rightTrigger().and(climb.reachedClimberStart)
             .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
 
-        driver.a().and(operator.hasReefLocation())
-            .whileTrue(new MoveToPoseWithLocalTag(swerve, () -> {
-                return new Tuple2<Pose2d, Integer>(operator.getDesiredLocation().pose,
-                    operator.getDesiredLocation().tag);
-            }, () -> 0.5, true, Units.inchesToMeters(4), 2));
+        boolean ready = false;
+
+        if (!ready) {
+            driver.a().and(operator.hasReefLocation())
+                .whileTrue(new MoveToPoseWithLocalTag(swerve, () -> {
+                    Pose2d finalLoc = operator.getDesiredLocation().pose;
+                    return new Tuple2<Pose2d, Integer>(new Pose2d(
+                        finalLoc.getTranslation().minus(
+                            new Translation2d(Units.inchesToMeters(24), finalLoc.getRotation())),
+                        finalLoc.getRotation()), operator.getDesiredLocation().tag);
+                }, () -> 0.5, true, Units.inchesToMeters(4), 2));
+        } else {
+            driver.a().and(operator.hasReefLocation())
+                .whileTrue(new MoveAndAvoidReef(swerve, () -> {
+                    Pose2d finalLoc = operator.getDesiredLocation().pose;
+                    return new Pose2d(
+                        finalLoc.getTranslation().minus(
+                            new Translation2d(Units.inchesToMeters(12), finalLoc.getRotation())),
+                        finalLoc.getRotation());
+                }, () -> 2.0, true, Units.inchesToMeters(12), 15)
+                    .andThen(new MoveToPoseWithLocalTag(swerve, () -> {
+                        return new Tuple2<Pose2d, Integer>(operator.getDesiredLocation().pose,
+                            operator.getDesiredLocation().tag);
+                    }, () -> 2.0, true, Units.inchesToMeters(4), 2)).andThen(swerve.run(() -> {
+                    })));
+        }
     }
 
     private void setupAltOperatorController() {

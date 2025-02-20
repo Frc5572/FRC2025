@@ -1,9 +1,14 @@
 package frc.lib.util;
 
+import static edu.wpi.first.units.Units.Meters;
+import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
 import frc.robot.Constants;
+import frc.robot.FieldConstants;
 
 /** Scoring Locations for the 2025 game Reefscape */
 public class ScoringLocation {
@@ -11,26 +16,41 @@ public class ScoringLocation {
     /** Reef locations */
     public static enum CoralLocation {
         // @formatter:off
-        A(new Pose2d(2.855360269546509, 4.392190456390381, Rotation2d.kZero), 18),
-        B(new Pose2d(2.855360269546509, 4.014956951141357, Rotation2d.kZero), 18),
-        C(new Pose2d(3.321354627609253, 2.822233200073242, Rotation2d.fromDegrees(60)), 17),
-        D(new Pose2d(3.6763980388641357, 2.616973876953125, Rotation2d.fromDegrees(60)), 17),
-        E(new Pose2d(4.935692310333252, 2.4061667919158936, Rotation2d.fromDegrees(120)), 22),
-        F(new Pose2d(5.307377815246582, 2.616973876953125, Rotation2d.fromDegrees(120)), 22),
-        G(new Pose2d(6.128415584564209, 3.64327073097229, Rotation2d.k180deg), 21),
-        H(new Pose2d(6.122868061065674, 4.0537896156311035, Rotation2d.k180deg), 21),
-        I(new Pose2d(5.623588562011719, 5.257608413696289, Rotation2d.fromDegrees(240)), 20),
-        J(new Pose2d(5.296282768249512, 5.440677642822266, Rotation2d.fromDegrees(240)), 20),
-        K(new Pose2d(4.025893688201904, 5.657032012939453, Rotation2d.fromDegrees(300)), 19),
-        L(new Pose2d(3.6653027534484863, 5.440677642822266, Rotation2d.fromDegrees(300)), 19);
+        A(coralPose(Rotation2d.kZero, true), 18),
+        B(coralPose(Rotation2d.kZero, false), 18),
+        C(coralPose(Rotation2d.fromDegrees(60), true), 17),
+        D(coralPose(Rotation2d.fromDegrees(60), false), 17),
+        E(coralPose(Rotation2d.fromDegrees(120), true), 22),
+        F(coralPose(Rotation2d.fromDegrees(120), false), 22),
+        G(coralPose(Rotation2d.k180deg, true), 21),
+        H(coralPose(Rotation2d.k180deg, false), 21),
+        I(coralPose(Rotation2d.fromDegrees(240), true), 20),
+        J(coralPose(Rotation2d.fromDegrees(240), false), 20),
+        K(coralPose(Rotation2d.fromDegrees(300), true), 19),
+        L(coralPose(Rotation2d.fromDegrees(300), false), 19);
         // @formatter:on
 
         public final Pose2d pose;
         public final int tag;
 
+        private static Pose2d coralPose(Rotation2d direction, boolean offset) {
+            return new Pose2d(
+                FieldConstants.Reef.center.plus(new Translation2d(
+                    FieldConstants.Reef.inscribedRadius.in(Meters)
+                        + Constants.Swerve.bumperFront.in(Meters),
+                    direction.plus(Rotation2d.k180deg))).plus(
+                        offset
+                            ? new Translation2d(Units.inchesToMeters(10),
+                                direction.plus(Rotation2d.kCCW_90deg))
+                            : new Translation2d()),
+                direction);
+        }
+
         CoralLocation(Pose2d pose, int tag) {
             this.pose = pose;
             this.tag = tag;
+            String name = this.toString();
+            Logger.recordOutput("Reef/" + name, this.pose);
         }
 
         /** Deserialize from integer */
