@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -19,6 +20,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -36,6 +38,7 @@ public class Swerve extends SubsystemBase {
     private SwerveInputsAutoLogged inputs = new SwerveInputsAutoLogged();
     private SwerveIO swerveIO;
     private final RobotState state;
+    private double setSpeedMultiplier = 1.0;
     private final HolonomicDriveController holonomicDriveController = new HolonomicDriveController(
         new PIDController(Constants.SwerveTransformPID.PID_XKP,
             Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
@@ -45,6 +48,7 @@ public class Swerve extends SubsystemBase {
             Constants.SwerveTransformPID.PID_TKI, Constants.SwerveTransformPID.PID_TKD,
             new TrapezoidProfile.Constraints(Constants.SwerveTransformPID.MAX_ANGULAR_VELOCITY,
                 Constants.SwerveTransformPID.MAX_ANGULAR_ACCELERATION)));
+
 
     /**
      * Swerve Subsystem
@@ -59,6 +63,7 @@ public class Swerve extends SubsystemBase {
         swerveIO.updateInputs(inputs);
 
         state.init(getModulePositions(), getGyroYaw());
+        SmartDashboard.putData("Dashboard/Auto/Field2d", field);
     }
 
     /**
@@ -207,6 +212,8 @@ public class Swerve extends SubsystemBase {
         }
         state.addSwerveObservation(getModulePositions(), getGyroYaw());
         Logger.processInputs("Swerve", inputs);
+        field.setRobotPose(getPose());
+        SmartDashboard.putNumber("SpeedMultiplier", setSpeedMultiplier);
     }
 
     /**
@@ -253,6 +260,14 @@ public class Swerve extends SubsystemBase {
         return false;
     }
 
+    public void setSpeedMultiplier(double multiplier) {
+        setSpeedMultiplier = multiplier;
+    }
+
+    public double getSpeedMultiplier() {
+        return setSpeedMultiplier;
+    }
+
     /**
      * Creates a command for driving the swerve drive during tele-op
      *
@@ -263,24 +278,22 @@ public class Swerve extends SubsystemBase {
     public Command teleOpDrive(CommandXboxController controller, boolean fieldRelative,
         boolean openLoop) {
         return this.run(() -> {
-            double speedMultiplier = 1;
-            double yaxis = -controller.getLeftY() * speedMultiplier;
-            double xaxis = -controller.getLeftX() * speedMultiplier;
-            double raxis = -controller.getRightX() * speedMultiplier;
+            double yaxis = -controller.getLeftY();
+            double xaxis = -controller.getLeftX();
+            double raxis = -controller.getRightX();
             /* Deadbands */
-            yaxis = (Math.abs(yaxis) < Constants.STICK_DEADBAND) ? 0
-                : (yaxis - Constants.STICK_DEADBAND) / (1.0 - Constants.STICK_DEADBAND);
-            xaxis = (Math.abs(xaxis) < Constants.STICK_DEADBAND) ? 0
-                : (xaxis - Constants.STICK_DEADBAND) / (1.0 - Constants.STICK_DEADBAND);
+            yaxis = MathUtil.applyDeadband(yaxis, 0.1);
+            xaxis = MathUtil.applyDeadband(xaxis, 0.1);
             xaxis *= xaxis * Math.signum(xaxis);
             yaxis *= yaxis * Math.signum(yaxis);
             raxis = (Math.abs(raxis) < Constants.STICK_DEADBAND) ? 0 : raxis;
-            Translation2d translation =
-                new Translation2d(yaxis, xaxis).times(Constants.Swerve.maxSpeed);
-            double rotation = raxis * Constants.Swerve.maxAngularVelocity;
+            Translation2d translation = new Translation2d(yaxis, xaxis)
+                .times(Constants.Swerve.maxSpeed).times(setSpeedMultiplier);
+            double rotation = raxis * Constants.Swerve.maxAngularVelocity * setSpeedMultiplier;
             this.drive(translation, rotation, fieldRelative, openLoop);
         });
     }
+
 
     /**
      * Follow Choreo Trajectory
@@ -313,4 +326,5 @@ public class Swerve extends SubsystemBase {
             holonomicDriveController.calculate(getPose(), pose, 0, pose.getRotation());
         setModuleStates(ctrlEffort);
     }
+
 }

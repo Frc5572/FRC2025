@@ -17,3 +17,5 @@ permissions:
 jobs:
   code-checks:
     uses: Frc5572/Workflows/.github/workflows/frc-checks.yml@main
+    with:
+      codespell_ignore: .codespellignore

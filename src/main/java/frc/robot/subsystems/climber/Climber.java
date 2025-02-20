@@ -5,6 +5,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -28,7 +29,8 @@ public class Climber extends SubsystemBase {
     public void periodic() {
         io.updateInputs(climberAutoLogged);
         Logger.processInputs("Climber", climberAutoLogged);
-        Logger.recordOutput("/Climber/Climber Near Climber Start", reachedClimberStart);
+        viz.setClimberAngle(climberAutoLogged.climberPosition);
+        SmartDashboard.putBoolean("Climber Out", reachedClimberStart());
     }
 
     public void setClimberMotorVoltage(double voltage) {
@@ -109,7 +111,7 @@ public class Climber extends SubsystemBase {
             () -> setClimberMotorVoltage(0)).until(resetButton).unless(resetButton);
     }
 
-    public Command restEncoder() {
+    public Command resetEncoder() {
         return Commands.runOnce(() -> io.setEncoderPoisiton(0.0)).ignoringDisable(true);
     }
 

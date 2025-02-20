@@ -9,6 +9,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Constants;
 
@@ -18,8 +21,8 @@ import frc.robot.Constants;
 public class Elevator extends SubsystemBase {
     ElevatorIO io;
     private final Viz2025 viz;
-
     private ElevatorInputsAutoLogged inputs = new ElevatorInputsAutoLogged();
+    public Trigger hightAboveP0 = new Trigger(() -> hightAboveP0());
 
     /** Elevator Subsystem */
     public Elevator(ElevatorIO io, Viz2025 viz) {
@@ -37,6 +40,10 @@ public class Elevator extends SubsystemBase {
         if (inputs.limitSwitch) {
             io.resetHome();
         }
+        SmartDashboard.putString("Dashboard/Main Driver/Elevator Height",
+            Height.getCurrentState().displayName);
+        SmartDashboard.putNumber("Dashboard/Main Driver/Elevator Preset Level",
+            Height.getCurrentState().ordinal());
     }
 
     /**
@@ -46,7 +53,7 @@ public class Elevator extends SubsystemBase {
      *
      */
     public Command home() {
-        Command slowLower = Commands.runEnd(() -> io.setVoltage(-0.7), () -> io.setVoltage(0.0));
+        Command slowLower = Commands.runEnd(() -> io.setVoltage(-1.4), () -> io.setVoltage(0.0));
         return moveTo(() -> Constants.Elevator.HOME).until(() -> inputs.position.in(Inches) < 5.0)
             .andThen(slowLower).until(() -> (inputs.limitSwitch == true)).alongWith(
                 Commands.runOnce(() -> Logger.recordOutput(Constants.Elevator.heightName, "home")));
@@ -78,6 +85,9 @@ public class Elevator extends SubsystemBase {
         return moveTo(() -> Constants.Elevator.P4);
     }
 
+    public boolean hightAboveP0() {
+        return (inputs.position).in(Inches) >= (Constants.Elevator.P0).in(Inches) + 5;
+    }
 
     /**
      * sets height of elevator
@@ -93,6 +103,10 @@ public class Elevator extends SubsystemBase {
         }).until(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1);
     }
 
+    public Command manualMove(CommandXboxController leftStick) {
+        return run(() -> io.setPower(leftStick.getLeftY()));
+    }
+
     public Command moveUp() {
         return runEnd(() -> io.setVoltage(SmartDashboard.getNumber("elevatorVoltage", 1.0)),
             () -> io.setVoltage(0));
@@ -100,5 +114,18 @@ public class Elevator extends SubsystemBase {
 
     public Command moveDown() {
         return runEnd(() -> io.setVoltage(-1.0), () -> io.setVoltage(0));
+    }
+
+    /**
+     * selects height
+     *
+     * @return selected height
+     */
+    public Command heightSelector() {
+        return moveTo(() -> {
+            var height = Height.getCurrentState();
+            Logger.recordOutput(Constants.Elevator.heightName, height.displayName);
+            return height.height;
+        });
     }
 }
