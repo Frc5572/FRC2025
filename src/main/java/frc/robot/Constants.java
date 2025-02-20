@@ -375,8 +375,7 @@ public final class Constants {
                 new Transform3d(
                     new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(12),
                         Units.inchesToMeters(10)),
-                    new Rotation3d(Math.PI, -Units.degreesToRadians(5),
-                        -Units.degreesToRadians(10))),
+                    new Rotation3d(0, -Units.degreesToRadians(5), -Units.degreesToRadians(10))),
                 Units.inchesToMeters(0.0))};
 
         public static final double zMargin = 0.75;
