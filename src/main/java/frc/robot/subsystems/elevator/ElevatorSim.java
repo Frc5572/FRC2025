@@ -53,5 +53,4 @@ public class ElevatorSim implements ElevatorIO {
     public void resetHome() {
         offset = -currentPoint;
     }
-
 }

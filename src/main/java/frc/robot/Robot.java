@@ -14,6 +14,8 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import edu.wpi.first.net.WebServer;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -45,6 +47,7 @@ public class Robot extends LoggedRobot {
      */
     @Override
     public void robotInit() {
+        WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
         // Record metadata
         Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
         Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -132,15 +135,7 @@ public class Robot extends LoggedRobot {
      * This autonomous runs the autonomous command selected by your {@link RobotContainer} class.
      */
     @Override
-    public void autonomousInit() {
-        // robotContainer.getAutonomousCommand().schedule();
-        // autoChooser = robotContainer.getAutonomousCommand();
-
-        // // schedule the autonomous command (example)
-        // if (autoChooser != null) {
-        // autoChooser.schedule();
-        // }
-    }
+    public void autonomousInit() {}
 
     /** This function is called periodically during autonomous. */
     @Override

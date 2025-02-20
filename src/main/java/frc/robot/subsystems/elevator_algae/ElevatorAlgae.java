@@ -1,6 +1,8 @@
 package frc.robot.subsystems.elevator_algae;
 
 import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.viz.Viz2025;
@@ -28,6 +30,13 @@ public class ElevatorAlgae extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Algae", inputs);
         viz.setHasAlgae(hasAlgae());
+        Color temp = Color.kBlack;
+        if (hasAlgae()) {
+            temp = Color.kGreen;
+        } else if (!hasAlgae()) {
+            temp = Color.kRed;
+        }
+        SmartDashboard.putString("Dashboard/Main Driver/Have Algae", temp.toHexString());
     }
 
 

@@ -1,117 +1,67 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Seconds;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.MoveToPose;
+import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.coral.CoralScoring;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.swerve.Swerve;
 
+/**
+ * Command Factory for Autos
+ */
 public class AutoCommandFactory {
 
     AutoFactory autoFactory;
     Swerve swerve;
     Elevator elevator;
     CoralScoring coral;
+    LEDs leds;
 
+    /**
+     * Command Factory for Autos
+     *
+     * @param autoFactory Choreo Auto Factory
+     * @param swerve Swerve Subsystem
+     * @param elevator Elevator Subsystem
+     * @param coral Coral Subsystem
+     * @param leds LED Subsystem
+     */
     public AutoCommandFactory(AutoFactory autoFactory, Swerve swerve, Elevator elevator,
-        CoralScoring coral) {
+        CoralScoring coral, LEDs leds) {
         this.autoFactory = autoFactory;
         this.swerve = swerve;
         this.elevator = elevator;
         this.coral = coral;
+        this.leds = leds;
     }
 
-    public AutoRoutine resnick() {
-        AutoRoutine routine = autoFactory.newRoutine("Resnick");
-
-        Trigger haveCoral = routine.observe(coral.intakedCoralRight);
-
-        AutoTrajectory startToScore1 = routine.trajectory("Resnick", 0);
-        AutoTrajectory Score1ToFeeder = routine.trajectory("Resnick", 1);
-        AutoTrajectory FeederToScore2 = routine.trajectory("Resnick", 2);
+    /**
+     * Example Auto Routine
+     *
+     * @return Auto Routine
+     */
+    public AutoRoutine example() {
+        AutoRoutine routine = autoFactory.newRoutine("Example");
+        MoveToPose testMTP =
+            new MoveToPose(swerve,
+                () -> new Pose2d(FieldConstants.Reef.center.getX(),
+                    FieldConstants.Barge.middleCage.getY(), new Rotation2d()),
+                true, .25, 10, routine);
 
         routine.active()
-            .onTrue(Commands.sequence(startToScore1.resetOdometry(), startToScore1.cmd()));
-        startToScore1.active().onTrue(elevator.p0());
-        startToScore1.done()
             .onTrue(Commands.sequence(
-                swerve.runOnce(swerve::setMotorsZero)
-                    .alongWith(Commands.waitTime(Seconds.of(0.01))),
-                elevator.p4(), coral.runScoringMotor(0.5), elevator.p0(),
-                new ProxyCommand(Score1ToFeeder.cmd())));
-        Score1ToFeeder.active().onTrue(elevator.home());
-        Score1ToFeeder.done().onTrue(Commands.sequence(
-            swerve.runOnce(swerve::setMotorsZero).alongWith(Commands.waitTime(Seconds.of(0.01))),
-            new ProxyCommand(FeederToScore2.cmd())));
-        FeederToScore2.done().onTrue(
-            swerve.runOnce(swerve::setMotorsZero).alongWith(Commands.waitTime(Seconds.of(0.01))));
-
-        return routine;
-    }
-
-    public AutoRoutine watson() {
-        AutoRoutine routine = autoFactory.newRoutine("Watson");
-
-        Trigger haveCoral = routine.observe(coral.intakedCoralRight);
-
-        AutoTrajectory startToScore1 = routine.trajectory("Watson1", 0);
-        AutoTrajectory Score1ToFeeder = routine.trajectory("Watson2", 0);
-        AutoTrajectory FeederToScore2 = routine.trajectory("Watson3", 0);
-        AutoTrajectory Score2ToFeeder = routine.trajectory("Watson4", 0);
-
-        routine.active()
-            .onTrue(Commands.sequence(startToScore1.resetOdometry(), startToScore1.cmd()));
-        startToScore1.active().onTrue(elevator.p0());
-        startToScore1.done().onTrue(Commands.sequence(
-            swerve.moveToPose(() -> Score1ToFeeder.getInitialPose().get(), false, 0.1, 1)
-                .withTimeout(1),
-            swerve.runOnce(swerve::setMotorsZero).alongWith(Commands.waitTime(Seconds.of(0.01))),
-            elevator.p4(), coral.runScoringMotor(0.5), elevator.p0(),
-            new ProxyCommand(Score1ToFeeder.cmd())));
-        Score1ToFeeder.active().onTrue(Commands.waitSeconds(0.5).andThen(elevator.home()));
-        Score1ToFeeder.done().onTrue(Commands.sequence(
-            swerve.moveToPose(() -> FeederToScore2.getInitialPose().get(), false, 0.1, 1)
-                .withTimeout(1),
-            swerve.runOnce(swerve::setMotorsZero).alongWith(Commands.waitTime(Seconds.of(0.01))),
-            Commands.waitSeconds(2), new ProxyCommand(FeederToScore2.cmd())));
-        FeederToScore2.active().onTrue(Commands.waitSeconds(0.5).andThen(elevator.p0()));
-        FeederToScore2.done().onTrue(Commands.sequence(
-            swerve.moveToPose(() -> Score2ToFeeder.getInitialPose().get(), false, 0.1, 1)
-                .withTimeout(1),
-            swerve.runOnce(swerve::setMotorsZero).alongWith(Commands.waitTime(Seconds.of(0.01))),
-            elevator.p4(), coral.runScoringMotor(0.5), elevator.p0(),
-            new ProxyCommand(Score2ToFeeder.cmd())));
-        Score2ToFeeder.active().onTrue(Commands.waitSeconds(0.5).andThen(elevator.home()));
-        Score2ToFeeder.done().onTrue(Commands.sequence(
-            swerve.moveToPose(() -> FeederToScore2.getInitialPose().get(), false, 0.1, 1)
-                .withTimeout(1),
-            swerve.runOnce(swerve::setMotorsZero).alongWith(Commands.waitTime(Seconds.of(0.01))),
-            Commands.waitSeconds(2), new ProxyCommand(FeederToScore2.cmd())));
-
-        return routine;
-    }
-
-    public AutoRoutine jace() {
-        AutoRoutine routine = autoFactory.newRoutine("jace1");
-
-        AutoTrajectory start = routine.trajectory("jace1", 0);
-        AutoTrajectory routine2 = routine.trajectory("jace2", 0);
-
-        routine.active().onTrue(Commands.sequence(start.resetOdometry(), start.cmd()));
-        start.active().onTrue(elevator.p0());
-        start.done().onTrue(Commands.sequence(
-            swerve.moveToPose(() -> routine2.getInitialPose().get(), false, 0.1, 1.0)
-                .withTimeout(1),
-            swerve.runOnce(swerve::setMotorsZero).alongWith(Commands.waitTime(Seconds.of(0.01))),
-            elevator.p4(), coral.runScoringMotor(0.5), elevator.p0(),
-            new ProxyCommand(routine2.cmd())));
-        routine2.active().onTrue(elevator.p4());
-        routine2.done();
+                Commands.runOnce(() -> swerve
+                    .resetOdometry(new Pose2d(FieldConstants.Barge.middleCage, new Rotation2d()))),
+                leds.blinkLEDs(Color.kGreen, 5), testMTP));
+        testMTP.done().onTrue(leds.blinkLEDs(Color.kPurple, 5));
         return routine;
     }
 
@@ -185,6 +135,5 @@ public class AutoCommandFactory {
                 new ProxyCommand(goToReef4.cmd())));;;
         goToReef4.active().onTrue(elevator.p4());
         goToReef4.done();
-        return routine;
     }
 }

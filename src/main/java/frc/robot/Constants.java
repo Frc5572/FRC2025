@@ -76,7 +76,7 @@ public final class Constants {
 
     // pit and alt operator controllers
     public static final int PIT_CONTROLLER_ID = 3;
-    public static final int ALT_OPERATOR_ID = 4;
+    public static final int ALT_OPERATOR_ID = 2;
 
 
 
@@ -106,7 +106,7 @@ public final class Constants {
      */
     public static final class LEDs {
         public static final int LED_PORT = 0;
-        public static final int LED_LENGTH = 123;
+        public static final int LED_LENGTH = 60;
     }
 
 
@@ -119,10 +119,14 @@ public final class Constants {
         public static final int LEFT_TALON_FX_ID = 3;
         public static final int RIGHT_TALON_FX_ID = 12;
         public static final int TOUCH_SENSOR_CHANNEL = 2;
-        public static final Angle MAX_ANGLE = Radians.of(250);
+        public static final Angle CLIMB_ANGLE = Radians.of(550);
+        public static final Angle MAX_ANGLE = Radians.of(703);
+        public static final Angle CLIMBER_OUT_ANGLE = Radians.of(300);
+        public static final Angle CLIMBER_START_ANGLE = Radians.of(140);
         public static final double GEAR_RATIO = 1;
-        public static final double VOLTAGE = 4;
-        public static final double RESET_VOLTAGE = -4;
+        public static final double CLIMB_VOLTAGE = 3.0;
+        public static final double PRE_CLIMB_VOLTAGE = 5.5;
+        public static final double RESET_VOLTAGE = -5.5;
 
     }
 
@@ -183,6 +187,8 @@ public final class Constants {
         /** Meters per Second */
         public static final double maxSpeed = 4.0;
         public static final double AUTO_MAX_SPEED = 3.0;
+        public static final double MAX_ELEVATOR_SPEED = 2.0;
+
         /** Radians per Second */
         public static final double maxAngularVelocity = 6.28;
 
@@ -240,8 +246,8 @@ public final class Constants {
 
             public static final DCMotor driveMotor = DCMotor.getKrakenX60(1);
             public static final DCMotor angleMotor = DCMotor.getFalcon500(1);
-            public static final Voltage driveFrictionVoltage = Volts.of(0);
-            public static final Voltage angleFrictionVoltage = Volts.of(0);
+            public static final Voltage driveFrictionVoltage = Volts.of(0.15);
+            public static final Voltage angleFrictionVoltage = Volts.of(0.35);
             public static final double wheelCoeffFriction = 1.2;
             public static final MomentOfInertia angleMomentOfInertia =
                 KilogramSquareMeters.of(0.02);
@@ -314,22 +320,26 @@ public final class Constants {
         public static final NeutralModeValue BREAK = NeutralModeValue.Brake;
 
         // PID and feedforward
-        public static final double KP = 7.0;
-        public static final double KI = 2.0;
+        public static final double KP = 40.0;
+        public static final double KI = 0.0;
         public static final double KD = 0.0;
-        public static final double KS = 0.1675;
+        public static final double KS = 0.2675;
         public static final double KV = 0.0;
         public static final double KA = 0.0;
         public static final double KG = 0.3375;
+        public static final double CVeleocity = 2.0;
+        public static final double Acceleration = 12.0;
+        public static final double Jerk = 6000000.0;
+
         public static final AngularVelocity MAX_VELOCITY = RotationsPerSecond.of(0.0);
 
         // positions
         public static final Distance HOME = Inches.of(2);
         public static final Distance P0 = Inches.of(16.5); // Algae L2-L3
-        public static final Distance P1 = Inches.of(26); // Coral L2
-        public static final Distance P2 = Inches.of(33); // Algae L3-L4
-        public static final Distance P3 = Inches.of(43); // Coral L3
-        public static final Distance P4 = Inches.of(67); // Coral L4
+        public static final Distance P1 = Inches.of(28.1); // floor
+        public static final Distance P2 = Inches.of(31.2); // Coral l2
+        public static final Distance P3 = Inches.of(45.0); // Coral L3
+        public static final Distance P4 = Inches.of(70.0); // Coral L4
 
 
         public static final double gearRatio = 1.0;
@@ -347,7 +357,7 @@ public final class Constants {
     public static class Vision {
 
         public static final AprilTagFieldLayout fieldLayout =
-            AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+            AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
 
         /** Constants for an individual camera. */
         public static final record CameraConstants(String name, int height, int width,
@@ -383,9 +393,29 @@ public final class Constants {
      * Primary Coral Scoring Constants
      */
     public static final class CoralScoringConstants {
-        public static final int Scoring_Beam_Brake_DIO_Port = 0;
-        public static final int Coral_Touch_Sensor_DIO_Port = 3;
-        public static final int Random_Touch_Sensor = 1;
+        public static final int OUTTAKE_BEAM_BREAK_DIO_PORT = 0;
+        public static final int INTAKE_BEAM_BREAK_DIO_PORT = 3;
+        public static final double INTAKE_POWER = 0.3;
+        public static final double OUTTAKE_POWER = 1.0;
+    }
+
+    /**
+     * MoveToPos constants.
+     */
+    public static class SwerveTransformPID {
+        public static final double PID_XKP = 5.0;
+        public static final double PID_XKI = 0.5;
+        public static final double PID_XKD = 0.0;
+        public static final double PID_YKP = 3.5;
+        public static final double PID_YKI = 0.5;
+        public static final double PID_YKD = 0.0;
+        public static final double PID_TKP = 3.0;
+        public static final double PID_TKI = 0.1;
+        public static final double PID_TKD = 0.0;
+
+        public static final double MAX_ANGULAR_VELOCITY = 9.0;
+        public static final double MAX_ANGULAR_ACCELERATION = 9 * 5;
+        public static final double STD_DEV_MOD = 2.0;
     }
 
     /**
