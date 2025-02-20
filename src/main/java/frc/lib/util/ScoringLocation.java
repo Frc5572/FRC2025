@@ -15,9 +15,9 @@ public class ScoringLocation {
      * set of height modes
      */
     public enum Height {
-        KP0("trough/algae 1", Constants.Elevator.P0), KP1("coral 1", Constants.Elevator.P1), KP2(
-            "algae 2", Constants.Elevator.P2), KP3("coral 2",
-                Constants.Elevator.P3), KP4("coral 3", Constants.Elevator.P4);
+        KP0("Trough/Algae 1", Constants.Elevator.P0), KP1("Coral 1", Constants.Elevator.P1), KP2(
+            "Algae 2", Constants.Elevator.P2), KP3("Coral 2",
+                Constants.Elevator.P3), KP4("Coral 3", Constants.Elevator.P4);
 
         public final String displayName;
         public final Distance height;
@@ -26,15 +26,6 @@ public class ScoringLocation {
             this.displayName = displayName;
             this.height = height;
         }
-
-        // public static Trigger level1 = new Trigger(() -> getCurrentState() ==
-        // CoralHeight.Klevel1);
-        // public static Trigger level2 = new Trigger(() -> getCurrentState() ==
-        // CoralHeight.Klevel2);
-        // public static Trigger level3 = new Trigger(() -> getCurrentState() ==
-        // CoralHeight.Klevel3);
-        // public static Trigger level4 = new Trigger(() -> getCurrentState() ==
-        // CoralHeight.Klevel4);
 
         /**
          *

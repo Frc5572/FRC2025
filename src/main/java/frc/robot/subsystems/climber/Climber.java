@@ -114,7 +114,7 @@ public class Climber extends SubsystemBase {
             () -> setClimberMotorVoltage(0)).until(resetButton).unless(resetButton);
     }
 
-    public Command restEncoder() {
+    public Command resetEncoder() {
         return Commands.runOnce(() -> io.setEncoderPoisiton(0.0)).ignoringDisable(true);
     }
 

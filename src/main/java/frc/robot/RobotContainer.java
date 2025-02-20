@@ -14,15 +14,16 @@ import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
@@ -201,12 +202,7 @@ public class RobotContainer {
         swerve.setDefaultCommand(swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
 
-        driver.y().onTrue(new InstantCommand(() -> swerve.resetFieldRelativeOffset()));
-
-        driver.x().onTrue(new InstantCommand(() -> { // sim only
-
-            swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero));
-        }));
+        driver.y().onTrue(Commands.runOnce(() -> swerve.resetFieldRelativeOffset()));
         driver.rightTrigger().and(climb.reachedClimberStart.negate())
             .onTrue(climb
                 .runClimberMotorCommand(Constants.Climb.PRE_CLIMB_VOLTAGE,
@@ -227,20 +223,17 @@ public class RobotContainer {
         altOperator.leftTrigger()
             .whileTrue(algae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
         // manual mode
-        altOperator.start().onTrue(Commands.runOnce(() -> {
-            operatorStates.toggleManualMode();
-        }).ignoringDisable(true));
+        altOperator.start().onTrue(
+            Commands.runOnce(() -> operatorStates.toggleManualMode()).ignoringDisable(true));
         operatorStates.manualModeCheck.onTrue(elevator.manualMove(altOperator));
 
 
         altOperator.a().and(operatorStates.manualModeCheck.negate())
             .whileTrue(elevator.heightSelector());
         altOperator.povUp().and(operatorStates.manualModeCheck.negate())
-            .onTrue(Commands.runOnce(() -> frc.lib.util.ScoringLocation.Height.incrementState())
-                .ignoringDisable(true));
+            .onTrue(Commands.runOnce(() -> Height.incrementState()).ignoringDisable(true));
         altOperator.povDown().and(operatorStates.manualModeCheck.negate())
-            .onTrue(Commands.runOnce(() -> frc.lib.util.ScoringLocation.Height.decrementState())
-                .ignoringDisable(true));
+            .onTrue(Commands.runOnce(() -> Height.decrementState()).ignoringDisable(true));
         altOperator.b().whileTrue(elevator.p0());
     }
 
@@ -248,33 +241,30 @@ public class RobotContainer {
         pitController.y().whileTrue(climb.resetClimberCommand());
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());
         pitController.x().whileTrue(climb.manualClimb(() -> pitController.getLeftY()));
-
+        pitController.start().and(RobotBase::isSimulation).onTrue(
+            Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero))));
         // remove later
         SmartDashboard.putNumber("elevatorTargetHeight", 20);
         driver.a().whileTrue(
             elevator.moveTo(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
+        climb.resetButton.and(pitController.y()).onTrue(climb.resetEncoder());
     }
 
     private void configureTriggerBindings() {
         // Coral
         coralScoring.coralAtIntake.whileTrue(leds.setLEDsSolid(Color.kOrange));
         coralScoring.coralAtOuttake.whileTrue(leds.setLEDsSolid(Color.kCyan));
-        coralScoring.coralAtOuttake.negate().debounce(1.0)
-            .whileTrue(coralScoring.runCoralIntake().ignoringDisable(true)); // TDOD
+        coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
-        // coralScoring.coralAtIntake.debounce(.25)
-        // .onTrue(coralScoring.runCoralIntake().withTimeout(30));
         // Algae
-        algaeInIntake.onTrue(leds.blinkLEDs(Color.kCyan, 2).ignoringDisable(true)); // TDOD
+        algaeInIntake.and(coralScoring.coralAtOuttake.negate())
+            .onTrue(leds.blinkLEDs(Color.kCyan, 2));
         // Climb
-        climb.resetButton.onTrue(climb.restEncoder().ignoringDisable(true)); // TDOD
-        climb.resetButton.and(pitController.y()).onTrue(climb.restEncoder());
+        climb.resetButton.onTrue(climb.resetEncoder());
         // coralScoring.coralAtOuttake.and(RobotModeTriggers.teleop()).onTrue(elevator.p0());
-
         elevator.hightAboveP0.or(climb.reachedClimberStart)
-            .onTrue(new InstantCommand(() -> swerve.setSpeedMultiplier(0.15)).ignoringDisable(true))
-            .onFalse(
-                new InstantCommand(() -> swerve.setSpeedMultiplier(1.0)).ignoringDisable(true));
+            .onTrue(Commands.runOnce(() -> swerve.setSpeedMultiplier(0.15)).ignoringDisable(true))
+            .onFalse(Commands.runOnce(() -> swerve.setSpeedMultiplier(1.0)).ignoringDisable(true));
 
     }
 
