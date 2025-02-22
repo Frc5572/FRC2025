@@ -223,21 +223,22 @@ public class RobotContainer {
         altOperator.leftTrigger()
             .whileTrue(algae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
         // manual mode
-        altOperator.start().onTrue(
-            Commands.runOnce(() -> operatorStates.toggleManualMode()).ignoringDisable(true));
-        operatorStates.manualModeCheck.onTrue(elevator.manualMove(altOperator));
 
 
-        altOperator.a().and(operatorStates.manualModeCheck.negate())
-            .whileTrue(elevator.heightSelector());
-        altOperator.povUp().and(operatorStates.manualModeCheck.negate())
+
+        altOperator.a().whileTrue(elevator.heightSelector());
+        altOperator.povUp()
             .onTrue(Commands.runOnce(() -> Height.incrementState()).ignoringDisable(true));
-        altOperator.povDown().and(operatorStates.manualModeCheck.negate())
+        altOperator.povDown()
             .onTrue(Commands.runOnce(() -> Height.decrementState()).ignoringDisable(true));
         altOperator.b().whileTrue(elevator.p0());
     }
 
     private void setupPitController() {
+        altOperator.start().onTrue(
+            Commands.runOnce(() -> operatorStates.toggleManualMode()).ignoringDisable(true));
+        operatorStates.manualModeCheck.onTrue(elevator.manualMove(altOperator));
+
         pitController.y().whileTrue(climb.resetClimberCommand());
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());
         pitController.x().whileTrue(climb.manualClimb(() -> pitController.getLeftY()));
