@@ -254,7 +254,6 @@ public class RobotContainer {
         // Algae
         algae.hasAlgae.and(coralScoring.coralAtOuttake.negate())
             .onTrue(leds.blinkLEDs(Color.kCyan, 2));
-        // elevator.heightEqualToP0.or(elevator.heightEqualToP3).whileTrue(algae.algaeIntakeCommand());
         // Climb
         climb.resetButton.onTrue(climb.resetEncoder());
         // coralScoring.coralAtOuttake.and(RobotModeTriggers.teleop()).onTrue(elevator.p0());
