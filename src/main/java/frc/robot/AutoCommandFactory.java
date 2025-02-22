@@ -84,56 +84,58 @@ public class AutoCommandFactory {
         start.active().onChange(elevator.home());
         start.done()
             .onTrue(Commands.sequence(
-                swerve.moveToPose(() -> goToReef.getInitialPose().get(), false, 0.1, 1.0),
+                Commands.runOnce(() -> swerve.moveToPose(goToReef.getInitialPose().get())),
                 swerve.runOnce(swerve::setMotorsZero), elevator.p4(),
                 new ProxyCommand(goToReef.cmd())));
         goToReef.active().onChange(elevator.p4());
         goToReef.done()
             .onTrue(Commands.sequence(
-                swerve.moveToPose(() -> feed1.getInitialPose().get(), false, 0.1, 1),
-                swerve.runOnce(swerve::setMotorsZero), elevator.p4(), coral.runScoringMotor(0.5),
+                Commands.runOnce(() -> swerve.moveToPose(feed1.getInitialPose().get())),
+                swerve.runOnce(swerve::setMotorsZero), elevator.p4(), coral.runCoralOuttake(),
                 new ProxyCommand(feed1.cmd())));
         feed1.active().onTrue(elevator.p4());
         feed1.done()
             .onTrue(Commands.sequence(
-                swerve.moveToPose(() -> feed1.getInitialPose().get(), false, 0.1, 1),
+                Commands.runOnce(() -> swerve.moveToPose(feed1.getInitialPose().get())),
                 swerve.runOnce(swerve::setMotorsZero), elevator.home(),
                 new ProxyCommand(feed1.cmd())));;
         feed1.active().onTrue(elevator.home());
         feed1.done()
             .onTrue(Commands.sequence(
-                swerve.moveToPose(() -> goToReef2.getInitialPose().get(), false, 0.1, 1),
+                Commands.runOnce(() -> swerve.moveToPose(goToReef2.getInitialPose().get())),
                 swerve.runOnce(swerve::setMotorsZero), elevator.p4(),
                 new ProxyCommand(goToReef2.cmd())));;
         goToReef2.active().onTrue(elevator.p4());
         goToReef2.done()
             .onTrue(Commands.sequence(
-                swerve.moveToPose(() -> feed2.getInitialPose().get(), false, 0.1, 1),
-                swerve.runOnce(swerve::setMotorsZero), elevator.p4(), coral.runScoringMotor(0.5),
+                Commands.runOnce(() -> swerve.moveToPose(feed2.getInitialPose().get())),
+                swerve.runOnce(swerve::setMotorsZero), elevator.p4(), coral.runCoralOuttake(),
                 new ProxyCommand(feed2.cmd())));;
         feed2.active().onTrue(elevator.p4());
         feed2.done()
             .onTrue(Commands.sequence(
-                swerve.moveToPose(() -> feed2.getInitialPose().get(), false, 0.1, 1),
+                Commands.runOnce(() -> swerve.moveToPose(feed2.getInitialPose().get())),
                 swerve.runOnce(swerve::setMotorsZero), elevator.home(),
                 new ProxyCommand(feed2.cmd())));;
         feed2.active().onTrue(elevator.home());
         feed2.done()
             .onTrue(Commands.sequence(
-                swerve.moveToPose(() -> goToReef3.getInitialPose().get(), false, 0.1, 1),
-                swerve.runOnce(swerve::setMotorsZero), elevator.p4(), coral.runScoringMotor(0.5),
+                Commands.runOnce(() -> swerve.moveToPose(goToReef3.getInitialPose().get())),
+                swerve.runOnce(swerve::setMotorsZero), elevator.p4(), coral.runCoralOuttake(),
                 new ProxyCommand(goToReef3.cmd())));
         goToReef3.active().onTrue(elevator.p4());
         goToReef3.done().onTrue(Commands.sequence(
-            swerve.moveToPose(() -> feed4.getInitialPose().get(), false, 0.1, 1),
+            Commands.runOnce(() -> swerve.moveToPose(feed4.getInitialPose().get())),
             swerve.runOnce(swerve::setMotorsZero), elevator.p4(), new ProxyCommand(feed4.cmd())));
         feed4.active().onTrue(elevator.home());
         feed4.done()
             .onTrue(Commands.sequence(
-                swerve.moveToPose(() -> goToReef4.getInitialPose().get(), false, 0.1, 1),
+                Commands.runOnce(() -> swerve.moveToPose(goToReef4.getInitialPose().get())),
                 swerve.runOnce(swerve::setMotorsZero), elevator.p4(),
                 new ProxyCommand(goToReef4.cmd())));;;
         goToReef4.active().onTrue(elevator.p4());
         goToReef4.done();
+
+        return routine;
     }
 }
