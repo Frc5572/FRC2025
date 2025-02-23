@@ -17,6 +17,7 @@ import frc.lib.math.Hexagon;
 import frc.lib.math.Penetration;
 import frc.lib.math.Rectangle;
 import frc.lib.math.SeparatingAxis;
+import frc.lib.mut.MutableTranslation2d;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.subsystems.swerve.Swerve;
 
@@ -106,18 +107,15 @@ public class RobotState {
         double y = original.getY();
         double t = -original.getRotation().getRadians();
 
-        Translation2d[] bumpers = new Translation2d[5];
-        Translation2d[] tr = new Translation2d[4];
+
         for (int i = 0; i < 4; i++) {
             double theta = t + i * Math.PI / 2;
-            tr[i] = new Translation2d(
+            tr[i].setXY(
                 x + Math.cos(theta) * Constants.Swerve.bumperFront.in(Meters)
                     + Math.sin(theta) * Constants.Swerve.bumperRight.in(Meters),
                 y - Math.sin(theta) * Constants.Swerve.bumperFront.in(Meters)
                     + Math.cos(theta) * Constants.Swerve.bumperRight.in(Meters));
-            bumpers[i] = tr[i];
         }
-        bumpers[4] = bumpers[0];
 
         double dx = 0.0;
         double dy = 0.0;
@@ -229,15 +227,12 @@ public class RobotState {
         robot.draw();
 
         if (Constants.StateEstimator.keepOutOfReefs) {
-            Penetration penetration = new Penetration("ReefPen");
-            Translation2d[] sepResult =
-                new Translation2d[] {Translation2d.kZero, Translation2d.kZero};
             if (SeparatingAxis.solve(robot, reef1, penetration)) {
                 sepResult[0] = robot.getCenter();
-                Translation2d offs = new Translation2d(penetration.getDepth(),
-                    new Rotation2d(penetration.getXDir(), penetration.getYDir()));
-                Translation2d resPos = robot.getCenter().plus(offs);
-                robotTest.setPose(new Pose2d(resPos, original.getRotation()));
+                penetration.update(offs);
+                robot.getCenter().plus(offs, resPos);
+                robotTest.setPose(resPos.getX(), resPos.getY(),
+                    original.getRotation().getRadians());
                 sepResult[1] = robotTest.getCenter();
                 penetration.draw();
 
@@ -245,10 +240,10 @@ public class RobotState {
                 dy = offs.getY();
             } else if (SeparatingAxis.solve(robot, reef2, penetration)) {
                 sepResult[0] = robot.getCenter();
-                Translation2d offs = new Translation2d(penetration.getDepth(),
-                    new Rotation2d(penetration.getXDir(), penetration.getYDir()));
-                Translation2d resPos = robot.getCenter().plus(offs);
-                robotTest.setPose(new Pose2d(resPos, original.getRotation()));
+                penetration.update(offs);
+                robot.getCenter().plus(offs, resPos);
+                robotTest.setPose(resPos.getX(), resPos.getY(),
+                    original.getRotation().getRadians());
                 sepResult[1] = robotTest.getCenter();
                 penetration.draw();
 
@@ -256,10 +251,10 @@ public class RobotState {
                 dy = offs.getY();
             } else if (SeparatingAxis.solve(robot, centerPost, penetration)) {
                 sepResult[0] = robot.getCenter();
-                Translation2d offs = new Translation2d(penetration.getDepth(),
-                    new Rotation2d(penetration.getXDir(), penetration.getYDir()));
-                Translation2d resPos = robot.getCenter().plus(offs);
-                robotTest.setPose(new Pose2d(resPos, original.getRotation()));
+                penetration.update(offs);
+                robot.getCenter().plus(offs, resPos);
+                robotTest.setPose(resPos.getX(), resPos.getY(),
+                    original.getRotation().getRadians());
                 sepResult[1] = robotTest.getCenter();
                 penetration.draw();
 
@@ -269,17 +264,23 @@ public class RobotState {
                 robotTest.setPose(new Pose2d(-100, -100, Rotation2d.kZero));
             }
             robotTest.draw();
-
-            Logger.recordOutput("sepResult", sepResult);
         }
-
-        // TODO
 
         if (Math.abs(dx) > 0.01 || Math.abs(dy) > 0.01) {
             resetPose(new Pose2d(x + dx, y + dy, original.getRotation()), positions, gyroYaw);
             return;
         }
     }
+
+    private final MutableTranslation2d[] tr =
+        new MutableTranslation2d[] {new MutableTranslation2d(), new MutableTranslation2d(),
+            new MutableTranslation2d(), new MutableTranslation2d()};
+
+    private final Penetration penetration = new Penetration("ReefPen");
+    private final MutableTranslation2d[] sepResult =
+        new MutableTranslation2d[] {new MutableTranslation2d(), new MutableTranslation2d()};
+    private final MutableTranslation2d resPos = new MutableTranslation2d();
+    private final MutableTranslation2d offs = new MutableTranslation2d();
 
     private final Hexagon reef1 = new Hexagon("BlueReef", FieldConstants.Reef.center,
         FieldConstants.Reef.circumscribedRadius.in(Meters), Rotation2d.fromDegrees(30));

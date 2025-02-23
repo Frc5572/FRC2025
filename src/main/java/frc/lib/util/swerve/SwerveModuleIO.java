@@ -1,5 +1,7 @@
 package frc.lib.util.swerve;
 
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import org.littletonrobotics.junction.AutoLog;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -9,10 +11,10 @@ public interface SwerveModuleIO {
     /** Inputs Class for SwerveModule */
     @AutoLog
     public static class SwerveModuleInputs {
-        public Angle driveMotorSelectedPosition;
-        public AngularVelocity driveMotorSelectedSensorVelocity;
-        public Angle angleMotorSelectedPosition;
-        public Angle absolutePositionAngleEncoder;
+        public Angle driveMotorSelectedPosition = Rotations.of(0.0);
+        public AngularVelocity driveMotorSelectedSensorVelocity = RotationsPerSecond.of(0.0);
+        public Angle angleMotorSelectedPosition = Rotations.of(0.0);
+        public Angle absolutePositionAngleEncoder = Rotations.of(0.0);
         // public double driveMotorTemp;
         // public double angleMotorTemp;
     }
