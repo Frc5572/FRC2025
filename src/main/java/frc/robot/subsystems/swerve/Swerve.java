@@ -11,6 +11,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -37,13 +38,13 @@ public class Swerve extends SubsystemBase {
     private double fieldOffset;
     private SwerveInputsAutoLogged inputs = new SwerveInputsAutoLogged();
     private SwerveIO swerveIO;
-    private final RobotState state;
+    public final RobotState state;
     private double setSpeedMultiplier = 1.0;
     private final HolonomicDriveController holonomicDriveController = new HolonomicDriveController(
         new PIDController(Constants.SwerveTransformPID.PID_XKP,
             Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
-        new PIDController(Constants.SwerveTransformPID.PID_YKP,
-            Constants.SwerveTransformPID.PID_YKI, Constants.SwerveTransformPID.PID_YKD),
+        new PIDController(Constants.SwerveTransformPID.PID_XKP,
+            Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
         new ProfiledPIDController(Constants.SwerveTransformPID.PID_TKP,
             Constants.SwerveTransformPID.PID_TKI, Constants.SwerveTransformPID.PID_TKD,
             new TrapezoidProfile.Constraints(Constants.SwerveTransformPID.MAX_ANGULAR_VELOCITY,
@@ -295,6 +296,11 @@ public class Swerve extends SubsystemBase {
     }
 
 
+
+    public Command stop() {
+        return this.runOnce(this::setMotorsZero);
+    }
+
     /**
      * Follow Choreo Trajectory
      *
@@ -316,15 +322,60 @@ public class Swerve extends SubsystemBase {
             state.getGlobalPoseEstimate().getRotation()));
     }
 
+    private final TrapezoidProfile profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(
+        Constants.SwerveTransformPID.MAX_VELOCITY, Constants.SwerveTransformPID.MAX_ACCELERATION));
+
+    /**
+     * Move to a Pose2d
+     *
+     * @param pose Desired Pose2d
+     */
+    public void moveToPose(Pose2d pose, double maxSpeed, double maxAcceleration) {
+        var current = getChassisSpeeds();
+        var diff = pose.minus(state.getGlobalPoseEstimate());
+        double totalDistance = diff.getTranslation().getNorm();
+        if (totalDistance > 1e-6) {
+            var next = profile.calculate(0.08,
+                new TrapezoidProfile.State(0,
+                    Math.hypot(current.vxMetersPerSecond, current.vyMetersPerSecond)),
+                new TrapezoidProfile.State(diff.getTranslation().getNorm(), 0));
+            double next_t = next.position / totalDistance;
+            var nextTranslation = diff.getTranslation().times(next_t);
+            var nextRotation = diff.getRotation().times(next_t);
+            pose =
+                state.getGlobalPoseEstimate().plus(new Transform2d(nextTranslation, nextRotation));
+        }
+        if (Constants.shouldDrawStuff) {
+            Logger.recordOutput("Swerve/moveToPoseTarget", pose);
+        }
+        ChassisSpeeds ctrlEffort = holonomicDriveController.calculate(state.getGlobalPoseEstimate(),
+            pose, 0, pose.getRotation());
+        double speed = Math.hypot(ctrlEffort.vxMetersPerSecond, ctrlEffort.vyMetersPerSecond);
+        if (speed > maxSpeed) {
+            double mul = maxSpeed / speed;
+            ctrlEffort.vxMetersPerSecond *= mul;
+            ctrlEffort.vyMetersPerSecond *= mul;
+        }
+        setModuleStates(ctrlEffort);
+    }
+
+    /**
+     * Move to a Pose2d
+     *
+     * @param pose Desired Pose2d
+     */
+    public void moveToPose(Pose2d pose, double maxVelocity) {
+        moveToPose(pose, maxVelocity, Constants.SwerveTransformPID.MAX_ACCELERATION);
+    }
+
     /**
      * Move to a Pose2d
      *
      * @param pose Desired Pose2d
      */
     public void moveToPose(Pose2d pose) {
-        ChassisSpeeds ctrlEffort =
-            holonomicDriveController.calculate(getPose(), pose, 0, pose.getRotation());
-        setModuleStates(ctrlEffort);
+        moveToPose(pose, Constants.SwerveTransformPID.MAX_VELOCITY,
+            Constants.SwerveTransformPID.MAX_ACCELERATION);
     }
 
 }
