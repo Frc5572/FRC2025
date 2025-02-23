@@ -37,9 +37,9 @@ public class Elevator extends SubsystemBase {
         Logger.processInputs("Elevator", inputs);
         viz.setElevatorHeight(inputs.position);
         Logger.recordOutput("Elevator/position_in", inputs.position.in(Inches));
-        if (inputs.limitSwitch) {
-            io.resetHome();
-        }
+        // if (inputs.limitSwitch) {
+        // io.resetHome();
+        // }
         SmartDashboard.putString("Dashboard/Main Driver/Elevator Height",
             Height.getCurrentState().displayName);
         SmartDashboard.putNumber("Dashboard/Main Driver/Elevator Preset Level",
@@ -55,8 +55,10 @@ public class Elevator extends SubsystemBase {
     public Command home() {
         Command slowLower = Commands.runEnd(() -> io.setVoltage(-1.4), () -> io.setVoltage(0.0));
         return moveTo(() -> Constants.Elevator.HOME).until(() -> inputs.position.in(Inches) < 5.0)
-            .andThen(slowLower).until(() -> (inputs.limitSwitch == true)).alongWith(
-                Commands.runOnce(() -> Logger.recordOutput(Constants.Elevator.heightName, "home")));
+            .andThen(slowLower).until(() -> inputs.limitSwitch).andThen(Commands.runOnce(() -> {
+                io.resetHome();
+                Logger.recordOutput(Constants.Elevator.heightName, "home");
+            }));
     }
 
     /**
