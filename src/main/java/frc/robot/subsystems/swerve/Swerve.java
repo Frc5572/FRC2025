@@ -9,6 +9,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -277,6 +278,8 @@ public class Swerve extends SubsystemBase {
      */
     public Command teleOpDrive(CommandXboxController controller, boolean fieldRelative,
         boolean openLoop) {
+        SlewRateLimiter slewRateLimiterX = new SlewRateLimiter(1.0);
+        SlewRateLimiter slewRateLimiterY = new SlewRateLimiter(1.0);
         return this.run(() -> {
             double yaxis = -controller.getLeftY();
             double xaxis = -controller.getLeftX();
@@ -284,11 +287,12 @@ public class Swerve extends SubsystemBase {
             /* Deadbands */
             yaxis = MathUtil.applyDeadband(yaxis, 0.1);
             xaxis = MathUtil.applyDeadband(xaxis, 0.1);
-            xaxis *= xaxis * Math.signum(xaxis);
-            yaxis *= yaxis * Math.signum(yaxis);
+            // xaxis *= xaxis * Math.signum(xaxis);
+            // yaxis *= yaxis * Math.signum(yaxis);
             raxis = (Math.abs(raxis) < Constants.STICK_DEADBAND) ? 0 : raxis;
-            Translation2d translation = new Translation2d(yaxis, xaxis)
-                .times(Constants.Swerve.maxSpeed).times(setSpeedMultiplier);
+            Translation2d translation = new Translation2d(slewRateLimiterY.calculate(yaxis),
+                slewRateLimiterX.calculate(xaxis)).times(Constants.Swerve.maxSpeed)
+                    .times(setSpeedMultiplier);
             double rotation = raxis * Constants.Swerve.maxAngularVelocity * setSpeedMultiplier;
             this.drive(translation, rotation, fieldRelative, openLoop);
         });
