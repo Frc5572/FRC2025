@@ -61,17 +61,19 @@ public final class Constants {
     public static final int operatorId = 1;
 
     public static final boolean tuningMode = false;
-    /**
-     * Current threshold that indicates an algae is in possestion
-     */
-    public static final double HAS_ALGAE_CURRENT_THRESHOLD = 100;
 
     /**
      * Algae misc values
      */
     public static final class Algae {
-        public static final int VOLTAGE = 2;
+        /**
+         * Current threshold that indicates an algae is in possestion
+         */
+        public static final double HAS_ALGAE_CURRENT_THRESHOLD = 70;
+        public static final int VOLTAGE = 4;
         public static final int NEGATIVE_VOLTAGE = -2;
+        public static final double SMALLER_VOLTAGE = 0.5;
+        public static final double SMALLER_NEGATIVE_VOLTAGE = -1;
     }
 
     // pit and alt operator controllers

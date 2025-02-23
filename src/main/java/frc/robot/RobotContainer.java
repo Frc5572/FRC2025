@@ -94,10 +94,6 @@ public class RobotContainer {
     private Climber climb;
     private OperatorStates operatorStates = new OperatorStates();
 
-
-    /* Triggers */
-    private Trigger algaeInIntake = new Trigger(() -> algae.hasAlgae());
-
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -219,9 +215,8 @@ public class RobotContainer {
     private void setupAltOperatorController() {
         altOperator.y().onTrue(elevator.home());
         altOperator.x().and(coralScoring.coralAtOuttake).whileTrue(coralScoring.runCoralOuttake());
-        altOperator.rightTrigger().whileTrue(algae.setMotorVoltageCommand(Constants.Algae.VOLTAGE));
-        altOperator.leftTrigger()
-            .whileTrue(algae.setMotorVoltageCommand(Constants.Algae.NEGATIVE_VOLTAGE));
+        altOperator.rightTrigger().whileTrue(algae.algaeIntakeCommand());
+        altOperator.leftTrigger().whileTrue(algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE));
         // manual mode
 
 
@@ -258,7 +253,7 @@ public class RobotContainer {
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
         // Algae
-        algaeInIntake.and(coralScoring.coralAtOuttake.negate())
+        algae.hasAlgae.and(coralScoring.coralAtOuttake.negate())
             .onTrue(leds.blinkLEDs(Color.kCyan, 2));
         // Climb
         climb.resetButton.onTrue(climb.resetEncoder());
@@ -307,5 +302,3 @@ public class RobotContainer {
         }
     }
 }
-
-
