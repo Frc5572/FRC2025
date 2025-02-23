@@ -251,7 +251,7 @@ public final class Constants {
             public static final double wheelCoeffFriction = 1.2;
             public static final MomentOfInertia angleMomentOfInertia =
                 KilogramSquareMeters.of(0.02);
-            public static final Distance wheelRadius = Inches.of(1.9);
+            public static final Distance wheelRadius = Inches.of(3.87 / 2);
             public static final Current slipCurrent = Amps.of(120.0);
 
             public static final Current driveCurrentLimit = Amps.of(35.0);
@@ -268,7 +268,7 @@ public final class Constants {
             public static final LinearAcceleration maxDriveRate = MetersPerSecondPerSecond.of(50.0);
 
 
-            public static final double ffkS = 0.32;
+            public static final double ffkS = 1.0;
             public static final double ffkV = 1.51;
             public static final double ffkT = 1.0 / driveMotor.KtNMPerAmp;
             public static final double ffkA = 0.27;
@@ -320,7 +320,7 @@ public final class Constants {
         public static final NeutralModeValue BREAK = NeutralModeValue.Brake;
 
         // PID and feedforward
-        public static final double KP = 40.0;
+        public static final double KP = 60.0;
         public static final double KI = 0.0;
         public static final double KD = 0.0;
         public static final double KS = 0.2675;
@@ -339,7 +339,7 @@ public final class Constants {
         public static final Distance P1 = Inches.of(28.1); // floor
         public static final Distance P2 = Inches.of(31.2); // Coral l2
         public static final Distance P3 = Inches.of(45.0); // Coral L3
-        public static final Distance P4 = Inches.of(70.0); // Coral L4
+        public static final Distance P4 = Inches.of(72.0); // Coral L4
 
 
         public static final double gearRatio = 1.0;
@@ -376,10 +376,10 @@ public final class Constants {
                     -Units.inchesToMeters(12), Units.inchesToMeters(10)),
                     new Rotation3d(Math.PI, 0, 0)),
                 Units.inchesToMeters(1.6)),
-            new CameraConstants("cam1", 480, 640, Rotation2d.fromDegrees(120), Hertz.of(65),
+            new CameraConstants("cam1", 480, 640, Rotation2d.fromDegrees(140), Hertz.of(65),
                 Seconds.of(0.15), Seconds.of(0.02), 0.25, 0.08,
                 new Transform3d(
-                    new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(12),
+                    new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(13.5),
                         Units.inchesToMeters(10)),
                     new Rotation3d(0, -Units.degreesToRadians(5), -Units.degreesToRadians(10))),
                 Units.inchesToMeters(0.0))};
@@ -412,15 +412,18 @@ public final class Constants {
      * MoveToPos constants.
      */
     public static class SwerveTransformPID {
-        public static final double PID_XKP = 7.0;
-        public static final double PID_XKI = 0.2;
+        public static final double PID_XKP = 10.0;
+        public static final double PID_XKI = 0.0;
         public static final double PID_XKD = 0.0;
-        public static final double PID_TKP = 7.0;
-        public static final double PID_TKI = 0.1;
+        public static final double PID_TKP = 5.0;
+        public static final double PID_TKI = 0.0;
         public static final double PID_TKD = 0.0;
 
-        public static final double MAX_ANGULAR_VELOCITY = 9.0;
-        public static final double MAX_ANGULAR_ACCELERATION = 9 * 5;
+        public static final double MAX_VELOCITY = 2;
+        public static final double MAX_ACCELERATION = 3;
+
+        public static final double MAX_ANGULAR_VELOCITY = 8.9;
+        public static final double MAX_ANGULAR_ACCELERATION = 30;
     }
 
     public static final Rotation2d CIRCLE_REEF_LOOKAHEAD_ANGLE = Rotation2d.fromDegrees(15);

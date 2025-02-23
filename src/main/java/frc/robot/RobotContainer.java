@@ -26,13 +26,12 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.ScoringLocation.Height;
-import frc.lib.util.Tuples.Tuple2;
 import frc.lib.util.WebController;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
 import frc.robot.commands.MoveAndAvoidReef;
-import frc.robot.commands.MoveToPoseWithLocalTag;
+import frc.robot.commands.MoveToPose;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIO;
@@ -223,32 +222,39 @@ public class RobotContainer {
         driver.rightTrigger().and(climb.reachedClimberStart)
             .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
 
-        boolean ready = false;
+        driver.a().and(operator.hasReefLocation()).whileTrue(new MoveAndAvoidReef(swerve, () -> {
+            Pose2d finalLoc = operator.getDesiredLocation().pose;
+            return new Pose2d(
+                finalLoc.getTranslation()
+                    .minus(new Translation2d(Units.inchesToMeters(12), finalLoc.getRotation())),
+                finalLoc.getRotation());
+        }, () -> 0.8, true, Units.inchesToMeters(12), 15).andThen(elevator.moveTo(() -> {
+            return operator.getDesiredHeight().height;
+        })).andThen(new MoveToPose(swerve, () -> {
+            Pose2d finalLoc = operator.getDesiredLocation().pose;
 
-        if (!ready) {
-            driver.a().and(operator.hasReefLocation())
-                .whileTrue(new MoveToPoseWithLocalTag(swerve, () -> {
-                    Pose2d finalLoc = operator.getDesiredLocation().pose;
-                    return new Tuple2<Pose2d, Integer>(new Pose2d(
-                        finalLoc.getTranslation().minus(
-                            new Translation2d(Units.inchesToMeters(24), finalLoc.getRotation())),
-                        finalLoc.getRotation()), operator.getDesiredLocation().tag);
-                }, () -> 0.5, true, Units.inchesToMeters(4), 2));
-        } else {
-            driver.a().and(operator.hasReefLocation())
-                .whileTrue(new MoveAndAvoidReef(swerve, () -> {
-                    Pose2d finalLoc = operator.getDesiredLocation().pose;
-                    return new Pose2d(
-                        finalLoc.getTranslation().minus(
-                            new Translation2d(Units.inchesToMeters(12), finalLoc.getRotation())),
-                        finalLoc.getRotation());
-                }, () -> 2.0, true, Units.inchesToMeters(12), 15)
-                    .andThen(new MoveToPoseWithLocalTag(swerve, () -> {
-                        return new Tuple2<Pose2d, Integer>(operator.getDesiredLocation().pose,
-                            operator.getDesiredLocation().tag);
-                    }, () -> 2.0, true, Units.inchesToMeters(4), 2)).andThen(swerve.run(() -> {
-                    })));
-        }
+            return new Pose2d(
+                finalLoc.getTranslation()
+                    .minus(new Translation2d(Units.inchesToMeters(0.75), finalLoc.getRotation())),
+                finalLoc.getRotation());
+        }, () -> 0.3, true, Units.inchesToMeters(0.25), 5))
+            // .andThen(Commands.waitSeconds(10))
+            .andThen(coralScoring.runCoralOuttake().withTimeout(1.5))
+            .andThen(new MoveToPose(swerve, () -> {
+                Pose2d finalLoc = operator.getDesiredLocation().pose;;
+                return new Pose2d(
+                    finalLoc.getTranslation()
+                        .minus(new Translation2d(Units.inchesToMeters(12), finalLoc.getRotation())),
+                    finalLoc.getRotation());
+            }, () -> 0.3, true, Units.inchesToMeters(4), 5).withTimeout(1.5))
+            .andThen(elevator.home()).andThen(swerve.run(() -> {
+            })));
+        driver.b().whileTrue(new MoveAndAvoidReef(swerve, () -> {
+            return new Pose2d(1.5196709632873535, 7.158551216125488,
+                Rotation2d.fromRadians(-2.4980917038665034));
+        }, () -> 0.8, true, Units.inchesToMeters(2), 5).andThen(swerve.stop())
+            .andThen(swerve.run(() -> {
+            })));
     }
 
     private void setupAltOperatorController() {
@@ -289,8 +295,8 @@ public class RobotContainer {
         // Coral
         coralScoring.coralAtIntake.whileTrue(leds.setLEDsSolid(Color.kOrange));
         coralScoring.coralAtOuttake.whileTrue(leds.setLEDsSolid(Color.kCyan));
-        coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
-        RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
+        // coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
+        // RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
         // Algae
         algaeInIntake.and(coralScoring.coralAtOuttake.negate())
             .onTrue(leds.blinkLEDs(Color.kCyan, 2));

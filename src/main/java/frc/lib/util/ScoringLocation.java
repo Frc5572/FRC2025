@@ -34,15 +34,13 @@ public class ScoringLocation {
         public final int tag;
 
         private static Pose2d coralPose(Rotation2d direction, boolean offset) {
-            return new Pose2d(
-                FieldConstants.Reef.center.plus(new Translation2d(
+            return new Pose2d(FieldConstants.Reef.center
+                .plus(new Translation2d(
                     FieldConstants.Reef.inscribedRadius.in(Meters)
                         + Constants.Swerve.bumperFront.in(Meters),
-                    direction.plus(Rotation2d.k180deg))).plus(
-                        offset
-                            ? new Translation2d(Units.inchesToMeters(10),
-                                direction.plus(Rotation2d.kCCW_90deg))
-                            : new Translation2d()),
+                    direction.plus(Rotation2d.k180deg)))
+                .plus(new Translation2d(Units.inchesToMeters(offset ? 13.5 : 1.25),
+                    direction.plus(Rotation2d.kCCW_90deg))),
                 direction);
         }
 

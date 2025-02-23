@@ -148,7 +148,7 @@ public class MoveAndAvoidReef extends Command implements Drawable {
 
     public static final double driveCircleRadius =
         FieldConstants.Reef.circumscribedRadius.in(Meters) + Math.hypot(
-            Constants.Swerve.bumperFront.in(Meters), Constants.Swerve.bumperRight.in(Meters));
+            1.2 * Constants.Swerve.bumperFront.in(Meters), Constants.Swerve.bumperRight.in(Meters));
     private static final Circle redDriveCircle = new Circle("avoidReef/redDriveCircle",
         new Translation2d(FieldConstants.fieldLength.in(Meters) - FieldConstants.Reef.center.getX(),
             FieldConstants.Reef.center.getY()),
@@ -173,7 +173,7 @@ public class MoveAndAvoidReef extends Command implements Drawable {
                 RotationInterval.acute(targetAngles.getMin(), currentAngles.getMax()).range()
                     * driveCircleRadius + currentPosition.minus(currentMax).getNorm()
                     + targetPosition.minus(targetMin).getNorm();
-            if (driveCircle.sdf(currentPosition) < Units.inchesToMeters(10)) {
+            if (driveCircle.sdf(currentPosition) < Units.inchesToMeters(20)) {
                 Rotation2d angle = driveCircle.getAngle(currentPosition);
                 if (rightLen > leftLen) {
                     Rotation2d targetAngle = angle.plus(Constants.CIRCLE_REEF_LOOKAHEAD_ANGLE);
@@ -186,9 +186,11 @@ public class MoveAndAvoidReef extends Command implements Drawable {
                 }
             } else {
                 if (rightLen > leftLen) {
-                    return new Pose2d(currentMax, currentAngles.getMax().plus(Rotation2d.k180deg));
+                    return new Pose2d(currentMax,
+                        driveCircle.getCenter().minus(currentPosition).getAngle());
                 } else {
-                    return new Pose2d(currentMin, currentAngles.getMin().plus(Rotation2d.k180deg));
+                    return new Pose2d(currentMin,
+                        driveCircle.getCenter().minus(currentPosition).getAngle());
                 }
             }
         }

@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 import choreo.auto.AutoRoutine;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.event.EventLoop;
@@ -20,12 +21,13 @@ public class MoveToPoseWithLocalTag extends Command {
 
     private EventLoop eventLoop = CommandScheduler.getInstance().getDefaultButtonLoop();
     private AutoRoutine autoRoutine;
-    private Swerve swerve;
-    private Supplier<Tuple2<Pose2d, Integer>> pose2dAndTagSupplier;
+    private final Swerve swerve;
+    private final Supplier<Tuple2<Pose2d, Integer>> pose2dAndTagSupplier;
+    private final DoubleSupplier maxSpeedSupplier;
     private Pose2d pose2d;
-    private boolean flipForRed;
-    private double tol;
-    private double rotTol;
+    private final boolean flipForRed;
+    private final double tol;
+    private final double rotTol;
     /** If this trajectory us currently running */
     private boolean isActive = false;
     /** If the trajectory ran to completion */
@@ -46,6 +48,7 @@ public class MoveToPoseWithLocalTag extends Command {
         boolean flipForRed, double tol, double rotTol) {
         this.swerve = swerve;
         this.pose2dAndTagSupplier = pose2dAndTagSupplier;
+        this.maxSpeedSupplier = maxSpeedSupplier;
         this.flipForRed = flipForRed;
         this.tol = tol;
         this.rotTol = rotTol;
@@ -119,11 +122,12 @@ public class MoveToPoseWithLocalTag extends Command {
         } else {
             swerve.state.setLocalTarget(x._1());
         }
+        finishCycleCount = 0;
     }
 
     @Override
     public void execute() {
-        swerve.moveToPose(pose2d);
+        swerve.moveToPose(pose2d, maxSpeedSupplier.getAsDouble());
     }
 
     @Override
@@ -134,13 +138,22 @@ public class MoveToPoseWithLocalTag extends Command {
         isCompleted = !interrupted;
     }
 
+    private int finishCycleCount = 0;
+
     @Override
     public boolean isFinished() {
         Pose2d poseError = Pose2d.kZero.plus(pose2d.minus(swerve.getPose()));
         final var eTranslate = poseError.getTranslation();
         final var eRotate = poseError.getRotation();
-        return Math.abs(eTranslate.getX()) < tol && Math.abs(eTranslate.getY()) < tol
-            && Math.abs(eRotate.getDegrees()) < rotTol;
+        Logger.recordOutput("moveToPose/eTranslate", eTranslate);
+        Logger.recordOutput("moveToPose/eTranslateNorm", eTranslate.getNorm());
+        Logger.recordOutput("moveToPose/eRotate", eRotate);
+        if (eTranslate.getNorm() < tol && Math.abs(eRotate.getDegrees()) < rotTol) {
+            finishCycleCount += 1;
+        } else {
+            finishCycleCount = 0;
+        }
+        return finishCycleCount > 5;
     }
 
 

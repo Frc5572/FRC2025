@@ -31,13 +31,15 @@ public class Elevator extends SubsystemBase {
         io.updateInputs(inputs);
     }
 
+    private final Trigger limitSwitchTouched = new Trigger(() -> inputs.limitSwitch).debounce(0.25);
+
     @Override
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);
         viz.setElevatorHeight(inputs.position);
         Logger.recordOutput("Elevator/position_in", inputs.position.in(Inches));
-        if (inputs.limitSwitch) {
+        if (limitSwitchTouched.getAsBoolean()) {
             io.resetHome();
         }
         SmartDashboard.putString("Dashboard/Main Driver/Elevator Height",
@@ -55,7 +57,7 @@ public class Elevator extends SubsystemBase {
     public Command home() {
         Command slowLower = Commands.runEnd(() -> io.setVoltage(-1.4), () -> io.setVoltage(0.0));
         return moveTo(() -> Constants.Elevator.HOME).until(() -> inputs.position.in(Inches) < 5.0)
-            .andThen(slowLower).until(() -> (inputs.limitSwitch == true)).alongWith(
+            .andThen(slowLower).until(() -> (limitSwitchTouched.getAsBoolean())).alongWith(
                 Commands.runOnce(() -> Logger.recordOutput(Constants.Elevator.heightName, "home")));
     }
 
@@ -97,10 +99,11 @@ public class Elevator extends SubsystemBase {
      *
      */
     public Command moveTo(Supplier<Distance> height) {
-        return run(() -> {
+        return runOnce(() -> {
             Logger.recordOutput("targetHeight", height.get().in(Meters));
             io.setPositon(height.get().in(Meters));
-        }).until(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1);
+        }).andThen(Commands
+            .waitUntil(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1));
     }
 
     public Command manualMove(CommandXboxController leftStick) {
