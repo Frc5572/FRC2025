@@ -192,7 +192,7 @@ public final class Constants {
         public static final double MAX_ELEVATOR_SPEED = 2.0;
 
         /** Radians per Second */
-        public static final double maxAngularVelocity = 6.28 / 8;
+        public static final double maxAngularVelocity = 6.28;
 
         /* Neutral Modes */
         public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Coast;
