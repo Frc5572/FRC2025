@@ -87,7 +87,6 @@ public class MoveAndAvoidReef extends Command implements Drawable {
      *
      * @param swerve Swerve Subsystem
      * @param pose2dSupplier Pose2d Supplier
-     * @param maxSpeedSupplier maximum speed to move at
      * @param flipForRed Whether to flip the pose2d for red alliance
      * @param tol Translational Tolerance
      * @param rotTol Rotational Tolerance
