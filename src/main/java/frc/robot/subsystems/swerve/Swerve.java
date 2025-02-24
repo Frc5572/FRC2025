@@ -330,15 +330,16 @@ public class Swerve extends SubsystemBase {
      *
      * @param pose Desired Pose2d
      */
-    public void moveToPose(Pose2d pose, double maxSpeed, double maxAcceleration) {
+    public void moveToPose(Pose2d pose, double maxSpeed, double maxAcceleration,
+        double targetSpeed) {
         var current = getChassisSpeeds();
         var diff = pose.minus(state.getGlobalPoseEstimate());
         double totalDistance = diff.getTranslation().getNorm();
-        if (totalDistance > 1e-6) {
+        if (totalDistance > 0.5) {
             var next = profile.calculate(0.08,
                 new TrapezoidProfile.State(0,
                     Math.hypot(current.vxMetersPerSecond, current.vyMetersPerSecond)),
-                new TrapezoidProfile.State(diff.getTranslation().getNorm(), 0));
+                new TrapezoidProfile.State(diff.getTranslation().getNorm(), targetSpeed));
             double next_t = next.position / totalDistance;
             var nextTranslation = diff.getTranslation().times(next_t);
             var nextRotation = diff.getRotation().times(next_t);
@@ -356,6 +357,11 @@ public class Swerve extends SubsystemBase {
             ctrlEffort.vxMetersPerSecond *= mul;
             ctrlEffort.vyMetersPerSecond *= mul;
         }
+        if (totalDistance > 0.5 && targetSpeed > 1e-6 && speed < targetSpeed && speed > 1e-6) {
+            double mul = targetSpeed / speed;
+            ctrlEffort.vxMetersPerSecond *= mul;
+            ctrlEffort.vyMetersPerSecond *= mul;
+        }
         setModuleStates(ctrlEffort);
     }
 
@@ -365,7 +371,7 @@ public class Swerve extends SubsystemBase {
      * @param pose Desired Pose2d
      */
     public void moveToPose(Pose2d pose, double maxVelocity) {
-        moveToPose(pose, maxVelocity, Constants.SwerveTransformPID.MAX_ACCELERATION);
+        moveToPose(pose, maxVelocity, Constants.SwerveTransformPID.MAX_ACCELERATION, 0.0);
     }
 
     /**
@@ -375,7 +381,7 @@ public class Swerve extends SubsystemBase {
      */
     public void moveToPose(Pose2d pose) {
         moveToPose(pose, Constants.SwerveTransformPID.MAX_VELOCITY,
-            Constants.SwerveTransformPID.MAX_ACCELERATION);
+            Constants.SwerveTransformPID.MAX_ACCELERATION, 0.0);
     }
 
 }

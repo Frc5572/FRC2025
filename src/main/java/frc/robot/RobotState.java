@@ -33,7 +33,6 @@ import frc.robot.subsystems.swerve.Swerve;
 public class RobotState {
 
     private final Viz2025 vis;
-    private int currentTarget = 0;
     private boolean isInitialized = false;
 
     private final Vector<N3> globalUncertainty = VecBuilder.fill(
@@ -100,13 +99,6 @@ public class RobotState {
     }
 
     /**
-     * Set local target fiducial id. If 0, use global instead.
-     */
-    public void setLocalTarget(int id) {
-        currentTarget = id;
-    }
-
-    /**
      * Add information from cameras.
      */
     public void addVisionObservation(PhotonPipelineResult result, Transform3d robotToCamera,
@@ -124,42 +116,37 @@ public class RobotState {
             if (!isInitialized) {
                 swerveOdometry.resetPose(robotPose2d);
                 isInitialized = true;
-            } else if (currentTarget == 0) {
+            } else {
+                double uncertainty = result.multitagResult.get().estimatedPose.bestReprojErr;
+                Logger.recordOutput("State/globalUncertainty", uncertainty);
                 swerveOdometry.addVisionMeasurement(robotPose2d, result.getTimestampSeconds(),
                     globalUncertainty);
             }
         }
         if (whichCamera == 1) {
             for (var target : result.targets) {
-                if (target.fiducialId == currentTarget) {
-                    double dist =
-                        target.getBestCameraToTarget().getTranslation().toTranslation2d().getNorm();
-                    localCircle.setRadius(dist - Constants.Vision.cameras[whichCamera].offset());
-                    localCircle.setCenter(Constants.Vision.fieldLayout.getTagPose(target.fiducialId)
-                        .get().getTranslation().toTranslation2d());
-                    localCircle.draw();
-                    Optional<Rotation2d> maybeRobotYaw =
-                        sampleRotationAt(result.getTimestampSeconds());
-                    Rotation2d robotYaw;
-                    if (maybeRobotYaw.isPresent()) {
-                        robotYaw = maybeRobotYaw.get();
-                    } else {
+                if (target.getPoseAmbiguity() < 0.2) {
+                    Transform3d best = target.getBestCameraToTarget();
+                    double dist = best.getTranslation().getNorm();
+                    var maybeTagPose = Constants.Vision.fieldLayout.getTagPose(target.fiducialId);
+                    if (!maybeTagPose.isPresent()) {
                         continue;
                     }
-                    Rotation2d yaw = Rotation2d.fromDegrees(robotYaw.getDegrees() - target.getYaw()
-                        + 180 + Units.radiansToDegrees(robotToCamera.getRotation().getZ()));
-                    Logger.recordOutput("State/LocalYaw", yaw);
-                    xCircle.setCenter(localCircle.getVertex(yaw));
-                    xCircle.draw();
-                    Pose2d robotPose2d = new Pose2d(
-                        xCircle.getCenter().minus(
-                            robotToCamera.getTranslation().toTranslation2d().rotateBy(robotYaw)),
-                        robotYaw);
-                    if (Constants.shouldDrawStuff) {
-                        Logger.recordOutput("State/LocalPose", robotPose2d);
+                    var tagPose = maybeTagPose.get();
+                    if (dist < 2.0) {
+                        Pose3d cameraPose = tagPose.plus(best.inverse())
+                            .relativeTo(Constants.Vision.fieldLayout.getOrigin());
+                        Pose3d robotPose = cameraPose.plus(robotToCamera.inverse());
+                        Pose2d robotPose2d = robotPose.toPose2d();
+                        Logger.recordOutput("State/LocalVisionEstimate", robotPose);
+                        if (isInitialized) {
+                            double uncertainty = (MathUtil.clamp(dist, 0.2, 0.5) + 0.8)
+                                * (MathUtil.clamp(target.getPoseAmbiguity(), 0.02, 0.2) + 0.98);
+                            Logger.recordOutput("State/localUncertainty", uncertainty);
+                            swerveOdometry.addVisionMeasurement(robotPose2d,
+                                result.getTimestampSeconds(), localUncertainty.times(uncertainty));
+                        }
                     }
-                    swerveOdometry.addVisionMeasurement(robotPose2d, result.getTimestampSeconds(),
-                        localUncertainty);
                 }
             }
         }

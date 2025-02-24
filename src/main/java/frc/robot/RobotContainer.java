@@ -228,16 +228,17 @@ public class RobotContainer {
                 finalLoc.getTranslation()
                     .minus(new Translation2d(Units.inchesToMeters(12), finalLoc.getRotation())),
                 finalLoc.getRotation());
-        }, () -> 0.8, true, Units.inchesToMeters(12), 15).andThen(elevator.moveTo(() -> {
-            return operator.getDesiredHeight().height;
-        })).andThen(new MoveToPose(swerve, () -> {
-            Pose2d finalLoc = operator.getDesiredLocation().pose;
+        }, () -> Constants.SwerveTransformPID.MAX_VELOCITY, true, Units.inchesToMeters(12), 15)
+            .andThen(elevator.moveTo(() -> {
+                return operator.getDesiredHeight().height;
+            }).alongWith(new MoveToPose(swerve, () -> {
+                Pose2d finalLoc = operator.getDesiredLocation().pose;
 
-            return new Pose2d(
-                finalLoc.getTranslation()
-                    .minus(new Translation2d(Units.inchesToMeters(0.75), finalLoc.getRotation())),
-                finalLoc.getRotation());
-        }, () -> 0.3, true, Units.inchesToMeters(0.25), 5))
+                return new Pose2d(
+                    finalLoc.getTranslation().minus(
+                        new Translation2d(Units.inchesToMeters(0.75), finalLoc.getRotation())),
+                    finalLoc.getRotation());
+            }, () -> 0.3, true, Units.inchesToMeters(0.25), 5)))
             // .andThen(Commands.waitSeconds(10))
             .andThen(coralScoring.runCoralOuttake().withTimeout(1.5))
             .andThen(new MoveToPose(swerve, () -> {

@@ -395,7 +395,7 @@ public final class Constants {
         public static final boolean keepOutOfReefs = true;
         public static final double globalVisionTrust = 0.5;
         public static final double globalVisionTrustRotation = 0.5;
-        public static final double localVisionTrust = 0.02;
+        public static final double localVisionTrust = 0.8;
     }
 
     /**
