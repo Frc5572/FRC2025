@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Constants;
 
@@ -15,6 +16,10 @@ public class ElevatorAlgae extends SubsystemBase {
     ElevatorAlgaeIO io;
     AlgaeIOInputsAutoLogged inputs = new AlgaeIOInputsAutoLogged();
     private final Viz2025 viz;
+
+    public Trigger hasAlgae =
+        new Trigger(() -> inputs.algaeMotorCurrent > Constants.Algae.HAS_ALGAE_CURRENT_THRESHOLD)
+            .debounce(.25);
 
     /**
      * Constructor for Elevator Algae class
@@ -29,11 +34,11 @@ public class ElevatorAlgae extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Algae", inputs);
-        viz.setHasAlgae(hasAlgae());
+        viz.setHasAlgae(hasAlgae.getAsBoolean());
         Color temp = Color.kBlack;
-        if (hasAlgae()) {
+        if (hasAlgae.getAsBoolean()) {
             temp = Color.kGreen;
-        } else if (!hasAlgae()) {
+        } else if (!hasAlgae.getAsBoolean()) {
             temp = Color.kRed;
         }
         SmartDashboard.putString("Dashboard/Main Driver/Have Algae", temp.toHexString());
@@ -41,16 +46,26 @@ public class ElevatorAlgae extends SubsystemBase {
 
 
     private void setAlgaeMotorVoltage(double voltage) { // set motor speed function
+        Logger.recordOutput("Algae/Voltage", voltage);
         io.setAlgaeMotorVoltage(voltage);
     }
 
-    /** Get if we're holding algae */
-    public boolean hasAlgae() {
-        return inputs.algaeMotorCurrent > Constants.HAS_ALGAE_CURRENT_THRESHOLD;
-    }
+    // /** Get if we're holding algae */
+    // public boolean hasAlgae() {
+    // return inputs.algaeMotorCurrent > Constants.Algae.HAS_ALGAE_CURRENT_THRESHOLD;
+    // }
 
-    public Command setMotorVoltageCommand(double speed) { // set motor speed Command
+    public Command runAlgaeMotor(double speed) { // set motor speed Command
         return runEnd(() -> setAlgaeMotorVoltage(speed), () -> setAlgaeMotorVoltage(0));
         // .until(() -> hasAlgae());
+    }
+
+    /**
+     * Keeps algae intake motor running even after it has intaked an algae, but it lowers the speed
+     */
+    public Command algaeIntakeCommand() {
+        return runAlgaeMotor(Constants.Algae.VOLTAGE).until(hasAlgae)
+            .andThen(() -> setAlgaeMotorVoltage(Constants.Algae.SMALLER_VOLTAGE));
+
     }
 }
