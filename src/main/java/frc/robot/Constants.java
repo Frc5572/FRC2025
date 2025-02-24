@@ -339,10 +339,10 @@ public final class Constants {
         public static final Distance HOME = Inches.of(2);
         public static final Distance P0 = Inches.of(16.5); // Algae L2-L3
         public static final Distance P1 = Inches.of(28.1); // floor
-        public static final Distance P2 = Inches.of(31.2); // Coral l2
-        public static final Distance P3 = Inches.of(45.0); // Coral L3
-        public static final Distance P4 = Inches.of(70.0); // Coral L4
-
+        public static final Distance P2 = Inches.of(26.45); // Coral l2
+        public static final Distance P3 = Inches.of(43.6); // Coral L3
+        public static final Distance P4 = Inches.of(67.9); // Coral L4
+        public static final Distance P5 = Inches.of(70); // Barge
 
         public static final double gearRatio = 1.0;
         public static final Distance INCHES_AT_TOP = Inches.of(72.0);
