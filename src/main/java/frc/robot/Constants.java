@@ -337,9 +337,9 @@ public final class Constants {
         public static final Distance HOME = Inches.of(2);
         public static final Distance P0 = Inches.of(16.5); // Algae L2-L3
         public static final Distance P1 = Inches.of(28.1); // floor
-        public static final Distance P2 = Inches.of(31.2); // Coral l2
-        public static final Distance P3 = Inches.of(45.0); // Coral L3
-        public static final Distance P4 = Inches.of(72.0); // Coral L4
+        public static final Distance P2 = Inches.of(26.95); // Coral l2
+        public static final Distance P3 = Inches.of(44.08); // Coral L3
+        public static final Distance P4 = Inches.of(67.9); // Coral L4
 
 
         public static final double gearRatio = 1.0;
@@ -370,13 +370,13 @@ public final class Constants {
         }
 
         public static final CameraConstants[] cameras = new CameraConstants[] {
-            new CameraConstants("cam0", 800, 1280, Rotation2d.fromDegrees(70), Hertz.of(20),
+            new CameraConstants("cam0", 800, 1280, Rotation2d.fromDegrees(82.59), Hertz.of(20),
                 Seconds.of(0.3), Seconds.of(0.02), 0.25, 0.08,
                 new Transform3d(new Translation3d(Units.inchesToMeters(11),
                     -Units.inchesToMeters(12), Units.inchesToMeters(10)),
                     new Rotation3d(Math.PI, 0, 0)),
                 Units.inchesToMeters(1.6)),
-            new CameraConstants("cam1", 480, 640, Rotation2d.fromDegrees(140), Hertz.of(65),
+            new CameraConstants("cam1", 600, 800, Rotation2d.fromDegrees(61.29), Hertz.of(65),
                 Seconds.of(0.15), Seconds.of(0.02), 0.25, 0.08,
                 new Transform3d(
                     new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(13.5),
