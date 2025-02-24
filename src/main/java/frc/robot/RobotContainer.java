@@ -235,10 +235,7 @@ public class RobotContainer {
     }
 
     private void setupPitController() {
-        altOperator.start().onTrue(
-            Commands.runOnce(() -> operatorStates.toggleManualMode()).ignoringDisable(true));
-        operatorStates.manualModeCheck.onTrue(elevator.manualMove(altOperator));
-
+        pitController.b().onTrue(elevator.manualMove(altOperator));
         pitController.y().whileTrue(climb.resetClimberCommand());
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());
         pitController.x().whileTrue(climb.manualClimb(() -> pitController.getLeftY()));
