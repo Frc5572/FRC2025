@@ -295,9 +295,8 @@ public class RobotContainer {
         // Coral
         coralScoring.coralAtIntake.whileTrue(leds.setLEDsSolid(Color.kOrange));
         coralScoring.coralAtOuttake.whileTrue(leds.setLEDsSolid(Color.kCyan));
-        // coralScoring.coralAtOuttake.negate()
-        // .debounce(1.0).whileTrue(coralScoring.runCoralIntake());
-        // RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
+        coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
+        RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
         // Algae
         algaeInIntake.and(coralScoring.coralAtOuttake.negate())
             .onTrue(leds.blinkLEDs(Color.kCyan, 2));
