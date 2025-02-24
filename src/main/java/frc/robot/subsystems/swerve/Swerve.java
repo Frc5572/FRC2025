@@ -278,8 +278,9 @@ public class Swerve extends SubsystemBase {
      */
     public Command teleOpDrive(CommandXboxController controller, boolean fieldRelative,
         boolean openLoop) {
-        SlewRateLimiter slewRateLimiterX = new SlewRateLimiter(1.0);
-        SlewRateLimiter slewRateLimiterY = new SlewRateLimiter(1.0);
+        SlewRateLimiter slewRateLimiterX = new SlewRateLimiter(6);
+        SlewRateLimiter slewRateLimiterY = new SlewRateLimiter(6);
+        SlewRateLimiter slewRateLimiterAngle = new SlewRateLimiter(6);
         return this.run(() -> {
             double yaxis = -controller.getLeftY();
             double xaxis = -controller.getLeftX();
@@ -293,7 +294,8 @@ public class Swerve extends SubsystemBase {
             Translation2d translation = new Translation2d(slewRateLimiterY.calculate(yaxis),
                 slewRateLimiterX.calculate(xaxis)).times(Constants.Swerve.maxSpeed)
                     .times(setSpeedMultiplier);
-            double rotation = raxis * Constants.Swerve.maxAngularVelocity * setSpeedMultiplier;
+            double rotation = slewRateLimiterAngle.calculate(raxis)
+                * Constants.Swerve.maxAngularVelocity * setSpeedMultiplier;
             this.drive(translation, rotation, fieldRelative, openLoop);
         });
     }

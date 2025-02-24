@@ -7,11 +7,11 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants;
@@ -24,10 +24,10 @@ public class ElevatorReal implements ElevatorIO {
     private final TalonFX leftElevatorMotor = new TalonFX(Constants.Elevator.LEFT_ID);
     private final DigitalInput limitSwitch = new DigitalInput(Constants.Elevator.LIMIT_ID);
     private final TalonFXConfiguration elevatorConf = new TalonFXConfiguration();
-    private final PositionVoltage positionVoltage = new PositionVoltage(0.0).withSlot(0);
     private StatusSignal<Angle> elevatorPosition = rightElevatorMotor.getPosition();
     private StatusSignal<Voltage> elevatorVoltage = rightElevatorMotor.getMotorVoltage();
     private StatusSignal<AngularVelocity> elevatorVelocity = rightElevatorMotor.getVelocity();
+    private StatusSignal<Current> motorCurrent = rightElevatorMotor.getStatorCurrent();
     private final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
 
     /** Real Elevator Initializer */
@@ -83,11 +83,13 @@ public class ElevatorReal implements ElevatorIO {
 
     /** Updates Inputs to IO */
     public void updateInputs(ElevatorInputs inputs) {
-        BaseStatusSignal.refreshAll(elevatorPosition, elevatorVelocity, elevatorVoltage);
+        BaseStatusSignal.refreshAll(elevatorPosition, elevatorVelocity, elevatorVoltage,
+            motorCurrent);
         inputs.limitSwitch = limitSwitch.get();
         inputs.position = Meters.of(elevatorPosition.getValue().in(Rotations));
         inputs.velocity = elevatorVelocity.getValue();
         inputs.outputVoltage = elevatorVoltage.getValue();
+        inputs.motorCurrent = motorCurrent.getValue();
     }
 
     public void resetHome() {
