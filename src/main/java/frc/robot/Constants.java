@@ -61,17 +61,19 @@ public final class Constants {
     public static final int operatorId = 1;
 
     public static final boolean tuningMode = false;
-    /**
-     * Current threshold that indicates an algae is in possestion
-     */
-    public static final double HAS_ALGAE_CURRENT_THRESHOLD = 100;
 
     /**
      * Algae misc values
      */
     public static final class Algae {
-        public static final int VOLTAGE = 2;
+        /**
+         * Current threshold that indicates an algae is in possestion
+         */
+        public static final double HAS_ALGAE_CURRENT_THRESHOLD = 70;
+        public static final int VOLTAGE = 4;
         public static final int NEGATIVE_VOLTAGE = -2;
+        public static final double SMALLER_VOLTAGE = 0.5;
+        public static final double SMALLER_NEGATIVE_VOLTAGE = -1;
     }
 
     // pit and alt operator controllers
@@ -337,10 +339,10 @@ public final class Constants {
         public static final Distance HOME = Inches.of(2);
         public static final Distance P0 = Inches.of(16.5); // Algae L2-L3
         public static final Distance P1 = Inches.of(28.1); // floor
-        public static final Distance P2 = Inches.of(26.95); // Coral l2
-        public static final Distance P3 = Inches.of(44.08); // Coral L3
+        public static final Distance P2 = Inches.of(26.45); // Coral l2
+        public static final Distance P3 = Inches.of(43.6); // Coral L3
         public static final Distance P4 = Inches.of(67.9); // Coral L4
-
+        public static final Distance P5 = Inches.of(70); // Barge
 
         public static final double gearRatio = 1.0;
         public static final Distance INCHES_AT_TOP = Inches.of(72.0);
