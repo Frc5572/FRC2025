@@ -343,6 +343,10 @@ public final class Constants {
         public static final Distance P3 = Inches.of(45.0); // Coral L3
         public static final Distance P4 = Inches.of(70.0); // Coral L4
 
+        // positions when bumper against the reef
+        public static final Distance P2_AGAINST_BUMPER = Inches.of(26.95);
+        public static final Distance P3_AGAINST_BUMPER = Inches.of(44.1);
+        public static final Distance P4_AGAINST_BUMPER = Inches.of(67.9);
 
         public static final double gearRatio = 1.0;
         public static final Distance INCHES_AT_TOP = Inches.of(72.0);
