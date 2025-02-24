@@ -84,6 +84,10 @@ public class Elevator extends SubsystemBase {
         return moveTo(() -> Constants.Elevator.P4);
     }
 
+    public Command p5() {
+        return moveTo(() -> Constants.Elevator.P5);
+    }
+
     public boolean hightAboveP0() {
         return (inputs.position).in(Inches) >= (Constants.Elevator.P0).in(Inches) + 5;
     }
