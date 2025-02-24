@@ -6,7 +6,6 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import choreo.auto.AutoRoutine;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -132,11 +131,7 @@ public class MoveAndAvoidReef extends Command implements Drawable {
         draw();
         var intermediatePose =
             getNextIntermediateTarget(swerve.state.getGlobalPoseEstimate(), pose2d);
-        double distFromTarget =
-            intermediatePose.getTranslation().getDistance(pose2d.getTranslation());
-        swerve.moveToPose(intermediatePose, maxSpeedSupplier.getAsDouble(),
-            Constants.SwerveTransformPID.MAX_ACCELERATION,
-            MathUtil.clamp(distFromTarget, 0.5, 1.0) * maxSpeedSupplier.getAsDouble());
+        swerve.moveToPose(intermediatePose, maxSpeedSupplier.getAsDouble());
     }
 
     @Override

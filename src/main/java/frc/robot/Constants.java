@@ -393,9 +393,9 @@ public final class Constants {
     public static class StateEstimator {
         public static final boolean keepInField = true;
         public static final boolean keepOutOfReefs = true;
-        public static final double globalVisionTrust = 0.5;
-        public static final double globalVisionTrustRotation = 0.5;
-        public static final double localVisionTrust = 0.8;
+        public static final double globalVisionTrust = 1.0;
+        public static final double globalVisionTrustRotation = 200.0;
+        public static final double localVisionTrust = 1.6;
     }
 
     /**
@@ -412,15 +412,12 @@ public final class Constants {
      * MoveToPos constants.
      */
     public static class SwerveTransformPID {
-        public static final double PID_XKP = 10.0;
+        public static final double PID_XKP = 30.0;
         public static final double PID_XKI = 0.0;
-        public static final double PID_XKD = 0.0;
+        public static final double PID_XKD = 0.05;
         public static final double PID_TKP = 5.0;
         public static final double PID_TKI = 0.0;
         public static final double PID_TKD = 0.0;
-
-        public static final double MAX_VELOCITY = 2;
-        public static final double MAX_ACCELERATION = 3;
 
         public static final double MAX_ANGULAR_VELOCITY = 8.9;
         public static final double MAX_ANGULAR_ACCELERATION = 30;

@@ -1,7 +1,6 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Meters;
-import java.util.Optional;
 import java.util.stream.Stream;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.targeting.PhotonPipelineResult;
@@ -18,10 +17,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.lib.math.Circle;
 import frc.lib.math.Hexagon;
 import frc.lib.math.Penetration;
 import frc.lib.math.Rectangle;
@@ -38,8 +35,9 @@ public class RobotState {
     private final Vector<N3> globalUncertainty = VecBuilder.fill(
         Constants.StateEstimator.globalVisionTrust, Constants.StateEstimator.globalVisionTrust,
         Constants.StateEstimator.globalVisionTrustRotation);
-    private final Vector<N3> localUncertainty = VecBuilder.fill(
-        Constants.StateEstimator.localVisionTrust, Constants.StateEstimator.localVisionTrust, 1000);
+    private final Vector<N3> localUncertainty =
+        VecBuilder.fill(Constants.StateEstimator.localVisionTrust,
+            Constants.StateEstimator.localVisionTrust, Double.POSITIVE_INFINITY);
 
     private final TimeInterpolatableBuffer<Rotation2d> rotationBuffer =
         TimeInterpolatableBuffer.createBuffer(1.5);
@@ -73,22 +71,6 @@ public class RobotState {
         visionCutoff = Timer.getFPGATimestamp();
         rotationBuffer.clear();
         rotationBuffer.getInternalBuffer().clear();
-    }
-
-    private Optional<Rotation2d> sampleRotationAt(double timestampSeconds) {
-        if (rotationBuffer.getInternalBuffer().isEmpty()) {
-            return Optional.empty();
-        }
-
-        double oldestOdometryTimestamp = rotationBuffer.getInternalBuffer().firstKey();
-        double newestOdometryTimestamp = rotationBuffer.getInternalBuffer().lastKey();
-        if (oldestOdometryTimestamp > timestampSeconds) {
-            return Optional.empty();
-        }
-        timestampSeconds =
-            MathUtil.clamp(timestampSeconds, oldestOdometryTimestamp, newestOdometryTimestamp);
-
-        return rotationBuffer.getSample(timestampSeconds);
     }
 
     /**
@@ -133,7 +115,7 @@ public class RobotState {
                         continue;
                     }
                     var tagPose = maybeTagPose.get();
-                    if (dist < 2.0) {
+                    if (dist < 1.0) {
                         Pose3d cameraPose = tagPose.plus(best.inverse())
                             .relativeTo(Constants.Vision.fieldLayout.getOrigin());
                         Pose3d robotPose = cameraPose.plus(robotToCamera.inverse());
@@ -151,11 +133,6 @@ public class RobotState {
             }
         }
     }
-
-    private final Circle localCircle =
-        new Circle("State/LocalEstimationDistance", new Translation2d(), 0);
-    private final Circle xCircle =
-        new Circle("State/LocalEstimationPose", new Translation2d(), Units.inchesToMeters(2));
 
     /**
      * Add information from swerve drive.

@@ -180,4 +180,12 @@ public class WebController {
         return currentLocation;
     }
 
+    public boolean fastestFeeder() {
+        return fdr == 'f';
+    }
+
+    public boolean leftFeeder() {
+        return fdr == 'l';
+    }
+
 }

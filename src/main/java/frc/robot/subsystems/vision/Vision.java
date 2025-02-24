@@ -42,6 +42,12 @@ public class Vision extends SubsystemBase {
 
     private final IntArrayList tmpArrList = new IntArrayList();
 
+    private double closestYaw = 0;
+
+    public double getClosestTagYaw() {
+        return closestYaw;
+    }
+
     @Override
     public void periodic() {
         io.updateInputs(cameraInputs);
@@ -59,11 +65,22 @@ public class Vision extends SubsystemBase {
                 results.add(new Tuple3<>(i, transform, result));
             }
         }
+        double closestDist = Double.POSITIVE_INFINITY;
         results.sort(
             (a, b) -> Double.compare(a._2().getTimestampSeconds(), b._2().getTimestampSeconds()));
         for (var result : results) {
             state.addVisionObservation(result._2(), result._1(), result._0());
+            if (result._0() == 1) {
+                double dist =
+                    result._2().getBestTarget().getBestCameraToTarget().getTranslation().getNorm();
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    closestYaw = result._2().getBestTarget().getYaw();
+                }
+            }
         }
+
+        Logger.recordOutput("Vision/closestYaw", closestYaw);
 
         // Viz
         Pose3d robotPose = new Pose3d(state.getGlobalPoseEstimate());

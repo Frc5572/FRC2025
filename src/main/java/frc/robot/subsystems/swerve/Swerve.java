@@ -7,17 +7,16 @@ import org.littletonrobotics.junction.Logger;
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.HolonomicDriveController;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -25,6 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.lib.math.FilteredPIDController;
 import frc.lib.util.swerve.SwerveModule;
 import frc.robot.Constants;
 import frc.robot.RobotState;
@@ -41,10 +41,10 @@ public class Swerve extends SubsystemBase {
     public final RobotState state;
     private double setSpeedMultiplier = 1.0;
     private final HolonomicDriveController holonomicDriveController = new HolonomicDriveController(
-        new PIDController(Constants.SwerveTransformPID.PID_XKP,
-            Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
-        new PIDController(Constants.SwerveTransformPID.PID_XKP,
-            Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
+        new FilteredPIDController(Constants.SwerveTransformPID.PID_XKP,
+            Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD, 0.1),
+        new FilteredPIDController(Constants.SwerveTransformPID.PID_XKP,
+            Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD, 0.1),
         new ProfiledPIDController(Constants.SwerveTransformPID.PID_TKP,
             Constants.SwerveTransformPID.PID_TKI, Constants.SwerveTransformPID.PID_TKD,
             new TrapezoidProfile.Constraints(Constants.SwerveTransformPID.MAX_ANGULAR_VELOCITY,
@@ -60,6 +60,10 @@ public class Swerve extends SubsystemBase {
         this.swerveIO = swerveIO;
         swerveMods = swerveIO.createModules();
         fieldOffset = getGyroYaw().getDegrees();
+
+        holonomicDriveController.getXController().setIZone(0.5);
+        holonomicDriveController.getYController().setIZone(0.5);
+        holonomicDriveController.getThetaController().setIZone(Units.degreesToRadians(5));
 
         swerveIO.updateInputs(inputs);
 
@@ -322,43 +326,22 @@ public class Swerve extends SubsystemBase {
             state.getGlobalPoseEstimate().getRotation()));
     }
 
-    private final TrapezoidProfile profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(
-        Constants.SwerveTransformPID.MAX_VELOCITY, Constants.SwerveTransformPID.MAX_ACCELERATION));
 
     /**
      * Move to a Pose2d
      *
      * @param pose Desired Pose2d
      */
-    public void moveToPose(Pose2d pose, double maxSpeed, double maxAcceleration,
-        double targetSpeed) {
-        var current = getChassisSpeeds();
-        var diff = pose.minus(state.getGlobalPoseEstimate());
-        double totalDistance = diff.getTranslation().getNorm();
-        if (totalDistance > 0.5) {
-            var next = profile.calculate(0.08,
-                new TrapezoidProfile.State(0,
-                    Math.hypot(current.vxMetersPerSecond, current.vyMetersPerSecond)),
-                new TrapezoidProfile.State(diff.getTranslation().getNorm(), targetSpeed));
-            double next_t = next.position / totalDistance;
-            var nextTranslation = diff.getTranslation().times(next_t);
-            var nextRotation = diff.getRotation().times(next_t);
-            pose =
-                state.getGlobalPoseEstimate().plus(new Transform2d(nextTranslation, nextRotation));
-        }
+    public void moveToPose(Pose2d pose, double maxSpeed) {
         if (Constants.shouldDrawStuff) {
             Logger.recordOutput("Swerve/moveToPoseTarget", pose);
         }
-        ChassisSpeeds ctrlEffort = holonomicDriveController.calculate(state.getGlobalPoseEstimate(),
-            pose, 0, pose.getRotation());
+        Pose2d currentPose = state.getGlobalPoseEstimate();
+        ChassisSpeeds ctrlEffort =
+            holonomicDriveController.calculate(currentPose, pose, 0, pose.getRotation());
         double speed = Math.hypot(ctrlEffort.vxMetersPerSecond, ctrlEffort.vyMetersPerSecond);
         if (speed > maxSpeed) {
             double mul = maxSpeed / speed;
-            ctrlEffort.vxMetersPerSecond *= mul;
-            ctrlEffort.vyMetersPerSecond *= mul;
-        }
-        if (totalDistance > 0.5 && targetSpeed > 1e-6 && speed < targetSpeed && speed > 1e-6) {
-            double mul = targetSpeed / speed;
             ctrlEffort.vxMetersPerSecond *= mul;
             ctrlEffort.vyMetersPerSecond *= mul;
         }
@@ -370,18 +353,8 @@ public class Swerve extends SubsystemBase {
      *
      * @param pose Desired Pose2d
      */
-    public void moveToPose(Pose2d pose, double maxVelocity) {
-        moveToPose(pose, maxVelocity, Constants.SwerveTransformPID.MAX_ACCELERATION, 0.0);
-    }
-
-    /**
-     * Move to a Pose2d
-     *
-     * @param pose Desired Pose2d
-     */
     public void moveToPose(Pose2d pose) {
-        moveToPose(pose, Constants.SwerveTransformPID.MAX_VELOCITY,
-            Constants.SwerveTransformPID.MAX_ACCELERATION, 0.0);
+        moveToPose(pose, 4.0);
     }
 
 }
