@@ -73,15 +73,19 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command p2() {
-        return moveTo(() -> Constants.Elevator.P2);
+        return moveTo(() -> Constants.Elevator.P2_AGAINST_BUMPER);
     }
 
     public Command p3() {
-        return moveTo(() -> Constants.Elevator.P3);
+        return moveTo(() -> Constants.Elevator.P3_AGAINST_BUMPER);
     }
 
     public Command p4() {
-        return moveTo(() -> Constants.Elevator.P4);
+        return moveTo(() -> Constants.Elevator.P4_AGAINST_BUMPER);
+    }
+
+    public Command p5() {
+        return moveTo(() -> Constants.Elevator.P5);
     }
 
     public boolean hightAboveP0() {
