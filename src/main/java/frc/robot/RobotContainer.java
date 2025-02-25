@@ -73,8 +73,6 @@ public class RobotContainer {
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
     public final WebController operator = new WebController(5801);
-    public final CommandXboxController backUpOperator =
-        new CommandXboxController(Constants.operatorId);
     public final CommandXboxController pitController =
         new CommandXboxController(Constants.PIT_CONTROLLER_ID);
     public final CommandXboxController altOperator =
