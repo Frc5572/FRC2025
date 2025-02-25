@@ -2,6 +2,7 @@ package frc.robot;
 
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.util.Color;
@@ -60,6 +61,24 @@ public class AutoCommandFactory {
                     .resetOdometry(new Pose2d(FieldConstants.Barge.middleCage, new Rotation2d()))),
                 leds.blinkLEDs(Color.kGreen, 5), testMTP));
         testMTP.done().onTrue(leds.blinkLEDs(Color.kPurple, 5));
+        return routine;
+    }
+
+    public AutoRoutine HIJK() {
+        AutoRoutine routine = autoFactory.newRoutine("HIJK");
+
+        AutoTrajectory StartToH = routine.trajectory("Reed", 0);
+        AutoTrajectory HToFeeder = routine.trajectory("Reed", 1);
+        AutoTrajectory feederToIPrep = routine.trajectory("Reed", 2);
+        AutoTrajectory IprepToI = routine.trajectory("Reed", 3);
+        AutoTrajectory IToFeeder = routine.trajectory("Reed", 4);
+        AutoTrajectory FeederToJPrep = routine.trajectory("Reed", 5);
+
+        return routine;
+    }
+
+    public AutoRoutine CoralAndBarge() {
+        AutoRoutine routine = autoFactory.newRoutine("CoralAndBarge");
         return routine;
     }
 }
