@@ -73,8 +73,8 @@
               "period": 0.06,
               "data_type": "double",
               "min_value": 0.0,
-              "max_value": 4.0,
-              "divisions": 5,
+              "max_value": 5.0,
+              "divisions": 6,
               "inverted": false,
               "orientation": "vertical"
             }
