@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.lib.mut.MutableSwerveModuleState;
 import frc.lib.util.swerve.SwerveModule;
 import frc.robot.Constants;
 import frc.robot.RobotState;
@@ -84,6 +85,10 @@ public class Swerve extends SubsystemBase {
         setModuleStates(chassisSpeeds);
     }
 
+    private final MutableSwerveModuleState[] desiredStates = new MutableSwerveModuleState[] {
+        new MutableSwerveModuleState(), new MutableSwerveModuleState(),
+        new MutableSwerveModuleState(), new MutableSwerveModuleState()};
+
     /**
      * Set Swerve Module States
      *
@@ -93,7 +98,9 @@ public class Swerve extends SubsystemBase {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.Swerve.maxSpeed);
         Logger.recordOutput("/Swerve/DesiredStates", desiredStates);
         for (SwerveModule mod : swerveMods) {
-            mod.setDesiredState(desiredStates[mod.moduleNumber], false);
+            mod.setDesiredState(
+                this.desiredStates[mod.moduleNumber].fromImmutable(desiredStates[mod.moduleNumber]),
+                false);
         }
     }
 
@@ -129,7 +136,7 @@ public class Swerve extends SubsystemBase {
     public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
         for (SwerveModule mod : swerveMods) {
-            states[mod.moduleNumber] = mod.getState();
+            states[mod.moduleNumber] = mod.getState().toImmutable();
         }
         return states;
     }
@@ -142,7 +149,7 @@ public class Swerve extends SubsystemBase {
     public SwerveModulePosition[] getModulePositions() {
         SwerveModulePosition[] positions = new SwerveModulePosition[4];
         for (SwerveModule mod : swerveMods) {
-            positions[mod.moduleNumber] = mod.getPosition();
+            positions[mod.moduleNumber] = mod.getPosition().toImmutable();
         }
         return positions;
     }
@@ -228,11 +235,14 @@ public class Swerve extends SubsystemBase {
      * Make an X pattern with the wheels
      */
     public void wheelsIn() {
-        swerveMods[0].setDesiredState(new SwerveModuleState(2, Rotation2d.fromDegrees(45)), false);
-        swerveMods[1].setDesiredState(new SwerveModuleState(2, Rotation2d.fromDegrees(135)), false);
-        swerveMods[2].setDesiredState(new SwerveModuleState(2, Rotation2d.fromDegrees(-45)), false);
-        swerveMods[3].setDesiredState(new SwerveModuleState(2, Rotation2d.fromDegrees(-135)),
-            false);
+        swerveMods[0].setDesiredState(this.desiredStates[0]
+            .fromImmutable(new SwerveModuleState(2, Rotation2d.fromDegrees(45))), false);
+        swerveMods[1].setDesiredState(this.desiredStates[0]
+            .fromImmutable(new SwerveModuleState(2, Rotation2d.fromDegrees(135))), false);
+        swerveMods[2].setDesiredState(this.desiredStates[0]
+            .fromImmutable(new SwerveModuleState(2, Rotation2d.fromDegrees(-45))), false);
+        swerveMods[3].setDesiredState(this.desiredStates[0]
+            .fromImmutable(new SwerveModuleState(2, Rotation2d.fromDegrees(-135))), false);
         this.setMotorsZero();
     }
 
@@ -242,7 +252,7 @@ public class Swerve extends SubsystemBase {
     public SwerveModulePosition[] getSwerveModulePositions() {
         SwerveModulePosition[] positions = new SwerveModulePosition[4];
         for (SwerveModule mod : swerveMods) {
-            positions[mod.moduleNumber] = mod.getPosition();
+            positions[mod.moduleNumber] = mod.getPosition().toImmutable();
         }
         return positions;
     }

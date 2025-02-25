@@ -1,6 +1,6 @@
 package frc.lib.math;
 
-import edu.wpi.first.math.geometry.Translation2d;
+import frc.lib.mut.MutableTranslation2d;
 
 /** Represents a convex shape for the purpose of separating axis solving. */
 public interface ConvexShape {
@@ -16,6 +16,6 @@ public interface ConvexShape {
     /**
      * Get the center of this {@link ConvexShape}.
      */
-    public Translation2d getCenter();
+    public MutableTranslation2d getCenter();
 
 }

@@ -1,7 +1,8 @@
 package frc.lib.math;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import frc.lib.mut.MutableRotation2d;
+import frc.lib.mut.MutableTranslation2d;
 
 /** Represents an axis. */
 public class Axis {
@@ -21,6 +22,11 @@ public class Axis {
 
     /** Set axis direction to the same direction as the given rotation. */
     public void setFromRotation(Rotation2d rot) {
+        setDirectionImpl(rot.getCos(), rot.getSin());
+    }
+
+    /** Set axis direction to the same direction as the given rotation. */
+    public void setFromRotation(MutableRotation2d rot) {
         setDirectionImpl(rot.getCos(), rot.getSin());
     }
 
@@ -62,14 +68,19 @@ public class Axis {
     /**
      * Get the dot product between this direction and a given point.
      */
-    public double dot(Translation2d point) {
+    public double dot(MutableTranslation2d point) {
         return this.xDir * point.getX() + this.yDir * point.getY();
     }
 
     /** Project multiple points onto this axis. */
-    public Interval project(Translation2d[] points) {
+    public Interval project(MutableTranslation2d[] points) {
+        return project(points, new Interval(0.0, 0.0));
+    }
+
+    /** Project multiple points onto this axis. */
+    public Interval project(MutableTranslation2d[] points, Interval out) {
         double v = 0.0;
-        Translation2d p = points[0];
+        MutableTranslation2d p = points[0];
         double min = this.dot(p);
         double max = min;
 
@@ -84,7 +95,9 @@ public class Axis {
             }
         }
 
-        return new Interval(min, max);
+        out.setMin(min);
+        out.setMax(max);
+        return out;
     }
 
 }
