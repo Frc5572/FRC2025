@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.LoggedTracer;
 import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Constants;
@@ -43,6 +44,7 @@ public class Elevator extends SubsystemBase {
             Height.getCurrentState().displayName);
         SmartDashboard.putNumber("Dashboard/Main Driver/Elevator Preset Level",
             Height.getCurrentState().ordinal());
+        LoggedTracer.record("Elevator");
     }
 
     /**

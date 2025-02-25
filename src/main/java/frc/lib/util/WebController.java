@@ -121,6 +121,7 @@ public class WebController {
                     break;
             }
         }
+        LoggedTracer.record("WebController");
     }
 
     private final long[] response_values = new long[21];
@@ -210,6 +211,10 @@ public class WebController {
 
     public ScoringLocation.CoralLocation getDesiredLocation() {
         return currentLocation;
+    }
+
+    public char feeder() {
+        return this.fdr;
     }
 
 }

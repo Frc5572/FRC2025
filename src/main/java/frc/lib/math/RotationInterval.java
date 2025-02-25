@@ -73,20 +73,20 @@ public class RotationInterval {
         if (min > max) {
             if (other.min > other.max) {
                 // Both cross 0
-                return getOverlap(this.min, 2 * Math.PI, other.min, 2 * Math.PI)
-                    + getOverlap(this.min, 2 * Math.PI, 0, other.max)
-                    + getOverlap(0, this.max, other.min, 2 * Math.PI)
-                    + getOverlap(0, this.max, 0, other.max);
+                return getOverlap(this.min, Math.PI, other.min, Math.PI)
+                    + getOverlap(this.min, Math.PI, -Math.PI, other.max)
+                    + getOverlap(-Math.PI, this.max, other.min, Math.PI)
+                    + getOverlap(-Math.PI, this.max, -Math.PI, other.max);
             } else {
                 // Only this crosses 0
-                return getOverlap(this.min, 2 * Math.PI, other.min, other.max)
-                    + getOverlap(0, this.max, other.min, other.max);
+                return getOverlap(this.min, Math.PI, other.min, other.max)
+                    + getOverlap(-Math.PI, this.max, other.min, other.max);
             }
         } else {
             if (other.min > other.max) {
                 // Only other crosses 0
-                return getOverlap(this.min, this.max, other.min, 2 * Math.PI)
-                    + getOverlap(this.min, this.max, 0, other.max);
+                return getOverlap(this.min, this.max, other.min, Math.PI)
+                    + getOverlap(this.min, this.max, -Math.PI, other.max);
             } else {
                 // Neither cross 0
                 return getOverlap(this.min, this.max, other.min, other.max);

@@ -37,12 +37,6 @@ public class RobotState {
     private final Viz2025 vis;
     private boolean isInitialized = false;
 
-    private final Vector<N3> globalUncertainty = VecBuilder.fill(
-        Constants.StateEstimator.globalVisionTrust, Constants.StateEstimator.globalVisionTrust,
-        Constants.StateEstimator.globalVisionTrustRotation);
-    private final Vector<N3> localUncertainty = VecBuilder.fill(
-        Constants.StateEstimator.localVisionTrust, Constants.StateEstimator.localVisionTrust, 1000);
-
     private final TimeInterpolatableBuffer<Rotation2d> rotationBuffer =
         TimeInterpolatableBuffer.createBuffer(1.5);
 
@@ -100,11 +94,14 @@ public class RobotState {
         return swerveOdometry.getEstimatedPosition();
     }
 
-    private static final Circle stdDevCircle = new Circle("", new Translation2d(), 0);
+    private final Circle stdDevGlobalCircle =
+        new Circle("State/GlobalEstimateStdDev", new Translation2d(), 0);
+    private final Circle stdDevLocalCircle =
+        new Circle("State/LocalEstimateStdDev", new Translation2d(), 0);
 
     private void addVisionObservation(Pose3d cameraPose, Pose3d robotPose, double timestamp,
         Vector<N3> baseUncertainty, List<PhotonTrackedTarget> targets, String prefix,
-        boolean doInit) {
+        boolean doInit, Circle circle) {
         double totalDistance = 0.0;
         int count = 0;
         for (var tag : targets) {
@@ -119,16 +116,14 @@ public class RobotState {
         double stddev = Math.pow(avgDistance, 2.0) / count;
         Pose2d robotPose2d = robotPose.toPose2d();
         if (Constants.shouldDrawStuff) {
-            stdDevCircle.name = "State/" + prefix + "EstimateStdDev";
-            stdDevCircle.setCenter(robotPose2d.getTranslation());
-            stdDevCircle.setRadius(stddev * globalUncertainty.get(0));
-            stdDevCircle.drawImpl();
+            circle.setCenter(robotPose2d.getTranslation());
+            circle.setRadius(stddev * baseUncertainty.get(0));
+            circle.drawImpl();
             Logger.recordOutput("State/" + prefix + "VisionEstimate", robotPose);
             Logger.recordOutput("State/" + prefix + "AverageDistance", avgDistance);
             Logger.recordOutput("State/" + prefix + "StdDevMultiplier", stddev);
-            Logger.recordOutput("State/" + prefix + "XYStdDev", stddev * globalUncertainty.get(0));
-            Logger.recordOutput("State/" + prefix + "ThetaStdDev",
-                stddev * globalUncertainty.get(2));
+            Logger.recordOutput("State/" + prefix + "XYStdDev", stddev * baseUncertainty.get(0));
+            Logger.recordOutput("State/" + prefix + "ThetaStdDev", stddev * baseUncertainty.get(2));
         }
         if (doInit && !isInitialized) {
             swerveOdometry.resetPose(robotPose2d);
@@ -153,7 +148,10 @@ public class RobotState {
                 new Pose3d().plus(best).relativeTo(Constants.Vision.fieldLayout.getOrigin());
             Pose3d robotPose = cameraPose.plus(robotToCamera.inverse());
             addVisionObservation(cameraPose, robotPose, result.getTimestampSeconds(),
-                globalUncertainty, result.getTargets(), "Global", true);
+                VecBuilder.fill(Constants.StateEstimator.globalVisionTrust.getAsDouble(),
+                    Constants.StateEstimator.globalVisionTrust.getAsDouble(),
+                    Constants.StateEstimator.globalVisionTrustRotation.getAsDouble()),
+                result.getTargets(), "Global", true, stdDevGlobalCircle);
         }
         if (whichCamera == 1) {
             for (var target : result.targets) {
@@ -184,7 +182,10 @@ public class RobotState {
                 Pose3d robotPose = new Pose3d(robotPose2d);
                 Pose3d cameraPose = robotPose.plus(robotToCamera);
                 addVisionObservation(cameraPose, robotPose, result.getTimestampSeconds(),
-                    localUncertainty, result.getTargets(), "Local", false);
+                    VecBuilder.fill(Constants.StateEstimator.localVisionTrust.getAsDouble(),
+                        Constants.StateEstimator.localVisionTrust.getAsDouble(),
+                        Double.POSITIVE_INFINITY),
+                    result.getTargets(), "Local", false, stdDevLocalCircle);
             }
         }
     }
@@ -204,6 +205,10 @@ public class RobotState {
             getGlobalPoseEstimate().getRotation());
         vis.setDrivetrainState(swerveOdometry.getEstimatedPosition(),
             Stream.of(positions).map(x -> x.angle).toArray(this::swerveRotationsArray));
+        stdDevGlobalCircle.setCenter(getGlobalPoseEstimate().getTranslation());
+        stdDevGlobalCircle.setRadius(stdDevGlobalCircle.getRadius() + 0.01);
+        stdDevLocalCircle.setCenter(new Translation2d());
+        stdDevLocalCircle.setRadius(0.0);
     }
 
     private Rotation2d[] swerveRotations = new Rotation2d[4];

@@ -39,6 +39,7 @@ import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
+import frc.lib.util.LoggedTunableNumber;
 
 /**
  * Constants file.
@@ -378,7 +379,7 @@ public final class Constants {
                     -Units.inchesToMeters(12), Units.inchesToMeters(10)),
                     new Rotation3d(Math.PI, 0, 0)),
                 Units.inchesToMeters(1.6)),
-            new CameraConstants("cam1", 600, 800, Rotation2d.fromDegrees(60), Hertz.of(65),
+            new CameraConstants("cam1", 600, 800, Rotation2d.fromDegrees(60), Hertz.of(40),
                 Seconds.of(0.15), Seconds.of(0.02), 0.27, 0.08,
                 new Transform3d(
                     new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(13.5),
@@ -395,9 +396,12 @@ public final class Constants {
     public static class StateEstimator {
         public static final boolean keepInField = true;
         public static final boolean keepOutOfReefs = true;
-        public static final double globalVisionTrust = 0.5;
-        public static final double globalVisionTrustRotation = 0.5;
-        public static final double localVisionTrust = 0.02;
+        public static final LoggedTunableNumber globalVisionTrust =
+            new LoggedTunableNumber("globalVisionTrust", 0.2);
+        public static final LoggedTunableNumber globalVisionTrustRotation =
+            new LoggedTunableNumber("globalVisionTrustRotation", 0.5);
+        public static final LoggedTunableNumber localVisionTrust =
+            new LoggedTunableNumber("localVisionTrust", 0.02);
     }
 
     /**
@@ -417,7 +421,7 @@ public final class Constants {
         public static final double PID_XKP = 10.0;
         public static final double PID_XKI = 0.0;
         public static final double PID_XKD = 0.0;
-        public static final double PID_TKP = 5.0;
+        public static final double PID_TKP = 8.0;
         public static final double PID_TKI = 0.0;
         public static final double PID_TKD = 0.0;
 

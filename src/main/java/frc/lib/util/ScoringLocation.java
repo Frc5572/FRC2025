@@ -89,16 +89,19 @@ public class ScoringLocation {
      */
     public enum Height {
 
-        KP0("Algae 1", Constants.Elevator.P0), KP1("Coral 1", Constants.Elevator.P1), KP2("Algae 2",
-            Constants.Elevator.P2), KP3("Coral 3", Constants.Elevator.P3), KP4("Coral 4",
-                Constants.Elevator.P4), KP5("Barge", Constants.Elevator.P5);
+        KP0("Algae 1", Constants.Elevator.P0, true), KP1("Coral 1", Constants.Elevator.P1,
+            false), KP2("Algae 2", Constants.Elevator.P2, true), KP3("Coral 3",
+                Constants.Elevator.P3, false), KP4("Coral 4", Constants.Elevator.P4,
+                    false), KP5("Barge", Constants.Elevator.P5, true);
 
         public final String displayName;
         public final Distance height;
+        public final boolean isAlgae;
 
-        Height(String displayName, Distance height) {
+        Height(String displayName, Distance height, boolean isAlgae) {
             this.displayName = displayName;
             this.height = height;
+            this.isAlgae = isAlgae;
         }
 
         /** Deserialize from integer */

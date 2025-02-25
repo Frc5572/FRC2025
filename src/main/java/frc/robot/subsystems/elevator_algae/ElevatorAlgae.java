@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.LoggedTracer;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Constants;
 
@@ -42,6 +43,7 @@ public class ElevatorAlgae extends SubsystemBase {
             temp = Color.kRed;
         }
         SmartDashboard.putString("Dashboard/Main Driver/Have Algae", temp.toHexString());
+        LoggedTracer.record("Algae");
     }
 
 

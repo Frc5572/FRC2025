@@ -13,8 +13,6 @@ import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
@@ -30,8 +28,6 @@ import frc.lib.util.WebController;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
-import frc.robot.commands.MoveAndAvoidReef;
-import frc.robot.commands.MoveToPose;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIO;
@@ -139,9 +135,10 @@ public class RobotContainer {
             swerve::followTrajectory, true, swerve);
 
         AutoCommandFactory autos =
-            new AutoCommandFactory(autoFactory, swerve, elevator, coralScoring, leds);
+            new AutoCommandFactory(autoFactory, swerve, elevator, coralScoring, algae, leds);
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Example", autos::example);
+        autoChooser.addRoutine("TestAuto", autos::test);
 
         SmartDashboard.putData("Dashboard/Auto/Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler()
@@ -199,8 +196,6 @@ public class RobotContainer {
      */
 
     private void setupDriver() {
-
-
         swerve.setDefaultCommand(swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
 
@@ -217,36 +212,14 @@ public class RobotContainer {
         driver.rightTrigger().and(climb.reachedClimberStart)
             .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
 
-        driver.a().and(operator.hasReefLocation()).whileTrue(new MoveAndAvoidReef(swerve, () -> {
-            Pose2d finalLoc = operator.getDesiredLocation().pose;
-            return new Pose2d(
-                finalLoc.getTranslation()
-                    .minus(new Translation2d(Units.inchesToMeters(12), finalLoc.getRotation())),
-                finalLoc.getRotation());
-        }, () -> 4.0, true, Units.inchesToMeters(12), 15).andThen(elevator.moveTo(() -> {
-            return operator.getDesiredHeight().height;
-        })).andThen(new MoveToPose(swerve, () -> {
-            Pose2d finalLoc = operator.getDesiredLocation().pose;
-
-            return new Pose2d(
-                finalLoc.getTranslation()
-                    .minus(new Translation2d(Units.inchesToMeters(0.75), finalLoc.getRotation())),
-                finalLoc.getRotation());
-        }, () -> 0.3, true, Units.inchesToMeters(0.25), 5)).andThen(Commands.waitSeconds(0.5))
-            .andThen(coralScoring.runCoralOuttake().withTimeout(0.5))
-            .andThen(new MoveToPose(swerve, () -> {
-                Pose2d finalLoc = operator.getDesiredLocation().pose;;
-                return new Pose2d(
-                    finalLoc.getTranslation()
-                        .minus(new Translation2d(Units.inchesToMeters(12), finalLoc.getRotation())),
-                    finalLoc.getRotation());
-            }, () -> 0.3, true, Units.inchesToMeters(4), 5).withTimeout(1.5))
-            .andThen(elevator.home()).andThen(swerve.run(() -> {
-            })));
-        driver.b().whileTrue(new MoveAndAvoidReef(swerve, () -> {
-            return new Pose2d(1.5196709632873535, 7.158551216125488,
-                Rotation2d.fromRadians(-2.4980917038665034));
-        }, () -> 0.8, true, Units.inchesToMeters(2), 5).andThen(swerve.stop())
+        driver.a().and(operator.hasReefLocation())
+            .whileTrue(CommandFactory
+                .autoScore(swerve, elevator, coralScoring, algae, operator::getDesiredLocation,
+                    operator::getDesiredHeight)
+                .andThen(CommandFactory.selectFeeder(swerve, elevator, operator::feeder))
+                .andThen(swerve.run(() -> {
+                })));
+        driver.b().whileTrue(CommandFactory.selectFeeder(swerve, elevator, operator::feeder)
             .andThen(swerve.run(() -> {
             })));
     }

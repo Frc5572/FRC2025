@@ -128,7 +128,7 @@ public class MoveAndAvoidReef extends Command implements Drawable {
 
     @Override
     public void execute() {
-        draw();
+        // draw();
         swerve.moveToPose(getNextIntermediateTarget(swerve.state.getGlobalPoseEstimate(), pose2d),
             maxSpeedSupplier.getAsDouble());
     }
@@ -177,11 +177,11 @@ public class MoveAndAvoidReef extends Command implements Drawable {
                 if (rightLen > leftLen) {
                     Rotation2d targetAngle = angle.plus(Constants.CIRCLE_REEF_LOOKAHEAD_ANGLE);
                     return new Pose2d(driveCircle.getVertex(targetAngle, Units.inchesToMeters(3)),
-                        targetAngle.plus(Rotation2d.k180deg));
+                        targetAngle.plus(Rotation2d.k180deg).plus(Rotation2d.fromDegrees(10)));
                 } else {
                     Rotation2d targetAngle = angle.minus(Constants.CIRCLE_REEF_LOOKAHEAD_ANGLE);
                     return new Pose2d(driveCircle.getVertex(targetAngle, Units.inchesToMeters(3)),
-                        targetAngle.plus(Rotation2d.k180deg));
+                        targetAngle.plus(Rotation2d.k180deg).plus(Rotation2d.fromDegrees(10)));
                 }
             } else {
                 if (rightLen > leftLen) {
@@ -207,6 +207,15 @@ public class MoveAndAvoidReef extends Command implements Drawable {
         RotationInterval currentBlueAngles = blueDriveCircle.circleTangentAngles(currentPosition);
         RotationInterval currentRedAngles = redDriveCircle.circleTangentAngles(currentPosition);
 
+        Logger.recordOutput("avoidReef/targetBlueAngles", new double[] {
+            targetBlueAngles.getMin().getDegrees(), targetBlueAngles.getMax().getDegrees(),});
+        Logger.recordOutput("avoidReef/targetRedAngles", new double[] {
+            targetRedAngles.getMin().getDegrees(), targetRedAngles.getMax().getDegrees(),});
+        Logger.recordOutput("avoidReef/currentBlueAngles", new double[] {
+            currentBlueAngles.getMin().getDegrees(), currentBlueAngles.getMax().getDegrees(),});
+        Logger.recordOutput("avoidReef/currentRedAngles", new double[] {
+            currentRedAngles.getMin().getDegrees(), currentRedAngles.getMax().getDegrees(),});
+
         double blueOverlap = targetBlueAngles.getOverlap(currentBlueAngles);
         double redOverlap = targetRedAngles.getOverlap(currentRedAngles);
 
@@ -218,10 +227,12 @@ public class MoveAndAvoidReef extends Command implements Drawable {
             Pose2d next = null;
             if ((next = avoidReef(redDriveCircle, currentPosition, targetPosition, redOverlap,
                 currentRedAngles, targetRedAngles)) != null) {
+                Logger.recordOutput("avoidReef/avoiding", "redReef");
                 return next;
             }
             if ((next = avoidReef(blueDriveCircle, currentPosition, targetPosition, blueOverlap,
                 currentBlueAngles, targetBlueAngles)) != null) {
+                Logger.recordOutput("avoidReef/avoiding", "blueReef");
                 return next;
             }
         } else {
@@ -229,13 +240,16 @@ public class MoveAndAvoidReef extends Command implements Drawable {
             Pose2d next = null;
             if ((next = avoidReef(blueDriveCircle, currentPosition, targetPosition, blueOverlap,
                 currentBlueAngles, targetBlueAngles)) != null) {
+                Logger.recordOutput("avoidReef/avoiding", "blueReef");
                 return next;
             }
             if ((next = avoidReef(redDriveCircle, currentPosition, targetPosition, redOverlap,
                 currentRedAngles, targetRedAngles)) != null) {
+                Logger.recordOutput("avoidReef/avoiding", "redReef");
                 return next;
             }
         }
+        Logger.recordOutput("avoidReef/avoiding", "nothing");
 
         return target;
     }

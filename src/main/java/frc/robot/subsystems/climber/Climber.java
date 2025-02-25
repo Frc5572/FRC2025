@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.LoggedTracer;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Constants;
 
@@ -34,6 +35,7 @@ public class Climber extends SubsystemBase {
         Logger.processInputs("Climber", climberAutoLogged);
         viz.setClimberAngle(climberAutoLogged.climberPosition);
         SmartDashboard.putBoolean("Climber Out", reachedClimberStart());
+        LoggedTracer.record("Climber");
     }
 
     public void setClimberMotorVoltage(double voltage) {
