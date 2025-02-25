@@ -2,6 +2,10 @@ package frc.lib.util;
 
 import java.nio.file.Paths;
 import java.util.EnumSet;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.networktables.IntegerArrayPublisher;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -28,6 +32,16 @@ public class WebController {
 
     private final IntegerArrayPublisher response;
 
+    /** Webcontroller inputs */
+    @AutoLog
+    public static class WebControllerInputs {
+        public String currentCommand = "";
+    }
+
+    private final WebControllerInputsAutoLogged inputs = new WebControllerInputsAutoLogged();
+
+    private Lock lock = new ReentrantLock();
+
     /**
      * Create a new WebController
      *
@@ -44,52 +58,69 @@ public class WebController {
         instance.addListener(instance.getTopic("/web/ctrl"),
             EnumSet.of(NetworkTableEvent.Kind.kValueRemote), (ev) -> {
                 String value = ev.valueData.value.getString();
-                if (value.startsWith("reef-")) {
-                    value = value.substring(5);
-                    bay = value.charAt(0);
-                    checkReefLocation();
-                    createResponse();
-                } else if (value.startsWith("p")) {
-                    value = value.substring(1);
-                    height = Integer.parseInt(value.substring(0, 1));
-                    value = value.substring(1);
-                    if (value.length() == 0 || value.charAt(0) == 'r') {
-                        right = true;
-                    } else {
-                        right = false;
-                    }
-                    checkReefLocation();
-                    createResponse();
-                } else if (value.startsWith("fdr")) {
-                    value = value.substring(3);
-                    fdr = value.charAt(0);
-                    createResponse();
-                } else if (value.startsWith("conf")) {
-                    value = value.substring(4);
-                    switch (value.charAt(0)) {
-                        case 'x':
-                            if (hasReefLocation.getAsBoolean()) {
-                                branches_compl[bay - 'a'][encode_height(height, right)] = true;
-                                checkBayCompl();
-                                createResponse();
-                            }
-                            break;
-                        case 'y':
-                            if (hasReefLocation.getAsBoolean()) {
-                                branches_compl[bay - 'a'][encode_height(height, right)] = false;
-                                checkBayCompl();
-                                createResponse();
-                            }
-                            break;
-                        case 'c':
-                            // IDK what this is for
-                            break;
-                        default:
-                            break;
-                    }
-                }
+                System.out.println("new value");
+                lock.lock();
+                inputs.currentCommand = value;
+                lock.unlock();
             });
         createResponse();
+    }
+
+    /** Run once per cycle. */
+    public void periodic() {
+        lock.lock();
+        Logger.processInputs("WebController", inputs);
+        String value = inputs.currentCommand;
+        inputs.currentCommand = "";
+        lock.unlock();
+        if (value.isEmpty()) {
+            return;
+        }
+        System.out.println(value);
+        if (value.startsWith("reef-")) {
+            value = value.substring(5);
+            bay = value.charAt(0);
+            checkReefLocation();
+            createResponse();
+        } else if (value.startsWith("p")) {
+            value = value.substring(1);
+            height = Integer.parseInt(value.substring(0, 1));
+            value = value.substring(1);
+            if (value.length() == 0 || value.charAt(0) == 'r') {
+                right = true;
+            } else {
+                right = false;
+            }
+            checkReefLocation();
+            createResponse();
+        } else if (value.startsWith("fdr")) {
+            value = value.substring(3);
+            fdr = value.charAt(0);
+            createResponse();
+        } else if (value.startsWith("conf")) {
+            value = value.substring(4);
+            switch (value.charAt(0)) {
+                case 'x':
+                    if (hasReefLocation.getAsBoolean()) {
+                        branches_compl[bay - 'a'][encode_height(height, right)] = true;
+                        checkBayCompl();
+                        createResponse();
+                    }
+                    break;
+                case 'y':
+                    if (hasReefLocation.getAsBoolean()) {
+                        branches_compl[bay - 'a'][encode_height(height, right)] = false;
+                        checkBayCompl();
+                        createResponse();
+                    }
+                    break;
+                case 'c':
+                    // IDK what this is for
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     private final long[] response_values = new long[21];
@@ -157,6 +188,7 @@ public class WebController {
         response_values[19] = (hasReefLocation.getAsBoolean() ? 0 : 2);
         response_values[20] = (hasReefLocation.getAsBoolean() ? 0 : 2);
 
+        Logger.recordOutput("WebControllerButtons", response_values);
         response.set(response_values);
     }
 

@@ -184,6 +184,7 @@ public class RobotContainer {
 
     /** Setup buttons for newly attached controllers */
     public void queryControllers() {
+        operator.periodic();
         for (var setup : controllerSetups) {
             setup.run();
         }
