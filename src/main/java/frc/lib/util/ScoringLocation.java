@@ -88,9 +88,10 @@ public class ScoringLocation {
      * set of height modes
      */
     public enum Height {
-        KP0("Algae 1", Constants.Elevator.P0), KP1("Coral 2", Constants.Elevator.P1), KP2("Algae 2",
-            Constants.Elevator.P2), KP3("Coral 3",
-                Constants.Elevator.P3), KP4("Coral 4", Constants.Elevator.P4);
+
+        KP0("Algae 1", Constants.Elevator.P0), KP1("Coral 1", Constants.Elevator.P1), KP2("Algae 2",
+            Constants.Elevator.P2), KP3("Coral 3", Constants.Elevator.P3), KP4("Coral 4",
+                Constants.Elevator.P4), KP5("Barge", Constants.Elevator.P5);
 
         public final String displayName;
         public final Distance height;
