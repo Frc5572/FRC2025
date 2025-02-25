@@ -8,7 +8,7 @@ import frc.lib.util.viz.Drawable;
 /** Represents a circle with a known center and radius. */
 public class Circle implements ConvexShape, Drawable {
 
-    private final String name;
+    public String name;
     private Translation2d center;
     private double radius;
 

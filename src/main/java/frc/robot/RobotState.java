@@ -100,6 +100,8 @@ public class RobotState {
         return swerveOdometry.getEstimatedPosition();
     }
 
+    private static final Circle stdDevCircle = new Circle("", new Translation2d(), 0);
+
     private void addVisionObservation(Pose3d cameraPose, Pose3d robotPose, double timestamp,
         Vector<N3> baseUncertainty, List<PhotonTrackedTarget> targets, String prefix,
         boolean doInit) {
@@ -117,6 +119,10 @@ public class RobotState {
         double stddev = Math.pow(avgDistance, 2.0) / count;
         Pose2d robotPose2d = robotPose.toPose2d();
         if (Constants.shouldDrawStuff) {
+            stdDevCircle.name = "State/" + prefix + "EstimateStdDev";
+            stdDevCircle.setCenter(robotPose2d.getTranslation());
+            stdDevCircle.setRadius(stddev * globalUncertainty.get(0));
+            stdDevCircle.drawImpl();
             Logger.recordOutput("State/" + prefix + "VisionEstimate", robotPose);
             Logger.recordOutput("State/" + prefix + "AverageDistance", avgDistance);
             Logger.recordOutput("State/" + prefix + "StdDevMultiplier", stddev);
