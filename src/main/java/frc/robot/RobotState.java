@@ -1,10 +1,12 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Meters;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -33,7 +35,6 @@ import frc.robot.subsystems.swerve.Swerve;
 public class RobotState {
 
     private final Viz2025 vis;
-    private int currentTarget = 0;
     private boolean isInitialized = false;
 
     private final Vector<N3> globalUncertainty = VecBuilder.fill(
@@ -99,11 +100,37 @@ public class RobotState {
         return swerveOdometry.getEstimatedPosition();
     }
 
-    /**
-     * Set local target fiducial id. If 0, use global instead.
-     */
-    public void setLocalTarget(int id) {
-        currentTarget = id;
+    private void addVisionObservation(Pose3d cameraPose, Pose3d robotPose, double timestamp,
+        Vector<N3> baseUncertainty, List<PhotonTrackedTarget> targets, String prefix,
+        boolean doInit) {
+        double totalDistance = 0.0;
+        int count = 0;
+        for (var tag : targets) {
+            var maybeTagPose = Constants.Vision.fieldLayout.getTagPose(tag.getFiducialId());
+            if (maybeTagPose.isPresent()) {
+                var tagPose = maybeTagPose.get();
+                totalDistance += tagPose.getTranslation().getDistance(cameraPose.getTranslation());
+                count++;
+            }
+        }
+        double avgDistance = totalDistance / count;
+        double stddev = Math.pow(avgDistance, 2.0) / count;
+        Pose2d robotPose2d = robotPose.toPose2d();
+        if (Constants.shouldDrawStuff) {
+            Logger.recordOutput("State/" + prefix + "VisionEstimate", robotPose);
+            Logger.recordOutput("State/" + prefix + "AverageDistance", avgDistance);
+            Logger.recordOutput("State/" + prefix + "StdDevMultiplier", stddev);
+            Logger.recordOutput("State/" + prefix + "XYStdDev", stddev * globalUncertainty.get(0));
+            Logger.recordOutput("State/" + prefix + "ThetaStdDev",
+                stddev * globalUncertainty.get(2));
+        }
+        if (doInit && !isInitialized) {
+            swerveOdometry.resetPose(robotPose2d);
+            isInitialized = true;
+        } else if (isInitialized) {
+            swerveOdometry.addVisionMeasurement(robotPose2d, timestamp,
+                baseUncertainty.times(stddev));
+        }
     }
 
     /**
@@ -119,48 +146,39 @@ public class RobotState {
             Pose3d cameraPose =
                 new Pose3d().plus(best).relativeTo(Constants.Vision.fieldLayout.getOrigin());
             Pose3d robotPose = cameraPose.plus(robotToCamera.inverse());
-            Pose2d robotPose2d = robotPose.toPose2d();
-            Logger.recordOutput("State/GlobalVisionEstimate", robotPose);
-            if (!isInitialized) {
-                swerveOdometry.resetPose(robotPose2d);
-                isInitialized = true;
-            } else if (currentTarget == 0) {
-                swerveOdometry.addVisionMeasurement(robotPose2d, result.getTimestampSeconds(),
-                    globalUncertainty);
-            }
+            addVisionObservation(cameraPose, robotPose, result.getTimestampSeconds(),
+                globalUncertainty, result.getTargets(), "Global", true);
         }
         if (whichCamera == 1) {
             for (var target : result.targets) {
-                if (target.fiducialId == currentTarget) {
-                    double dist =
-                        target.getBestCameraToTarget().getTranslation().toTranslation2d().getNorm();
-                    localCircle.setRadius(dist - Constants.Vision.cameras[whichCamera].offset());
-                    localCircle.setCenter(Constants.Vision.fieldLayout.getTagPose(target.fiducialId)
-                        .get().getTranslation().toTranslation2d());
-                    localCircle.draw();
-                    Optional<Rotation2d> maybeRobotYaw =
-                        sampleRotationAt(result.getTimestampSeconds());
-                    Rotation2d robotYaw;
-                    if (maybeRobotYaw.isPresent()) {
-                        robotYaw = maybeRobotYaw.get();
-                    } else {
-                        continue;
-                    }
-                    Rotation2d yaw = Rotation2d.fromDegrees(robotYaw.getDegrees() - target.getYaw()
-                        + 180 + Units.radiansToDegrees(robotToCamera.getRotation().getZ()));
-                    Logger.recordOutput("State/LocalYaw", yaw);
-                    xCircle.setCenter(localCircle.getVertex(yaw));
-                    xCircle.draw();
-                    Pose2d robotPose2d = new Pose2d(
-                        xCircle.getCenter().minus(
-                            robotToCamera.getTranslation().toTranslation2d().rotateBy(robotYaw)),
-                        robotYaw);
-                    if (Constants.shouldDrawStuff) {
-                        Logger.recordOutput("State/LocalPose", robotPose2d);
-                    }
-                    swerveOdometry.addVisionMeasurement(robotPose2d, result.getTimestampSeconds(),
-                        localUncertainty);
+                double dist =
+                    target.getBestCameraToTarget().getTranslation().toTranslation2d().getNorm();
+                if (dist > Units.inchesToMeters(36)) {
+                    continue;
                 }
+                localCircle.setRadius(dist - Constants.Vision.cameras[whichCamera].offset());
+                localCircle.setCenter(Constants.Vision.fieldLayout.getTagPose(target.fiducialId)
+                    .get().getTranslation().toTranslation2d());
+                localCircle.draw();
+                Optional<Rotation2d> maybeRobotYaw = sampleRotationAt(result.getTimestampSeconds());
+                Rotation2d robotYaw;
+                if (maybeRobotYaw.isPresent()) {
+                    robotYaw = maybeRobotYaw.get();
+                } else {
+                    continue;
+                }
+                Rotation2d yaw = Rotation2d.fromDegrees(robotYaw.getDegrees() - target.getYaw()
+                    + 180 + Units.radiansToDegrees(robotToCamera.getRotation().getZ()));
+                xCircle.setCenter(localCircle.getVertex(yaw));
+                xCircle.draw();
+                Pose2d robotPose2d = new Pose2d(
+                    xCircle.getCenter()
+                        .minus(robotToCamera.getTranslation().toTranslation2d().rotateBy(robotYaw)),
+                    robotYaw);
+                Pose3d robotPose = new Pose3d(robotPose2d);
+                Pose3d cameraPose = robotPose.plus(robotToCamera);
+                addVisionObservation(cameraPose, robotPose, result.getTimestampSeconds(),
+                    localUncertainty, result.getTargets(), "Local", false);
             }
         }
     }

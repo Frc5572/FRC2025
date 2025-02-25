@@ -372,18 +372,18 @@ public final class Constants {
         }
 
         public static final CameraConstants[] cameras = new CameraConstants[] {
-            new CameraConstants("cam0", 800, 1280, Rotation2d.fromDegrees(70), Hertz.of(20),
-                Seconds.of(0.3), Seconds.of(0.02), 0.25, 0.08,
+            new CameraConstants("cam0", 800, 1280, Rotation2d.fromDegrees(80), Hertz.of(20),
+                Seconds.of(0.3), Seconds.of(0.02), 0.8, 0.08,
                 new Transform3d(new Translation3d(Units.inchesToMeters(11),
                     -Units.inchesToMeters(12), Units.inchesToMeters(10)),
                     new Rotation3d(Math.PI, 0, 0)),
                 Units.inchesToMeters(1.6)),
-            new CameraConstants("cam1", 480, 640, Rotation2d.fromDegrees(140), Hertz.of(65),
-                Seconds.of(0.15), Seconds.of(0.02), 0.25, 0.08,
+            new CameraConstants("cam1", 600, 800, Rotation2d.fromDegrees(60), Hertz.of(65),
+                Seconds.of(0.15), Seconds.of(0.02), 0.27, 0.08,
                 new Transform3d(
                     new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(13.5),
                         Units.inchesToMeters(10)),
-                    new Rotation3d(0, -Units.degreesToRadians(5), -Units.degreesToRadians(10))),
+                    new Rotation3d(0, -Units.degreesToRadians(5), -Units.degreesToRadians(55))),
                 Units.inchesToMeters(0.0))};
 
         public static final double zMargin = 0.75;
