@@ -210,6 +210,9 @@ public class RobotContainer {
 
         driver.rightTrigger().and(climb.reachedClimberStart)
             .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
+        driver.leftTrigger().onTrue(Commands.runOnce(() -> leds.setLEDsSolid(Color.kBlue))); // Cole
+                                                                                             // Added
+        coralScoring.coralAtOuttake.whileTrue(leds.setLEDsSolid(Color.kCyan));
     }
 
     private void setupAltOperatorController() {
@@ -245,8 +248,9 @@ public class RobotContainer {
 
     private void configureTriggerBindings() {
         // Coral
-        coralScoring.coralAtIntake.whileTrue(leds.setLEDsSolid(Color.kOrange));
+        coralScoring.coralAtIntake.whileTrue(leds.setLEDsSolid(Color.kBlue));
         coralScoring.coralAtOuttake.whileTrue(leds.setLEDsSolid(Color.kCyan));
+
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
         // Algae
