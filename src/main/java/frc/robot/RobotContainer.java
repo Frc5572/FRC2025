@@ -221,34 +221,36 @@ public class RobotContainer {
 
         driver.rightTrigger().and(climb.reachedClimberStart)
             .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
+        // ________________________________________________________________________________________
+        driver.a().and(operator.hasReefLocation()).whileTrue(new MoveAndAvoidReef(swerve, () -> { //passes swerve
+            Pose2d finalLoc = operator.getDesiredLocation().pose; // gets the selected location of the operator
+            return new Pose2d(
+                finalLoc.getTranslation() //gets the translation of the desired location
+                    .minus(new Translation2d(Units.inchesToMeters(12), finalLoc.getRotation())), // -12 in from desired(!bumpers against)/ orient the right way
+                finalLoc.getRotation()); //gets the rotation of the desired location
+        }, () -> 0.8, true, Units.inchesToMeters(12), 15).andThen(elevator.moveTo(() -> { //max speed, flipped for red, tol and rot tol; end of moveandavoid reef
+            return operator.getDesiredHeight().height; //move to desired height after reaching destiation
+        })).andThen(new MoveToPose(swerve, () -> { //after going up with elevator, mtp
+            Pose2d finalLoc = operator.getDesiredLocation().pose; //get the desired location
 
-        driver.a().and(operator.hasReefLocation()).whileTrue(new MoveAndAvoidReef(swerve, () -> {
-            Pose2d finalLoc = operator.getDesiredLocation().pose;
             return new Pose2d(
                 finalLoc.getTranslation()
-                    .minus(new Translation2d(Units.inchesToMeters(12), finalLoc.getRotation())),
+                    .minus(new Translation2d(Units.inchesToMeters(0.75), finalLoc.getRotation())), //go to desired location - 3/4 in (line to shoot)
                 finalLoc.getRotation());
-        }, () -> 0.8, true, Units.inchesToMeters(12), 15).andThen(elevator.moveTo(() -> {
-            return operator.getDesiredHeight().height;
-        })).andThen(new MoveToPose(swerve, () -> {
-            Pose2d finalLoc = operator.getDesiredLocation().pose;
-
-            return new Pose2d(
-                finalLoc.getTranslation()
-                    .minus(new Translation2d(Units.inchesToMeters(0.75), finalLoc.getRotation())),
-                finalLoc.getRotation());
-        }, () -> 0.3, true, Units.inchesToMeters(0.25), 5))
+        }, () -> 0.3, true, Units.inchesToMeters(0.25), 5)) //end of final line up
             // .andThen(Commands.waitSeconds(10))
-            .andThen(coralScoring.runCoralOuttake().withTimeout(1.5))
-            .andThen(new MoveToPose(swerve, () -> {
-                Pose2d finalLoc = operator.getDesiredLocation().pose;;
+            .andThen(coralScoring.runCoralOuttake().withTimeout(1.5)) //score coral
+            .andThen(new MoveToPose(swerve, () -> { //new mtp
+                Pose2d finalLoc = operator.getDesiredLocation().pose;; //back up
                 return new Pose2d(
                     finalLoc.getTranslation()
                         .minus(new Translation2d(Units.inchesToMeters(12), finalLoc.getRotation())),
                     finalLoc.getRotation());
             }, () -> 0.3, true, Units.inchesToMeters(4), 5).withTimeout(1.5))
-            .andThen(elevator.home()).andThen(swerve.run(() -> {
+            .andThen(elevator.home()).andThen(swerve.run(() -> {//finally, elevator home
             })));
+//________________________________________ 
+
         driver.b().whileTrue(new MoveAndAvoidReef(swerve, () -> {
             return new Pose2d(1.5196709632873535, 7.158551216125488,
                 Rotation2d.fromRadians(-2.4980917038665034));
