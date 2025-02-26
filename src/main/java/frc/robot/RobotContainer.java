@@ -13,6 +13,8 @@ import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
@@ -24,9 +26,12 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.ScoringLocation.Height;
+import frc.lib.util.WebController;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
+import frc.robot.commands.MoveAndAvoidReef;
+import frc.robot.commands.MoveToPose;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIO;
@@ -67,11 +72,11 @@ public class RobotContainer {
 
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
+    public final WebController operator = new WebController(5801);
     public final CommandXboxController pitController =
         new CommandXboxController(Constants.PIT_CONTROLLER_ID);
     public final CommandXboxController altOperator =
         new CommandXboxController(Constants.ALT_OPERATOR_ID);
-    public final CommandXboxController operator = new CommandXboxController(1);
 
 
     /** Simulation */
@@ -210,6 +215,40 @@ public class RobotContainer {
 
         driver.rightTrigger().and(climb.reachedClimberStart)
             .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
+
+        driver.a().and(operator.hasReefLocation()).whileTrue(new MoveAndAvoidReef(swerve, () -> {
+            Pose2d finalLoc = operator.getDesiredLocation().pose;
+            return new Pose2d(
+                finalLoc.getTranslation()
+                    .minus(new Translation2d(Units.inchesToMeters(12), finalLoc.getRotation())),
+                finalLoc.getRotation());
+        }, () -> 0.8, true, Units.inchesToMeters(12), 15).andThen(elevator.moveTo(() -> {
+            return operator.getDesiredHeight().height;
+        })).andThen(new MoveToPose(swerve, () -> {
+            Pose2d finalLoc = operator.getDesiredLocation().pose;
+
+            return new Pose2d(
+                finalLoc.getTranslation()
+                    .minus(new Translation2d(Units.inchesToMeters(0.75), finalLoc.getRotation())),
+                finalLoc.getRotation());
+        }, () -> 0.3, true, Units.inchesToMeters(0.25), 5))
+            // .andThen(Commands.waitSeconds(10))
+            .andThen(coralScoring.runCoralOuttake().withTimeout(1.5))
+            .andThen(new MoveToPose(swerve, () -> {
+                Pose2d finalLoc = operator.getDesiredLocation().pose;;
+                return new Pose2d(
+                    finalLoc.getTranslation()
+                        .minus(new Translation2d(Units.inchesToMeters(12), finalLoc.getRotation())),
+                    finalLoc.getRotation());
+            }, () -> 0.3, true, Units.inchesToMeters(4), 5).withTimeout(1.5))
+            .andThen(elevator.home()).andThen(swerve.run(() -> {
+            })));
+        driver.b().whileTrue(new MoveAndAvoidReef(swerve, () -> {
+            return new Pose2d(1.5196709632873535, 7.158551216125488,
+                Rotation2d.fromRadians(-2.4980917038665034));
+        }, () -> 0.8, true, Units.inchesToMeters(2), 5).andThen(swerve.stop())
+            .andThen(swerve.run(() -> {
+            })));
     }
 
     private void setupAltOperatorController() {
