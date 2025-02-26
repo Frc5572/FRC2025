@@ -13,7 +13,7 @@ public class AprilTagAlign extends Command {
     private final Vision vision;
     private final DoubleSupplier targetYawSupplier;
 
-    private final FilteredPIDController controller = new FilteredPIDController(0.03, 0, 0.0, 0.1);
+    private final FilteredPIDController controller = new FilteredPIDController(0.01, 0, 0.0, 0.1);
 
     public AprilTagAlign(Swerve swerve, Vision vision, DoubleSupplier targetYawSupplier) {
         this.swerve = swerve;
@@ -32,8 +32,15 @@ public class AprilTagAlign extends Command {
 
     @Override
     public void execute() {
-        double output = controller.calculate(vision.getClosestTagYaw());
+        double diff = vision.getClosestTagYaw();
+        double output =
+            controller.calculate(Math.signum(diff) * diff * diff, targetYawSupplier.getAsDouble());
         swerve.setModuleStates(new ChassisSpeeds(0, output, 0));
+    }
+
+    @Override
+    public boolean isFinished() {
+        return Math.abs(vision.getClosestTagYaw() - targetYawSupplier.getAsDouble()) < 1.0;
     }
 
 }

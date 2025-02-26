@@ -71,6 +71,9 @@ public class Vision extends SubsystemBase {
         for (var result : results) {
             state.addVisionObservation(result._2(), result._1(), result._0());
             if (result._0() == 1) {
+                if (!result._2().hasTargets()) {
+                    continue;
+                }
                 double dist =
                     result._2().getBestTarget().getBestCameraToTarget().getTranslation().getNorm();
                 if (dist < closestDist) {
