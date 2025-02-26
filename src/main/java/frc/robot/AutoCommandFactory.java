@@ -62,4 +62,10 @@ public class AutoCommandFactory {
         testMTP.done().onTrue(leds.blinkLEDs(Color.kPurple, 5));
         return routine;
     }
+
+    public AutoRoutine Algae() {
+        AutoRoutine routine = autoFactory.newRoutine("Algae");
+
+        return routine;
+    }
 }
