@@ -107,7 +107,7 @@ public class AutoCommandFactory {
     boolean dashboard = SmartDashboard.putBoolean("isHigh", true);
 
     public AutoRoutine barge() {
-        boolean AlgaeIsHigh = SmartDashboard.getBoolean("isHigh", true);
+        boolean AlgaeIsHigh = SmartDashboard.getBoolean("isHigh", false);
 
         AutoRoutine routine = autoFactory.newRoutine("Barge");
 //@formatter:off
@@ -116,13 +116,13 @@ public class AutoCommandFactory {
         }), CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.H, () -> { //take off algae in back
             return (AlgaeIsHigh) ? Height.KP2 : Height.KP0;
         }), CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.H, //score lvl 4 coral
-            () -> Height.KP4), CommandFactory.barge(swerve, elevator), Commands.waitSeconds(0.5), //travel to barge
+            () -> Height.KP4), CommandFactory.barge(swerve, elevator), //travel to barge
             elevator.moveTo(() -> ScoringLocation.Height.KP5.height), //move elevator up to barge
             algae.runAlgaeMotor(Constants.Algae.VOLTAGE) //run algae motor for 1 second
                 .withDeadline(Commands.waitSeconds(.25)),CommandFactory.ensureHome(elevator).andThen( //go home
             CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.J, () -> { //go to j and grap algae
-                return (!AlgaeIsHigh) ? Height.KP2 : Height.KP0;
-            })),CommandFactory.ensureHome(elevator).andThen(CommandFactory.barge(swerve, elevator), Commands.waitSeconds(0.25)), // go home then travel to barge
+                return (AlgaeIsHigh) ? Height.KP0 : Height.KP2;
+            })),CommandFactory.ensureHome(elevator).andThen(CommandFactory.barge(swerve, elevator)), // go home then travel to barge
             elevator.moveTo(() -> ScoringLocation.Height.KP5.height),// move elevator to barge
             algae.runAlgaeMotor(Constants.Algae.VOLTAGE).withDeadline(Commands.waitSeconds(.5)), CommandFactory.ensureHome(elevator), swerve.stop())); //score
         return routine;
