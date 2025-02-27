@@ -107,13 +107,13 @@ public class AutoCommandFactory {
     boolean dashboard = SmartDashboard.putBoolean("isHigh", true);
 
     public AutoRoutine barge() {
-        boolean AlgaeIsHigh = SmartDashboard.getBoolean("isHigh", false);
 
         AutoRoutine routine = autoFactory.newRoutine("Barge");
 //@formatter:off
         routine.active().onTrue(Commands.sequence(swerve.runOnce(() -> {
             swerve.resetOdometry(AllianceFlipUtil.apply(middleStart)); //start at middle
         }), CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.H, () -> { //take off algae in back
+            boolean AlgaeIsHigh = SmartDashboard.getBoolean("isHigh", false);
             return (AlgaeIsHigh) ? Height.KP2 : Height.KP0;
         }), CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.H, //score lvl 4 coral
             () -> Height.KP4), CommandFactory.barge(swerve, elevator), //travel to barge
@@ -121,6 +121,7 @@ public class AutoCommandFactory {
             algae.runAlgaeMotor(Constants.Algae.VOLTAGE) //run algae motor for 1 second
                 .withDeadline(Commands.waitSeconds(.25)),CommandFactory.ensureHome(elevator).andThen( //go home
             CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.J, () -> { //go to j and grap algae
+                boolean AlgaeIsHigh = SmartDashboard.getBoolean("isHigh", false);
                 return (AlgaeIsHigh) ? Height.KP0 : Height.KP2;
             })),CommandFactory.ensureHome(elevator).andThen(CommandFactory.barge(swerve, elevator)), // go home then travel to barge
             elevator.moveTo(() -> ScoringLocation.Height.KP5.height),// move elevator to barge
