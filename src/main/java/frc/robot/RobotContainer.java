@@ -139,6 +139,8 @@ public class RobotContainer {
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Example", autos::example);
         autoChooser.addRoutine("TestAuto", autos::test);
+        autoChooser.addRoutine("jaceTest", autos::jaceTest);
+
 
         SmartDashboard.putData("Dashboard/Auto/Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler()

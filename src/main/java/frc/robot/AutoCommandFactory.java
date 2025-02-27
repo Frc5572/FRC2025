@@ -95,4 +95,27 @@ public class AutoCommandFactory {
             CommandFactory.leftFeeder(swerve, elevator), Commands.waitSeconds(1.0), swerve.stop()));
         return routine;
     }
+
+    public AutoRoutine jaceTest() {
+        AutoRoutine routine = autoFactory.newRoutine("jaceTest");
+
+        routine.active().onTrue(Commands.sequence(swerve.runOnce(() -> {
+            swerve.resetOdometry(AllianceFlipUtil.apply(leftStart));
+        }), CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.H,
+            () -> Height.KP4), CommandFactory.leftFeeder(swerve, elevator),
+            Commands.waitSeconds(1.0),
+            CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.I,
+                () -> Height.KP4),
+            CommandFactory.leftFeeder(swerve, elevator), Commands.waitSeconds(1.0),
+            CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.J,
+                () -> Height.KP4),
+            CommandFactory.leftFeeder(swerve, elevator), Commands.waitSeconds(1.0),
+            CommandFactory
+                .autoScore(swerve, elevator, coral, algae, () -> CoralLocation.K, () -> Height.KP4),
+            CommandFactory.leftFeeder(swerve, elevator),
+            CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.L,
+                () -> Height.KP4),
+            CommandFactory.leftFeeder(swerve, elevator), Commands.waitSeconds(1.0), swerve.stop()));
+        return routine;
+    }
 }
