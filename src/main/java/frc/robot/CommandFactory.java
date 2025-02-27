@@ -159,4 +159,17 @@ public class CommandFactory {
         }).withTimeout(0.5));
     }
 
+    private static final Pose2d bargePose =
+        new Pose2d(7.596248722076416, 5.551057815551758, Rotation2d.kZero);
+
+    public static Command barge(Swerve swerve, Elevator elevator) {
+        return ensureHome(elevator).alongWith(new MoveAndAvoidReef(swerve, () -> bargePose, () -> {
+            if (elevator.hightAboveP0.getAsBoolean()) {
+                return 0.8;
+            } else {
+                return 12.0;
+            }
+        }, true, Units.inchesToMeters(12), 3));
+    }
+
 }

@@ -139,11 +139,14 @@ public class RobotContainer {
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Example", autos::example);
         autoChooser.addRoutine("TestAuto", autos::test);
+        autoChooser.addRoutine("Barge", autos::barge);
+
 
         SmartDashboard.putData("Dashboard/Auto/Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler()
             .andThen(Commands.runOnce(() -> swerve.setMotorsZero())));
         RobotModeTriggers.disabled().onTrue(Commands.runOnce(() -> swerve.setMotorsZero()));
+
 
         /* Default Commands */
         leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed));
