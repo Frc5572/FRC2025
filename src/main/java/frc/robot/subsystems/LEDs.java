@@ -36,39 +36,10 @@ public class LEDs extends SubsystemBase {
 
     }
 
+    public class LEDsRight extends SubsystemBase {
+        public final AddressableLEDBufferView leds_right;
 
-
-    /**
-     * Set LEDs to color gradient
-     *
-     * @param color first color for gradient
-     * @param color2 second color for gradient
-     *
-     * @return sets color gradient
-     */
-    public Command setLEDsGradient(Color color, Color color2) {
-        LEDPattern gradientPattern = LEDPattern.gradient(GradientType.kContinuous, color, color2);
-        return run(() -> gradientPattern.applyTo(buffer)).ignoringDisable(true);
-    }
-
-
-
-    public Command setPoliceLeds() {
-        LEDPattern notbase2 = LEDPattern.solid(Color.kBlue);
-        LEDPattern notbase3 = LEDPattern.solid(Color.kRed);
-        LEDPattern blink2 = notbase3.blink(Seconds.of(0.5)).overlayOn(notbase2);
-        LEDPattern blink = notbase2.blink(Seconds.of(0.5)).overlayOn(notbase3);
-        return run(() -> {
-            blink.applyTo(leds_right);
-            blink2.applyTo(leds_left);
-        }).ignoringDisable(true);
-
-    }
-
-    public class LEDsRight {
-        private final AddressableLEDBufferView leds_right;
-
-        LEDsRight() {
+        public LEDsRight() {
             leds_right = buffer.createView(60, 119);
 
         }
@@ -123,12 +94,26 @@ public class LEDs extends SubsystemBase {
             LEDPattern breathe = base.breathe(Seconds.of(2));
             return run(() -> breathe.applyTo(leds_right)).ignoringDisable(true);
         }
+
+        /**
+         * Set LEDs to color gradient
+         *
+         * @param color first color for gradient
+         * @param color2 second color for gradient
+         *
+         * @return sets color gradient
+         */
+        public Command setLEDsGradient(Color color, Color color2) {
+            LEDPattern gradientPattern =
+                LEDPattern.gradient(GradientType.kContinuous, color, color2);
+            return run(() -> gradientPattern.applyTo(leds_right)).ignoringDisable(true);
+        }
     }
 
-    public class LEDsLeft {
-        private final AddressableLEDBufferView leds_left;
+    public class LEDsLeft extends SubsystemBase {
+        public final AddressableLEDBufferView leds_left;
 
-        LEDsLeft() {
+        public LEDsLeft() {
             leds_left = buffer.createView(0, 59);
 
         }
@@ -183,7 +168,19 @@ public class LEDs extends SubsystemBase {
             LEDPattern breathe = base.breathe(Seconds.of(2));
             return run(() -> breathe.applyTo(leds_left)).ignoringDisable(true);
         }
+
+        /**
+         * Set LEDs to color gradient
+         *
+         * @param color first color for gradient
+         * @param color2 second color for gradient
+         *
+         * @return sets color gradient
+         */
+        public Command setLEDsGradient(Color color, Color color2) {
+            LEDPattern gradientPattern =
+                LEDPattern.gradient(GradientType.kContinuous, color, color2);
+            return run(() -> gradientPattern.applyTo(leds_left)).ignoringDisable(true);
+        }
     }
-
-
 }

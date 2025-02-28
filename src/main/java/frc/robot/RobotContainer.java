@@ -28,6 +28,8 @@ import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
 import frc.robot.subsystems.LEDs;
+import frc.robot.subsystems.LEDs.LEDsLeft;
+import frc.robot.subsystems.LEDs.LEDsRight;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberReal;
@@ -93,6 +95,8 @@ public class RobotContainer {
     private CoralScoring coralScoring;
     private Climber climb;
     private OperatorStates operatorStates = new OperatorStates();
+    private LEDsLeft ledsLeft = new LEDs.LEDsLeft();
+    private LEDsRight ledsRight = new LEDs.LEDsRight();
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -212,7 +216,8 @@ public class RobotContainer {
         driver.rightTrigger().and(climb.reachedClimberStart)
             .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
         driver.leftTrigger().onTrue(Commands.runOnce(() -> leds.setPoliceLeds())); // Cole
-        coralScoring.coralAtOuttake.whileTrue(leds.setLEDsSolid(Color.kCyan));
+        coralScoring.coralAtOuttake.whileTrue(Commands.parallel(ledsLeft.setLEDsSolid(Color.kCyan),
+            ledsRight.setLEDsSolid(Color.kCyan)));
     }
 
     private void setupAltOperatorController() {
@@ -248,14 +253,16 @@ public class RobotContainer {
 
     private void configureTriggerBindings() {
         // Coral
-        coralScoring.coralAtIntake.whileTrue(leds.setLEDsSolid(Color.kBlue));
-        coralScoring.coralAtOuttake.whileTrue(leds.setLEDsSolid(Color.kCyan));
+        coralScoring.coralAtIntake.whileTrue(Commands.parallel(ledsLeft.setLEDsSolid(Color.kBlue),
+            ledsRight.setLEDsSolid(Color.kBlue)));
+        coralScoring.coralAtOuttake.whileTrue(Commands.parallel(ledsLeft.setLEDsSolid(Color.kCyan),
+            ledsRight.setLEDsSolid(Color.kCyan)));
 
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
         // Algae
-        algae.hasAlgae.and(coralScoring.coralAtOuttake.negate())
-            .onTrue(leds.blinkLEDs(Color.kCyan, 2));
+        algae.hasAlgae.and(coralScoring.coralAtOuttake.negate()).onTrue(Commands
+            .parallel(ledsLeft.blinkLEDs(Color.kCyan, 2), ledsRight.blinkLEDs(Color.kCyan, 2)));
         // Climb
         climb.resetButton.onTrue(climb.resetEncoder());
         // coralScoring.coralAtOuttake.and(RobotModeTriggers.teleop()).onTrue(elevator.p0());
