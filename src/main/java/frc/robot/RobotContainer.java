@@ -144,7 +144,8 @@ public class RobotContainer {
         RobotModeTriggers.disabled().onTrue(Commands.runOnce(() -> swerve.setMotorsZero()));
 
         /* Default Commands */
-        leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed));
+        leds.setDefaultCommand(leds.setPoliceLeds()); // Flashing Leds
+        // leds.setDefaultCommand(leds.setPoliceLeds());
         /* Button and Trigger Bindings */
 
         configureTriggerBindings();
@@ -210,8 +211,7 @@ public class RobotContainer {
 
         driver.rightTrigger().and(climb.reachedClimberStart)
             .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
-        driver.leftTrigger().onTrue(Commands.runOnce(() -> leds.setLEDsSolid(Color.kBlue))); // Cole
-                                                                                             // Added
+        driver.leftTrigger().onTrue(Commands.runOnce(() -> leds.setPoliceLeds())); // Cole
         coralScoring.coralAtOuttake.whileTrue(leds.setLEDsSolid(Color.kCyan));
     }
 

@@ -18,6 +18,7 @@ public class LEDs extends SubsystemBase {
     private final AddressableLED leds;
     private final AddressableLEDBuffer buffer;
     private final AddressableLEDBufferView leds_left;
+    private final AddressableLEDBufferView leds_right;
 
     LEDPattern rainbow = LEDPattern.rainbow(100, 255);
 
@@ -33,6 +34,7 @@ public class LEDs extends SubsystemBase {
         leds = new AddressableLED(Constants.LEDs.LED_PORT);
         buffer = new AddressableLEDBuffer(Constants.LEDs.LED_LENGTH);
         leds_left = buffer.createView(0, 59);
+        leds_right = buffer.createView(60, 119);
         leds.setLength(Constants.LEDs.LED_LENGTH);
         leds.start();
 
@@ -98,6 +100,20 @@ public class LEDs extends SubsystemBase {
     public Command setLEDsBreathe(Color color) {
         LEDPattern base = LEDPattern.solid(color);
         LEDPattern breathe = base.breathe(Seconds.of(2));
-        return run(() -> breathe.applyTo(buffer)).ignoringDisable(true);
+        return run(() -> breathe.applyTo(leds_left)).ignoringDisable(true);
+    }
+
+
+
+    public Command setPoliceLeds() {
+        LEDPattern notbase2 = LEDPattern.solid(Color.kBlue);
+        LEDPattern notbase3 = LEDPattern.solid(Color.kRed);
+        LEDPattern blink2 = notbase3.blink(Seconds.of(0.5)).overlayOn(notbase2);
+        LEDPattern blink = notbase2.blink(Seconds.of(0.5)).overlayOn(notbase3);
+        return run(() -> {
+            blink.applyTo(leds_right);
+            blink2.applyTo(leds_left);
+        }).ignoringDisable(true);
+
     }
 }
