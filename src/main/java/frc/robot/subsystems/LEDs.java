@@ -17,8 +17,6 @@ import frc.robot.Constants;
 public class LEDs extends SubsystemBase {
     private final AddressableLED leds;
     private final AddressableLEDBuffer buffer;
-    private final AddressableLEDBufferView leds_left;
-    private final AddressableLEDBufferView leds_right;
 
     LEDPattern rainbow = LEDPattern.rainbow(100, 255);
 
@@ -33,49 +31,12 @@ public class LEDs extends SubsystemBase {
     public LEDs() {
         leds = new AddressableLED(Constants.LEDs.LED_PORT);
         buffer = new AddressableLEDBuffer(Constants.LEDs.LED_LENGTH);
-        leds_left = buffer.createView(0, 59);
-        leds_right = buffer.createView(60, 119);
         leds.setLength(Constants.LEDs.LED_LENGTH);
         leds.start();
 
     }
 
-    /**
-     * Blink LEDs
-     *
-     * @param mainColor color to blink (on and off)
-     *
-     * @return Command to blink leds
-     */
-    public Command blinkLEDs(Color mainColor) {
-        LEDPattern colorToPattern = LEDPattern.solid(mainColor);
-        LEDPattern blinkPattern = colorToPattern.blink(Seconds.of(.5));
-        return run(() -> blinkPattern.applyTo(buffer)).ignoringDisable(true);
-    }
 
-    /**
-     * Blink LEDs for a certain timeout
-     *
-     * @param mainColor color to blink (on and off)
-     * @param timeout Number of seconds to blink
-     *
-     * @return Command to blink leds
-     */
-    public Command blinkLEDs(Color mainColor, double timeout) {
-        return blinkLEDs(mainColor).withTimeout(timeout);
-    }
-
-    /**
-     * Set LEDs to solid color
-     *
-     * @param color color to set the leds to solidly
-     *
-     * @return Command to set leds to a solid color
-     */
-    public Command setLEDsSolid(Color color) {
-        LEDPattern solidPattern = LEDPattern.solid(color);
-        return run(() -> solidPattern.applyTo(buffer)).ignoringDisable(true);
-    }
 
     /**
      * Set LEDs to color gradient
@@ -88,19 +49,6 @@ public class LEDs extends SubsystemBase {
     public Command setLEDsGradient(Color color, Color color2) {
         LEDPattern gradientPattern = LEDPattern.gradient(GradientType.kContinuous, color, color2);
         return run(() -> gradientPattern.applyTo(buffer)).ignoringDisable(true);
-    }
-
-    /**
-     * Set LEDs to breathe
-     *
-     * @param color Color to set leds to
-     *
-     * @return leds breathe command
-     */
-    public Command setLEDsBreathe(Color color) {
-        LEDPattern base = LEDPattern.solid(color);
-        LEDPattern breathe = base.breathe(Seconds.of(2));
-        return run(() -> breathe.applyTo(leds_left)).ignoringDisable(true);
     }
 
 
@@ -116,4 +64,126 @@ public class LEDs extends SubsystemBase {
         }).ignoringDisable(true);
 
     }
+
+    public class LEDsRight {
+        private final AddressableLEDBufferView leds_right;
+
+        LEDsRight() {
+            leds_right = buffer.createView(60, 119);
+
+        }
+
+
+        /**
+         * Blink LEDs
+         *
+         * @param mainColor color to blink (on and off)
+         *
+         * @return Command to blink leds
+         */
+        public Command blinkLEDs(Color mainColor) {
+            LEDPattern colorToPattern = LEDPattern.solid(mainColor);
+            LEDPattern blinkPattern = colorToPattern.blink(Seconds.of(.5));
+            return run(() -> blinkPattern.applyTo(leds_right)).ignoringDisable(true);
+        }
+
+        /**
+         * Blink LEDs for a certain timeout
+         *
+         * @param mainColor color to blink (on and off)
+         * @param timeout Number of seconds to blink
+         *
+         * @return Command to blink leds
+         */
+        public Command blinkLEDs(Color mainColor, double timeout) {
+            return blinkLEDs(mainColor).withTimeout(timeout);
+        }
+
+        /**
+         * Set LEDs to solid color
+         *
+         * @param color color to set the leds to solidly
+         *
+         * @return Command to set leds to a solid color
+         */
+        public Command setLEDsSolid(Color color) {
+            LEDPattern solidPattern = LEDPattern.solid(color);
+            return run(() -> solidPattern.applyTo(leds_right)).ignoringDisable(true);
+        }
+
+        /**
+         * Set LEDs to breathe
+         *
+         * @param color Color to set leds to
+         *
+         * @return leds breathe command
+         */
+        public Command setLEDsBreathe(Color color) {
+            LEDPattern base = LEDPattern.solid(color);
+            LEDPattern breathe = base.breathe(Seconds.of(2));
+            return run(() -> breathe.applyTo(leds_right)).ignoringDisable(true);
+        }
+    }
+
+    public class LEDsLeft {
+        private final AddressableLEDBufferView leds_left;
+
+        LEDsLeft() {
+            leds_left = buffer.createView(0, 59);
+
+        }
+
+
+        /**
+         * Blink LEDs
+         *
+         * @param mainColor color to blink (on and off)
+         *
+         * @return Command to blink leds
+         */
+        public Command blinkLEDs(Color mainColor) {
+            LEDPattern colorToPattern = LEDPattern.solid(mainColor);
+            LEDPattern blinkPattern = colorToPattern.blink(Seconds.of(.5));
+            return run(() -> blinkPattern.applyTo(leds_left)).ignoringDisable(true);
+        }
+
+        /**
+         * Blink LEDs for a certain timeout
+         *
+         * @param mainColor color to blink (on and off)
+         * @param timeout Number of seconds to blink
+         *
+         * @return Command to blink leds
+         */
+        public Command blinkLEDs(Color mainColor, double timeout) {
+            return blinkLEDs(mainColor).withTimeout(timeout);
+        }
+
+        /**
+         * Set LEDs to solid color
+         *
+         * @param color color to set the leds to solidly
+         *
+         * @return Command to set leds to a solid color
+         */
+        public Command setLEDsSolid(Color color) {
+            LEDPattern solidPattern = LEDPattern.solid(color);
+            return run(() -> solidPattern.applyTo(leds_left)).ignoringDisable(true);
+        }
+
+        /**
+         * Set LEDs to breathe
+         *
+         * @param color Color to set leds to
+         *
+         * @return leds breathe command
+         */
+        public Command setLEDsBreathe(Color color) {
+            LEDPattern base = LEDPattern.solid(color);
+            LEDPattern breathe = base.breathe(Seconds.of(2));
+            return run(() -> breathe.applyTo(leds_left)).ignoringDisable(true);
+        }
+    }
+
+
 }
