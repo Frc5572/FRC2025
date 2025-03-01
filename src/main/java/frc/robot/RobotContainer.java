@@ -13,6 +13,8 @@ import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
@@ -86,7 +88,10 @@ public class RobotContainer {
 
     /* Subsystems */
     private ElevatorAlgae algae;
-    private LEDs leds = new LEDs();
+    private final AddressableLED leds = new AddressableLED(Constants.LEDs.LED_PORT);
+    private final AddressableLEDBuffer buffer = new AddressableLEDBuffer(Constants.LEDs.LED_LENGTH);
+    private LEDs ledsright = new LEDs(buffer, leds, 0, 59);
+    private LEDs ledsleft = new LEDs(buffer, leds, 60, 119);
     private Elevator elevator;
     private final Swerve swerve;
     private final Vision vision;
@@ -134,7 +139,7 @@ public class RobotContainer {
             swerve::followTrajectory, true, swerve);
 
         AutoCommandFactory autos =
-            new AutoCommandFactory(autoFactory, swerve, elevator, coralScoring, leds);
+            new AutoCommandFactory(autoFactory, swerve, elevator, coralScoring, ledsright);
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Example", autos::example);
 
@@ -144,7 +149,9 @@ public class RobotContainer {
         RobotModeTriggers.disabled().onTrue(Commands.runOnce(() -> swerve.setMotorsZero()));
 
         /* Default Commands */
-        leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed));
+        ledsright.setDefaultCommand(ledsright.setLEDsBreathe(Color.kRed));
+        ledsleft.setDefaultCommand(ledsleft.setLEDsBreathe(Color.kRed));
+
         /* Button and Trigger Bindings */
 
         configureTriggerBindings();
@@ -210,6 +217,10 @@ public class RobotContainer {
 
         driver.rightTrigger().and(climb.reachedClimberStart)
             .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
+        coralScoring.coralAtOuttake.whileTrue(
+            ledsright.setLEDsSolid(Color.kCyan).alongWith(ledsleft.setLEDsSolid(Color.kCyan)));
+
+
     }
 
     private void setupAltOperatorController() {
@@ -245,13 +256,18 @@ public class RobotContainer {
 
     private void configureTriggerBindings() {
         // Coral
-        coralScoring.coralAtIntake.whileTrue(leds.setLEDsSolid(Color.kOrange));
-        coralScoring.coralAtOuttake.whileTrue(leds.setLEDsSolid(Color.kCyan));
+        coralScoring.coralAtIntake.whileTrue(
+            ledsright.setLEDsSolid(Color.kBlue).alongWith(ledsleft.setLEDsSolid(Color.kBlue)));
+        coralScoring.coralAtOuttake.whileTrue(
+            ledsright.setLEDsSolid(Color.kCyan).alongWith(ledsleft.setLEDsSolid(Color.kCyan)));
+        vision.seesTwoAprilTags.whileTrue(ledsright.setRainbow().alongWith(ledsleft.setRainbow()));
+
+
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
         // Algae
-        algae.hasAlgae.and(coralScoring.coralAtOuttake.negate())
-            .onTrue(leds.blinkLEDs(Color.kCyan, 2));
+        algae.hasAlgae.and(coralScoring.coralAtOuttake.negate()).onTrue(
+            ledsright.blinkLEDs(Color.kCyan, 2).alongWith(ledsleft.blinkLEDs(Color.kCyan, 2)));
         // Climb
         climb.resetButton.onTrue(climb.resetEncoder());
         // coralScoring.coralAtOuttake.and(RobotModeTriggers.teleop()).onTrue(elevator.p0());
