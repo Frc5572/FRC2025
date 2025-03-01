@@ -77,11 +77,11 @@ public class AutoCommandFactory {
         new Pose2d(7.578684329986572, 3.9847824573516846, Rotation2d.k180deg);
 
     /**
-     * Example Auto Routine
+     * Left L4 Auto
      *
      * @return Auto Routine
      */
-    public AutoRoutine test() {
+    public AutoRoutine l4left() {
         AutoRoutine routine = autoFactory.newRoutine("Test");
 
         routine.active()
@@ -108,11 +108,11 @@ public class AutoCommandFactory {
     }
 
     /**
-     * Example Auto Routine
+     * Right L4 Auto
      *
      * @return Auto Routine
      */
-    public AutoRoutine test2() {
+    public AutoRoutine l4right() {
         AutoRoutine routine = autoFactory.newRoutine("Test2");
 
         routine.active()

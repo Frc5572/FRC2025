@@ -143,8 +143,8 @@ public class RobotContainer {
             new AutoCommandFactory(autoFactory, swerve, elevator, coralScoring, algae, ledsleft);
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Example", autos::example);
-        autoChooser.addRoutine("TestAuto", autos::test);
-        autoChooser.addRoutine("TestAutoRight", autos::test2);
+        autoChooser.addRoutine("L4 Left", autos::l4left);
+        autoChooser.addRoutine("L4 Right", autos::l4right);
         autoChooser.addRoutine("Barge", autos::barge);
 
 
@@ -222,16 +222,16 @@ public class RobotContainer {
 
         driver.rightTrigger().and(climb.reachedClimberStart)
             .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
-        driver.a().and(operator.hasReefLocation())
-            .whileTrue(CommandFactory
-                .autoScore(swerve, elevator, coralScoring, algae, operator::getDesiredLocation,
-                    operator::getDesiredHeight)
-                .andThen(CommandFactory.selectFeeder(swerve, elevator, operator::feeder))
-                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming))
-            .negate().onTrue(coralScoring.runCoralIntake());
-        driver.b().whileTrue(CommandFactory.selectFeeder(swerve, elevator, operator::feeder)
-            .andThen(swerve.run(() -> {
-            })));
+        driver.a().and(operator.hasReefLocation()).whileTrue(CommandFactory
+            .autoScore(swerve, elevator, coralScoring, algae, operator::getDesiredLocation,
+                operator::getDesiredHeight)
+            .andThen(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder))
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)).negate()
+            .onTrue(coralScoring.runCoralIntake());
+        driver.b()
+            .whileTrue(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)
+                .andThen(swerve.run(() -> {
+                })));
     }
 
     private void setupAltOperatorController() {
