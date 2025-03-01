@@ -1,8 +1,11 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Percent;
+import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.AddressableLEDBufferView;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj.util.Color;
@@ -16,8 +19,11 @@ import frc.robot.Constants;
 public class LEDs extends SubsystemBase {
     private final AddressableLED leds;
     private final AddressableLEDBuffer buffer;
+    private final AddressableLEDBufferView chosenLEDside;
 
-    LEDPattern rainbow = LEDPattern.rainbow(100, 255);
+
+    LEDPattern rainbow = LEDPattern.rainbow(255, 128);
+    LEDPattern rainbowPattern = rainbow.scrollAtRelativeSpeed(Percent.per(Second).of(100));
 
     @Override
     public void periodic() {
@@ -27,9 +33,10 @@ public class LEDs extends SubsystemBase {
     /**
      * constructor
      */
-    public LEDs() {
-        leds = new AddressableLED(Constants.LEDs.LED_PORT);
-        buffer = new AddressableLEDBuffer(Constants.LEDs.LED_LENGTH);
+    public LEDs(AddressableLEDBuffer passedBuffer, AddressableLED passedLEDs, int start, int end) {
+        leds = passedLEDs;
+        buffer = passedBuffer;
+        chosenLEDside = buffer.createView(start, end);
         leds.setLength(Constants.LEDs.LED_LENGTH);
         leds.start();
 
@@ -45,7 +52,7 @@ public class LEDs extends SubsystemBase {
     public Command blinkLEDs(Color mainColor) {
         LEDPattern colorToPattern = LEDPattern.solid(mainColor);
         LEDPattern blinkPattern = colorToPattern.blink(Seconds.of(.5));
-        return run(() -> blinkPattern.applyTo(buffer)).ignoringDisable(true);
+        return run(() -> blinkPattern.applyTo(chosenLEDside)).ignoringDisable(true);
     }
 
     /**
@@ -69,7 +76,7 @@ public class LEDs extends SubsystemBase {
      */
     public Command setLEDsSolid(Color color) {
         LEDPattern solidPattern = LEDPattern.solid(color);
-        return run(() -> solidPattern.applyTo(buffer)).ignoringDisable(true);
+        return run(() -> solidPattern.applyTo(chosenLEDside)).ignoringDisable(true);
     }
 
     /**
@@ -82,7 +89,7 @@ public class LEDs extends SubsystemBase {
      */
     public Command setLEDsGradient(Color color, Color color2) {
         LEDPattern gradientPattern = LEDPattern.gradient(GradientType.kContinuous, color, color2);
-        return run(() -> gradientPattern.applyTo(buffer)).ignoringDisable(true);
+        return run(() -> gradientPattern.applyTo(chosenLEDside)).ignoringDisable(true);
     }
 
     /**
@@ -95,6 +102,51 @@ public class LEDs extends SubsystemBase {
     public Command setLEDsBreathe(Color color) {
         LEDPattern base = LEDPattern.solid(color);
         LEDPattern breathe = base.breathe(Seconds.of(2));
-        return run(() -> breathe.applyTo(buffer)).ignoringDisable(true);
+        return run(() -> breathe.applyTo(chosenLEDside)).ignoringDisable(true);
     }
+
+
+    /**
+     * Set LEDs to police pattern/color
+     *
+     *
+     *
+     *
+     */
+    public Command setPoliceLeds(Boolean isRight) {
+        if (isRight) {
+            LEDPattern notbase2 = LEDPattern.solid(Color.kRed);
+            LEDPattern notbase3 = LEDPattern.solid(Color.kBlue);
+            LEDPattern blink = notbase2.blink(Seconds.of(0.5)).overlayOn(notbase3);
+            return run(() -> {
+                blink.applyTo(chosenLEDside);
+            }).ignoringDisable(true);
+
+        } else {
+            LEDPattern notbase2 = LEDPattern.solid(Color.kBlue);
+            LEDPattern notbase3 = LEDPattern.solid(Color.kRed);
+            LEDPattern blink = notbase2.blink(Seconds.of(0.5)).overlayOn(notbase3);
+            return run(() -> {
+                blink.applyTo(chosenLEDside);
+            }).ignoringDisable(true);
+        }
+
+
+    }
+
+    /**
+     * Sets specified LED side to Rainbow even when disabled
+     *
+     *
+     *
+     *
+     */
+    public Command setRainbow() {
+        return run(() -> {
+            rainbowPattern.applyTo(chosenLEDside);
+        }).ignoringDisable(true);
+
+    }
+
+
 }
