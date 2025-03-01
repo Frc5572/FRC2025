@@ -131,5 +131,12 @@ public class LEDs extends SubsystemBase {
 
     }
 
+    public Command setRainbow() {
+        return run(() -> {
+            rainbow.applyTo(chosenLEDside);
+        }).ignoringDisable(true);
+
+    }
+
 
 }

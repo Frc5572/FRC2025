@@ -149,8 +149,9 @@ public class RobotContainer {
         RobotModeTriggers.disabled().onTrue(Commands.runOnce(() -> swerve.setMotorsZero()));
 
         /* Default Commands */
-        ledsright.setDefaultCommand(
-            ledsright.setLEDsBreathe(Color.kRed).alongWith(ledsleft.setLEDsBreathe(Color.kRed)));
+        ledsright.setDefaultCommand(ledsright.setLEDsBreathe(Color.kRed));
+        ledsleft.setDefaultCommand(ledsleft.setLEDsBreathe(Color.kRed));
+
         /* Button and Trigger Bindings */
 
         configureTriggerBindings();
@@ -219,6 +220,7 @@ public class RobotContainer {
         coralScoring.coralAtOuttake.whileTrue(
             ledsright.setLEDsSolid(Color.kCyan).alongWith(ledsleft.setLEDsSolid(Color.kCyan)));
 
+
     }
 
     private void setupAltOperatorController() {
@@ -258,6 +260,8 @@ public class RobotContainer {
             ledsright.setLEDsSolid(Color.kBlue).alongWith(ledsleft.setLEDsSolid(Color.kBlue)));
         coralScoring.coralAtOuttake.whileTrue(
             ledsright.setLEDsSolid(Color.kCyan).alongWith(ledsleft.setLEDsSolid(Color.kCyan)));
+        vision.seesTwoAprilTags.whileTrue(ledsright.setRainbow().alongWith(ledsleft.setRainbow()));
+
 
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());

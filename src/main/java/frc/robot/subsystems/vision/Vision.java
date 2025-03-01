@@ -11,6 +11,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.IntArrayList;
 import frc.lib.util.Tuples.Tuple3;
 import frc.robot.Constants;
@@ -26,6 +27,9 @@ public class Vision extends SubsystemBase {
     private final RobotState state;
 
     private final Transform3d[] robotToCamera;
+
+    private boolean seesMultitag = false;
+    public Trigger seesTwoAprilTags = new Trigger(() -> twoAprilTags());
 
     /** Vision Subsystem */
     public Vision(RobotState state, Function<Constants.Vision.CameraConstants[], VisionIO> io) {
@@ -59,12 +63,17 @@ public class Vision extends SubsystemBase {
                 results.add(new Tuple3<>(i, transform, result));
             }
         }
+
         results.sort(
             (a, b) -> Double.compare(a._2().getTimestampSeconds(), b._2().getTimestampSeconds()));
         for (var result : results) {
+            if (result._2().multitagResult.isPresent()) {
+                seesMultitag = true;
+            } else {
+                seesMultitag = false;
+            }
             state.addVisionObservation(result._2(), result._1(), result._0());
         }
-
         // Viz
         Pose3d robotPose = new Pose3d(state.getGlobalPoseEstimate());
         for (int i = 0; i < cameraInputs.length; i++) {
@@ -86,6 +95,12 @@ public class Vision extends SubsystemBase {
                 Logger.recordOutput("Vision/Camera" + i + "/AprilTagsCached", draw);
             }
         }
+
+
+    }
+
+    public boolean twoAprilTags() {
+        return seesMultitag && edu.wpi.first.wpilibj.RobotState.isDisabled();
     }
 
 }
