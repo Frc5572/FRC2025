@@ -13,6 +13,8 @@ import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
@@ -27,10 +29,7 @@ import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
-import frc.robot.commands.policeLights;
 import frc.robot.subsystems.LEDs;
-import frc.robot.subsystems.LEDs.LEDsLeft;
-import frc.robot.subsystems.LEDs.LEDsRight;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberReal;
@@ -89,16 +88,16 @@ public class RobotContainer {
 
     /* Subsystems */
     private ElevatorAlgae algae;
-    private LEDs leds = new LEDs();
+    private final AddressableLED leds = new AddressableLED(Constants.LEDs.LED_PORT);
+    private final AddressableLEDBuffer buffer = new AddressableLEDBuffer(Constants.LEDs.LED_LENGTH);
+    private LEDs ledsright = new LEDs(buffer, leds, 0, 59);
+    private LEDs ledsleft = new LEDs(buffer, leds, 60, 119);
     private Elevator elevator;
     private final Swerve swerve;
     private final Vision vision;
     private CoralScoring coralScoring;
     private Climber climb;
     private OperatorStates operatorStates = new OperatorStates();
-    private LEDsLeft ledsLeft = new LEDs.LEDsLeft();
-    private LEDsRight ledsRight = new LEDs.LEDsRight();
-    private policeLights police = new policeLights(ledsLeft, ledsRight);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -139,8 +138,8 @@ public class RobotContainer {
         autoFactory = new AutoFactory(swerve::getPose, swerve::resetOdometry,
             swerve::followTrajectory, true, swerve);
 
-        AutoCommandFactory autos = new AutoCommandFactory(autoFactory, swerve, elevator,
-            coralScoring, leds, ledsLeft, ledsRight);
+        AutoCommandFactory autos =
+            new AutoCommandFactory(autoFactory, swerve, elevator, coralScoring, ledsright);
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Example", autos::example);
 
@@ -150,8 +149,8 @@ public class RobotContainer {
         RobotModeTriggers.disabled().onTrue(Commands.runOnce(() -> swerve.setMotorsZero()));
 
         /* Default Commands */
-        leds.setDefaultCommand(police.setPoliceLeds()); // Flashing Leds
-        // leds.setDefaultCommand(leds.setPoliceLeds());
+        ledsright.setDefaultCommand(
+            ledsright.setPoliceLeds(true).alongWith(ledsleft.setPoliceLeds(false)));
         /* Button and Trigger Bindings */
 
         configureTriggerBindings();
@@ -217,9 +216,9 @@ public class RobotContainer {
 
         driver.rightTrigger().and(climb.reachedClimberStart)
             .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
-        driver.leftTrigger().onTrue(Commands.runOnce(() -> police.setPoliceLeds())); // Cole
-        coralScoring.coralAtOuttake.whileTrue(Commands.parallel(ledsLeft.setLEDsSolid(Color.kCyan),
-            ledsRight.setLEDsSolid(Color.kCyan)));
+        coralScoring.coralAtOuttake.whileTrue(
+            ledsright.setLEDsSolid(Color.kCyan).alongWith(ledsleft.setLEDsSolid(Color.kCyan)));
+
     }
 
     private void setupAltOperatorController() {
@@ -255,16 +254,16 @@ public class RobotContainer {
 
     private void configureTriggerBindings() {
         // Coral
-        coralScoring.coralAtIntake.whileTrue(Commands.parallel(ledsLeft.setLEDsSolid(Color.kBlue),
-            ledsRight.setLEDsSolid(Color.kBlue)));
-        coralScoring.coralAtOuttake.whileTrue(Commands.parallel(ledsLeft.setLEDsSolid(Color.kCyan),
-            ledsRight.setLEDsSolid(Color.kCyan)));
+        coralScoring.coralAtIntake.whileTrue(
+            ledsright.setLEDsSolid(Color.kBlue).alongWith(ledsleft.setLEDsSolid(Color.kBlue)));
+        coralScoring.coralAtOuttake.whileTrue(
+            ledsright.setLEDsSolid(Color.kCyan).alongWith(ledsleft.setLEDsSolid(Color.kCyan)));
 
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
         // Algae
-        algae.hasAlgae.and(coralScoring.coralAtOuttake.negate()).onTrue(Commands
-            .parallel(ledsLeft.blinkLEDs(Color.kCyan, 2), ledsRight.blinkLEDs(Color.kCyan, 2)));
+        algae.hasAlgae.and(coralScoring.coralAtOuttake.negate()).onTrue(
+            ledsright.blinkLEDs(Color.kCyan, 2).alongWith(ledsleft.blinkLEDs(Color.kCyan, 2)));
         // Climb
         climb.resetButton.onTrue(climb.resetEncoder());
         // coralScoring.coralAtOuttake.and(RobotModeTriggers.teleop()).onTrue(elevator.p0());

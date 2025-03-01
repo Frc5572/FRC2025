@@ -8,8 +8,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.MoveToPose;
 import frc.robot.subsystems.LEDs;
-import frc.robot.subsystems.LEDs.LEDsLeft;
-import frc.robot.subsystems.LEDs.LEDsRight;
 import frc.robot.subsystems.coral.CoralScoring;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.swerve.Swerve;
@@ -24,8 +22,6 @@ public class AutoCommandFactory {
     Elevator elevator;
     CoralScoring coral;
     LEDs leds;
-    LEDsLeft ledsLeft;
-    LEDsRight ledsRight;
 
     /**
      * Command Factory for Autos
@@ -37,14 +33,12 @@ public class AutoCommandFactory {
      * @param leds LED Subsystem
      */
     public AutoCommandFactory(AutoFactory autoFactory, Swerve swerve, Elevator elevator,
-        CoralScoring coral, LEDs leds, LEDsLeft ledsLeft, LEDsRight ledsRight) {
+        CoralScoring coral, LEDs leds) {
         this.autoFactory = autoFactory;
         this.swerve = swerve;
         this.elevator = elevator;
         this.coral = coral;
         this.leds = leds;
-        this.ledsLeft = ledsLeft;
-        this.ledsRight = ledsRight;
     }
 
     /**
@@ -64,10 +58,8 @@ public class AutoCommandFactory {
             .onTrue(Commands.sequence(
                 Commands.runOnce(() -> swerve
                     .resetOdometry(new Pose2d(FieldConstants.Barge.middleCage, new Rotation2d()))),
-                Commands.parallel(ledsLeft.blinkLEDs(Color.kGreen, 5),
-                    ledsRight.blinkLEDs(Color.kGreen, 5))));
-        testMTP.done().onTrue(Commands.parallel(ledsLeft.blinkLEDs(Color.kPurple, 5),
-            ledsRight.blinkLEDs(Color.kPurple, 5)));
+                leds.blinkLEDs(Color.kGreen, 5), testMTP));
+        testMTP.done().onTrue(leds.blinkLEDs(Color.kPurple, 5));
         return routine;
     }
 }
