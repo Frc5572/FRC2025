@@ -143,34 +143,25 @@ public class AutoCommandFactory {
     public AutoRoutine barge() {
 
         AutoRoutine routine = autoFactory.newRoutine("Barge");
-//@formatter:off
+
         routine.active().onTrue(Commands.sequence(swerve.runOnce(() -> {
-            swerve.resetOdometry(AllianceFlipUtil.apply(middleStart)); //start at middle
-        }), CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.H, () -> { //take off algae in back
+            swerve.resetOdometry(AllianceFlipUtil.apply(middleStart));
+        }), CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.H, () -> {
             boolean AlgaeIsHigh = SmartDashboard.getBoolean("isHigh", false);
             return (AlgaeIsHigh) ? Height.KP2 : Height.KP0;
-        }), CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.H, //score lvl 4 coral
-            () -> Height.KP4), CommandFactory.barge(swerve, elevator), //travel to barge
-            elevator.moveTo(() -> ScoringLocation.Height.KP5.height), //move elevator up to barge
-            algae.runAlgaeMotor(Constants.Algae.VOLTAGE) //run algae motor for 1 second
-                .withDeadline(Commands.waitSeconds(.25)),CommandFactory.ensureHome(elevator).andThen( //go home
-            CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.J, () -> { //go to j and grap algae
-                boolean AlgaeIsHigh = SmartDashboard.getBoolean("isHigh", false);
-                return (AlgaeIsHigh) ? Height.KP0 : Height.KP2;
-            })),CommandFactory.ensureHome(elevator).andThen(CommandFactory.barge(swerve, elevator)), // go home then travel to barge
-            elevator.moveTo(() -> ScoringLocation.Height.KP5.height),// move elevator to barge
-            algae.runAlgaeMotor(Constants.Algae.VOLTAGE).withDeadline(Commands.waitSeconds(.5)), CommandFactory.ensureHome(elevator), swerve.stop())); //score
+        }), CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.H,
+            () -> Height.KP4), CommandFactory.barge(swerve, elevator),
+            elevator.moveTo(() -> ScoringLocation.Height.KP5.height),
+            algae.runAlgaeMotor(Constants.Algae.VOLTAGE).withDeadline(Commands.waitSeconds(.25)),
+            CommandFactory.ensureHome(elevator).andThen(CommandFactory.autoScore(swerve, elevator,
+                coral, algae, () -> CoralLocation.J, () -> {
+                    boolean AlgaeIsHigh = SmartDashboard.getBoolean("isHigh", false);
+                    return (AlgaeIsHigh) ? Height.KP0 : Height.KP2;
+                })),
+            CommandFactory.ensureHome(elevator).andThen(CommandFactory.barge(swerve, elevator)),
+            elevator.moveTo(() -> ScoringLocation.Height.KP5.height),
+            algae.runAlgaeMotor(Constants.Algae.VOLTAGE).withDeadline(Commands.waitSeconds(.5)),
+            CommandFactory.ensureHome(elevator), swerve.stop()));
         return routine;
     }
-    /*
-     * start center
-     * go to h and grab algae
-     * score lvl 4 h
-     * elevator down
-     * go to barge and score
-     * go to j and grab algae
-     * elevator down
-     * go to barge and score
-     */
-    // @formatter:on
 }
