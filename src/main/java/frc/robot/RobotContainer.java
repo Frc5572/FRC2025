@@ -150,7 +150,7 @@ public class RobotContainer {
 
         /* Default Commands */
         ledsright.setDefaultCommand(
-            ledsright.setPoliceLeds(true).alongWith(ledsleft.setPoliceLeds(false)));
+            ledsright.setLEDsBreathe(Color.kRed).alongWith(ledsleft.setLEDsBreathe(Color.kRed)));
         /* Button and Trigger Bindings */
 
         configureTriggerBindings();
