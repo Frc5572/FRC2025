@@ -276,11 +276,12 @@ public class Swerve extends SubsystemBase {
      * @param fieldRelative Whether the movement is relative to the field or absolute
      * @param openLoop Open or closed loop system
      */
+
     public Command teleOpDrive(CommandXboxController controller, boolean fieldRelative,
         boolean openLoop) {
-        SlewRateLimiter slewRateLimiterX = new SlewRateLimiter(6);
-        SlewRateLimiter slewRateLimiterY = new SlewRateLimiter(6);
-        SlewRateLimiter slewRateLimiterAngle = new SlewRateLimiter(6);
+        SlewRateLimiter slewRateLimiterX = new SlewRateLimiter(1.4);
+        SlewRateLimiter slewRateLimiterY = new SlewRateLimiter(1.4);
+        SlewRateLimiter slewRateLimiterAngle = new SlewRateLimiter(2.5);
         return this.run(() -> {
             double yaxis = -controller.getLeftY();
             double xaxis = -controller.getLeftX();
@@ -291,11 +292,25 @@ public class Swerve extends SubsystemBase {
             // xaxis *= xaxis * Math.signum(xaxis);
             // yaxis *= yaxis * Math.signum(yaxis);
             raxis = (Math.abs(raxis) < Constants.STICK_DEADBAND) ? 0 : raxis;
-            Translation2d translation = new Translation2d(slewRateLimiterY.calculate(yaxis),
-                slewRateLimiterX.calculate(xaxis)).times(Constants.Swerve.maxSpeed)
-                    .times(setSpeedMultiplier);
-            double rotation = slewRateLimiterAngle.calculate(raxis)
-                * Constants.Swerve.maxAngularVelocity * setSpeedMultiplier;
+
+            double slewX = slewRateLimiterX.calculate(xaxis);
+            if (Math.abs(xaxis) < 0.1) {
+                slewX = xaxis;
+            }
+
+            double slewY = slewRateLimiterY.calculate(yaxis);
+            if (Math.abs(yaxis) < 0.1) {
+                slewY = yaxis;
+            }
+
+            Double slewR = slewRateLimiterAngle.calculate(raxis);
+            if (Math.abs(raxis) < 0.1) {
+                slewR = raxis;
+            }
+
+            Translation2d translation = new Translation2d(slewY, slewX)
+                .times(Constants.Swerve.maxSpeed).times(setSpeedMultiplier);
+            double rotation = slewR * Constants.Swerve.maxAngularVelocity * setSpeedMultiplier;
             this.drive(translation, rotation, fieldRelative, openLoop);
         });
     }
