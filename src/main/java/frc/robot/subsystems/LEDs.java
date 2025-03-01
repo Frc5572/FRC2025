@@ -103,7 +103,13 @@ public class LEDs extends SubsystemBase {
     }
 
 
-
+    /**
+     * Set LEDs to police pattern/color
+     *
+     *
+     *
+     *
+     */
     public Command setPoliceLeds(Boolean isRight) {
         if (isRight) {
             LEDPattern notbase2 = LEDPattern.solid(Color.kRed);
