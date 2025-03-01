@@ -131,6 +131,13 @@ public class LEDs extends SubsystemBase {
 
     }
 
+    /**
+     * Sets specified LED side to Rainbow even when disabled
+     *
+     *
+     *
+     *
+     */
     public Command setRainbow() {
         return run(() -> {
             rainbow.applyTo(chosenLEDside);
