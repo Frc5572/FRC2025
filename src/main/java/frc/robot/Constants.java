@@ -382,9 +382,9 @@ public final class Constants {
             new CameraConstants("cam1", 600, 800, Rotation2d.fromDegrees(60), Hertz.of(40),
                 Seconds.of(0.15), Seconds.of(0.02), 0.27, 0.08,
                 new Transform3d(
-                    new Translation3d(Units.inchesToMeters(11), Units.inchesToMeters(13.5),
+                    new Translation3d(Units.inchesToMeters(9.2), Units.inchesToMeters(13.5),
                         Units.inchesToMeters(10)),
-                    new Rotation3d(0, -Units.degreesToRadians(5), -Units.degreesToRadians(55))),
+                    new Rotation3d(0, 0, -Units.degreesToRadians(45))),
                 Units.inchesToMeters(0.0))};
 
         public static final double zMargin = 0.75;
@@ -401,7 +401,7 @@ public final class Constants {
         public static final LoggedTunableNumber globalVisionTrustRotation =
             new LoggedTunableNumber("globalVisionTrustRotation", 0.5);
         public static final LoggedTunableNumber localVisionTrust =
-            new LoggedTunableNumber("localVisionTrust", 0.02);
+            new LoggedTunableNumber("localVisionTrust", 0.2);
     }
 
     /**
@@ -418,18 +418,18 @@ public final class Constants {
      * MoveToPos constants.
      */
     public static class SwerveTransformPID {
-        public static final double PID_XKP = 10.0;
+        public static final double PID_XKP = 1.0;
         public static final double PID_XKI = 0.0;
         public static final double PID_XKD = 0.0;
-        public static final double PID_TKP = 8.0;
+        public static final double PID_TKP = 3.0;
         public static final double PID_TKI = 0.0;
         public static final double PID_TKD = 0.0;
 
         public static final double MAX_VELOCITY = 2;
         public static final double MAX_ACCELERATION = 3;
 
-        public static final double MAX_ANGULAR_VELOCITY = 8.9;
-        public static final double MAX_ANGULAR_ACCELERATION = 30;
+        public static final double MAX_ANGULAR_VELOCITY = 2.9;
+        public static final double MAX_ANGULAR_ACCELERATION = 8;
     }
 
     public static final Rotation2d CIRCLE_REEF_LOOKAHEAD_ANGLE = Rotation2d.fromDegrees(15);

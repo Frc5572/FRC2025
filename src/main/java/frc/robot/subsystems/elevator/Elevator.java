@@ -47,6 +47,10 @@ public class Elevator extends SubsystemBase {
         LoggedTracer.record("Elevator");
     }
 
+    public Distance getHeight() {
+        return inputs.position;
+    }
+
     /**
      * moves elevator to home
      *
@@ -54,9 +58,9 @@ public class Elevator extends SubsystemBase {
      *
      */
     public Command home() {
-        Command slowLower = Commands.runEnd(() -> io.setVoltage(-1.4), () -> io.setVoltage(0.0));
+        Command slowLower = this.runEnd(() -> io.setVoltage(-1.4), () -> io.setVoltage(0.0));
         return moveTo(() -> Constants.Elevator.HOME).until(() -> inputs.position.in(Inches) < 5.0)
-            .andThen(slowLower).until(limitSwitchTouched).andThen(Commands.runOnce(() -> {
+            .andThen(slowLower.until(limitSwitchTouched)).andThen(this.runOnce(() -> {
                 io.resetHome();
                 Logger.recordOutput(Constants.Elevator.heightName, "home");
             }));

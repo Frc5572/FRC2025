@@ -91,7 +91,7 @@ public class Viz2025 implements Drawable {
             }
         } else {
             mechanisms[BLUE_BUMPER] = invisible;
-            mechanisms[RED_BUMPER] = invisible;
+            mechanisms[RED_BUMPER] = useBumper;
         }
         this.estimatedPose = estimatedPose;
         if (RobotBase.isReal()) {

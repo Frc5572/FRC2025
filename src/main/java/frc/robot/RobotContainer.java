@@ -1,6 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Radians;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -19,6 +18,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -139,6 +139,7 @@ public class RobotContainer {
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Example", autos::example);
         autoChooser.addRoutine("TestAuto", autos::test);
+        autoChooser.addRoutine("TestAutoRight", autos::test2);
         autoChooser.addRoutine("Barge", autos::barge);
 
 
@@ -220,8 +221,8 @@ public class RobotContainer {
                 .autoScore(swerve, elevator, coralScoring, algae, operator::getDesiredLocation,
                     operator::getDesiredHeight)
                 .andThen(CommandFactory.selectFeeder(swerve, elevator, operator::feeder))
-                .andThen(swerve.run(() -> {
-                })));
+                .deadlineFor(leds.blinkLEDs(Color.kOrange))
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
         driver.b().whileTrue(CommandFactory.selectFeeder(swerve, elevator, operator::feeder)
             .andThen(swerve.run(() -> {
             })));
@@ -255,8 +256,8 @@ public class RobotContainer {
             Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero))));
         // remove later
         SmartDashboard.putNumber("elevatorTargetHeight", 20);
-        driver.a().whileTrue(
-            elevator.moveTo(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
+        // driver.a().whileTrue(
+        // elevator.moveTo(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
         climb.resetButton.and(pitController.y()).onTrue(climb.resetEncoder());
     }
 

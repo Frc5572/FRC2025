@@ -16,30 +16,30 @@ public class ScoringLocation {
     /** Reef locations */
     public static enum CoralLocation {
         // @formatter:off
-        A(coralPose(Rotation2d.kZero, true), 18),
-        B(coralPose(Rotation2d.kZero, false), 18),
-        C(coralPose(Rotation2d.fromDegrees(60), true), 17),
-        D(coralPose(Rotation2d.fromDegrees(60), false), 17),
-        E(coralPose(Rotation2d.fromDegrees(120), true), 22),
-        F(coralPose(Rotation2d.fromDegrees(120), false), 22),
-        G(coralPose(Rotation2d.k180deg, true), 21),
-        H(coralPose(Rotation2d.k180deg, false), 21),
-        I(coralPose(Rotation2d.fromDegrees(240), true), 20),
-        J(coralPose(Rotation2d.fromDegrees(240), false), 20),
-        K(coralPose(Rotation2d.fromDegrees(300), true), 19),
-        L(coralPose(Rotation2d.fromDegrees(300), false), 19);
+        A(coralPose(Rotation2d.kZero, true, 0), 18),
+        B(coralPose(Rotation2d.kZero, false, 0), 18),
+        C(coralPose(Rotation2d.fromDegrees(60), true, 0), 17),
+        D(coralPose(Rotation2d.fromDegrees(60), false, 0), 17),
+        E(coralPose(Rotation2d.fromDegrees(120), true, 0), 22),
+        F(coralPose(Rotation2d.fromDegrees(120), false, 0), 22),
+        G(coralPose(Rotation2d.k180deg, true, 0), 21),
+        H(coralPose(Rotation2d.k180deg, false, 0), 21),
+        I(coralPose(Rotation2d.fromDegrees(240), true, -2.5), 20),
+        J(coralPose(Rotation2d.fromDegrees(240), false, -1.5), 20),
+        K(coralPose(Rotation2d.fromDegrees(300), true, 0), 19),
+        L(coralPose(Rotation2d.fromDegrees(300), false, 0), 19);
         // @formatter:on
 
         public final Pose2d pose;
         public final int tag;
 
-        private static Pose2d coralPose(Rotation2d direction, boolean offset) {
+        private static Pose2d coralPose(Rotation2d direction, boolean offset, double customOffset) {
             return new Pose2d(FieldConstants.Reef.center
                 .plus(new Translation2d(
                     FieldConstants.Reef.inscribedRadius.in(Meters)
                         + Constants.Swerve.bumperFront.in(Meters),
                     direction.plus(Rotation2d.k180deg)))
-                .plus(new Translation2d(Units.inchesToMeters(offset ? 13.5 : 1.25),
+                .plus(new Translation2d(Units.inchesToMeters((offset ? 12 : 0) + customOffset),
                     direction.plus(Rotation2d.kCCW_90deg))),
                 direction);
         }

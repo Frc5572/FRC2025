@@ -1,10 +1,12 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
@@ -25,6 +27,13 @@ import frc.robot.subsystems.swerve.Swerve;
  */
 public class CommandFactory {
 
+    public static Command dropAlgaeIntake(Swerve swerve) {
+        return new MoveToPose(swerve, () -> {
+            return swerve.getPose()
+                .plus(new Transform2d(Units.inchesToMeters(10), 0, Rotation2d.kZero));
+        }, () -> 5.0, false, Units.inchesToMeters(2), 10).andThen(swerve.stop());
+    }
+
     public static Command reefPreAlign(Swerve swerve,
         Supplier<ScoringLocation.CoralLocation> location) {
         return new MoveAndAvoidReef(swerve, () -> {
@@ -43,9 +52,9 @@ public class CommandFactory {
 
             return new Pose2d(
                 finalLoc.getTranslation()
-                    .minus(new Translation2d(Units.inchesToMeters(0.75), finalLoc.getRotation())),
+                    .minus(new Translation2d(Units.inchesToMeters(1.0), finalLoc.getRotation())),
                 finalLoc.getRotation());
-        }, () -> 0.8, true, Units.inchesToMeters(0.25), 2);
+        }, () -> 0.3, true, Units.inchesToMeters(0.25), 0.2);
     }
 
     public static Command backAwayReef(Swerve swerve,
@@ -54,9 +63,9 @@ public class CommandFactory {
             Pose2d finalLoc = location.get().pose;
             return new Pose2d(
                 finalLoc.getTranslation()
-                    .minus(new Translation2d(Units.inchesToMeters(12), finalLoc.getRotation())),
+                    .minus(new Translation2d(Units.inchesToMeters(16), finalLoc.getRotation())),
                 finalLoc.getRotation());
-        }, () -> 1.0, true, Units.inchesToMeters(4), 5).withTimeout(1.5);
+        }, () -> 0.3, true, Units.inchesToMeters(4), 5).withTimeout(1.5);
     }
 
     public static Command goToHeight(Elevator elevator, Supplier<ScoringLocation.Height> height) {
@@ -64,17 +73,25 @@ public class CommandFactory {
     }
 
     public static Command ensureHome(Elevator elevator) {
-        return elevator.home().repeatedly().raceWith(Commands.waitSeconds(1.0));
+        return elevator.home().repeatedly().until(() -> elevator.getHeight().in(Inches) < 0.5);
     }
 
     public static Command autoScore(Swerve swerve, Elevator elevator, CoralScoring coralScoring,
         ElevatorAlgae algae, Supplier<ScoringLocation.CoralLocation> location,
         Supplier<ScoringLocation.Height> height) {
-        return reefPreAlign(swerve, location)
-            .andThen(goToHeight(elevator, height).alongWith(reefAlign(swerve, location)))
-            .andThen(new ConditionalCommand(algae.algaeIntakeCommand().withTimeout(0.4),
-                coralScoring.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae))
-            .andThen(backAwayReef(swerve, location));
+        return (reefPreAlign(swerve, location).andThen(new ConditionalCommand(
+            Commands.waitUntil(coralScoring.coralAtOuttake), Commands.runOnce(() -> {
+            }), () -> !height.get().isAlgae))).alongWith(coralScoring.runCoralIntake())
+                .andThen(goToHeight(elevator, height).andThen(reefAlign(swerve, location)))
+                .andThen(new ConditionalCommand(algae.algaeIntakeCommand().withTimeout(0.4),
+                    coralScoring.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae))
+                .andThen(backAwayReef(swerve, location));
+    }
+
+    private static Command feederAfter(Swerve swerve) {
+        return swerve.run(() -> {
+            swerve.setModuleStates(new ChassisSpeeds(0.0, -0.1, 0.0));
+        }).withTimeout(1.0).andThen(swerve.stop());
     }
 
     private static final Pose2d leftFeeder = new Pose2d(1.5196709632873535, 7.158551216125488,
@@ -85,11 +102,9 @@ public class CommandFactory {
             if (elevator.hightAboveP0.getAsBoolean()) {
                 return 0.8;
             } else {
-                return 12.0;
+                return 4.0;
             }
-        }, true, Units.inchesToMeters(12), 20)).andThen(swerve.run(() -> {
-            swerve.setModuleStates(new ChassisSpeeds(0.0, -1.0, 0.0));
-        }).withTimeout(0.5));
+        }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve));
     }
 
     private static final Pose2d rightFeeder =
@@ -102,11 +117,9 @@ public class CommandFactory {
                 if (elevator.hightAboveP0.getAsBoolean()) {
                     return 0.8;
                 } else {
-                    return 12.0;
+                    return 1.2;
                 }
-            }, true, Units.inchesToMeters(12), 20)).andThen(swerve.run(() -> {
-                swerve.setModuleStates(new ChassisSpeeds(0.0, -1.0, 0.0));
-            }).withTimeout(0.5));
+            }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve));
     }
 
     public static Command fasterFeeder(Swerve swerve, Elevator elevator) {
@@ -126,9 +139,7 @@ public class CommandFactory {
             } else {
                 return 12.0;
             }
-        }, true, Units.inchesToMeters(12), 20)).andThen(swerve.run(() -> {
-            swerve.setModuleStates(new ChassisSpeeds(0.0, -1.0, 0.0));
-        }).withTimeout(0.5));
+        }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve));
     }
 
     public static Command selectFeeder(Swerve swerve, Elevator elevator,
@@ -154,9 +165,7 @@ public class CommandFactory {
             } else {
                 return 12.0;
             }
-        }, true, Units.inchesToMeters(12), 20)).andThen(swerve.run(() -> {
-            swerve.setModuleStates(new ChassisSpeeds(0.0, -1.0, 0.0));
-        }).withTimeout(0.5));
+        }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve));
     }
 
     private static final Pose2d bargePose =
