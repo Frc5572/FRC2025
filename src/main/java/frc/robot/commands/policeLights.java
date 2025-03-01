@@ -13,9 +13,9 @@ public class policeLights extends Command {
     private LEDs.LEDsLeft ledsLeft;
     private LEDs.LEDsRight ledsRight;
 
-    policeLights() {
-        this.ledsLeft = new LEDsLeft();
-        this.ledsRight = new LEDsRight();
+    public policeLights(LEDsLeft ledsLeft, LEDsRight ledsRight) {
+        this.ledsLeft = ledsLeft;
+        this.ledsRight = ledsRight;
     }
 
     public Command setPoliceLeds() {

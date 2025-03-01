@@ -27,6 +27,7 @@ import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
+import frc.robot.commands.policeLights;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.LEDs.LEDsLeft;
 import frc.robot.subsystems.LEDs.LEDsRight;
@@ -97,6 +98,7 @@ public class RobotContainer {
     private OperatorStates operatorStates = new OperatorStates();
     private LEDsLeft ledsLeft = new LEDs.LEDsLeft();
     private LEDsRight ledsRight = new LEDs.LEDsRight();
+    private policeLights police = new policeLights(ledsLeft, ledsRight);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -137,8 +139,8 @@ public class RobotContainer {
         autoFactory = new AutoFactory(swerve::getPose, swerve::resetOdometry,
             swerve::followTrajectory, true, swerve);
 
-        AutoCommandFactory autos =
-            new AutoCommandFactory(autoFactory, swerve, elevator, coralScoring, leds);
+        AutoCommandFactory autos = new AutoCommandFactory(autoFactory, swerve, elevator,
+            coralScoring, leds, ledsLeft, ledsRight);
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Example", autos::example);
 
@@ -148,7 +150,7 @@ public class RobotContainer {
         RobotModeTriggers.disabled().onTrue(Commands.runOnce(() -> swerve.setMotorsZero()));
 
         /* Default Commands */
-        leds.setDefaultCommand(leds.setPoliceLeds()); // Flashing Leds
+        leds.setDefaultCommand(police.setPoliceLeds()); // Flashing Leds
         // leds.setDefaultCommand(leds.setPoliceLeds());
         /* Button and Trigger Bindings */
 
@@ -215,7 +217,7 @@ public class RobotContainer {
 
         driver.rightTrigger().and(climb.reachedClimberStart)
             .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
-        driver.leftTrigger().onTrue(Commands.runOnce(() -> leds.setPoliceLeds())); // Cole
+        driver.leftTrigger().onTrue(Commands.runOnce(() -> police.setPoliceLeds())); // Cole
         coralScoring.coralAtOuttake.whileTrue(Commands.parallel(ledsLeft.setLEDsSolid(Color.kCyan),
             ledsRight.setLEDsSolid(Color.kCyan)));
     }
