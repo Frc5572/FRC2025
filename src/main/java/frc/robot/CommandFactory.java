@@ -91,7 +91,7 @@ public class CommandFactory {
     private static Command feederAfter(Swerve swerve) {
         return swerve.run(() -> {
             swerve.setModuleStates(new ChassisSpeeds(0.0, -0.1, 0.0));
-        }).withTimeout(1.0).andThen(swerve.stop());
+        }).withTimeout(3.0).andThen(swerve.stop());
     }
 
     private static final Pose2d leftFeeder = new Pose2d(1.5196709632873535, 7.158551216125488,
@@ -117,7 +117,7 @@ public class CommandFactory {
                 if (elevator.hightAboveP0.getAsBoolean()) {
                     return 0.8;
                 } else {
-                    return 1.2;
+                    return 4.0;
                 }
             }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve));
     }

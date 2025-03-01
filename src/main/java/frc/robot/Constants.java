@@ -342,7 +342,7 @@ public final class Constants {
         public static final Distance P1 = Inches.of(26.45); // Coral l1
         public static final Distance P2 = Inches.of(31.2); // Algae 2
         public static final Distance P3 = Inches.of(43.6); // Coral L3
-        public static final Distance P4 = Inches.of(67.9); // Coral L4
+        public static final Distance P4 = Inches.of(68.9); // Coral L4
         public static final Distance P5 = Inches.of(70); // Barge
 
         public static final double gearRatio = 1.0;
@@ -432,7 +432,7 @@ public final class Constants {
         public static final double MAX_ANGULAR_ACCELERATION = 8;
     }
 
-    public static final Rotation2d CIRCLE_REEF_LOOKAHEAD_ANGLE = Rotation2d.fromDegrees(15);
+    public static final Rotation2d CIRCLE_REEF_LOOKAHEAD_ANGLE = Rotation2d.fromDegrees(30);
 }
 
 

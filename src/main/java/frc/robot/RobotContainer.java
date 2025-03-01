@@ -222,7 +222,8 @@ public class RobotContainer {
                     operator::getDesiredHeight)
                 .andThen(CommandFactory.selectFeeder(swerve, elevator, operator::feeder))
                 .deadlineFor(leds.blinkLEDs(Color.kOrange))
-                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming))
+            .negate().onTrue(coralScoring.runCoralIntake());
         driver.b().whileTrue(CommandFactory.selectFeeder(swerve, elevator, operator::feeder)
             .andThen(swerve.run(() -> {
             })));
@@ -235,7 +236,7 @@ public class RobotContainer {
         altOperator.leftTrigger().whileTrue(algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE));
         // manual mode
 
-
+        altOperator.povLeft().onTrue(elevator.moveTo(() -> Height.KP5.height));
 
         altOperator.a().whileTrue(elevator.heightSelector());
         altOperator.povUp()
