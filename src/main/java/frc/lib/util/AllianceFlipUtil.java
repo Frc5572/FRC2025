@@ -1,4 +1,4 @@
-package frc.lib.math;
+package frc.lib.util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -10,6 +10,44 @@ import edu.wpi.first.wpilibj.DriverStation;
 public class AllianceFlipUtil {
     public static double fieldWidth = Units.feetToMeters(26.0) + Units.inchesToMeters(5.0);
     public static double fieldLength = Units.feetToMeters(57.0) + Units.inchesToMeters(6.875);
+
+    /** Possibly flip */
+    public static int applyAprilTag(int fiducialId) {
+        if (shouldFlip()) {
+            switch (fiducialId) {
+                // Barge
+                case 14:
+                    return 5;
+                case 15:
+                    return 4;
+                // Processor
+                case 16:
+                    return 3;
+                // Feeder Stations
+                case 13:
+                    return 1;
+                case 12:
+                    return 2;
+                // Reef
+                case 18:
+                    return 7;
+                case 17:
+                    return 8;
+                case 22:
+                    return 9;
+                case 21:
+                    return 10;
+                case 20:
+                    return 11;
+                case 19:
+                    return 6;
+                default:
+                    return fiducialId;
+            }
+        } else {
+            return fiducialId;
+        }
+    }
 
     /** Possibly flip */
     public static double applyX(double x) {

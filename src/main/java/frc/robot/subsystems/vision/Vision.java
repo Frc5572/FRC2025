@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.IntArrayList;
+import frc.lib.util.LoggedTracer;
 import frc.lib.util.Tuples.Tuple3;
 import frc.robot.Constants;
 import frc.robot.RobotState;
@@ -69,7 +70,7 @@ public class Vision extends SubsystemBase {
         for (var result : results) {
             if (result._2().multitagResult.isPresent()) {
                 seesMultitag = true;
-            } else {
+            } else if (result._0() == 0) {
                 seesMultitag = false;
             }
             state.addVisionObservation(result._2(), result._1(), result._0());
@@ -95,6 +96,7 @@ public class Vision extends SubsystemBase {
                 Logger.recordOutput("Vision/Camera" + i + "/AprilTagsCached", draw);
             }
         }
+        LoggedTracer.record("Vision");
 
 
     }

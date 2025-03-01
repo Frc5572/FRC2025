@@ -39,13 +39,14 @@ import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
+import frc.lib.util.LoggedTunableNumber;
 
 /**
  * Constants file.
  */
 public final class Constants {
 
-    public static final boolean shouldDrawStuff = false;
+    public static final boolean shouldDrawStuff = true;
 
     /**
      * Stick Deadband
@@ -253,7 +254,7 @@ public final class Constants {
             public static final double wheelCoeffFriction = 1.2;
             public static final MomentOfInertia angleMomentOfInertia =
                 KilogramSquareMeters.of(0.02);
-            public static final Distance wheelRadius = Inches.of(1.9);
+            public static final Distance wheelRadius = Inches.of(3.87 / 2);
             public static final Current slipCurrent = Amps.of(120.0);
 
             public static final Current driveCurrentLimit = Amps.of(35.0);
@@ -270,7 +271,7 @@ public final class Constants {
             public static final LinearAcceleration maxDriveRate = MetersPerSecondPerSecond.of(50.0);
 
 
-            public static final double ffkS = 0.32;
+            public static final double ffkS = 1.0;
             public static final double ffkV = 1.51;
             public static final double ffkT = 1.0 / driveMotor.KtNMPerAmp;
             public static final double ffkA = 0.27;
@@ -322,7 +323,7 @@ public final class Constants {
         public static final NeutralModeValue BREAK = NeutralModeValue.Brake;
 
         // PID and feedforward
-        public static final double KP = 40.0;
+        public static final double KP = 60.0;
         public static final double KI = 0.0;
         public static final double KD = 0.0;
         public static final double KS = 0.2675;
@@ -341,7 +342,7 @@ public final class Constants {
         public static final Distance P1 = Inches.of(26.45); // Coral l1
         public static final Distance P2 = Inches.of(31.2); // Algae 2
         public static final Distance P3 = Inches.of(43.6); // Coral L3
-        public static final Distance P4 = Inches.of(67.9); // Coral L4
+        public static final Distance P4 = Inches.of(68.9); // Coral L4
         public static final Distance P5 = Inches.of(70); // Barge
 
         public static final double gearRatio = 1.0;
@@ -365,18 +366,26 @@ public final class Constants {
         public static final record CameraConstants(String name, int height, int width,
             Rotation2d horizontalFieldOfView, Frequency framesPerSecond, Time latencyAvg,
             Time latencyStdDev, double calibErrorAvg, double calibErrorStdDev,
-            Transform3d robotToCamera) {
+            Transform3d robotToCamera, double offset) {
             public double centerPixelYawRads() {
                 return robotToCamera.getRotation().getZ();
             }
         }
 
         public static final CameraConstants[] cameras = new CameraConstants[] {
-            new CameraConstants("cam0", 800, 1280, Rotation2d.fromDegrees(100), Hertz.of(20),
-                Seconds.of(0.3), Seconds.of(0.02), 0.25, 0.08,
+            new CameraConstants("cam0", 800, 1280, Rotation2d.fromDegrees(80), Hertz.of(20),
+                Seconds.of(0.3), Seconds.of(0.02), 0.8, 0.08,
+                new Transform3d(new Translation3d(Units.inchesToMeters(11),
+                    -Units.inchesToMeters(12), Units.inchesToMeters(10)),
+                    new Rotation3d(Math.PI, 0, 0)),
+                Units.inchesToMeters(1.6)),
+            new CameraConstants("cam1", 600, 800, Rotation2d.fromDegrees(60), Hertz.of(40),
+                Seconds.of(0.15), Seconds.of(0.02), 0.27, 0.08,
                 new Transform3d(
-                    new Translation3d(Units.inchesToMeters(11), -Units.inchesToMeters(12), 0),
-                    new Rotation3d(Math.PI, 0, 0)))};
+                    new Translation3d(Units.inchesToMeters(9.2), Units.inchesToMeters(13.5),
+                        Units.inchesToMeters(10)),
+                    new Rotation3d(0, 0, -Units.degreesToRadians(45))),
+                Units.inchesToMeters(0.0))};
 
         public static final double zMargin = 0.75;
         public static final double fieldBorderMargin = 0.5;
@@ -387,8 +396,12 @@ public final class Constants {
     public static class StateEstimator {
         public static final boolean keepInField = true;
         public static final boolean keepOutOfReefs = true;
-        public static final double visionTrust = 0.02;
-        public static final double visionTrustRotation = 0.02;
+        public static final LoggedTunableNumber globalVisionTrust =
+            new LoggedTunableNumber("globalVisionTrust", 0.2);
+        public static final LoggedTunableNumber globalVisionTrustRotation =
+            new LoggedTunableNumber("globalVisionTrustRotation", 0.5);
+        public static final LoggedTunableNumber localVisionTrust =
+            new LoggedTunableNumber("localVisionTrust", 0.2);
     }
 
     /**
@@ -405,20 +418,21 @@ public final class Constants {
      * MoveToPos constants.
      */
     public static class SwerveTransformPID {
-        public static final double PID_XKP = 5.0;
-        public static final double PID_XKI = 0.5;
+        public static final double PID_XKP = 1.0;
+        public static final double PID_XKI = 0.0;
         public static final double PID_XKD = 0.0;
-        public static final double PID_YKP = 3.5;
-        public static final double PID_YKI = 0.5;
-        public static final double PID_YKD = 0.0;
         public static final double PID_TKP = 3.0;
-        public static final double PID_TKI = 0.1;
+        public static final double PID_TKI = 0.0;
         public static final double PID_TKD = 0.0;
 
-        public static final double MAX_ANGULAR_VELOCITY = 9.0;
-        public static final double MAX_ANGULAR_ACCELERATION = 9 * 5;
-        public static final double STD_DEV_MOD = 2.0;
+        public static final double MAX_VELOCITY = 2;
+        public static final double MAX_ACCELERATION = 3;
+
+        public static final double MAX_ANGULAR_VELOCITY = 2.9;
+        public static final double MAX_ANGULAR_ACCELERATION = 8;
     }
+
+    public static final Rotation2d CIRCLE_REEF_LOOKAHEAD_ANGLE = Rotation2d.fromDegrees(30);
 }
 
 
