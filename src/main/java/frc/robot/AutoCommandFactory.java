@@ -140,6 +140,7 @@ public class AutoCommandFactory {
 
     boolean dashboard = SmartDashboard.putBoolean("isHigh", true);
 
+    /** Barge auto */
     public AutoRoutine barge() {
 
         AutoRoutine routine = autoFactory.newRoutine("Barge");
@@ -147,16 +148,16 @@ public class AutoCommandFactory {
         routine.active().onTrue(Commands.sequence(swerve.runOnce(() -> {
             swerve.resetOdometry(AllianceFlipUtil.apply(middleStart));
         }), CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.H, () -> {
-            boolean AlgaeIsHigh = SmartDashboard.getBoolean("isHigh", false);
-            return (AlgaeIsHigh) ? Height.KP2 : Height.KP0;
+            boolean algaeIsHigh = SmartDashboard.getBoolean("isHigh", false);
+            return (algaeIsHigh) ? Height.KP2 : Height.KP0;
         }), CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.H,
             () -> Height.KP4), CommandFactory.barge(swerve, elevator),
             elevator.moveTo(() -> ScoringLocation.Height.KP5.height),
             algae.runAlgaeMotor(Constants.Algae.VOLTAGE).withDeadline(Commands.waitSeconds(.25)),
             CommandFactory.ensureHome(elevator).andThen(CommandFactory.autoScore(swerve, elevator,
                 coral, algae, () -> CoralLocation.J, () -> {
-                    boolean AlgaeIsHigh = SmartDashboard.getBoolean("isHigh", false);
-                    return (AlgaeIsHigh) ? Height.KP0 : Height.KP2;
+                    boolean algaeIsHigh = SmartDashboard.getBoolean("isHigh", false);
+                    return (algaeIsHigh) ? Height.KP0 : Height.KP2;
                 })),
             CommandFactory.ensureHome(elevator).andThen(CommandFactory.barge(swerve, elevator)),
             elevator.moveTo(() -> ScoringLocation.Height.KP5.height),

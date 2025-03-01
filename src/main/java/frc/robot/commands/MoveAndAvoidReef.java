@@ -208,13 +208,13 @@ public class MoveAndAvoidReef extends Command implements Drawable {
         RotationInterval currentRedAngles = redDriveCircle.circleTangentAngles(currentPosition);
 
         Logger.recordOutput("avoidReef/targetBlueAngles", new double[] {
-            targetBlueAngles.getMin().getDegrees(), targetBlueAngles.getMax().getDegrees(),});
+            targetBlueAngles.getMin().getDegrees(), targetBlueAngles.getMax().getDegrees()});
         Logger.recordOutput("avoidReef/targetRedAngles", new double[] {
-            targetRedAngles.getMin().getDegrees(), targetRedAngles.getMax().getDegrees(),});
+            targetRedAngles.getMin().getDegrees(), targetRedAngles.getMax().getDegrees()});
         Logger.recordOutput("avoidReef/currentBlueAngles", new double[] {
-            currentBlueAngles.getMin().getDegrees(), currentBlueAngles.getMax().getDegrees(),});
+            currentBlueAngles.getMin().getDegrees(), currentBlueAngles.getMax().getDegrees()});
         Logger.recordOutput("avoidReef/currentRedAngles", new double[] {
-            currentRedAngles.getMin().getDegrees(), currentRedAngles.getMax().getDegrees(),});
+            currentRedAngles.getMin().getDegrees(), currentRedAngles.getMax().getDegrees()});
 
         double blueOverlap = targetBlueAngles.getOverlap(currentBlueAngles);
         double redOverlap = targetRedAngles.getOverlap(currentRedAngles);
