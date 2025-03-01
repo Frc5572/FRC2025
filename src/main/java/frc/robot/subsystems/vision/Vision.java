@@ -70,7 +70,7 @@ public class Vision extends SubsystemBase {
         for (var result : results) {
             if (result._2().multitagResult.isPresent()) {
                 seesMultitag = true;
-            } else {
+            } else if (result._0() == 0) {
                 seesMultitag = false;
             }
             state.addVisionObservation(result._2(), result._1(), result._0());

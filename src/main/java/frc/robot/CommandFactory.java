@@ -88,30 +88,30 @@ public class CommandFactory {
                 .andThen(backAwayReef(swerve, location));
     }
 
-    private static Command feederAfter(Swerve swerve) {
+    private static Command feederAfter(Swerve swerve, CoralScoring scoring) {
         return swerve.run(() -> {
             swerve.setModuleStates(new ChassisSpeeds(0.0, -0.1, 0.0));
-        }).withTimeout(3.0).andThen(swerve.stop());
+        }).until(scoring.coralAtIntake).withTimeout(3.0).andThen(swerve.stop());
     }
 
     private static final Pose2d leftFeeder = new Pose2d(1.5196709632873535, 7.158551216125488,
         Rotation2d.fromRadians(-2.4980917038665034));
 
-    public static Command leftFeeder(Swerve swerve, Elevator elevator) {
+    public static Command leftFeeder(Swerve swerve, Elevator elevator, CoralScoring coral) {
         return ensureHome(elevator).alongWith(new MoveAndAvoidReef(swerve, () -> leftFeeder, () -> {
             if (elevator.hightAboveP0.getAsBoolean()) {
                 return 0.8;
             } else {
                 return 4.0;
             }
-        }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve));
+        }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve, coral));
     }
 
     private static final Pose2d rightFeeder =
         new Pose2d(leftFeeder.getX(), FieldConstants.fieldWidth.in(Meters) - leftFeeder.getY(),
             leftFeeder.getRotation().unaryMinus().plus(Rotation2d.k180deg));
 
-    public static Command rightFeeder(Swerve swerve, Elevator elevator) {
+    public static Command rightFeeder(Swerve swerve, Elevator elevator, CoralScoring coral) {
         return ensureHome(elevator)
             .alongWith(new MoveAndAvoidReef(swerve, () -> rightFeeder, () -> {
                 if (elevator.hightAboveP0.getAsBoolean()) {
@@ -119,10 +119,10 @@ public class CommandFactory {
                 } else {
                     return 4.0;
                 }
-            }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve));
+            }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve, coral));
     }
 
-    public static Command fasterFeeder(Swerve swerve, Elevator elevator) {
+    public static Command fasterFeeder(Swerve swerve, Elevator elevator, CoralScoring coral) {
         Logger.recordOutput("leftFeeder", leftFeeder);
         Logger.recordOutput("rightFeeder", rightFeeder);
 
@@ -139,10 +139,10 @@ public class CommandFactory {
             } else {
                 return 12.0;
             }
-        }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve));
+        }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve, coral));
     }
 
-    public static Command selectFeeder(Swerve swerve, Elevator elevator,
+    public static Command selectFeeder(Swerve swerve, Elevator elevator, CoralScoring coral,
         Supplier<Character> charSupplier) {
         return ensureHome(elevator).alongWith(new MoveAndAvoidReef(swerve, () -> {
             char target = charSupplier.get();
@@ -165,7 +165,7 @@ public class CommandFactory {
             } else {
                 return 12.0;
             }
-        }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve));
+        }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve, coral));
     }
 
     private static final Pose2d bargePose =
