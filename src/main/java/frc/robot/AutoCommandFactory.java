@@ -58,7 +58,7 @@ public class AutoCommandFactory {
     public AutoRoutine example() {
         AutoRoutine routine = autoFactory.newRoutine("Example");
         MoveToPose testMTP =
-            new MoveToPose(swerve,
+            new MoveToPose(swerve, elevator,
                 () -> new Pose2d(FieldConstants.Reef.center.getX(),
                     FieldConstants.Barge.middleCage.getY(), new Rotation2d()),
                 true, .25, 10, routine);
@@ -84,26 +84,25 @@ public class AutoCommandFactory {
     public AutoRoutine l4left() {
         AutoRoutine routine = autoFactory.newRoutine("Test");
 
-        routine.active()
-            .onTrue(Commands
-                .sequence(CommandFactory.dropAlgaeIntake(swerve), Commands.waitSeconds(.5),
-                    CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.I,
-                        () -> Height.KP4),
-                    CommandFactory.leftFeeder(swerve, elevator, coral),
-                    coral.runCoralIntake().until(coral.coralAtIntake),
-                    CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.K,
-                        () -> Height.KP4),
-                    CommandFactory.leftFeeder(swerve, elevator, coral),
-                    coral.runCoralIntake().until(coral.coralAtIntake),
-                    CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.J,
-                        () -> Height.KP4),
-                    CommandFactory.leftFeeder(swerve, elevator, coral),
-                    coral.runCoralIntake().until(coral.coralAtIntake),
-                    CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.L,
-                        () -> Height.KP4),
-                    CommandFactory.leftFeeder(swerve, elevator, coral),
-                    coral.runCoralIntake().until(coral.coralAtIntake), swerve.stop())
-                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+        routine.active().onTrue(Commands
+            .sequence(CommandFactory.dropAlgaeIntake(swerve, elevator), Commands.waitSeconds(.5),
+                CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.I,
+                    () -> Height.KP4),
+                CommandFactory.leftFeeder(swerve, elevator, coral),
+                coral.runCoralIntake().until(coral.coralAtIntake),
+                CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.K,
+                    () -> Height.KP4),
+                CommandFactory.leftFeeder(swerve, elevator, coral),
+                coral.runCoralIntake().until(coral.coralAtIntake),
+                CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.J,
+                    () -> Height.KP4),
+                CommandFactory.leftFeeder(swerve, elevator, coral),
+                coral.runCoralIntake().until(coral.coralAtIntake),
+                CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.L,
+                    () -> Height.KP4),
+                CommandFactory.leftFeeder(swerve, elevator, coral),
+                coral.runCoralIntake().until(coral.coralAtIntake), swerve.stop())
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
         return routine;
     }
 
@@ -115,26 +114,25 @@ public class AutoCommandFactory {
     public AutoRoutine l4right() {
         AutoRoutine routine = autoFactory.newRoutine("Test2");
 
-        routine.active()
-            .onTrue(Commands
-                .sequence(CommandFactory.dropAlgaeIntake(swerve), Commands.waitSeconds(.5),
-                    CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.E,
-                        () -> Height.KP4),
-                    CommandFactory.rightFeeder(swerve, elevator, coral),
-                    coral.runCoralIntake().until(coral.coralAtIntake),
-                    CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.C,
-                        () -> Height.KP4),
-                    CommandFactory.rightFeeder(swerve, elevator, coral),
-                    coral.runCoralIntake().until(coral.coralAtIntake),
-                    CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.F,
-                        () -> Height.KP4),
-                    CommandFactory.rightFeeder(swerve, elevator, coral),
-                    coral.runCoralIntake().until(coral.coralAtIntake),
-                    CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.D,
-                        () -> Height.KP4),
-                    CommandFactory.rightFeeder(swerve, elevator, coral),
-                    coral.runCoralIntake().until(coral.coralAtIntake), swerve.stop())
-                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+        routine.active().onTrue(Commands
+            .sequence(CommandFactory.dropAlgaeIntake(swerve, elevator), Commands.waitSeconds(.5),
+                CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.E,
+                    () -> Height.KP4),
+                CommandFactory.rightFeeder(swerve, elevator, coral),
+                coral.runCoralIntake().until(coral.coralAtIntake),
+                CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.C,
+                    () -> Height.KP4),
+                CommandFactory.rightFeeder(swerve, elevator, coral),
+                coral.runCoralIntake().until(coral.coralAtIntake),
+                CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.F,
+                    () -> Height.KP4),
+                CommandFactory.rightFeeder(swerve, elevator, coral),
+                coral.runCoralIntake().until(coral.coralAtIntake),
+                CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.D,
+                    () -> Height.KP4),
+                CommandFactory.rightFeeder(swerve, elevator, coral),
+                coral.runCoralIntake().until(coral.coralAtIntake), swerve.stop())
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
         return routine;
     }
 

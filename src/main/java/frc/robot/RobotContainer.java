@@ -207,8 +207,8 @@ public class RobotContainer {
      */
 
     private void setupDriver() {
-        swerve.setDefaultCommand(swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
-            Constants.Swerve.isOpenLoop));
+        swerve.setDefaultCommand(swerve.teleOpDrive(driver, elevator,
+            Constants.Swerve.isFieldRelative, Constants.Swerve.isOpenLoop));
 
         driver.y().onTrue(Commands.runOnce(() -> swerve.resetFieldRelativeOffset()));
         driver.rightTrigger().and(climb.reachedClimberStart.negate())

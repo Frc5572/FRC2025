@@ -21,6 +21,7 @@ import frc.lib.util.AllianceFlipUtil;
 import frc.lib.util.viz.Drawable;
 import frc.robot.Constants;
 import frc.robot.FieldConstants;
+import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.swerve.Swerve;
 
 /**
@@ -31,6 +32,7 @@ public class MoveAndAvoidReef extends Command implements Drawable {
     private EventLoop eventLoop = CommandScheduler.getInstance().getDefaultButtonLoop();
     private AutoRoutine autoRoutine;
     private final Swerve swerve;
+    private final Elevator elevator;
     private final Supplier<Pose2d> pose2dSupplier;
     private final DoubleSupplier maxSpeedSupplier;
     private Pose2d pose2d;
@@ -52,9 +54,10 @@ public class MoveAndAvoidReef extends Command implements Drawable {
      * @param tol Translational Tolerance
      * @param rotTol Rotational Tolerance
      */
-    public MoveAndAvoidReef(Swerve swerve, Supplier<Pose2d> pose2dSupplier,
+    public MoveAndAvoidReef(Swerve swerve, Elevator elevator, Supplier<Pose2d> pose2dSupplier,
         DoubleSupplier maxSpeedSupplier, boolean flipForRed, double tol, double rotTol) {
         this.swerve = swerve;
+        this.elevator = elevator;
         this.pose2dSupplier = pose2dSupplier;
         this.maxSpeedSupplier = maxSpeedSupplier;
         this.flipForRed = flipForRed;
@@ -74,10 +77,10 @@ public class MoveAndAvoidReef extends Command implements Drawable {
      * @param rotTol Rotational Tolerance
      * @param autoRoutine Choreo AutoRoutine to integrate command
      */
-    public MoveAndAvoidReef(Swerve swerve, Supplier<Pose2d> pose2dSupplier,
+    public MoveAndAvoidReef(Swerve swerve, Elevator elevator, Supplier<Pose2d> pose2dSupplier,
         DoubleSupplier maxSpeedSupplier, boolean flipForRed, double tol, double rotTol,
         AutoRoutine autoRoutine) {
-        this(swerve, pose2dSupplier, maxSpeedSupplier, flipForRed, tol, rotTol);
+        this(swerve, elevator, pose2dSupplier, maxSpeedSupplier, flipForRed, tol, rotTol);
         this.autoRoutine = autoRoutine;
         this.eventLoop = autoRoutine.loop();
     }
@@ -92,9 +95,10 @@ public class MoveAndAvoidReef extends Command implements Drawable {
      * @param rotTol Rotational Tolerance
      * @param autoRoutine Choreo AutoRoutine to integrate command
      */
-    public MoveAndAvoidReef(Swerve swerve, Supplier<Pose2d> pose2dSupplier, boolean flipForRed,
-        double tol, double rotTol, AutoRoutine autoRoutine) {
-        this(swerve, pose2dSupplier, () -> Constants.Swerve.maxSpeed, flipForRed, tol, rotTol);
+    public MoveAndAvoidReef(Swerve swerve, Elevator elevator, Supplier<Pose2d> pose2dSupplier,
+        boolean flipForRed, double tol, double rotTol, AutoRoutine autoRoutine) {
+        this(swerve, elevator, pose2dSupplier, () -> Constants.Swerve.maxSpeed, flipForRed, tol,
+            rotTol);
         this.autoRoutine = autoRoutine;
         this.eventLoop = autoRoutine.loop();
     }
@@ -130,7 +134,7 @@ public class MoveAndAvoidReef extends Command implements Drawable {
     public void execute() {
         // draw();
         swerve.moveToPose(getNextIntermediateTarget(swerve.state.getGlobalPoseEstimate(), pose2d),
-            maxSpeedSupplier.getAsDouble());
+            elevator.hightAboveP0(), maxSpeedSupplier.getAsDouble());
     }
 
     @Override

@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.AllianceFlipUtil;
 import frc.robot.Constants;
+import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.swerve.Swerve;
 
 /**
@@ -20,6 +21,7 @@ public class MoveToPose extends Command {
     private EventLoop eventLoop = CommandScheduler.getInstance().getDefaultButtonLoop();
     private AutoRoutine autoRoutine;
     private final Swerve swerve;
+    private final Elevator elevator;
     private final Supplier<Pose2d> pose2dSupplier;
     private final DoubleSupplier maxSpeedSupplier;
     private Pose2d pose2d;
@@ -41,9 +43,10 @@ public class MoveToPose extends Command {
      * @param tol Translational Tolerance
      * @param rotTol Rotational Tolerance
      */
-    public MoveToPose(Swerve swerve, Supplier<Pose2d> pose2dSupplier,
+    public MoveToPose(Swerve swerve, Elevator elevator, Supplier<Pose2d> pose2dSupplier,
         DoubleSupplier maxSpeedSupplier, boolean flipForRed, double tol, double rotTol) {
         this.swerve = swerve;
+        this.elevator = elevator;
         this.pose2dSupplier = pose2dSupplier;
         this.maxSpeedSupplier = maxSpeedSupplier;
         this.flipForRed = flipForRed;
@@ -63,10 +66,10 @@ public class MoveToPose extends Command {
      * @param rotTol Rotational Tolerance
      * @param autoRoutine Choreo AutoRoutine to integrate command
      */
-    public MoveToPose(Swerve swerve, Supplier<Pose2d> pose2dSupplier,
+    public MoveToPose(Swerve swerve, Elevator elevator, Supplier<Pose2d> pose2dSupplier,
         DoubleSupplier maxSpeedSupplier, boolean flipForRed, double tol, double rotTol,
         AutoRoutine autoRoutine) {
-        this(swerve, pose2dSupplier, maxSpeedSupplier, flipForRed, tol, rotTol);
+        this(swerve, elevator, pose2dSupplier, maxSpeedSupplier, flipForRed, tol, rotTol);
         this.autoRoutine = autoRoutine;
         this.eventLoop = autoRoutine.loop();
     }
@@ -81,9 +84,10 @@ public class MoveToPose extends Command {
      * @param rotTol Rotational Tolerance
      * @param autoRoutine Choreo AutoRoutine to integrate command
      */
-    public MoveToPose(Swerve swerve, Supplier<Pose2d> pose2dSupplier, boolean flipForRed,
-        double tol, double rotTol, AutoRoutine autoRoutine) {
-        this(swerve, pose2dSupplier, () -> Constants.Swerve.maxSpeed, flipForRed, tol, rotTol);
+    public MoveToPose(Swerve swerve, Elevator elevator, Supplier<Pose2d> pose2dSupplier,
+        boolean flipForRed, double tol, double rotTol, AutoRoutine autoRoutine) {
+        this(swerve, elevator, pose2dSupplier, () -> Constants.Swerve.maxSpeed, flipForRed, tol,
+            rotTol);
         this.autoRoutine = autoRoutine;
         this.eventLoop = autoRoutine.loop();
     }
@@ -117,7 +121,7 @@ public class MoveToPose extends Command {
 
     @Override
     public void execute() {
-        swerve.moveToPose(pose2d, maxSpeedSupplier.getAsDouble());
+        swerve.moveToPose(pose2d, elevator.hightAboveP0(), maxSpeedSupplier.getAsDouble());
     }
 
     @Override

@@ -28,6 +28,7 @@ import frc.lib.util.LoggedTracer;
 import frc.lib.util.swerve.SwerveModule;
 import frc.robot.Constants;
 import frc.robot.RobotState;
+import frc.robot.subsystems.elevator.Elevator;
 
 /**
  * Swerve Subsystem
@@ -76,13 +77,13 @@ public class Swerve extends SubsystemBase {
      * @param isOpenLoop Whether or not Open or Closed Loop
      */
     public void drive(Translation2d translation, double rotation, boolean fieldRelative,
-        boolean isOpenLoop) {
+        boolean isOpenLoop, boolean elevatorUp) {
         ChassisSpeeds chassisSpeeds = fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(),
                 rotation, getFieldRelativeHeading())
             : new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
 
-        setModuleStates(chassisSpeeds);
+        setModuleStates(chassisSpeeds, elevatorUp);
     }
 
     /**
@@ -103,9 +104,59 @@ public class Swerve extends SubsystemBase {
      *
      * @param chassisSpeeds The desired Chassis Speeds
      */
-    public void setModuleStates(ChassisSpeeds chassisSpeeds) {
-        Logger.recordOutput("Swerve/Velocity",
-            Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond));
+    public void setModuleStates(ChassisSpeeds chassisSpeeds, boolean elevatorUp) {
+        ChassisSpeeds current = getChassisSpeeds();
+        double wantedVelocity =
+            Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
+        double currentVelocity = Math.hypot(current.vxMetersPerSecond, current.vyMetersPerSecond);
+        Logger.recordOutput("Swerve/WantedVelocity", wantedVelocity);
+        Logger.recordOutput("Swerve/ActualVelocity", currentVelocity);
+        double wantedAcceleration = (wantedVelocity - currentVelocity) / 0.02;
+        double wantedAccelerationX =
+            (chassisSpeeds.vxMetersPerSecond - current.vxMetersPerSecond) / 0.02;
+        double wantedAccelerationY =
+            (chassisSpeeds.vyMetersPerSecond - current.vyMetersPerSecond) / 0.02;
+
+        // Forward limit
+        // The faster the robot moves the less it can accelerate
+        double forwardLimit = Constants.Swerve.accLimitForwardLimit
+            * (1.0 - (currentVelocity / Constants.Swerve.maxSpeed));
+        if (wantedAcceleration > forwardLimit) {
+            wantedAccelerationX *= forwardLimit / wantedAcceleration;
+            wantedAccelerationY *= forwardLimit / wantedAcceleration;
+        }
+
+        // Tilt limit
+        // Limit acceleration in robot relative directions to avoid tilting
+        double forwardTiltLimit = elevatorUp ? Constants.Swerve.accLimitTiltLimitForwardElevatorUp
+            : Constants.Swerve.accLimitTiltLimitForward;
+        double rightTiltLimit = elevatorUp ? Constants.Swerve.accLimitTiltLimitRightElevatorUp
+            : Constants.Swerve.accLimitTiltLimitRight;
+
+        if (Math.abs(wantedAccelerationX) > forwardTiltLimit) {
+            wantedAccelerationX *= forwardTiltLimit / Math.abs(wantedAccelerationX);
+            wantedAccelerationY *= forwardTiltLimit / Math.abs(wantedAccelerationX);
+        }
+        if (Math.abs(wantedAccelerationY) > rightTiltLimit) {
+            wantedAccelerationX *= rightTiltLimit / Math.abs(wantedAccelerationY);
+            wantedAccelerationY *= rightTiltLimit / Math.abs(wantedAccelerationY);
+        }
+
+        // Skid limit
+        // Limit max acceleration for the robot to not skid on the carpet
+        wantedAcceleration = Math.hypot(wantedAccelerationX, wantedAccelerationY);
+        if (wantedAcceleration > Constants.Swerve.accLimitSkidLimit) {
+            wantedAccelerationX *= Constants.Swerve.accLimitSkidLimit / wantedAcceleration;
+            wantedAccelerationY *= Constants.Swerve.accLimitSkidLimit / wantedAcceleration;
+        }
+
+        chassisSpeeds.vxMetersPerSecond = current.vxMetersPerSecond + wantedAccelerationX * 0.02;
+        chassisSpeeds.vyMetersPerSecond = current.vyMetersPerSecond + wantedAccelerationY * 0.02;
+
+        double finalVelocity =
+            Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
+        Logger.recordOutput("Swerve/LimitedVelocity", finalVelocity);
+
         ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
         SwerveModuleState[] swerveModuleStates =
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(targetSpeeds);
@@ -117,6 +168,7 @@ public class Swerve extends SubsystemBase {
      *
      * @return The current {@link ChassisSpeeds}
      */
+    @AutoLogOutput(key = "Swerve/ChassisSpeeds")
     public ChassisSpeeds getChassisSpeeds() {
         return Constants.Swerve.swerveKinematics.toChassisSpeeds(getModuleStates());
     }
@@ -223,7 +275,7 @@ public class Swerve extends SubsystemBase {
      */
     public void setMotorsZero() {
         System.out.println("Setting Zero!!!!!!");
-        setModuleStates(new ChassisSpeeds(0, 0, 0));
+        setModuleStates(new ChassisSpeeds(0, 0, 0), false);
     }
 
     /**
@@ -277,8 +329,8 @@ public class Swerve extends SubsystemBase {
      * @param fieldRelative Whether the movement is relative to the field or absolute
      * @param openLoop Open or closed loop system
      */
-    public Command teleOpDrive(CommandXboxController controller, boolean fieldRelative,
-        boolean openLoop) {
+    public Command teleOpDrive(CommandXboxController controller, Elevator elevator,
+        boolean fieldRelative, boolean openLoop) {
         return this.run(() -> {
             double yaxis = -controller.getLeftY();
             double xaxis = -controller.getLeftX();
@@ -292,7 +344,7 @@ public class Swerve extends SubsystemBase {
             Translation2d translation = new Translation2d(yaxis, xaxis)
                 .times(Constants.Swerve.maxSpeed).times(setSpeedMultiplier);
             double rotation = raxis * Constants.Swerve.maxAngularVelocity * setSpeedMultiplier;
-            this.drive(translation, rotation, fieldRelative, openLoop);
+            this.drive(translation, rotation, fieldRelative, openLoop, elevator.hightAboveP0());
         });
     }
 
@@ -320,7 +372,7 @@ public class Swerve extends SubsystemBase {
 
         // Apply the generated speeds
         setModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
-            state.getGlobalPoseEstimate().getRotation()));
+            state.getGlobalPoseEstimate().getRotation()), false);
     }
 
     /**
@@ -328,7 +380,8 @@ public class Swerve extends SubsystemBase {
      *
      * @param pose Desired Pose2d
      */
-    public void moveToPose(Pose2d pose, double maxSpeed, double maxAcceleration) {
+    public void moveToPose(Pose2d pose, boolean elevatorUp, double maxSpeed,
+        double maxAcceleration) {
         if (Constants.shouldDrawStuff) {
             Logger.recordOutput("Swerve/moveToPoseTarget", pose);
         }
@@ -340,7 +393,7 @@ public class Swerve extends SubsystemBase {
             ctrlEffort.vxMetersPerSecond *= mul;
             ctrlEffort.vyMetersPerSecond *= mul;
         }
-        setModuleStates(ctrlEffort);
+        setModuleStates(ctrlEffort, elevatorUp);
     }
 
     /**
@@ -348,8 +401,8 @@ public class Swerve extends SubsystemBase {
      *
      * @param pose Desired Pose2d
      */
-    public void moveToPose(Pose2d pose, double maxVelocity) {
-        moveToPose(pose, maxVelocity, Constants.SwerveTransformPID.MAX_ACCELERATION);
+    public void moveToPose(Pose2d pose, boolean elevatorUp, double maxVelocity) {
+        moveToPose(pose, elevatorUp, maxVelocity, Constants.SwerveTransformPID.MAX_ACCELERATION);
     }
 
     /**
@@ -357,8 +410,8 @@ public class Swerve extends SubsystemBase {
      *
      * @param pose Desired Pose2d
      */
-    public void moveToPose(Pose2d pose) {
-        moveToPose(pose, Constants.SwerveTransformPID.MAX_VELOCITY,
+    public void moveToPose(Pose2d pose, boolean elevatorUp) {
+        moveToPose(pose, elevatorUp, Constants.SwerveTransformPID.MAX_VELOCITY,
             Constants.SwerveTransformPID.MAX_ACCELERATION);
     }
 

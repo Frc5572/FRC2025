@@ -139,9 +139,12 @@ public final class Constants {
      * Swerve Constants
      */
     public static final class Swerve {
-        public static final double AUTO_ROTATION_KP = 5.0;
-        public static final double AUTO_ROTATION_KI = 0.0;
-        public static final double AUTO_ROTATION_KD = 0.0;
+        public static final double accLimitForwardLimit = 1000.0;
+        public static final double accLimitTiltLimitForward = 1000.0;
+        public static final double accLimitTiltLimitRight = 1000.0;
+        public static final double accLimitTiltLimitForwardElevatorUp = 1000.0;
+        public static final double accLimitTiltLimitRightElevatorUp = 1000.0;
+        public static final double accLimitSkidLimit = 1000.0;
 
         public static final NavXComType navXID = NavXComType.kMXP_SPI;
         public static final boolean invertGyro = false;

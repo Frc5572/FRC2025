@@ -34,7 +34,7 @@ public class SwerveModuleSim implements SwerveModuleIO {
         this.turnMotor =
             moduleSimulation.useGenericControllerForSteer().withCurrentLimit(Units.Amps.of(20));
 
-        this.driveController = new PIDController(0.5, 0.0, 0.0);
+        this.driveController = new PIDController(0.1, 0.0, 0.0);
         this.turnController = new PIDController(8.0, 0.0, 0.0);
 
         // Enable wrapping for turn PID
