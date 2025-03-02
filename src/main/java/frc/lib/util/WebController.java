@@ -24,6 +24,8 @@ public class WebController {
     private int height = -1;
     private char fdr = 'f';
 
+    private boolean hasSelectedAlgae = false;
+
     private boolean[] bays_compl = new boolean[6];
     private boolean[][] branches_compl = new boolean[6][10];
 
@@ -58,6 +60,9 @@ public class WebController {
         instance.addListener(instance.getTopic("/web/ctrl"),
             EnumSet.of(NetworkTableEvent.Kind.kValueRemote), (ev) -> {
                 String value = ev.valueData.value.getString();
+                if (value.isEmpty()) {
+                    return;
+                }
                 System.out.println("new value");
                 lock.lock();
                 inputs.currentCommand = value;
@@ -198,6 +203,17 @@ public class WebController {
             currentLocation =
                 ScoringLocation.CoralLocation.fromInt(2 * (int) (bay - 'a') + (right ? 1 : 0));
             currentHeight = ScoringLocation.Height.fromInt(height);
+            if (!hasSelectedAlgae && currentHeight.isAlgae) {
+                int offset = (bay - 'a') % 2;
+                if (height == 7) {
+                    offset = 1 - offset;
+                }
+                for (int i = 0; i < 6; i += 2) {
+                    branches_compl[(i + offset) % 6][4] = true;
+                    branches_compl[(i + offset + 1) % 6][7] = true;
+                }
+                hasSelectedAlgae = true;
+            }
         }
     }
 

@@ -1,17 +1,24 @@
 package frc.robot;
 
+import java.util.function.Supplier;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.AllianceFlipUtil;
+import frc.lib.util.Container;
 import frc.lib.util.ScoringLocation;
 import frc.lib.util.ScoringLocation.CoralLocation;
 import frc.lib.util.ScoringLocation.Height;
+import frc.robot.commands.MoveAndAvoidReef;
 import frc.robot.commands.MoveToPose;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.coral.CoralScoring;
@@ -164,5 +171,84 @@ public class AutoCommandFactory {
             algae.runAlgaeMotor(Constants.Algae.VOLTAGE).withDeadline(Commands.waitSeconds(.5)),
             CommandFactory.ensureHome(elevator), swerve.stop()));
         return routine;
+    }
+
+    // driver.a().and(operator.hasReefLocation()).whileTrue(CommandFactory
+    // .autoScore(swerve, elevator, coralScoring, algae, operator::getDesiredLocation,
+    // operator::getDesiredHeight)
+    // .andThen(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder))
+    // .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)).negate()
+    // .onTrue(coralScoring.runCoralIntake());
+
+    public AutoRoutine autoScore1(Supplier<ScoringLocation.CoralLocation> location,
+        Supplier<ScoringLocation.Height> height) {
+        AutoRoutine routine = autoFactory.newRoutine("AutoScore1");
+        autoScore1(routine, routine.active(), location, height);
+        return routine;
+    }
+
+    private void autoScore1(AutoRoutine routine, Trigger trigger,
+        Supplier<ScoringLocation.CoralLocation> location, Supplier<ScoringLocation.Height> height) {
+
+        final Container<Boolean> intakingAlgae = new Container<Boolean>(false);
+
+        MoveAndAvoidReef preAlign = reefPreAlign(routine, location);
+        MoveToPose align = reefAlign(routine, location);
+        MoveToPose backAway = backAwayReef(routine, location);
+
+        trigger.onTrue(preAlign);
+        preAlign.done()
+            .onTrue(elevator.moveTo(() -> height.get().height)
+                .andThen(new ConditionalCommand(Commands.waitUntil(coral.coralAtOuttake),
+                    Commands.runOnce(() -> {
+                    }), () -> !height.get().isAlgae))
+                .andThen(align));
+        align.active().onTrue(Commands.runOnce(() -> {
+            if (height.get().isAlgae) {
+                intakingAlgae.value = true;
+            }
+        }));
+        align.done().onTrue(new ConditionalCommand(Commands.runOnce(() -> {
+        }), coral.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae)
+            .andThen(backAway));
+
+        // Algae Intake runs if `intakingAlgae` is true.
+        routine.observe(() -> intakingAlgae.value).whileTrue(algae.algaeIntakeCommand());
+
+    }
+
+    private MoveToPose backAwayReef(AutoRoutine routine,
+        Supplier<ScoringLocation.CoralLocation> location) {
+        return new MoveToPose(swerve, () -> {
+            Pose2d finalLoc = location.get().pose;
+            return new Pose2d(
+                finalLoc.getTranslation()
+                    .minus(new Translation2d(Units.inchesToMeters(16), finalLoc.getRotation())),
+                finalLoc.getRotation());
+        }, () -> 0.3, true, Units.inchesToMeters(4), 5, routine);
+    }
+
+    private MoveToPose reefAlign(AutoRoutine routine,
+        Supplier<ScoringLocation.CoralLocation> location) {
+        return new MoveToPose(swerve, () -> {
+            Pose2d finalLoc = location.get().pose;
+
+            return new Pose2d(
+                finalLoc.getTranslation()
+                    .minus(new Translation2d(Units.inchesToMeters(1.0), finalLoc.getRotation())),
+                finalLoc.getRotation());
+        }, () -> 0.3, true, Units.inchesToMeters(0.25), 0.2, routine);
+    }
+
+    private MoveAndAvoidReef reefPreAlign(AutoRoutine routine,
+        Supplier<ScoringLocation.CoralLocation> location) {
+        MoveAndAvoidReef cmd = new MoveAndAvoidReef(swerve, () -> {
+            Pose2d finalLoc = location.get().pose;
+            return new Pose2d(
+                finalLoc.getTranslation()
+                    .minus(new Translation2d(Units.inchesToMeters(12), finalLoc.getRotation())),
+                finalLoc.getRotation().plus(Rotation2d.fromDegrees(15)));
+        }, () -> 4.0, true, Units.inchesToMeters(12), 2, routine);
+        return cmd;
     }
 }

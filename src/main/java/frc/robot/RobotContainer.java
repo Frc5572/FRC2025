@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -99,6 +98,7 @@ public class RobotContainer {
     private CoralScoring coralScoring;
     private Climber climb;
     private OperatorStates operatorStates = new OperatorStates();
+    private AutoCommandFactory autos;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -139,7 +139,7 @@ public class RobotContainer {
         autoFactory = new AutoFactory(swerve::getPose, swerve::resetOdometry,
             swerve::followTrajectory, true, swerve);
 
-        AutoCommandFactory autos =
+        autos =
             new AutoCommandFactory(autoFactory, swerve, elevator, coralScoring, algae, ledsleft);
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Example", autos::example);
@@ -222,12 +222,14 @@ public class RobotContainer {
 
         driver.rightTrigger().and(climb.reachedClimberStart)
             .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
-        driver.a().and(operator.hasReefLocation()).whileTrue(CommandFactory
-            .autoScore(swerve, elevator, coralScoring, algae, operator::getDesiredLocation,
-                operator::getDesiredHeight)
-            .andThen(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder))
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)).negate()
-            .onTrue(coralScoring.runCoralIntake());
+        // driver.a().and(operator.hasReefLocation()).whileTrue(CommandFactory
+        // .autoScore(swerve, elevator, coralScoring, algae, operator::getDesiredLocation,
+        // operator::getDesiredHeight)
+        // .andThen(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder))
+        // .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)).negate()
+        // .onTrue(coralScoring.runCoralIntake());
+        driver.a().and(operator.hasReefLocation()).whileTrue(
+            autos.autoScore1(operator::getDesiredLocation, operator::getDesiredHeight).cmd());
         driver.b()
             .whileTrue(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)
                 .andThen(swerve.run(() -> {
