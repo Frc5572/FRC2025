@@ -312,7 +312,7 @@
         const CTRL_ID = "/web/ctrl";
         const RESP_ID = "/web/resp";
 
-        const id_names = ["reef-a", "reef-b", "reef-c", "reef-d", "reef-e", "reef-f", "p0l", "p0r", "p1l", "p1r", "p2", "p3l", "p3r", "p4", "p5l", "p5r", "fdrl", "fdrf", "fdrr", "confx", "confy"];
+        const id_names = ["reef-a", "reef-b", "reef-c", "reef-d", "reef-e", "reef-f", "p0l", "p0r", "p1l", "p1r", "p2", "p3l", "p3r", "p4", "p5l", "p5r", "fdrl", "fdrf", "fdrr", "confx", "confy", "algb", "algp"];
 
         let client = new NT4_Client(
             window.location.hostname,
@@ -442,8 +442,8 @@
             ["confx", RIGHT_BRANCH_RIGHT_X, CONF_MID_Y, CONF_BUTTONS_RIGHT_X, FEEDER_BOTTOM_Y],
             ["confy", CONF_BUTTONS_RIGHT_X, CONF_MID_Y, FURTHEST_RIGHT_X, FEEDER_BOTTOM_Y],
             ["confc", RIGHT_BRANCH_RIGHT_X, CONF_BOTTOM_Y, CONF_BUTTONS_RIGHT_X, CONF_MID_Y],
-            ["confd", CONF_BUTTONS_RIGHT_X, CONF_BOTTOM_Y, FURTHEST_RIGHT_X, CONF_MID_Y],
-            ["confe", RIGHT_BRANCH_RIGHT_X, CONF_ROW_3_BOTTOM_Y, CONF_BUTTONS_RIGHT_X, CONF_BOTTOM_Y],
+            ["algb", CONF_BUTTONS_RIGHT_X, CONF_BOTTOM_Y, FURTHEST_RIGHT_X, CONF_MID_Y],
+            ["algp", RIGHT_BRANCH_RIGHT_X, CONF_ROW_3_BOTTOM_Y, CONF_BUTTONS_RIGHT_X, CONF_BOTTOM_Y],
             ["conff", CONF_BUTTONS_RIGHT_X, CONF_ROW_3_BOTTOM_Y, FURTHEST_RIGHT_X, CONF_BOTTOM_Y],
         ];
         // Reef branches
@@ -575,7 +575,7 @@
                         client.addSample(CTRL_ID, "confy");
                     } else if (y > CONF_BOTTOM_Y) {
                         client.addSample(CTRL_ID, "");
-                        client.addSample(CTRL_ID, "confd");
+                        client.addSample(CTRL_ID, "algb");
                     } else if (y > CONF_ROW_3_BOTTOM_Y) {
                         client.addSample(CTRL_ID, "");
                         client.addSample(CTRL_ID, "conff");
@@ -589,7 +589,7 @@
                         client.addSample(CTRL_ID, "confc");
                     } else if (y > CONF_ROW_3_BOTTOM_Y) {
                         client.addSample(CTRL_ID, "");
-                        client.addSample(CTRL_ID, "confe");
+                        client.addSample(CTRL_ID, "algp");
                     }
                 }
             }

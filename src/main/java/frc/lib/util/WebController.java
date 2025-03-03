@@ -24,6 +24,7 @@ public class WebController {
     private boolean right = false;
     private int height = -1;
     private char fdr = 'f';
+    private char alg = 'd';
 
     private boolean hasSelectedAlgae = false;
 
@@ -126,11 +127,19 @@ public class WebController {
                 default:
                     break;
             }
+        } else if (value.startsWith("alg")) {
+            value = value.substring(3);
+            char newVal = value.charAt(0);
+            if (newVal == alg) {
+                newVal = 'd';
+            }
+            alg = newVal;
+            createResponse();
         }
         LoggedTracer.record("WebController");
     }
 
-    private final long[] response_values = new long[21];
+    private final long[] response_values = new long[23];
     private static final boolean[] empty = new boolean[10];
 
     private static int encode_height(int height, boolean right) {
@@ -194,6 +203,9 @@ public class WebController {
         // Confirmation
         response_values[19] = (hasReefLocation.getAsBoolean() ? 0 : 2);
         response_values[20] = (hasReefLocation.getAsBoolean() ? 0 : 2);
+        // Algae
+        response_values[21] = (alg == 'b' ? 1 : 0);
+        response_values[22] = (alg == 'p' ? 1 : 0);
 
         Logger.recordOutput("WebControllerButtons", response_values);
         response.set(response_values);
@@ -232,6 +244,10 @@ public class WebController {
 
     public char feeder() {
         return this.fdr;
+    }
+
+    public char whatToDoWithAlgae() {
+        return this.alg;
     }
 
     public Optional<ScoringLocation.Height> additionalAlgaeHeight() {

@@ -425,11 +425,13 @@ public final class Constants {
         public static final double PID_TKI = 0.0;
         public static final double PID_TKD = 0.0;
 
-        public static final double MAX_VELOCITY = 2;
+        public static final double MAX_VELOCITY = 12.0;
         public static final double MAX_ACCELERATION = 3;
 
-        public static final double MAX_ANGULAR_VELOCITY = 2.9;
-        public static final double MAX_ANGULAR_ACCELERATION = 8;
+        public static final double MAX_ANGULAR_VELOCITY = 8;
+        public static final double MAX_ANGULAR_ACCELERATION = 16;
+
+        public static final double MAX_ELEVATOR_UP_VELOCITY = 1.0;
     }
 
     public static final Rotation2d CIRCLE_REEF_LOOKAHEAD_ANGLE = Rotation2d.fromDegrees(45);
