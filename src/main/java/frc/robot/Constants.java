@@ -434,6 +434,9 @@ public final class Constants {
 
     public static final Rotation2d CIRCLE_REEF_LOOKAHEAD_ANGLE = Rotation2d.fromDegrees(30);
 
+    /**
+     * Paths for Dashboard NT Tables topics
+     */
     public static class DashboardValues {
         // Auto
         public static final String autoChooser = "Dashboard/Auto/Auto Chooser";
