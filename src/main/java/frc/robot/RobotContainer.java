@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.lib.util.ScoringLocation;
 import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.WebController;
 import frc.lib.util.viz.FieldViz;
@@ -148,13 +146,6 @@ public class RobotContainer {
         autoChooser.addRoutine("Right Side L4 Coral", autos::l4right);
         autoChooser.addRoutine("Barge", autos::barge);
         SmartDashboard.putData(Constants.DashboardValues.autoChooser, autoChooser);
-
-        SendableChooser<ScoringLocation.Height> algaeHeight =
-            new SendableChooser<ScoringLocation.Height>();
-        algaeHeight.setDefaultOption("High", ScoringLocation.Height.KP2);
-        algaeHeight.addOption("Low", ScoringLocation.Height.KP0);
-        SmartDashboard.putData(Constants.DashboardValues.algaeHeight, algaeHeight);
-
 
         RobotModeTriggers.autonomous()
             .whileTrue(autoChooser.selectedCommandScheduler()
