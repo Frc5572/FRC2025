@@ -156,8 +156,10 @@ public class RobotContainer {
         SmartDashboard.putData(Constants.DashboardValues.algaeHeight, algaeHeight);
 
 
-        RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler()
-            .andThen(Commands.runOnce(() -> swerve.setMotorsZero())));
+        RobotModeTriggers.autonomous()
+            .whileTrue(autoChooser.selectedCommandScheduler()
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+                .andThen(Commands.runOnce(() -> swerve.setMotorsZero())));
         RobotModeTriggers.disabled().onTrue(Commands.runOnce(() -> swerve.setMotorsZero()));
 
 
