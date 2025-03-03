@@ -230,26 +230,32 @@ public class WebController {
         }
     }
 
+    /** Get if fully defined reef location is available */
     public Trigger hasReefLocation() {
         return hasReefLocation;
     }
 
+    /** Get elevator height for scoring location */
     public ScoringLocation.Height getDesiredHeight() {
         return currentHeight;
     }
 
+    /** Get coral scoring location */
     public ScoringLocation.CoralLocation getDesiredLocation() {
         return currentLocation;
     }
 
+    /** Which feeder to go to */
     public char feeder() {
         return this.fdr;
     }
 
+    /** Where to score algae (or drop) */
     public char whatToDoWithAlgae() {
         return this.alg;
     }
 
+    /** Get available algae at same position */
     public Optional<ScoringLocation.Height> additionalAlgaeHeight() {
         if (!right) {
             return Optional.empty();
