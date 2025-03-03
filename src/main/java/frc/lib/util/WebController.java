@@ -2,6 +2,7 @@ package frc.lib.util;
 
 import java.nio.file.Paths;
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLog;
@@ -231,6 +232,23 @@ public class WebController {
 
     public char feeder() {
         return this.fdr;
+    }
+
+    public Optional<ScoringLocation.Height> additionalAlgaeHeight() {
+        if (!right) {
+            return Optional.empty();
+        }
+        if (height == 4 || height == 7) {
+            return Optional.empty();
+        }
+        var branches = this.branches_compl[(this.bay - 'a')];
+        if (!branches[4]) {
+            return Optional.of(ScoringLocation.Height.KP0);
+        } else if (!branches[7]) {
+            return Optional.of(ScoringLocation.Height.KP2);
+        } else {
+            return Optional.empty();
+        }
     }
 
 }

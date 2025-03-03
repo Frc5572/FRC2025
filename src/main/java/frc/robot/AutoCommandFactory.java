@@ -1,24 +1,19 @@
 package frc.robot;
 
-import java.util.function.Supplier;
+import java.util.Optional;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.AllianceFlipUtil;
 import frc.lib.util.Container;
 import frc.lib.util.ScoringLocation;
 import frc.lib.util.ScoringLocation.CoralLocation;
 import frc.lib.util.ScoringLocation.Height;
-import frc.robot.commands.MoveAndAvoidReef;
 import frc.robot.commands.MoveToPose;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.coral.CoralScoring;
@@ -37,6 +32,7 @@ public class AutoCommandFactory {
     CoralScoring coral;
     LEDs leds;
     ElevatorAlgae algae;
+    Container<Boolean> intakingAlgae;
 
     /**
      * Command Factory for Autos
@@ -48,13 +44,14 @@ public class AutoCommandFactory {
      * @param leds LED Subsystem
      */
     public AutoCommandFactory(AutoFactory autoFactory, Swerve swerve, Elevator elevator,
-        CoralScoring coral, ElevatorAlgae algae, LEDs leds) {
+        CoralScoring coral, ElevatorAlgae algae, LEDs leds, Container<Boolean> intakingAlgae) {
         this.autoFactory = autoFactory;
         this.swerve = swerve;
         this.elevator = elevator;
         this.coral = coral;
         this.algae = algae;
         this.leds = leds;
+        this.intakingAlgae = intakingAlgae;
     }
 
     /**
@@ -79,7 +76,6 @@ public class AutoCommandFactory {
         return routine;
     }
 
-    private static final Pose2d leftStart = new Pose2d(7.50, 6.12, Rotation2d.k180deg);
     private static final Pose2d middleStart =
         new Pose2d(7.578684329986572, 3.9847824573516846, Rotation2d.k180deg);
 
@@ -94,20 +90,20 @@ public class AutoCommandFactory {
         routine.active()
             .onTrue(Commands
                 .sequence(CommandFactory.dropAlgaeIntake(swerve), Commands.waitSeconds(.5),
-                    CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.I,
-                        () -> Height.KP4),
+                    CommandFactory.autoScore(swerve, elevator, coral, () -> CoralLocation.I,
+                        () -> Height.KP4, () -> Optional.empty(), intakingAlgae),
                     CommandFactory.leftFeeder(swerve, elevator, coral),
                     coral.runCoralIntake().until(coral.coralAtIntake),
-                    CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.K,
-                        () -> Height.KP4),
+                    CommandFactory.autoScore(swerve, elevator, coral, () -> CoralLocation.K,
+                        () -> Height.KP4, () -> Optional.empty(), intakingAlgae),
                     CommandFactory.leftFeeder(swerve, elevator, coral),
                     coral.runCoralIntake().until(coral.coralAtIntake),
-                    CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.J,
-                        () -> Height.KP4),
+                    CommandFactory.autoScore(swerve, elevator, coral, () -> CoralLocation.J,
+                        () -> Height.KP4, () -> Optional.empty(), intakingAlgae),
                     CommandFactory.leftFeeder(swerve, elevator, coral),
                     coral.runCoralIntake().until(coral.coralAtIntake),
-                    CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.L,
-                        () -> Height.KP4),
+                    CommandFactory.autoScore(swerve, elevator, coral, () -> CoralLocation.L,
+                        () -> Height.KP4, () -> Optional.empty(), intakingAlgae),
                     CommandFactory.leftFeeder(swerve, elevator, coral),
                     coral.runCoralIntake().until(coral.coralAtIntake), swerve.stop())
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
@@ -125,20 +121,20 @@ public class AutoCommandFactory {
         routine.active()
             .onTrue(Commands
                 .sequence(CommandFactory.dropAlgaeIntake(swerve), Commands.waitSeconds(.5),
-                    CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.E,
-                        () -> Height.KP4),
+                    CommandFactory.autoScore(swerve, elevator, coral, () -> CoralLocation.E,
+                        () -> Height.KP4, () -> Optional.empty(), intakingAlgae),
                     CommandFactory.rightFeeder(swerve, elevator, coral),
                     coral.runCoralIntake().until(coral.coralAtIntake),
-                    CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.C,
-                        () -> Height.KP4),
+                    CommandFactory.autoScore(swerve, elevator, coral, () -> CoralLocation.C,
+                        () -> Height.KP4, () -> Optional.empty(), intakingAlgae),
                     CommandFactory.rightFeeder(swerve, elevator, coral),
                     coral.runCoralIntake().until(coral.coralAtIntake),
-                    CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.F,
-                        () -> Height.KP4),
+                    CommandFactory.autoScore(swerve, elevator, coral, () -> CoralLocation.F,
+                        () -> Height.KP4, () -> Optional.empty(), intakingAlgae),
                     CommandFactory.rightFeeder(swerve, elevator, coral),
                     coral.runCoralIntake().until(coral.coralAtIntake),
-                    CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.D,
-                        () -> Height.KP4),
+                    CommandFactory.autoScore(swerve, elevator, coral, () -> CoralLocation.D,
+                        () -> Height.KP4, () -> Optional.empty(), intakingAlgae),
                     CommandFactory.rightFeeder(swerve, elevator, coral),
                     coral.runCoralIntake().until(coral.coralAtIntake), swerve.stop())
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
@@ -154,18 +150,20 @@ public class AutoCommandFactory {
 
         routine.active().onTrue(Commands.sequence(swerve.runOnce(() -> {
             swerve.resetOdometry(AllianceFlipUtil.apply(middleStart));
-        }), CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.H, () -> {
+        }), CommandFactory.autoScore(swerve, elevator, coral, () -> CoralLocation.H, () -> {
             boolean algaeIsHigh = SmartDashboard.getBoolean("isHigh", false);
             return (algaeIsHigh) ? Height.KP2 : Height.KP0;
-        }), CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.H,
-            () -> Height.KP4), CommandFactory.barge(swerve, elevator),
+        }, () -> Optional.empty(), intakingAlgae),
+            CommandFactory.autoScore(swerve, elevator, coral, () -> CoralLocation.H,
+                () -> Height.KP4, () -> Optional.empty(), intakingAlgae),
+            CommandFactory.barge(swerve, elevator),
             elevator.moveTo(() -> ScoringLocation.Height.KP5.height),
             algae.runAlgaeMotor(Constants.Algae.VOLTAGE).withDeadline(Commands.waitSeconds(.25)),
-            CommandFactory.ensureHome(elevator).andThen(CommandFactory.autoScore(swerve, elevator,
-                coral, algae, () -> CoralLocation.J, () -> {
+            CommandFactory.ensureHome(elevator).andThen(
+                CommandFactory.autoScore(swerve, elevator, coral, () -> CoralLocation.J, () -> {
                     boolean algaeIsHigh = SmartDashboard.getBoolean("isHigh", false);
                     return (algaeIsHigh) ? Height.KP0 : Height.KP2;
-                })),
+                }, () -> Optional.empty(), intakingAlgae)),
             CommandFactory.ensureHome(elevator).andThen(CommandFactory.barge(swerve, elevator)),
             elevator.moveTo(() -> ScoringLocation.Height.KP5.height),
             algae.runAlgaeMotor(Constants.Algae.VOLTAGE).withDeadline(Commands.waitSeconds(.5)),
@@ -173,82 +171,4 @@ public class AutoCommandFactory {
         return routine;
     }
 
-    // driver.a().and(operator.hasReefLocation()).whileTrue(CommandFactory
-    // .autoScore(swerve, elevator, coralScoring, algae, operator::getDesiredLocation,
-    // operator::getDesiredHeight)
-    // .andThen(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder))
-    // .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)).negate()
-    // .onTrue(coralScoring.runCoralIntake());
-
-    public AutoRoutine autoScore1(Supplier<ScoringLocation.CoralLocation> location,
-        Supplier<ScoringLocation.Height> height) {
-        AutoRoutine routine = autoFactory.newRoutine("AutoScore1");
-        autoScore1(routine, routine.active(), location, height);
-        return routine;
-    }
-
-    private void autoScore1(AutoRoutine routine, Trigger trigger,
-        Supplier<ScoringLocation.CoralLocation> location, Supplier<ScoringLocation.Height> height) {
-
-        final Container<Boolean> intakingAlgae = new Container<Boolean>(false);
-
-        MoveAndAvoidReef preAlign = reefPreAlign(routine, location);
-        MoveToPose align = reefAlign(routine, location);
-        MoveToPose backAway = backAwayReef(routine, location);
-
-        trigger.onTrue(preAlign);
-        preAlign.done()
-            .onTrue(elevator.moveTo(() -> height.get().height)
-                .andThen(new ConditionalCommand(Commands.waitUntil(coral.coralAtOuttake),
-                    Commands.runOnce(() -> {
-                    }), () -> !height.get().isAlgae))
-                .andThen(align));
-        align.active().onTrue(Commands.runOnce(() -> {
-            if (height.get().isAlgae) {
-                intakingAlgae.value = true;
-            }
-        }));
-        align.done().onTrue(new ConditionalCommand(Commands.runOnce(() -> {
-        }), coral.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae)
-            .andThen(backAway));
-
-        // Algae Intake runs if `intakingAlgae` is true.
-        routine.observe(() -> intakingAlgae.value).whileTrue(algae.algaeIntakeCommand());
-
-    }
-
-    private MoveToPose backAwayReef(AutoRoutine routine,
-        Supplier<ScoringLocation.CoralLocation> location) {
-        return new MoveToPose(swerve, () -> {
-            Pose2d finalLoc = location.get().pose;
-            return new Pose2d(
-                finalLoc.getTranslation()
-                    .minus(new Translation2d(Units.inchesToMeters(16), finalLoc.getRotation())),
-                finalLoc.getRotation());
-        }, () -> 0.3, true, Units.inchesToMeters(4), 5, routine);
-    }
-
-    private MoveToPose reefAlign(AutoRoutine routine,
-        Supplier<ScoringLocation.CoralLocation> location) {
-        return new MoveToPose(swerve, () -> {
-            Pose2d finalLoc = location.get().pose;
-
-            return new Pose2d(
-                finalLoc.getTranslation()
-                    .minus(new Translation2d(Units.inchesToMeters(1.0), finalLoc.getRotation())),
-                finalLoc.getRotation());
-        }, () -> 0.3, true, Units.inchesToMeters(0.25), 0.2, routine);
-    }
-
-    private MoveAndAvoidReef reefPreAlign(AutoRoutine routine,
-        Supplier<ScoringLocation.CoralLocation> location) {
-        MoveAndAvoidReef cmd = new MoveAndAvoidReef(swerve, () -> {
-            Pose2d finalLoc = location.get().pose;
-            return new Pose2d(
-                finalLoc.getTranslation()
-                    .minus(new Translation2d(Units.inchesToMeters(12), finalLoc.getRotation())),
-                finalLoc.getRotation().plus(Rotation2d.fromDegrees(15)));
-        }, () -> 4.0, true, Units.inchesToMeters(12), 2, routine);
-        return cmd;
-    }
 }

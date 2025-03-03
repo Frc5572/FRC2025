@@ -2,6 +2,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -14,12 +15,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.lib.util.AllianceFlipUtil;
+import frc.lib.util.Container;
 import frc.lib.util.ScoringLocation;
 import frc.robot.commands.MoveAndAvoidReef;
 import frc.robot.commands.MoveToPose;
 import frc.robot.subsystems.coral.CoralScoring;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator_algae.ElevatorAlgae;
 import frc.robot.subsystems.swerve.Swerve;
 
 /**
@@ -79,15 +80,29 @@ public class CommandFactory {
 
     /** Move and score coral or retrieve algae. */
     public static Command autoScore(Swerve swerve, Elevator elevator, CoralScoring coralScoring,
-        ElevatorAlgae algae, Supplier<ScoringLocation.CoralLocation> location,
-        Supplier<ScoringLocation.Height> height) {
+        Supplier<ScoringLocation.CoralLocation> location, Supplier<ScoringLocation.Height> height,
+        Supplier<Optional<ScoringLocation.Height>> additionalAlgaeHeight,
+        Container<Boolean> intakingAlgae) {
+
         return (reefPreAlign(swerve, location).andThen(new ConditionalCommand(
             Commands.waitUntil(coralScoring.coralAtOuttake), Commands.runOnce(() -> {
             }), () -> !height.get().isAlgae))).alongWith(coralScoring.runCoralIntake())
+
+                .andThen(new ConditionalCommand(Commands.runOnce(() -> {
+                    intakingAlgae.value = true;
+                }), Commands.runOnce(() -> {
+                }), () -> height.get().isAlgae || additionalAlgaeHeight.get().isPresent()))
+                .andThen(new ConditionalCommand(elevator
+                    .moveTo(() -> additionalAlgaeHeight.get().get().height)
+                    .andThen(reefAlign(swerve, location)).andThen(backAwayReef(swerve, location)),
+                    Commands.runOnce(() -> {
+                    }), () -> {
+                        return additionalAlgaeHeight.get().isPresent();
+                    }))
                 .andThen(
                     elevator.moveTo(() -> height.get().height).andThen(reefAlign(swerve, location)))
-                .andThen(new ConditionalCommand(algae.algaeIntakeCommand().withTimeout(0.4),
-                    coralScoring.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae))
+                .andThen(new ConditionalCommand(Commands.runOnce(() -> {
+                }), coralScoring.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae))
                 .andThen(backAwayReef(swerve, location));
     }
 
