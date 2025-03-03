@@ -64,7 +64,7 @@ public class Swerve extends SubsystemBase {
         swerveIO.updateInputs(inputs);
 
         state.init(getModulePositions(), getGyroYaw());
-        SmartDashboard.putData("Dashboard/Auto/Field2d", field);
+        SmartDashboard.putData(Constants.DashboardValues.field2d, field);
     }
 
     /**

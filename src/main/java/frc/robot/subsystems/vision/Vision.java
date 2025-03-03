@@ -10,6 +10,7 @@ import org.littletonrobotics.junction.Logger;
 import org.photonvision.targeting.PhotonPipelineResult;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.IntArrayList;
@@ -97,8 +98,7 @@ public class Vision extends SubsystemBase {
             }
         }
         LoggedTracer.record("Vision");
-
-
+        SmartDashboard.putBoolean(Constants.DashboardValues.seeMultiTag, seesMultitag);
     }
 
     public boolean twoAprilTags() {

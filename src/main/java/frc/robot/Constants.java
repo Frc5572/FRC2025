@@ -433,6 +433,21 @@ public final class Constants {
     }
 
     public static final Rotation2d CIRCLE_REEF_LOOKAHEAD_ANGLE = Rotation2d.fromDegrees(30);
+
+    public static class DashboardValues {
+        // Auto
+        public static final String autoChooser = "Dashboard/Auto/Auto Chooser";
+        public static final String field2d = "Dashboard/Auto/Field2d";
+        public static final String algaeHeight = "Dashboard/Auto/Algae";
+        public static final String seeMultiTag = "Dashboard/Auto/Sees Multiple Tags";
+        // Tele
+        public static final String elevatorHeight = "Dashboard/Main Driver/Elevator Height";
+        public static final String elevatorPresetHeight =
+            "Dashboard/Main Driver/Elevator Preset Level";
+        public static final String haveCoral = "Dashboard/Main Driver/Have Coral";
+        public static final String haveAlgae = "Dashboard/Main Driver/Have Algae";
+
+    }
 }
 
 

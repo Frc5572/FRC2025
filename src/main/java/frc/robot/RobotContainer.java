@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.ScoringLocation;
 import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.WebController;
 import frc.lib.util.viz.FieldViz;
@@ -98,7 +100,6 @@ public class RobotContainer {
     private final Vision vision;
     private CoralScoring coralScoring;
     private Climber climb;
-    private OperatorStates operatorStates = new OperatorStates();
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -143,12 +144,18 @@ public class RobotContainer {
             new AutoCommandFactory(autoFactory, swerve, elevator, coralScoring, algae, ledsleft);
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Example", autos::example);
-        autoChooser.addRoutine("L4 Left", autos::l4left);
-        autoChooser.addRoutine("L4 Right", autos::l4right);
+        autoChooser.addRoutine("Left Side L4 Coral", autos::l4left);
+        autoChooser.addRoutine("Right Side L4 Coral", autos::l4right);
         autoChooser.addRoutine("Barge", autos::barge);
+        SmartDashboard.putData(Constants.DashboardValues.autoChooser, autoChooser);
+
+        SendableChooser<ScoringLocation.Height> algaeHeight =
+            new SendableChooser<ScoringLocation.Height>();
+        algaeHeight.setDefaultOption("High", ScoringLocation.Height.KP2);
+        algaeHeight.addOption("Low", ScoringLocation.Height.KP0);
+        SmartDashboard.putData(Constants.DashboardValues.algaeHeight, algaeHeight);
 
 
-        SmartDashboard.putData("Dashboard/Auto/Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler()
             .andThen(Commands.runOnce(() -> swerve.setMotorsZero())));
         RobotModeTriggers.disabled().onTrue(Commands.runOnce(() -> swerve.setMotorsZero()));
@@ -238,7 +245,7 @@ public class RobotContainer {
         altOperator.y().onTrue(elevator.home());
         altOperator.x().and(coralScoring.coralAtOuttake).whileTrue(coralScoring.runCoralOuttake());
         altOperator.rightTrigger().whileTrue(algae.algaeIntakeCommand());
-        altOperator.leftTrigger().whileTrue(algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE));
+        altOperator.leftTrigger().whileTrue(algae.algaeOuttakeCommand());
         // manual mode
 
         altOperator.povLeft().onTrue(elevator.moveTo(() -> Height.KP5.height));
@@ -271,7 +278,8 @@ public class RobotContainer {
             ledsright.setLEDsSolid(Color.kBlue).alongWith(ledsleft.setLEDsSolid(Color.kBlue)));
         coralScoring.coralAtOuttake.whileTrue(
             ledsright.setLEDsSolid(Color.kCyan).alongWith(ledsleft.setLEDsSolid(Color.kCyan)));
-        vision.seesTwoAprilTags.whileTrue(ledsright.setRainbow().alongWith(ledsleft.setRainbow()));
+        vision.seesTwoAprilTags.whileTrue(ledsright.setRainbow().alongWith(ledsleft.setRainbow())
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
 
 
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());

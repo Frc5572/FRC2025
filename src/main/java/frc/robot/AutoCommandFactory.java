@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.lib.util.AllianceFlipUtil;
 import frc.lib.util.ScoringLocation;
 import frc.lib.util.ScoringLocation.CoralLocation;
 import frc.lib.util.ScoringLocation.Height;
@@ -72,17 +71,13 @@ public class AutoCommandFactory {
         return routine;
     }
 
-    private static final Pose2d leftStart = new Pose2d(7.50, 6.12, Rotation2d.k180deg);
-    private static final Pose2d middleStart =
-        new Pose2d(7.578684329986572, 3.9847824573516846, Rotation2d.k180deg);
-
     /**
      * Left L4 Auto
      *
      * @return Auto Routine
      */
     public AutoRoutine l4left() {
-        AutoRoutine routine = autoFactory.newRoutine("Test");
+        AutoRoutine routine = autoFactory.newRoutine("Left Side L4 Coral");
 
         routine.active()
             .onTrue(Commands
@@ -113,7 +108,7 @@ public class AutoCommandFactory {
      * @return Auto Routine
      */
     public AutoRoutine l4right() {
-        AutoRoutine routine = autoFactory.newRoutine("Test2");
+        AutoRoutine routine = autoFactory.newRoutine("Right Side L4 Coral");
 
         routine.active()
             .onTrue(Commands
@@ -138,22 +133,21 @@ public class AutoCommandFactory {
         return routine;
     }
 
-    boolean dashboard = SmartDashboard.putBoolean("isHigh", true);
-
     /** Barge auto */
     public AutoRoutine barge() {
 
         AutoRoutine routine = autoFactory.newRoutine("Barge");
 
-        routine.active().onTrue(Commands.sequence(swerve.runOnce(() -> {
-            swerve.resetOdometry(AllianceFlipUtil.apply(middleStart));
-        }), CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.H, () -> {
-            boolean algaeIsHigh = SmartDashboard.getBoolean("isHigh", false);
-            return (algaeIsHigh) ? Height.KP2 : Height.KP0;
-        }), CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.H,
-            () -> Height.KP4), CommandFactory.barge(swerve, elevator),
+        routine.active().onTrue(Commands.sequence(
+            CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.H, () -> {
+                boolean algaeIsHigh = SmartDashboard.getBoolean("isHigh", false);
+                return (algaeIsHigh) ? Height.KP2 : Height.KP0;
+            }),
+            CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.H,
+                () -> Height.KP4),
+            CommandFactory.barge(swerve, elevator),
             elevator.moveTo(() -> ScoringLocation.Height.KP5.height),
-            algae.runAlgaeMotor(Constants.Algae.VOLTAGE).withDeadline(Commands.waitSeconds(.25)),
+            algae.algaeOuttakeCommand().withDeadline(Commands.waitSeconds(.25)),
             CommandFactory.ensureHome(elevator).andThen(CommandFactory.autoScore(swerve, elevator,
                 coral, algae, () -> CoralLocation.J, () -> {
                     boolean algaeIsHigh = SmartDashboard.getBoolean("isHigh", false);
@@ -161,7 +155,7 @@ public class AutoCommandFactory {
                 })),
             CommandFactory.ensureHome(elevator).andThen(CommandFactory.barge(swerve, elevator)),
             elevator.moveTo(() -> ScoringLocation.Height.KP5.height),
-            algae.runAlgaeMotor(Constants.Algae.VOLTAGE).withDeadline(Commands.waitSeconds(.5)),
+            algae.algaeOuttakeCommand().withDeadline(Commands.waitSeconds(.5)),
             CommandFactory.ensureHome(elevator), swerve.stop()));
         return routine;
     }
