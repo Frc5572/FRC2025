@@ -90,6 +90,5 @@ public class ElevatorAlgae extends SubsystemBase {
             .until(hasAlgae).andThen(runAlgaeMotor(Constants.Algae.SMALLER_VOLTAGE)
                 .until(() -> !supplier.getAsBoolean()))
             .repeatedly();
-
     }
 }

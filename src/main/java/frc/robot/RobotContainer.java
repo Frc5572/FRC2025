@@ -216,18 +216,6 @@ public class RobotContainer {
         swerve.setDefaultCommand(swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
 
-        driver.y().onTrue(Commands.runOnce(() -> swerve.resetFieldRelativeOffset()));
-        driver.rightTrigger().and(climb.reachedClimberStart.negate())
-            .onTrue(climb
-                .runClimberMotorCommand(Constants.Climb.PRE_CLIMB_VOLTAGE,
-                    () -> climb.getClimberPosition()
-                        .in(Radians) >= Constants.Climb.CLIMBER_OUT_ANGLE.in(Radians))
-                .andThen(climb.runClimberMotorCommand(Constants.Climb.RESET_VOLTAGE,
-                    () -> climb.getClimberPosition()
-                        .in(Radians) <= Constants.Climb.CLIMBER_START_ANGLE.in(Radians))));
-
-        driver.rightTrigger().and(climb.reachedClimberStart)
-            .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
         Command autoScore = CommandFactory
             .autoScore(swerve, elevator, coralScoring, operator::getDesiredLocation,
                 operator::getDesiredHeight, operator::additionalAlgaeHeight, intakingAlgae,
@@ -246,7 +234,23 @@ public class RobotContainer {
         driver.b()
             .whileTrue(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)
                 .andThen(swerve.run(() -> {
-                })));
+                })))
+            .whileTrue(ledsleft.setLEDsBreathe(Color.kGreen));
+        driver.x().onTrue(elevator.home());
+        driver.y().onTrue(Commands.runOnce(() -> swerve.resetFieldRelativeOffset()));
+        driver.rightTrigger().and(climb.reachedClimberStart.negate())
+            .onTrue(climb
+                .runClimberMotorCommand(Constants.Climb.PRE_CLIMB_VOLTAGE,
+                    () -> climb.getClimberPosition()
+                        .in(Radians) >= Constants.Climb.CLIMBER_OUT_ANGLE.in(Radians))
+                .andThen(climb.runClimberMotorCommand(Constants.Climb.RESET_VOLTAGE,
+                    () -> climb.getClimberPosition()
+                        .in(Radians) <= Constants.Climb.CLIMBER_START_ANGLE.in(Radians))));
+        driver.rightTrigger().and(climb.reachedClimberStart)
+            .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
+        driver.leftTrigger().whileTrue(Commands.runOnce(() -> {
+            intakingAlgae.value = false;
+        }).alongWith(algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE)));
     }
 
     private void setupAltOperatorController() {
@@ -296,7 +300,7 @@ public class RobotContainer {
 
         algae.setDefaultCommand(algae.algaeIntakeCommand(() -> {
             return intakingAlgae.value;
-        }).withName("default"));
+        }).withName("Algae Default Command"));
 
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
@@ -305,7 +309,6 @@ public class RobotContainer {
             .onTrue(ledsright.blinkLEDs(Color.kCyan, 2)).onTrue(ledsleft.blinkLEDs(Color.kCyan, 2));
         // Climb
         climb.resetButton.onTrue(climb.resetEncoder());
-        // coralScoring.coralAtOuttake.and(RobotModeTriggers.teleop()).onTrue(elevator.p0());
         elevator.hightAboveP0.or(climb.reachedClimberStart)
             .onTrue(Commands.runOnce(() -> swerve.setSpeedMultiplier(0.15)).ignoringDisable(true))
             .onFalse(Commands.runOnce(() -> swerve.setSpeedMultiplier(1.0)).ignoringDisable(true));
