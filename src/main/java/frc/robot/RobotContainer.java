@@ -88,7 +88,7 @@ public class RobotContainer {
     private final Viz2025 vis;
     /** State */
     private final RobotState state;
-    private final Container<Boolean> intakingAlgae = new Container<Boolean>(false);
+    private final Container<Boolean> intakingAlgae = new Container<Boolean>(true);
 
 
     /* Subsystems */
@@ -314,6 +314,8 @@ public class RobotContainer {
         elevator.hightAboveP0.or(climb.reachedClimberStart)
             .onTrue(Commands.runOnce(() -> swerve.setSpeedMultiplier(0.15)).ignoringDisable(true))
             .onFalse(Commands.runOnce(() -> swerve.setSpeedMultiplier(1.0)).ignoringDisable(true));
+        climb.leftMagnet.whileTrue(ledsleft.blinkLEDs(Color.kDeepPink));
+        climb.rightMagnet.whileTrue(ledsright.blinkLEDs(Color.kDeepPink));
 
     }
 
