@@ -110,8 +110,13 @@ public class CommandFactory {
                     }), () -> {
                         return additionalAlgaeHeight.get().isPresent();
                     }))
-                .andThen(elevator.moveTo(() -> height.get().height)
-                    .alongWith(reefAlign(swerve, location).withTimeout(2.0)))
+                .andThen(new ConditionalCommand(
+                    (elevator.moveTo(() -> height.get().height)
+                        .andThen(reefAlign(swerve, location).withTimeout(2.0))),
+                    (elevator.moveTo(() -> height.get().height)
+                        .alongWith(reefAlign(swerve, location).withTimeout(2.0))),
+                    () -> intakingAlgae.value))
+                .andThen(Commands.waitSeconds(0.2))
                 .andThen(new ConditionalCommand(Commands.runOnce(() -> {
                 }), coralScoring.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae))
                 .andThen(backAwayReef(swerve, location).withTimeout(2.0));
@@ -142,7 +147,9 @@ public class CommandFactory {
                         elevator.moveTo(() -> ScoringLocation.Height.KP5.height),
                         Commands.runOnce(() -> {
                             intakingAlgae.value = false;
-                        }), algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE).withTimeout(0.4)),
+                        }),
+                        algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE).withTimeout(0.4)
+                            .asProxy()),
                 'p', Commands
                     .sequence(ensureHome(elevator).alongWith(new MoveAndAvoidReef(swerve, () -> {
                         Pose2d desiredPose = processorPose;
@@ -162,8 +169,8 @@ public class CommandFactory {
                             Units.inchesToMeters(4), 5),
                         Commands.runOnce(() -> {
                             intakingAlgae.value = false;
-                        }),
-                        algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE).withTimeout(0.4))),
+                        }), algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE).withTimeout(0.4)
+                            .asProxy())),
                 whatToDo),
             Commands.runOnce(() -> {
             }), () -> intakingAlgae.value);
@@ -253,8 +260,8 @@ public class CommandFactory {
         }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve, coral));
     }
 
-    private static final Pose2d bargePose =
-        new Pose2d(7.596248722076416, 5.551057815551758, Rotation2d.kZero);
+    private static final Pose2d bargePose = new Pose2d(FieldConstants.fieldLength.in(Meters) - 9.49,
+        5.551057815551758, Rotation2d.kZero);
 
     /** Move to barge position */
     public static Command barge(Swerve swerve, Elevator elevator) {
