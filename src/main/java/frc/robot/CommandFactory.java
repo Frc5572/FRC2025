@@ -190,7 +190,7 @@ public class CommandFactory {
         }).until(scoring.coralAtIntake).withTimeout(3.0).andThen(swerve.stop());
     }
 
-    private static final Pose2d leftFeeder = new Pose2d(1.5196709632873535, 7.158551216125488,
+    private static final Pose2d leftFeeder = new Pose2d(1.4372355937957764, 7.302813529968262,
         Rotation2d.fromRadians(-2.4980917038665034));
 
     /** Move to left feeder */
