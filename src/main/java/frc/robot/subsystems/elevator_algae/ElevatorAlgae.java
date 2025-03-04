@@ -45,7 +45,7 @@ public class ElevatorAlgae extends SubsystemBase {
         } else if (!hasAlgae.getAsBoolean()) {
             temp = Color.kRed;
         }
-        SmartDashboard.putString("Dashboard/Main Driver/Have Algae", temp.toHexString());
+        SmartDashboard.putString(Constants.DashboardValues.haveAlgae, temp.toHexString());
         LoggedTracer.record("Algae");
     }
 
@@ -79,7 +79,15 @@ public class ElevatorAlgae extends SubsystemBase {
     public Command algaeIntakeCommand() {
         return runAlgaeMotor(Constants.Algae.VOLTAGE).until(hasAlgae)
             .andThen(() -> setAlgaeMotorVoltage(Constants.Algae.SMALLER_VOLTAGE));
+    }
 
+    /**
+     * Outtake Algae
+     *
+     * @return Command to outtake algae
+     */
+    public Command algaeOuttakeCommand() {
+        return runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE);
     }
 
     /**

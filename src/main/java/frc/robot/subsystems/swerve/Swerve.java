@@ -66,12 +66,12 @@ public class Swerve extends SubsystemBase {
         swerveIO.updateInputs(inputs);
 
         state.init(getModulePositions(), getGyroYaw());
-        SmartDashboard.putData("Dashboard/Auto/Field2d", field);
 
         if (RobotContainer.runType == RobotRunType.kSimulation) {
             holonomicDriveController.getXController().setP(7.0);
             holonomicDriveController.getYController().setP(7.0);
         }
+        SmartDashboard.putData(Constants.DashboardValues.field2d, field);
     }
 
     /**

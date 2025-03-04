@@ -102,8 +102,6 @@ public class RobotContainer {
     private final Vision vision;
     private CoralScoring coralScoring;
     private Climber climb;
-    private OperatorStates operatorStates = new OperatorStates();
-    private AutoCommandFactory autos;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -145,18 +143,19 @@ public class RobotContainer {
         autoFactory = new AutoFactory(swerve::getPose, swerve::resetOdometry,
             swerve::followTrajectory, true, swerve);
 
-        autos = new AutoCommandFactory(autoFactory, swerve, elevator, coralScoring, algae, ledsleft,
-            intakingAlgae);
+        AutoCommandFactory autos = new AutoCommandFactory(autoFactory, swerve, elevator,
+            coralScoring, algae, ledsleft, intakingAlgae);
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Example", autos::example);
-        autoChooser.addRoutine("L4 Left", autos::l4left);
-        autoChooser.addRoutine("L4 Right", autos::l4right);
+        autoChooser.addRoutine("Left Side L4 Coral", autos::l4left);
+        autoChooser.addRoutine("Right Side L4 Coral", autos::l4right);
         autoChooser.addRoutine("Barge", autos::barge);
+        SmartDashboard.putData(Constants.DashboardValues.autoChooser, autoChooser);
 
-
-        SmartDashboard.putData("Dashboard/Auto/Auto Chooser", autoChooser);
-        RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler()
-            .andThen(Commands.runOnce(() -> swerve.setMotorsZero())));
+        RobotModeTriggers.autonomous()
+            .whileTrue(autoChooser.selectedCommandScheduler()
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+                .andThen(Commands.runOnce(() -> swerve.setMotorsZero())));
         RobotModeTriggers.disabled().onTrue(Commands.runOnce(() -> swerve.setMotorsZero()));
 
 
@@ -296,7 +295,10 @@ public class RobotContainer {
             .whileTrue(ledsleft.setLEDsSolid(Color.kBlue));
         coralScoring.coralAtOuttake.whileTrue(ledsright.setLEDsSolid(Color.kCyan))
             .whileTrue(ledsleft.setLEDsSolid(Color.kCyan));
-        vision.seesTwoAprilTags.whileTrue(ledsright.setRainbow()).whileTrue(ledsleft.setRainbow());
+        vision.seesTwoAprilTags
+            .whileTrue(
+                ledsright.setRainbow().withInterruptBehavior(InterruptionBehavior.kCancelIncoming))
+            .whileTrue(ledsleft.setRainbow());
 
         algae.setDefaultCommand(algae.algaeIntakeCommand(() -> {
             return intakingAlgae.value;

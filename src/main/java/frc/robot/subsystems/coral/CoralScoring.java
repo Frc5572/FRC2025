@@ -61,7 +61,7 @@ public class CoralScoring extends SubsystemBase {
         } else if (getOuttakeBeamBreakStatus()) {
             temp = Color.kPurple;
         }
-        SmartDashboard.putString("Dashboard/Main Driver/Have Coral", temp.toHexString());
+        SmartDashboard.putString(Constants.DashboardValues.haveCoral, temp.toHexString());
         LoggedTracer.record("CoralScoring");
     }
 
