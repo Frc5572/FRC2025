@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -289,7 +290,8 @@ public class RobotContainer {
             .whileTrue(ledsleft.setLEDsSolid(Color.kCyan));
         vision.seesTwoAprilTags.whileTrue(ledsright.setRainbow()).whileTrue(ledsleft.setRainbow());
 
-        algae.setDefaultCommand(algae.algaeIntakeCommand());
+        algae.setDefaultCommand(new ConditionalCommand(algae.algaeIntakeCommand(), algae.run(() -> {
+        }), () -> intakingAlgae.value));
 
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
