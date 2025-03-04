@@ -104,6 +104,7 @@ public class ScoringLocation {
             this.isAlgae = isAlgae;
         }
 
+        /** Serialize to an integer */
         public int toInt() {
             switch (this) {
                 case KP0:
