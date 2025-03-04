@@ -230,7 +230,8 @@ public class RobotContainer {
             .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
         driver.a().and(operator.hasReefLocation()).whileTrue(CommandFactory
             .autoScore(swerve, elevator, coralScoring, operator::getDesiredLocation,
-                operator::getDesiredHeight, operator::additionalAlgaeHeight, intakingAlgae)
+                operator::getDesiredHeight, operator::additionalAlgaeHeight, intakingAlgae,
+                operator::crossOut)
             .andThen(CommandFactory.doSomethingWithAlgae(swerve, elevator, intakingAlgae, algae,
                 operator::whatToDoWithAlgae, () -> driver.getLeftX()))
             .andThen(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder))

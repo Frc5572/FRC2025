@@ -255,6 +255,11 @@ public class WebController {
         return this.alg;
     }
 
+    /** Cross out item on at given height */
+    public void crossOut(ScoringLocation.Height height) {
+        branches_compl[bay - 'a'][encode_height(height.toInt(), right)] = true;
+    }
+
     /** Get available algae at same position */
     public Optional<ScoringLocation.Height> additionalAlgaeHeight() {
         if (!right) {

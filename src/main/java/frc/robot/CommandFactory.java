@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -89,7 +90,7 @@ public class CommandFactory {
     public static Command autoScore(Swerve swerve, Elevator elevator, CoralScoring coralScoring,
         Supplier<ScoringLocation.CoralLocation> location, Supplier<ScoringLocation.Height> height,
         Supplier<Optional<ScoringLocation.Height>> additionalAlgaeHeight,
-        Container<Boolean> intakingAlgae) {
+        Container<Boolean> intakingAlgae, Consumer<ScoringLocation.Height> crossOut) {
 
         return (reefPreAlign(swerve, location).andThen(new ConditionalCommand(
             Commands.waitUntil(coralScoring.coralAtOuttake), Commands.runOnce(() -> {
@@ -102,7 +103,9 @@ public class CommandFactory {
                 .andThen(new ConditionalCommand(
                     elevator.moveTo(() -> additionalAlgaeHeight.get().get().height)
                         .alongWith(reefAlign(swerve, location).withTimeout(2.0))
-                        .andThen(backAwayReef(swerve, location).withTimeout(2.0)),
+                        .alongWith(Commands.runOnce(() -> {
+                            crossOut.accept(additionalAlgaeHeight.get().get());
+                        })).andThen(backAwayReef(swerve, location).withTimeout(2.0)),
                     Commands.runOnce(() -> {
                     }), () -> {
                         return additionalAlgaeHeight.get().isPresent();

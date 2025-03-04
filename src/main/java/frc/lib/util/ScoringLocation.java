@@ -104,6 +104,23 @@ public class ScoringLocation {
             this.isAlgae = isAlgae;
         }
 
+        public int toInt() {
+            switch (this) {
+                case KP0:
+                    return 2;
+                case KP1:
+                    return 1;
+                case KP2:
+                    return 4;
+                case KP3:
+                    return 3;
+                case KP4:
+                    return 5;
+                default:
+                    return 0;
+            }
+        }
+
         /** Deserialize from integer */
         public static Height fromInt(int value) {
             switch (value) {
