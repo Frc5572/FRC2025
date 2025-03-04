@@ -20,6 +20,7 @@ public class ElevatorAlgae extends SubsystemBase {
     AlgaeIOInputsAutoLogged inputs = new AlgaeIOInputsAutoLogged();
     private final Viz2025 viz;
 
+    /** Get if algae is held */
     public Trigger hasAlgae =
         new Trigger(() -> inputs.algaeMotorCurrent > Constants.Algae.HAS_ALGAE_CURRENT_THRESHOLD)
             .debounce(.25);
@@ -59,11 +60,13 @@ public class ElevatorAlgae extends SubsystemBase {
     // return inputs.algaeMotorCurrent > Constants.Algae.HAS_ALGAE_CURRENT_THRESHOLD;
     // }
 
+    /** Run algae intake with given speed */
     public Command runAlgaeMotor(double speed) { // set motor speed Command
         return runEnd(() -> setAlgaeMotorVoltage(speed), () -> setAlgaeMotorVoltage(0));
         // .until(() -> hasAlgae());
     }
 
+    /** Run algae intake with given speed */
     public Command runAlgaeMotor(DoubleSupplier speed) { // set motor speed Command
         return runEnd(() -> setAlgaeMotorVoltage(speed.getAsDouble()),
             () -> setAlgaeMotorVoltage(0));
