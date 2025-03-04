@@ -218,7 +218,7 @@ public class WebController {
             currentHeight = ScoringLocation.Height.fromInt(height);
             if (!hasSelectedAlgae && currentHeight.isAlgae) {
                 int offset = (bay - 'a') % 2;
-                if (height == 7) {
+                if (height == 2) {
                     offset = 1 - offset;
                 }
                 for (int i = 0; i < 6; i += 2) {
@@ -258,6 +258,7 @@ public class WebController {
     /** Cross out item on at given height */
     public void crossOut(ScoringLocation.Height height) {
         branches_compl[bay - 'a'][encode_height(height.toInt(), right)] = true;
+        createResponse();
     }
 
     /** Get available algae at same position */

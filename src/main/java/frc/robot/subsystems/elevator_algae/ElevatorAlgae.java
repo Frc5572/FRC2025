@@ -1,5 +1,7 @@
 package frc.robot.subsystems.elevator_algae;
 
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -62,12 +64,29 @@ public class ElevatorAlgae extends SubsystemBase {
         // .until(() -> hasAlgae());
     }
 
+    public Command runAlgaeMotor(DoubleSupplier speed) { // set motor speed Command
+        return runEnd(() -> setAlgaeMotorVoltage(speed.getAsDouble()),
+            () -> setAlgaeMotorVoltage(0));
+        // .until(() -> hasAlgae());
+    }
+
     /**
      * Keeps algae intake motor running even after it has intaked an algae, but it lowers the speed
      */
     public Command algaeIntakeCommand() {
         return runAlgaeMotor(Constants.Algae.VOLTAGE).until(hasAlgae)
             .andThen(() -> setAlgaeMotorVoltage(Constants.Algae.SMALLER_VOLTAGE));
+
+    }
+
+    /**
+     * Keeps algae intake motor running even after it has intaked an algae, but it lowers the speed
+     */
+    public Command algaeIntakeCommand(BooleanSupplier supplier) {
+        return runAlgaeMotor(() -> supplier.getAsBoolean() ? Constants.Algae.VOLTAGE : 0)
+            .until(hasAlgae).andThen(runAlgaeMotor(Constants.Algae.SMALLER_VOLTAGE)
+                .until(() -> !supplier.getAsBoolean()))
+            .repeatedly();
 
     }
 }

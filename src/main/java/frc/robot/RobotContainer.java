@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -229,14 +228,19 @@ public class RobotContainer {
 
         driver.rightTrigger().and(climb.reachedClimberStart)
             .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
-        driver.a().and(operator.hasReefLocation()).whileTrue(CommandFactory
+        Command autoScore = CommandFactory
             .autoScore(swerve, elevator, coralScoring, operator::getDesiredLocation,
                 operator::getDesiredHeight, operator::additionalAlgaeHeight, intakingAlgae,
                 operator::crossOut)
-            .andThen(CommandFactory.doSomethingWithAlgae(swerve, elevator, intakingAlgae, algae,
-                operator::whatToDoWithAlgae, () -> -driver.getLeftX()))
+            // .andThen(CommandFactory.doSomethingWithAlgae(swerve, elevator, intakingAlgae, algae,
+            // operator::whatToDoWithAlgae, () -> -driver.getLeftX()))
             .andThen(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder))
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming))
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        System.out.println("autoscore requires: ");
+        for (var req : autoScore.getRequirements()) {
+            System.out.println(" - " + req.getName());
+        }
+        driver.a().and(operator.hasReefLocation()).whileTrue(autoScore)
             .whileTrue(ledsleft.setLEDsBreathe(Color.kGreen)).negate()
             .onTrue(coralScoring.runCoralIntake());
         driver.b()
@@ -290,8 +294,9 @@ public class RobotContainer {
             .whileTrue(ledsleft.setLEDsSolid(Color.kCyan));
         vision.seesTwoAprilTags.whileTrue(ledsright.setRainbow()).whileTrue(ledsleft.setRainbow());
 
-        algae.setDefaultCommand(new ConditionalCommand(algae.algaeIntakeCommand(), algae.run(() -> {
-        }), () -> intakingAlgae.value));
+        algae.setDefaultCommand(algae.algaeIntakeCommand(() -> {
+            return intakingAlgae.value;
+        }).withName("default"));
 
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());

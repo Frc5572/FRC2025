@@ -92,6 +92,9 @@ public class CommandFactory {
         Supplier<Optional<ScoringLocation.Height>> additionalAlgaeHeight,
         Container<Boolean> intakingAlgae, Consumer<ScoringLocation.Height> crossOut) {
 
+        final Container<ScoringLocation.Height> additionalAlgae =
+            new Container<>(ScoringLocation.Height.KP0);
+
         return (reefPreAlign(swerve, location).andThen(new ConditionalCommand(
             Commands.waitUntil(coralScoring.coralAtOuttake), Commands.runOnce(() -> {
             }), () -> !height.get().isAlgae))).alongWith(coralScoring.runCoralIntake())
@@ -100,15 +103,20 @@ public class CommandFactory {
                     intakingAlgae.value = true;
                 }), Commands.runOnce(() -> {
                 }), () -> height.get().isAlgae || additionalAlgaeHeight.get().isPresent()))
-                .andThen(new ConditionalCommand(
-                    elevator.moveTo(() -> additionalAlgaeHeight.get().get().height)
-                        .alongWith(reefAlign(swerve, location).withTimeout(2.0))
-                        .alongWith(Commands.runOnce(() -> {
-                            crossOut.accept(additionalAlgaeHeight.get().get());
-                        })).andThen(backAwayReef(swerve, location).withTimeout(2.0)),
+                .andThen(new ConditionalCommand(elevator.moveTo(() -> additionalAlgae.value.height)
+                    .alongWith(reefAlign(swerve, location).withTimeout(2.0))
+                    .alongWith(Commands.runOnce(() -> {
+                        crossOut.accept(additionalAlgae.value);
+                    })).andThen(backAwayReef(swerve, location).withTimeout(2.0)),
                     Commands.runOnce(() -> {
                     }), () -> {
-                        return additionalAlgaeHeight.get().isPresent();
+                        var value = additionalAlgaeHeight.get();
+                        if (value.isPresent()) {
+                            additionalAlgae.value = value.get();
+                            return true;
+                        } else {
+                            return false;
+                        }
                     }))
                 .andThen(new ConditionalCommand(
                     (elevator.moveTo(() -> height.get().height)
