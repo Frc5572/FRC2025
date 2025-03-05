@@ -31,30 +31,27 @@ public class VisionReal implements VisionIO {
         cameras = Stream.of(constants).map((consts) -> new PhotonCamera(consts.name()))
             .toArray(PhotonCamera[]::new);
         for (String copro : coprocessorNames) {
-            SmartDashboard.putString("uploadSettings/" + copro + "/test", copro);
             new Thread(() -> {
-                SmartDashboard.putString("uploadSettings/" + copro + "/test1", copro);
                 Timer timer = new Timer();
                 boolean run = true;
+                int counter = 0;
                 timer.start();
                 while (run) {
-                    SmartDashboard.putNumber("uploadSettings/" + copro + "/test2",
-                        Timer.getFPGATimestamp());
+                    if (counter >= 12) {
+                        run = false;
+                    }
                     if (timer.advanceIfElapsed(5.0)) {
-                        SmartDashboard.putString("uploadSettings/" + copro + "/test3", copro);
                         try {
                             if (!waitForPV(copro)) {
-                                SmartDashboard.putNumber("uploadSettings/" + copro + "/test4",
-                                    Timer.getFPGATimestamp());
+                                continue;
                             }
                             if (uploadAprilTagMap(copro)) {
                                 run = false;
                             }
                         } catch (Exception e) {
-                            // SmartDashboard.putString("uploadSettings/" + copro + "/error",
-                            // e);
                             e.printStackTrace();
                         }
+                        counter++;
                     }
                     Thread.yield();
                 }
@@ -74,7 +71,8 @@ public class VisionReal implements VisionIO {
     }
 
     public boolean uploadAprilTagMap(String hostname) throws IOException {
-        SmartDashboard.putNumber("uploadSettings/" + hostname + "/test5", Timer.getFPGATimestamp());
+        // SmartDashboard.putNumber("uploadSettings/" + hostname + "/test5",
+        // Timer.getFPGATimestamp());
         String tempFile = tempDir + "/" + hostname + "-pv-tags-upload.json";
         try (final CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost postReq =
@@ -83,8 +81,8 @@ public class VisionReal implements VisionIO {
             HttpEntity entity = MultipartEntityBuilder.create()
                 .addPart("data", new FileBody(new File(tempFile))).build();
             postReq.setEntity(entity);
-            SmartDashboard.putNumber("uploadSettings/" + hostname + "/test6",
-                Timer.getFPGATimestamp());
+            // SmartDashboard.putNumber("uploadSettings/" + hostname + "/test6",
+            // Timer.getFPGATimestamp());
 
             try (CloseableHttpResponse response = httpClient.execute(postReq)) {
                 SmartDashboard.putString("uploadSettings/" + hostname + "/AprilTags/status",
