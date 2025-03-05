@@ -75,7 +75,7 @@ public class VisionReal implements VisionIO {
      *
      * @param hostname Hostname of Co-Processor
      * @return True when completed
-     * @throws IOException
+     * @throws IOException IOException for HTTP request
      */
     public boolean uploadAprilTagMap(String hostname) throws IOException {
         String tempFile = tempDir + "/" + hostname + "-pv-tags-upload.json";
@@ -111,7 +111,7 @@ public class VisionReal implements VisionIO {
      *
      * @param hostname Hostname of Co-Processor
      * @return True when completed
-     * @throws IOException
+     * @throws IOException IOException for HTTP request
      */
     public boolean waitForPV(String hostname) throws IOException {
         try (final CloseableHttpClient httpClient = HttpClients.createDefault()) {

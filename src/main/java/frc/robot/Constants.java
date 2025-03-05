@@ -20,7 +20,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.studica.frc.AHRS.NavXComType;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -359,8 +358,7 @@ public final class Constants {
     /** Vision Constants */
     public static class Vision {
 
-        public static AprilTagFieldLayout fieldLayout =
-            AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+        public static AprilTagFieldLayout fieldLayout;
 
         /** Constants for an individual camera. */
         public static final record CameraConstants(String name, int height, int width,
