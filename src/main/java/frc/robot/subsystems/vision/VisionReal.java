@@ -71,7 +71,7 @@ public class VisionReal implements VisionIO {
     }
 
     /**
-     * Upload current April Tage Field to PV Co-Processors
+     * Upload current April Tags Field to PV Co-Processors
      *
      * @param hostname Hostname of Co-Processor
      * @return True when completed
