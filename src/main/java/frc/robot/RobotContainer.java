@@ -292,9 +292,8 @@ public class RobotContainer {
     private void configureTriggerBindings() {
         // Coral
         coralScoring.coralAtIntake.whileTrue(ledsleft.setLEDsSolid(Color.kOrange));
-        // coralScoring.coralAtOuttake.whileTrue(ledsleft.setLEDsSolid(Color.kCyan));
-        vision.seesTwoAprilTags.whileTrue(
-            ledsright.setRainbow().withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+        coralScoring.coralAtOuttake.whileTrue(ledsleft.setLEDsSolid(Color.kCyan));
+        vision.seesTwoAprilTags.whileTrue(ledsright.setRainbow());
 
         algae.setDefaultCommand(algae.algaeIntakeCommand(() -> {
             return intakingAlgae.value;
@@ -312,7 +311,6 @@ public class RobotContainer {
             .onFalse(Commands.runOnce(() -> swerve.setSpeedMultiplier(1.0)).ignoringDisable(true));
         climb.leftMagnet.whileTrue(ledsleft.blinkLEDs(Color.kDeepPink));
         climb.rightMagnet.whileTrue(ledsright.blinkLEDs(Color.kDeepPink));
-
     }
 
     /**
