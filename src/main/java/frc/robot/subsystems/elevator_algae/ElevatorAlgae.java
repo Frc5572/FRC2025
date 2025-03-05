@@ -82,15 +82,6 @@ public class ElevatorAlgae extends SubsystemBase {
     }
 
     /**
-     * Outtake Algae
-     *
-     * @return Command to outtake algae
-     */
-    public Command algaeOuttakeCommand() {
-        return runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE);
-    }
-
-    /**
      * Keeps algae intake motor running even after it has intaked an algae, but it lowers the speed
      */
     public Command algaeIntakeCommand(BooleanSupplier supplier) {
@@ -98,5 +89,14 @@ public class ElevatorAlgae extends SubsystemBase {
             .until(hasAlgae).andThen(runAlgaeMotor(Constants.Algae.SMALLER_VOLTAGE)
                 .until(() -> !supplier.getAsBoolean()))
             .repeatedly();
+    }
+
+    /**
+     * Outtake Algae
+     *
+     * @return Command to outtake algae
+     */
+    public Command algaeOuttakeCommand() {
+        return runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE);
     }
 }

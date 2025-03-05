@@ -70,9 +70,14 @@ public class VisionReal implements VisionIO {
         }
     }
 
+    /**
+     * Upload current April Tage Field to PV Co-Processors
+     *
+     * @param hostname Hostname of Co-Processor
+     * @return True when completed
+     * @throws IOException
+     */
     public boolean uploadAprilTagMap(String hostname) throws IOException {
-        // SmartDashboard.putNumber("uploadSettings/" + hostname + "/test5",
-        // Timer.getFPGATimestamp());
         String tempFile = tempDir + "/" + hostname + "-pv-tags-upload.json";
         try (final CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost postReq =
@@ -81,9 +86,6 @@ public class VisionReal implements VisionIO {
             HttpEntity entity = MultipartEntityBuilder.create()
                 .addPart("data", new FileBody(new File(tempFile))).build();
             postReq.setEntity(entity);
-            // SmartDashboard.putNumber("uploadSettings/" + hostname + "/test6",
-            // Timer.getFPGATimestamp());
-
             try (CloseableHttpResponse response = httpClient.execute(postReq)) {
                 SmartDashboard.putString("uploadSettings/" + hostname + "/AprilTags/status",
                     response.getStatusLine().getStatusCode() + ": "
@@ -104,6 +106,13 @@ public class VisionReal implements VisionIO {
         }
     }
 
+    /**
+     * Check that PV has started on Co-Processor
+     *
+     * @param hostname Hostname of Co-Processor
+     * @return True when completed
+     * @throws IOException
+     */
     public boolean waitForPV(String hostname) throws IOException {
         try (final CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet getReq = new HttpGet("http://" + hostname + ":5800");
@@ -118,35 +127,4 @@ public class VisionReal implements VisionIO {
         }
         return false;
     }
-
-    /**
-     * Upload Settings
-     *
-     * @param ip Camera IP
-     * @param file Camera settings file
-     */
-    // public boolean uploadSettings(String ip, File file) throws IOException {
-    // try (final CloseableHttpClient httpClient = HttpClients.createDefault()) {
-    // HttpPost postReq = new HttpPost("http://" + ip + "/api/settings");
-    // HttpEntity entity =
-    // MultipartEntityBuilder.create().addPart("data", new FileBody(file)).build();
-    // postReq.setEntity(entity);
-    // try (CloseableHttpResponse response = httpClient.execute(postReq)) {
-    // SmartDashboard.putString("uploadSettings/" + this.name + "/status",
-    // response.getStatusLine().getStatusCode() + ": "
-    // + response.getStatusLine().getReasonPhrase());
-    // var ent = response.getEntity();
-    // if (ent != null) {
-    // try (InputStream stream = ent.getContent()) {
-    // String text = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
-    // SmartDashboard.putString("uploadSettings/" + this.name + "/content", text);
-    // }
-    // } else {
-    // SmartDashboard.putString("uploadSettings/" + this.name + "/content", "null");
-    // }
-    // return response.getStatusLine().getStatusCode() == 200;
-    // }
-    // }
-    // }
-
 }
