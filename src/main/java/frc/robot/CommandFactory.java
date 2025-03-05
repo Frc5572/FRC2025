@@ -55,14 +55,14 @@ public class CommandFactory {
     }
 
     /** Align to a given scoring location, assuming elevator is at the right height. */
-    public static Command reefAlign(Swerve swerve,
-        Supplier<ScoringLocation.CoralLocation> location) {
+    public static Command reefAlign(Swerve swerve, Supplier<ScoringLocation.CoralLocation> location,
+        double distAway) {
         return new MoveToPose(swerve, () -> {
             Pose2d finalLoc = location.get().pose;
 
             return new Pose2d(
-                finalLoc.getTranslation()
-                    .minus(new Translation2d(Units.inchesToMeters(1.0), finalLoc.getRotation())),
+                finalLoc.getTranslation().minus(
+                    new Translation2d(Units.inchesToMeters(distAway), finalLoc.getRotation())),
                 finalLoc.getRotation());
         }, () -> Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY, true,
             Units.inchesToMeters(0.25), 0.2);
@@ -104,7 +104,7 @@ public class CommandFactory {
                 }), Commands.runOnce(() -> {
                 }), () -> height.get().isAlgae || additionalAlgaeHeight.get().isPresent()))
                 .andThen(new ConditionalCommand(elevator.moveTo(() -> additionalAlgae.value.height)
-                    .alongWith(reefAlign(swerve, location).withTimeout(2.0))
+                    .alongWith(reefAlign(swerve, location, -3).withTimeout(2.0))
                     .alongWith(Commands.runOnce(() -> {
                         crossOut.accept(additionalAlgae.value);
                     })).andThen(backAwayReef(swerve, location).withTimeout(2.0)),
@@ -120,9 +120,9 @@ public class CommandFactory {
                     }))
                 .andThen(new ConditionalCommand(
                     (elevator.moveTo(() -> height.get().height)
-                        .andThen(reefAlign(swerve, location).withTimeout(2.0))),
+                        .andThen(reefAlign(swerve, location, 1).withTimeout(2.0))),
                     (elevator.moveTo(() -> height.get().height)
-                        .alongWith(reefAlign(swerve, location).withTimeout(2.0))),
+                        .alongWith(reefAlign(swerve, location, 1).withTimeout(2.0))),
                     () -> intakingAlgae.value))
                 .andThen(Commands.waitSeconds(0.2))
                 .andThen(new ConditionalCommand(Commands.runOnce(() -> {

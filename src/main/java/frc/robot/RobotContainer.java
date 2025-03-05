@@ -88,7 +88,7 @@ public class RobotContainer {
     private final Viz2025 vis;
     /** State */
     private final RobotState state;
-    private final Container<Boolean> intakingAlgae = new Container<Boolean>(true);
+    private final Container<Boolean> intakingAlgae = new Container<Boolean>(false);
 
 
     /* Subsystems */
@@ -237,7 +237,7 @@ public class RobotContainer {
             .whileTrue(ledsleft.setLEDsBreathe(Color.kGreen));
         driver.x().onTrue(elevator.home());
         driver.y().onTrue(Commands.runOnce(() -> swerve.resetFieldRelativeOffset()));
-        driver.rightTrigger().and(climb.reachedClimberStart.negate())
+        driver.start().and(climb.reachedClimberStart.negate())
             .onTrue(climb
                 .runClimberMotorCommand(Constants.Climb.PRE_CLIMB_VOLTAGE,
                     () -> climb.getClimberPosition()
@@ -245,7 +245,7 @@ public class RobotContainer {
                 .andThen(climb.runClimberMotorCommand(Constants.Climb.RESET_VOLTAGE,
                     () -> climb.getClimberPosition()
                         .in(Radians) <= Constants.Climb.CLIMBER_START_ANGLE.in(Radians))));
-        driver.rightTrigger().and(climb.reachedClimberStart)
+        driver.start().and(climb.reachedClimberStart)
             .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
         driver.leftTrigger().whileTrue(Commands.runOnce(() -> {
             intakingAlgae.value = false;
@@ -291,14 +291,10 @@ public class RobotContainer {
 
     private void configureTriggerBindings() {
         // Coral
-        coralScoring.coralAtIntake.whileTrue(ledsright.setLEDsSolid(Color.kBlue))
-            .whileTrue(ledsleft.setLEDsSolid(Color.kBlue));
-        coralScoring.coralAtOuttake.whileTrue(ledsright.setLEDsSolid(Color.kCyan))
-            .whileTrue(ledsleft.setLEDsSolid(Color.kCyan));
-        vision.seesTwoAprilTags
-            .whileTrue(
-                ledsright.setRainbow().withInterruptBehavior(InterruptionBehavior.kCancelIncoming))
-            .whileTrue(ledsleft.setRainbow());
+        coralScoring.coralAtIntake.whileTrue(ledsleft.setLEDsSolid(Color.kOrange));
+        // coralScoring.coralAtOuttake.whileTrue(ledsleft.setLEDsSolid(Color.kCyan));
+        vision.seesTwoAprilTags.whileTrue(
+            ledsright.setRainbow().withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
 
         algae.setDefaultCommand(algae.algaeIntakeCommand(() -> {
             return intakingAlgae.value;
@@ -308,7 +304,7 @@ public class RobotContainer {
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
         // Algae
         algae.hasAlgae.and(coralScoring.coralAtOuttake.negate())
-            .onTrue(ledsright.blinkLEDs(Color.kCyan, 2)).onTrue(ledsleft.blinkLEDs(Color.kCyan, 2));
+            .onTrue(ledsleft.blinkLEDs(Color.kCyan, 2));
         // Climb
         climb.resetButton.onTrue(climb.resetEncoder());
         elevator.hightAboveP0.or(climb.reachedClimberStart)

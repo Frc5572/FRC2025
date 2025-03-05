@@ -13,7 +13,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.IntArrayList;
 import frc.lib.util.LoggedTracer;
@@ -33,8 +32,8 @@ public class Vision extends SubsystemBase {
     private final Transform3d[] robotToCamera;
 
     private boolean seesMultitag = false;
-    public Trigger seesTwoAprilTags = new Trigger(() -> twoAprilTags())
-        .debounce(.3, Debouncer.DebounceType.kBoth).and(RobotModeTriggers.disabled());
+    public Trigger seesTwoAprilTags =
+        new Trigger(() -> twoAprilTags()).debounce(.3, Debouncer.DebounceType.kBoth);
 
     /** Vision Subsystem */
     public Vision(RobotState state, Function<Constants.Vision.CameraConstants[], VisionIO> io) {
