@@ -22,7 +22,7 @@
           },
           {
             "title": "Auto Chooser",
-            "x": 1024.0,
+            "x": 640.0,
             "y": 0.0,
             "width": 256.0,
             "height": 256.0,
@@ -34,11 +34,24 @@
             }
           },
           {
+            "title": "isHigh",
+            "x": 640.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/SmartDashboard/isHigh",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
+          },
+          {
             "title": "Field2d",
-            "x": 0.0,
+            "x": 128.0,
             "y": 0.0,
-            "width": 1024.0,
-            "height": 768.0,
+            "width": 512.0,
+            "height": 512.0,
             "type": "Field",
             "properties": {
               "topic": "/SmartDashboard/Dashboard/Auto/Field2d",
@@ -51,19 +64,6 @@
               "field_rotation": 0.0,
               "robot_color": 4294198070,
               "trajectory_color": 4294967295
-            }
-          },
-          {
-            "title": "isHigh",
-            "x": 1024.0,
-            "y": 256.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Toggle Switch",
-            "properties": {
-              "topic": "/SmartDashboard/isHigh",
-              "period": 0.06,
-              "data_type": "boolean"
             }
           }
         ]
