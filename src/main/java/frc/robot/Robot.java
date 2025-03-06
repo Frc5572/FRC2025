@@ -14,6 +14,8 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -65,6 +67,13 @@ public class Robot extends LoggedRobot {
             default:
                 Logger.recordMetadata("GitDirty", "Unknown");
                 break;
+        }
+        try {
+            Constants.Vision.fieldLayout = new AprilTagFieldLayout(
+                Filesystem.getDeployDirectory().getPath() + "/localization/only-reef-tags.json");
+        } catch (Exception e) {
+            Constants.Vision.fieldLayout =
+                AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
         }
 
 

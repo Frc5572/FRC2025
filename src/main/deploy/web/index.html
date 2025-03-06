@@ -41,14 +41,14 @@
 </head>
 
 <body class="side-blue">
-    <svg xmlns="http://www.w3.org/2000/svg" id="main" width="1920" height="800" viewBox="0 0 2592 1082"
+    <svg xmlns="http://www.w3.org/2000/svg" id="main" width="1920" height="1080" viewBox="0 0 2592 1082"
         style="position:absolute; left: 0; top: 0;">
         <pattern id="diagonalHatch" width="10" height="10" patternTransform="rotate(-45 0 0)"
             patternUnits="userSpaceOnUse">
             <line x1="0" y1="0" x2="0" y2="10" style="stroke:red; stroke-width:5px" />
         </pattern>
 
-        <g transform="translate(0, 1080)">
+        <g transform="translate(0, 890)">
             <g transform="scale(1, -1)" id="content">
                 <g id="outline">
                     <path class="team_color"
@@ -289,7 +289,16 @@
                         d="M620-520q25 0 42.5-17.5T680-580q0-25-17.5-42.5T620-640q-25 0-42.5 17.5T560-580q0 25 17.5 42.5T620-520Zm-280 0q25 0 42.5-17.5T400-580q0-25-17.5-42.5T340-640q-25 0-42.5 17.5T280-580q0 25 17.5 42.5T340-520Zm140 260q68 0 123.5-38.5T684-400h-66q-22 37-58.5 58.5T480-320q-43 0-79.5-21.5T342-400h-66q25 63 80.5 101.5T480-260Zm0 180q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-400Zm0 320q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Z"
                         fill="yellow" />
                 </g>
-
+                <!-- <g transform="translate(2105, 288.227) scale(0.2, -0.2)">
+                    <path
+                        d="M480-80q-61 0-125-22t-116-60q-52-38-85.5-89T120-360v-120l160 120-62 62q29 51 92 88t130 47v-357H320v-80h120v-47q-35-13-57.5-43.5T360-760q0-50 35-85t85-35q50 0 85 35t35 85q0 39-22.5 69.5T520-647v47h120v80H520v357q67-10 130-47t92-88l-62-62 160-120v120q0 58-33.5 109T721-162q-52 38-116 60T480-80Zm0-640q17 0 28.5-11.5T520-760q0-17-11.5-28.5T480-800q-17 0-28.5 11.5T440-760q0 17 11.5 28.5T480-720Z"
+                        fill="#34c0eb" />
+                </g>
+                <g transform="translate(1654, -28) scale(0.2, -0.2)">
+                    <path
+                        d="M360-360v-240h240v240H360Zm80-80h80v-80h-80v80Zm-80 320v-80h-80q-33 0-56.5-23.5T200-280v-80h-80v-80h80v-80h-80v-80h80v-80q0-33 23.5-56.5T280-760h80v-80h80v80h80v-80h80v80h80q33 0 56.5 23.5T760-680v80h80v80h-80v80h80v80h-80v80q0 33-23.5 56.5T680-200h-80v80h-80v-80h-80v80h-80Zm320-160v-400H280v400h400ZM480-480Z"
+                        fill="#34c0eb" />
+                </g> -->
             </g>
         </g>
     </svg>
@@ -303,7 +312,7 @@
         const CTRL_ID = "/web/ctrl";
         const RESP_ID = "/web/resp";
 
-        const id_names = ["reef-a", "reef-b", "reef-c", "reef-d", "reef-e", "reef-f", "p0l", "p0r", "p1l", "p1r", "p2", "p3l", "p3r", "p4", "p5l", "p5r", "fdrl", "fdrf", "fdrr", "confx", "confy"];
+        const id_names = ["reef-a", "reef-b", "reef-c", "reef-d", "reef-e", "reef-f", "p0l", "p0r", "p1l", "p1r", "p2", "p3l", "p3r", "p4", "p5l", "p5r", "fdrl", "fdrf", "fdrr", "confx", "confy", "algb", "algp"];
 
         let client = new NT4_Client(
             window.location.hostname,
@@ -363,6 +372,7 @@
         const FAST_FEEDER_RIGHT_X = 2125.87;
         const FURTHEST_RIGHT_X = 2425.87;
 
+        const CONF_ROW_3_BOTTOM_Y = -93.39;
         const L1_TOP_Y = 179.6;
         const CONF_BOTTOM_Y = 225.02;
         const ALGAE1_BOTTOM = 359.2;
@@ -432,6 +442,9 @@
             ["confx", RIGHT_BRANCH_RIGHT_X, CONF_MID_Y, CONF_BUTTONS_RIGHT_X, FEEDER_BOTTOM_Y],
             ["confy", CONF_BUTTONS_RIGHT_X, CONF_MID_Y, FURTHEST_RIGHT_X, FEEDER_BOTTOM_Y],
             ["confc", RIGHT_BRANCH_RIGHT_X, CONF_BOTTOM_Y, CONF_BUTTONS_RIGHT_X, CONF_MID_Y],
+            ["algb", CONF_BUTTONS_RIGHT_X, CONF_BOTTOM_Y, FURTHEST_RIGHT_X, CONF_MID_Y],
+            ["algp", RIGHT_BRANCH_RIGHT_X, CONF_ROW_3_BOTTOM_Y, CONF_BUTTONS_RIGHT_X, CONF_BOTTOM_Y],
+            ["conff", CONF_BUTTONS_RIGHT_X, CONF_ROW_3_BOTTOM_Y, FURTHEST_RIGHT_X, CONF_BOTTOM_Y],
         ];
         // Reef branches
         const reef_heights = [0, L1_TOP_Y, ALGAE1_BOTTOM, ALGAE1_TOP, ALGAE2_BOTTOM, ALGAE2_TOP, TOP_Y];
@@ -494,10 +507,10 @@
             let y = 1077.62 - (ev.clientY - main.clientTop) / main.clientWidth * 2592;
             // console.log("x = " + x + ", y = " + y)
 
-            if (y > TOP_Y || y < 0 || x < 0 || x > FURTHEST_RIGHT_X) {
+            if (y > TOP_Y || x < 0 || x > FURTHEST_RIGHT_X) {
                 return;
             }
-            if (x > REEF_LEFT_X && x < REEF_RIGHT_X) {
+            if (x > REEF_LEFT_X && x < REEF_RIGHT_X && y > 0) {
                 // In reef
                 let t1 = y > M1 * x + B1;
                 let t2 = y > M2 * x + B2;
@@ -519,7 +532,7 @@
                         client.addSample(CTRL_ID, "reef-a")
                     }
                 }
-            } else if (x < LEFT_BRANCH_RIGHT_X) {
+            } else if (x < LEFT_BRANCH_RIGHT_X && y > 0) {
                 // Left branch
                 for (let i = 0; i < reef_heights.length; i++) {
                     if (y < reef_heights[i]) {
@@ -531,7 +544,7 @@
                         break;
                     }
                 }
-            } else if (x < RIGHT_BRANCH_RIGHT_X) {
+            } else if (x < RIGHT_BRANCH_RIGHT_X && y > 0) {
                 // Right Branch
                 for (let i = 0; i < reef_heights.length; i++) {
                     if (y < reef_heights[i]) {
@@ -543,7 +556,7 @@
                         break;
                     }
                 }
-            } else if (y > FEEDER_BOTTOM_Y) {
+            } else if (x > RIGHT_BRANCH_RIGHT_X && y > FEEDER_BOTTOM_Y) {
                 if (y > FEEDER_TOP_Y) {
                     return;
                 }
@@ -555,16 +568,28 @@
                 } else {
                     client.addSample(CTRL_ID, "fdrr");
                 }
-            } else {
+            } else if (x > RIGHT_BRANCH_RIGHT_X) {
                 if (x > CONF_BUTTONS_RIGHT_X) {
                     if (y > CONF_MID_Y) {
+                        client.addSample(CTRL_ID, "");
                         client.addSample(CTRL_ID, "confy");
+                    } else if (y > CONF_BOTTOM_Y) {
+                        client.addSample(CTRL_ID, "");
+                        client.addSample(CTRL_ID, "algb");
+                    } else if (y > CONF_ROW_3_BOTTOM_Y) {
+                        client.addSample(CTRL_ID, "");
+                        client.addSample(CTRL_ID, "conff");
                     }
                 } else {
                     if (y > CONF_MID_Y) {
+                        client.addSample(CTRL_ID, "");
                         client.addSample(CTRL_ID, "confx");
                     } else if (y > CONF_BOTTOM_Y) {
+                        client.addSample(CTRL_ID, "");
                         client.addSample(CTRL_ID, "confc");
+                    } else if (y > CONF_ROW_3_BOTTOM_Y) {
+                        client.addSample(CTRL_ID, "");
+                        client.addSample(CTRL_ID, "algp");
                     }
                 }
             }
