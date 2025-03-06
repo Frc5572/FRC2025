@@ -206,7 +206,7 @@ public final class Constants {
         public static final class Mod0 {
             public static final int driveMotorID = 2;
             public static final int angleMotorID = 1;
-            public static final int canCoderID = 1; // duplicate?
+            public static final int canCoderID = 1;
             public static final Rotation2d angleOffset = Rotation2d.fromRotations(0.008789);
 
         }
