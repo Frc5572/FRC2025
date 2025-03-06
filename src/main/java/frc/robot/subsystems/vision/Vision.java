@@ -8,8 +8,10 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.targeting.PhotonPipelineResult;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.IntArrayList;
@@ -30,7 +32,8 @@ public class Vision extends SubsystemBase {
     private final Transform3d[] robotToCamera;
 
     private boolean seesMultitag = false;
-    public Trigger seesTwoAprilTags = new Trigger(() -> twoAprilTags());
+    public Trigger seesTwoAprilTags =
+        new Trigger(() -> twoAprilTags()).debounce(.3, Debouncer.DebounceType.kBoth);
 
     /** Vision Subsystem */
     public Vision(RobotState state, Function<Constants.Vision.CameraConstants[], VisionIO> io) {
@@ -97,12 +100,11 @@ public class Vision extends SubsystemBase {
             }
         }
         LoggedTracer.record("Vision");
-
-
+        SmartDashboard.putBoolean(Constants.DashboardValues.seeMultiTag, seesMultitag);
     }
 
     public boolean twoAprilTags() {
-        return seesMultitag && edu.wpi.first.wpilibj.RobotState.isDisabled();
+        return seesMultitag;
     }
 
 }

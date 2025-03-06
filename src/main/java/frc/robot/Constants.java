@@ -20,7 +20,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.studica.frc.AHRS.NavXComType;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -343,7 +342,7 @@ public final class Constants {
         public static final Distance P2 = Inches.of(31.2); // Algae 2
         public static final Distance P3 = Inches.of(43.6); // Coral L3
         public static final Distance P4 = Inches.of(68.9); // Coral L4
-        public static final Distance P5 = Inches.of(70); // Barge
+        public static final Distance P5 = Inches.of(74); // Barge
 
         public static final double gearRatio = 1.0;
         public static final Distance INCHES_AT_TOP = Inches.of(72.0);
@@ -359,8 +358,7 @@ public final class Constants {
     /** Vision Constants */
     public static class Vision {
 
-        public static final AprilTagFieldLayout fieldLayout =
-            AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+        public static AprilTagFieldLayout fieldLayout;
 
         /** Constants for an individual camera. */
         public static final record CameraConstants(String name, int height, int width,
@@ -425,14 +423,34 @@ public final class Constants {
         public static final double PID_TKI = 0.0;
         public static final double PID_TKD = 0.0;
 
-        public static final double MAX_VELOCITY = 2;
+        public static final double MAX_VELOCITY = 2.0;
         public static final double MAX_ACCELERATION = 3;
 
-        public static final double MAX_ANGULAR_VELOCITY = 2.9;
-        public static final double MAX_ANGULAR_ACCELERATION = 8;
+        public static final double MAX_ANGULAR_VELOCITY = 8;
+        public static final double MAX_ANGULAR_ACCELERATION = 16;
+
+        public static final double MAX_ELEVATOR_UP_VELOCITY = 0.3;
     }
 
-    public static final Rotation2d CIRCLE_REEF_LOOKAHEAD_ANGLE = Rotation2d.fromDegrees(30);
+    public static final Rotation2d CIRCLE_REEF_LOOKAHEAD_ANGLE = Rotation2d.fromDegrees(45);
+
+    /**
+     * Paths for Dashboard NT Tables topics
+     */
+    public static class DashboardValues {
+        // Auto
+        public static final String autoChooser = "Dashboard/Auto/Auto Chooser";
+        public static final String field2d = "Dashboard/Auto/Field2d";
+        public static final String algaeHeight = "Dashboard/Auto/Algae";
+        public static final String seeMultiTag = "Dashboard/Auto/Sees Multiple Tags";
+        // Tele
+        public static final String elevatorHeight = "Dashboard/Main Driver/Elevator Height";
+        public static final String elevatorPresetHeight =
+            "Dashboard/Main Driver/Elevator Preset Level";
+        public static final String haveCoral = "Dashboard/Main Driver/Have Coral";
+        public static final String haveAlgae = "Dashboard/Main Driver/Have Algae";
+
+    }
 }
 
 

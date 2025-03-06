@@ -176,11 +176,11 @@ public class MoveAndAvoidReef extends Command implements Drawable {
                 Rotation2d angle = driveCircle.getAngle(currentPosition);
                 if (rightLen > leftLen) {
                     Rotation2d targetAngle = angle.plus(Constants.CIRCLE_REEF_LOOKAHEAD_ANGLE);
-                    return new Pose2d(driveCircle.getVertex(targetAngle, Units.inchesToMeters(12)),
+                    return new Pose2d(driveCircle.getVertex(targetAngle, Units.inchesToMeters(24)),
                         targetAngle.plus(Rotation2d.k180deg).plus(Rotation2d.fromDegrees(10)));
                 } else {
                     Rotation2d targetAngle = angle.minus(Constants.CIRCLE_REEF_LOOKAHEAD_ANGLE);
-                    return new Pose2d(driveCircle.getVertex(targetAngle, Units.inchesToMeters(12)),
+                    return new Pose2d(driveCircle.getVertex(targetAngle, Units.inchesToMeters(24)),
                         targetAngle.plus(Rotation2d.k180deg).plus(Rotation2d.fromDegrees(10)));
                 }
             } else {

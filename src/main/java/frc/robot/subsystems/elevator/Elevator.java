@@ -40,9 +40,9 @@ public class Elevator extends SubsystemBase {
         Logger.processInputs("Elevator", inputs);
         viz.setElevatorHeight(inputs.position);
         Logger.recordOutput("Elevator/position_in", inputs.position.in(Inches));
-        SmartDashboard.putString("Dashboard/Main Driver/Elevator Height",
+        SmartDashboard.putString(Constants.DashboardValues.elevatorHeight,
             Height.getCurrentState().displayName);
-        SmartDashboard.putNumber("Dashboard/Main Driver/Elevator Preset Level",
+        SmartDashboard.putNumber(Constants.DashboardValues.elevatorPresetHeight,
             Height.getCurrentState().ordinal());
         LoggedTracer.record("Elevator");
     }

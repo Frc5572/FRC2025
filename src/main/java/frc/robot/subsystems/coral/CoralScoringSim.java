@@ -4,19 +4,13 @@ import static edu.wpi.first.units.Units.RPM;
 import org.littletonrobotics.junction.LoggedRobot;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import frc.robot.Constants;
 
 /**
  * Real Class Coral Scoring
  */
 
 public class CoralScoringSim implements CoralScoringIO {
-    private final DigitalInput outtakeBeamBreak =
-        new DigitalInput(Constants.CoralScoringConstants.OUTTAKE_BEAM_BREAK_DIO_PORT);
-    private final DigitalInput intakeBeamBreak =
-        new DigitalInput(Constants.CoralScoringConstants.INTAKE_BEAM_BREAK_DIO_PORT);
     private DCMotorSim coralMotor = new DCMotorSim(LinearSystemId.createDCMotorSystem(.5, .5),
         DCMotor.getNeo550(1).withReduction(4));
 
@@ -31,8 +25,9 @@ public class CoralScoringSim implements CoralScoringIO {
 
     public void updateInputs(CoralScoringInputs inputs) {
         coralMotor.update(LoggedRobot.defaultPeriodSecs);
-        inputs.outtakeBeamBreak = !outtakeBeamBreak.get();
-        inputs.intakeBeamBreak = !intakeBeamBreak.get();
+        // For sim, just assume we have coral all the time.
+        inputs.outtakeBeamBreak = true;
+        inputs.intakeBeamBreak = true;
         inputs.scoringRPM = RPM.of(coralMotor.getAngularVelocityRPM());
     }
 
