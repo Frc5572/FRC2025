@@ -186,7 +186,7 @@ public class CommandFactory {
 
     private static Command feederAfter(Swerve swerve, CoralScoring scoring) {
         return swerve.run(() -> {
-            swerve.setModuleStates(new ChassisSpeeds(0.0, -0.1, 0.0));
+            swerve.setModuleStates(new ChassisSpeeds(0.0, -0.4, 0.0));
         }).until(scoring.coralAtIntake).withTimeout(3.0).andThen(swerve.stop());
     }
 
