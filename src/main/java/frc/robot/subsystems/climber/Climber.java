@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.Radians;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,10 +23,8 @@ public class Climber extends SubsystemBase {
     private final Viz2025 viz;
     public Trigger resetButton = new Trigger(() -> getClimberTouchSensorStatus());
     public Trigger reachedClimberStart = new Trigger(() -> reachedClimberStart());
-    public Trigger leftMagnet =
-        new Trigger(() -> climberAutoLogged.leftMagnet).debounce(.25, DebounceType.kBoth);
-    public Trigger rightMagnet =
-        new Trigger(() -> climberAutoLogged.rightMagnet).debounce(.25, DebounceType.kBoth);
+    public Trigger leftMagnet = new Trigger(() -> climberAutoLogged.leftMagnet);
+    public Trigger rightMagnet = new Trigger(() -> climberAutoLogged.rightMagnet);
 
 
     public Climber(ClimberIO io, Viz2025 viz) {
