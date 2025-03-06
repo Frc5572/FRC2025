@@ -155,7 +155,7 @@ task(eventDeploy) {
         if (project.gradle.startParameter.taskNames.any({ it.toLowerCase().contains("deploy") })) {
             def branchPrefix = "event"
             def branch = 'git branch --show-current'.execute().text.trim()
-            def commitMessage = "Update at '${new Date().toString()}'"
+            def commitMessage = "Update at event (${new Date().toString()})"
 
             if (branch.startsWith(branchPrefix)) {
                 exec {
