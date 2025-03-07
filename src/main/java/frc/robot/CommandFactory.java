@@ -88,7 +88,8 @@ public class CommandFactory {
 
     /** Move and score coral or retrieve algae. */
     public static Command autoScore(Swerve swerve, Elevator elevator, CoralScoring coralScoring,
-        Supplier<ScoringLocation.CoralLocation> location, Supplier<ScoringLocation.Height> height,
+        ElevatorAlgae algae, Supplier<ScoringLocation.CoralLocation> location,
+        Supplier<ScoringLocation.Height> height,
         Supplier<Optional<ScoringLocation.Height>> additionalAlgaeHeight,
         Container<Boolean> intakingAlgae, Consumer<ScoringLocation.Height> crossOut) {
 
@@ -104,7 +105,8 @@ public class CommandFactory {
                 }), Commands.runOnce(() -> {
                 }), () -> height.get().isAlgae || additionalAlgaeHeight.get().isPresent()))
                 .andThen(new ConditionalCommand(elevator.moveTo(() -> additionalAlgae.value.height)
-                    .alongWith(reefAlign(swerve, location, -3).withTimeout(2.0))
+                    .alongWith(
+                        reefAlign(swerve, location, -3).until(algae.hasAlgae).withTimeout(2.0))
                     .alongWith(Commands.runOnce(() -> {
                         crossOut.accept(additionalAlgae.value);
                     })).andThen(backAwayReef(swerve, location).withTimeout(2.0)),
