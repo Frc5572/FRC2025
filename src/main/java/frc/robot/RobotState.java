@@ -52,7 +52,7 @@ public class RobotState {
      */
     public void init(SwerveModulePosition[] positions, Rotation2d gyroYaw) {
         swerveOdometry = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, gyroYaw,
-            positions, new Pose2d(0, 0, Rotation2d.k180deg.minus(Rotation2d.fromDegrees(-60))));
+            positions, new Pose2d(0, 0, Rotation2d.k180deg.minus(Rotation2d.fromDegrees(120))));
         rotationBuffer.clear();
         isInitialized = false;
         SmartDashboard.putNumber("cameraOffset", 0.0);
