@@ -130,6 +130,13 @@ public class Elevator extends SubsystemBase {
     }
 
     /**
+     * Stop motors for safety
+     */
+    public Command stop() {
+        return runOnce(() -> io.setVoltage(0));
+    }
+
+    /**
      * selects height
      *
      * @return selected height

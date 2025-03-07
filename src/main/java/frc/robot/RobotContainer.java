@@ -251,6 +251,7 @@ public class RobotContainer {
             intakingAlgae.value = false;
         }).alongWith(algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE)));
         driver.rightTrigger().whileTrue(elevator.p5()).onFalse(elevator.home());
+        driver.back().onTrue(elevator.stop());
     }
 
     private void setupAltOperatorController() {
