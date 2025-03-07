@@ -98,15 +98,15 @@ public class CommandFactory {
 
         return (reefPreAlign(swerve, location).andThen(new ConditionalCommand(
             Commands.waitUntil(coralScoring.coralAtOuttake), Commands.runOnce(() -> {
-            }), () -> !height.get().isAlgae))).alongWith(coralScoring.runCoralIntake())
-
+            }), () -> !height.get().isAlgae)))
+                .alongWith(coralScoring.runCoralIntake().unless(coralScoring.coralAtOuttake))
                 .andThen(new ConditionalCommand(Commands.runOnce(() -> {
                     intakingAlgae.value = true;
                 }), Commands.runOnce(() -> {
                 }), () -> height.get().isAlgae || additionalAlgaeHeight.get().isPresent()))
                 .andThen(new ConditionalCommand(elevator.moveTo(() -> additionalAlgae.value.height)
                     .alongWith(
-                        reefAlign(swerve, location, -3).until(algae.hasAlgae).withTimeout(2.0))
+                        reefAlign(swerve, location, -3).until(algae.hasAlgae).withTimeout(1.2))
                     .alongWith(Commands.runOnce(() -> {
                         crossOut.accept(additionalAlgae.value);
                     })).andThen(backAwayReef(swerve, location).withTimeout(2.0)),
