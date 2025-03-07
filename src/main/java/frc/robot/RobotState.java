@@ -185,7 +185,7 @@ public class RobotState {
                     VecBuilder.fill(Constants.StateEstimator.localVisionTrust.getAsDouble(),
                         Constants.StateEstimator.localVisionTrust.getAsDouble(),
                         Double.POSITIVE_INFINITY),
-                    result.getTargets(), "Local", false, stdDevLocalCircle);
+                    result.getTargets(), "Local", true, stdDevLocalCircle);
             }
         }
     }
