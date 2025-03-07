@@ -60,7 +60,8 @@ public class Elevator extends SubsystemBase {
     public Command home() {
         Command slowLower = this.runEnd(() -> io.setVoltage(-1.4), () -> io.setVoltage(0.0));
         return moveTo(() -> Constants.Elevator.HOME).until(() -> inputs.position.in(Inches) < 5.0)
-            .andThen(slowLower.until(limitSwitchTouched)).andThen(this.runOnce(() -> {
+            .andThen(slowLower.until(limitSwitchTouched).withTimeout(2))
+            .andThen(this.runOnce(() -> {
                 io.resetHome();
                 Logger.recordOutput(Constants.Elevator.heightName, "home");
             }));
