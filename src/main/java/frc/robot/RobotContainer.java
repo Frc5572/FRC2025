@@ -216,7 +216,7 @@ public class RobotContainer {
             Constants.Swerve.isOpenLoop));
 
         Command autoScore = CommandFactory
-            .autoScore(swerve, elevator, coralScoring, operator::getDesiredLocation,
+            .autoScore(swerve, elevator, coralScoring, algae, operator::getDesiredLocation,
                 operator::getDesiredHeight, operator::additionalAlgaeHeight, intakingAlgae,
                 operator::crossOut)
             // .andThen(CommandFactory.doSomethingWithAlgae(swerve, elevator, intakingAlgae, algae,
@@ -250,6 +250,8 @@ public class RobotContainer {
         driver.leftTrigger().whileTrue(Commands.runOnce(() -> {
             intakingAlgae.value = false;
         }).alongWith(algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE)));
+        driver.rightTrigger().whileTrue(elevator.p5()).onFalse(elevator.home());
+        driver.back().onTrue(elevator.stop());
     }
 
     private void setupAltOperatorController() {
