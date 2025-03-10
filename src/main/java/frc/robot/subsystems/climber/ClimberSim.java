@@ -30,7 +30,6 @@ public class ClimberSim implements ClimberIO {
 
         inputs.climberPosition =
             Rotations.of(MathUtil.clamp(currentPoint, 0, Constants.Climb.MAX_ANGLE.in(Rotations)));
-        inputs.climberTouchSensor = currentPoint < 1;
     }
 
 

@@ -7,7 +7,6 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants;
 
 
@@ -18,10 +17,6 @@ public class ClimberReal implements ClimberIO {
     private final TalonFXConfiguration rightConfig = new TalonFXConfiguration();
     private final TalonFXConfiguration leftConfig = new TalonFXConfiguration();
     private StatusSignal<Angle> climbMotorPosition = climberMotorRight.getPosition();
-    private final DigitalInput climberTouchSensor =
-        new DigitalInput(Constants.Climb.TOUCH_SENSOR_CHANNEL);
-    private final DigitalInput leftMagnet = new DigitalInput(9);
-    private final DigitalInput rightMagnet = new DigitalInput(8);
 
     /*** Real */
     public ClimberReal() {
@@ -41,9 +36,6 @@ public class ClimberReal implements ClimberIO {
     public void updateInputs(ClimberInputs inputs) {
         BaseStatusSignal.refreshAll(climbMotorPosition);
         inputs.climberPosition = climbMotorPosition.getValue();
-        inputs.climberTouchSensor = climberTouchSensor.get();
-        inputs.leftMagnet = !leftMagnet.get();
-        inputs.rightMagnet = !rightMagnet.get();
     }
 
 

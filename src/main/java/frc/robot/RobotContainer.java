@@ -282,13 +282,13 @@ public class RobotContainer {
         pitController.y().whileTrue(climb.resetClimberCommand());
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());
         pitController.x().whileTrue(climb.manualClimb(() -> pitController.getLeftY()));
+        pitController.y().onTrue(climb.resetEncoder());
         pitController.start().and(RobotBase::isSimulation).onTrue(
             Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero))));
         // remove later
         SmartDashboard.putNumber("elevatorTargetHeight", 20);
         // driver.a().whileTrue(
         // elevator.moveTo(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
-        climb.resetButton.and(pitController.y()).onTrue(climb.resetEncoder());
     }
 
     private void configureTriggerBindings() {
@@ -307,12 +307,9 @@ public class RobotContainer {
         algae.hasAlgae.and(coralScoring.coralAtOuttake.negate())
             .onTrue(ledsleft.blinkLEDs(Color.kCyan, 2));
         // Climb
-        climb.resetButton.onTrue(climb.resetEncoder());
         elevator.hightAboveP0.or(climb.reachedClimberStart)
             .onTrue(Commands.runOnce(() -> swerve.setSpeedMultiplier(0.15)).ignoringDisable(true))
             .onFalse(Commands.runOnce(() -> swerve.setSpeedMultiplier(1.0)).ignoringDisable(true));
-        climb.leftMagnet.whileTrue(ledsleft.blinkLEDs(Color.kDeepPink));
-        climb.rightMagnet.whileTrue(ledsright.blinkLEDs(Color.kDeepPink));
     }
 
     /**
