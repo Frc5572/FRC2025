@@ -21,10 +21,7 @@ public class Climber extends SubsystemBase {
     private ClimberIO io;
     private ClimberInputsAutoLogged climberAutoLogged = new ClimberInputsAutoLogged();
     private final Viz2025 viz;
-    public Trigger resetButton = new Trigger(() -> getClimberTouchSensorStatus());
     public Trigger reachedClimberStart = new Trigger(() -> reachedClimberStart());
-    public Trigger leftMagnet = new Trigger(() -> climberAutoLogged.leftMagnet);
-    public Trigger rightMagnet = new Trigger(() -> climberAutoLogged.rightMagnet);
 
 
     public Climber(ClimberIO io, Viz2025 viz) {
@@ -44,10 +41,6 @@ public class Climber extends SubsystemBase {
     public void setClimberMotorVoltage(double voltage) {
         Logger.recordOutput("/Climber/Climber Voltage", voltage);
         io.setClimbMotorVoltage(voltage);
-    }
-
-    public boolean getClimberTouchSensorStatus() {
-        return climberAutoLogged.climberTouchSensor;
     }
 
     /**
@@ -116,7 +109,7 @@ public class Climber extends SubsystemBase {
      */
     public Command resetClimberCommand() { // reset
         return runEnd(() -> setClimberMotorVoltage(Constants.Climb.RESET_VOLTAGE),
-            () -> setClimberMotorVoltage(0)).until(resetButton).unless(resetButton);
+            () -> setClimberMotorVoltage(0));
     }
 
     public Command resetEncoder() {

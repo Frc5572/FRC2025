@@ -31,8 +31,7 @@ Algae - 6
 ## DIO Ports
 0 - Coral Outtake Beam Brake  
 1 - Elevator Touch Sensor  
-2 - Climber Touch Sensor  
-3 - Coral Intake Beam Brake  
+2 - Coral Intake Beam Brake  
 
 ## PWM Ports
 0 - LEDs  
