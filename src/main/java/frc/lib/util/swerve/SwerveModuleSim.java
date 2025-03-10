@@ -100,4 +100,9 @@ public class SwerveModuleSim implements SwerveModuleIO {
 
     }
 
+    @Override
+    public void setDriveMotorVoltage(double v) {
+        setDriveMotorVoltage(v);
+    }
+
 }

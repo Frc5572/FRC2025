@@ -183,4 +183,9 @@ public class SwerveModuleReal implements SwerveModuleIO {
         mDriveMotor.setControl(driveVoltage.withOutput(power));
     }
 
+    @Override
+    public void setDriveMotorVoltage(double v) {
+        mDriveMotor.setVoltage(v);
+    }
+
 }

@@ -27,6 +27,8 @@ public interface SwerveModuleIO {
 
     public void setPositionAngleMotor(double absolutePosition);
 
+    public void setDriveMotorVoltage(double v);
+
     /** Empty implementation of a Swerve Module (for replay) */
     public static class Empty implements SwerveModuleIO {
 
@@ -54,6 +56,9 @@ public interface SwerveModuleIO {
         public void setPositionAngleMotor(double absolutePosition) {
             // Intentionally do nothing
         }
+
+        @Override
+        public void setDriveMotorVoltage(double v) {}
 
     }
 

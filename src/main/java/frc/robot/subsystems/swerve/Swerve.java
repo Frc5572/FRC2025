@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.util.LoggedTracer;
 import frc.lib.util.swerve.SwerveModule;
 import frc.robot.Constants;
@@ -51,7 +52,7 @@ public class Swerve extends SubsystemBase {
             Constants.SwerveTransformPID.PID_TKI, Constants.SwerveTransformPID.PID_TKD,
             new TrapezoidProfile.Constraints(Constants.SwerveTransformPID.MAX_ANGULAR_VELOCITY,
                 Constants.SwerveTransformPID.MAX_ANGULAR_ACCELERATION)));
-
+    private SysIdRoutine sys;
 
     /**
      * Swerve Subsystem
@@ -62,7 +63,9 @@ public class Swerve extends SubsystemBase {
         this.swerveIO = swerveIO;
         swerveMods = swerveIO.createModules();
         fieldOffset = getGyroYaw().getDegrees();
-
+        this.sys =
+            new SysIdRoutine(new SysIdRoutine.Config(null, null, null), new SysIdRoutine.Mechanism(
+                (Volts) -> swerveIO.setDriveMotorVoltage(Volts), null, this));
         swerveIO.updateInputs(inputs);
 
         state.init(getModulePositions(), getGyroYaw());
@@ -369,4 +372,11 @@ public class Swerve extends SubsystemBase {
             Constants.SwerveTransformPID.MAX_ACCELERATION);
     }
 
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        return sys.quasistatic(direction);
+    }
+
+    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return sys.dynamic(direction);
+    }
 }

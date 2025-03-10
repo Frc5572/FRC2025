@@ -110,4 +110,8 @@ public class SwerveModule {
                 Constants.Swerve.wheelCircumference),
             Rotation2d.fromRotations(inputs.angleMotorSelectedPosition.in(Rotations)));
     }
+
+    public void setDriveMotorVoltage(double v) {
+        io.setDriveMotorVoltage(v);
+    }
 }
