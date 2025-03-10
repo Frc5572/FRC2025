@@ -15,9 +15,8 @@ public interface ClimberIO {
     public static class ClimberInputs {
         public Angle climberPosition = Radians.of(0);
         public boolean climberTouchSensor;
-
-
-
+        public boolean leftMagnet;
+        public boolean rightMagnet;
     }
 
     public void updateInputs(ClimberInputs inputs);
@@ -45,5 +44,4 @@ public interface ClimberIO {
         }
 
     }
-
 }

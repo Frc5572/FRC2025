@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.LoggedTracer;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Constants;
 
@@ -60,7 +61,8 @@ public class CoralScoring extends SubsystemBase {
         } else if (getOuttakeBeamBreakStatus()) {
             temp = Color.kPurple;
         }
-        SmartDashboard.putString("Dashboard/Main Driver/Have Coral", temp.toHexString());
+        SmartDashboard.putString(Constants.DashboardValues.haveCoral, temp.toHexString());
+        LoggedTracer.record("CoralScoring");
     }
 
     /**

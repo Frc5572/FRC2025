@@ -1,11 +1,14 @@
 package frc.robot.subsystems.elevator_algae;
 
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.LoggedTracer;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Constants;
 
@@ -17,6 +20,7 @@ public class ElevatorAlgae extends SubsystemBase {
     AlgaeIOInputsAutoLogged inputs = new AlgaeIOInputsAutoLogged();
     private final Viz2025 viz;
 
+    /** Get if algae is held */
     public Trigger hasAlgae =
         new Trigger(() -> inputs.algaeMotorCurrent > Constants.Algae.HAS_ALGAE_CURRENT_THRESHOLD)
             .debounce(.25);
@@ -41,7 +45,8 @@ public class ElevatorAlgae extends SubsystemBase {
         } else if (!hasAlgae.getAsBoolean()) {
             temp = Color.kRed;
         }
-        SmartDashboard.putString("Dashboard/Main Driver/Have Algae", temp.toHexString());
+        SmartDashboard.putString(Constants.DashboardValues.haveAlgae, temp.toHexString());
+        LoggedTracer.record("Algae");
     }
 
 
@@ -55,8 +60,16 @@ public class ElevatorAlgae extends SubsystemBase {
     // return inputs.algaeMotorCurrent > Constants.Algae.HAS_ALGAE_CURRENT_THRESHOLD;
     // }
 
+    /** Run algae intake with given speed */
     public Command runAlgaeMotor(double speed) { // set motor speed Command
         return runEnd(() -> setAlgaeMotorVoltage(speed), () -> setAlgaeMotorVoltage(0));
+        // .until(() -> hasAlgae());
+    }
+
+    /** Run algae intake with given speed */
+    public Command runAlgaeMotor(DoubleSupplier speed) { // set motor speed Command
+        return runEnd(() -> setAlgaeMotorVoltage(speed.getAsDouble()),
+            () -> setAlgaeMotorVoltage(0));
         // .until(() -> hasAlgae());
     }
 
@@ -66,6 +79,24 @@ public class ElevatorAlgae extends SubsystemBase {
     public Command algaeIntakeCommand() {
         return runAlgaeMotor(Constants.Algae.VOLTAGE).until(hasAlgae)
             .andThen(() -> setAlgaeMotorVoltage(Constants.Algae.SMALLER_VOLTAGE));
+    }
 
+    /**
+     * Keeps algae intake motor running even after it has intaked an algae, but it lowers the speed
+     */
+    public Command algaeIntakeCommand(BooleanSupplier supplier) {
+        return runAlgaeMotor(() -> supplier.getAsBoolean() ? Constants.Algae.VOLTAGE : 0)
+            .until(hasAlgae).andThen(runAlgaeMotor(Constants.Algae.SMALLER_VOLTAGE)
+                .until(() -> !supplier.getAsBoolean()))
+            .repeatedly();
+    }
+
+    /**
+     * Outtake Algae
+     *
+     * @return Command to outtake algae
+     */
+    public Command algaeOuttakeCommand() {
+        return runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE);
     }
 }

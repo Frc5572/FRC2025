@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.LoggedTracer;
 import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Constants;
@@ -31,16 +32,23 @@ public class Elevator extends SubsystemBase {
         io.updateInputs(inputs);
     }
 
+    private final Trigger limitSwitchTouched = new Trigger(() -> inputs.limitSwitch).debounce(0.25);
+
     @Override
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);
         viz.setElevatorHeight(inputs.position);
         Logger.recordOutput("Elevator/position_in", inputs.position.in(Inches));
-        SmartDashboard.putString("Dashboard/Main Driver/Elevator Height",
+        SmartDashboard.putString(Constants.DashboardValues.elevatorHeight,
             Height.getCurrentState().displayName);
-        SmartDashboard.putNumber("Dashboard/Main Driver/Elevator Preset Level",
+        SmartDashboard.putNumber(Constants.DashboardValues.elevatorPresetHeight,
             Height.getCurrentState().ordinal());
+        LoggedTracer.record("Elevator");
+    }
+
+    public Distance getHeight() {
+        return inputs.position;
     }
 
     /**
@@ -50,9 +58,10 @@ public class Elevator extends SubsystemBase {
      *
      */
     public Command home() {
-        Command slowLower = Commands.runEnd(() -> io.setVoltage(-1.4), () -> io.setVoltage(0.0));
+        Command slowLower = this.runEnd(() -> io.setVoltage(-1.4), () -> io.setVoltage(0.0));
         return moveTo(() -> Constants.Elevator.HOME).until(() -> inputs.position.in(Inches) < 5.0)
-            .andThen(slowLower).until(() -> inputs.limitSwitch).andThen(Commands.runOnce(() -> {
+            .andThen(slowLower.until(limitSwitchTouched).withTimeout(2))
+            .andThen(this.runOnce(() -> {
                 io.resetHome();
                 Logger.recordOutput(Constants.Elevator.heightName, "home");
             }));
@@ -100,10 +109,11 @@ public class Elevator extends SubsystemBase {
      *
      */
     public Command moveTo(Supplier<Distance> height) {
-        return run(() -> {
+        return runOnce(() -> {
             Logger.recordOutput("targetHeight", height.get().in(Meters));
             io.setPositon(height.get().in(Meters));
-        }).until(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1);
+        }).andThen(Commands
+            .waitUntil(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1));
     }
 
     public Command manualMove(CommandXboxController leftStick) {
@@ -117,6 +127,13 @@ public class Elevator extends SubsystemBase {
 
     public Command moveDown() {
         return runEnd(() -> io.setVoltage(-1.0), () -> io.setVoltage(0));
+    }
+
+    /**
+     * Stop motors for safety
+     */
+    public Command stop() {
+        return runOnce(() -> io.setVoltage(0));
     }
 
     /**

@@ -24,8 +24,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.lib.util.LoggedTracer;
 import frc.lib.util.swerve.SwerveModule;
 import frc.robot.Constants;
+import frc.robot.Robot.RobotRunType;
+import frc.robot.RobotContainer;
 import frc.robot.RobotState;
 
 /**
@@ -37,13 +40,13 @@ public class Swerve extends SubsystemBase {
     private double fieldOffset;
     private SwerveInputsAutoLogged inputs = new SwerveInputsAutoLogged();
     private SwerveIO swerveIO;
-    private final RobotState state;
+    public final RobotState state;
     private double setSpeedMultiplier = 1.0;
     private final HolonomicDriveController holonomicDriveController = new HolonomicDriveController(
         new PIDController(Constants.SwerveTransformPID.PID_XKP,
             Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
-        new PIDController(Constants.SwerveTransformPID.PID_YKP,
-            Constants.SwerveTransformPID.PID_YKI, Constants.SwerveTransformPID.PID_YKD),
+        new PIDController(Constants.SwerveTransformPID.PID_XKP,
+            Constants.SwerveTransformPID.PID_XKI, Constants.SwerveTransformPID.PID_XKD),
         new ProfiledPIDController(Constants.SwerveTransformPID.PID_TKP,
             Constants.SwerveTransformPID.PID_TKI, Constants.SwerveTransformPID.PID_TKD,
             new TrapezoidProfile.Constraints(Constants.SwerveTransformPID.MAX_ANGULAR_VELOCITY,
@@ -63,7 +66,12 @@ public class Swerve extends SubsystemBase {
         swerveIO.updateInputs(inputs);
 
         state.init(getModulePositions(), getGyroYaw());
-        SmartDashboard.putData("Dashboard/Auto/Field2d", field);
+        SmartDashboard.putData(Constants.DashboardValues.field2d, field);
+
+        if (RobotContainer.runType == RobotRunType.kSimulation) {
+            holonomicDriveController.getXController().setP(7.0);
+            holonomicDriveController.getYController().setP(7.0);
+        }
     }
 
     /**
@@ -214,6 +222,7 @@ public class Swerve extends SubsystemBase {
         Logger.processInputs("Swerve", inputs);
         field.setRobotPose(getPose());
         SmartDashboard.putNumber("SpeedMultiplier", setSpeedMultiplier);
+        LoggedTracer.record("Swerve");
     }
 
     /**
@@ -295,6 +304,11 @@ public class Swerve extends SubsystemBase {
     }
 
 
+
+    public Command stop() {
+        return this.runOnce(this::setMotorsZero);
+    }
+
     /**
      * Follow Choreo Trajectory
      *
@@ -321,10 +335,38 @@ public class Swerve extends SubsystemBase {
      *
      * @param pose Desired Pose2d
      */
-    public void moveToPose(Pose2d pose) {
-        ChassisSpeeds ctrlEffort =
-            holonomicDriveController.calculate(getPose(), pose, 0, pose.getRotation());
+    public void moveToPose(Pose2d pose, double maxSpeed, double maxAcceleration) {
+        if (Constants.shouldDrawStuff) {
+            Logger.recordOutput("Swerve/moveToPoseTarget", pose);
+        }
+        ChassisSpeeds ctrlEffort = holonomicDriveController.calculate(state.getGlobalPoseEstimate(),
+            pose, 0, pose.getRotation());
+        double speed = Math.hypot(ctrlEffort.vxMetersPerSecond, ctrlEffort.vyMetersPerSecond);
+        if (speed > maxSpeed) {
+            double mul = maxSpeed / speed;
+            ctrlEffort.vxMetersPerSecond *= mul;
+            ctrlEffort.vyMetersPerSecond *= mul;
+        }
         setModuleStates(ctrlEffort);
+    }
+
+    /**
+     * Move to a Pose2d
+     *
+     * @param pose Desired Pose2d
+     */
+    public void moveToPose(Pose2d pose, double maxVelocity) {
+        moveToPose(pose, maxVelocity, Constants.SwerveTransformPID.MAX_ACCELERATION);
+    }
+
+    /**
+     * Move to a Pose2d
+     *
+     * @param pose Desired Pose2d
+     */
+    public void moveToPose(Pose2d pose) {
+        moveToPose(pose, Constants.SwerveTransformPID.MAX_VELOCITY,
+            Constants.SwerveTransformPID.MAX_ACCELERATION);
     }
 
 }

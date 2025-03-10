@@ -20,8 +20,8 @@ public class ClimberReal implements ClimberIO {
     private StatusSignal<Angle> climbMotorPosition = climberMotorRight.getPosition();
     private final DigitalInput climberTouchSensor =
         new DigitalInput(Constants.Climb.TOUCH_SENSOR_CHANNEL);
-    // private final CANcoder canEncoder = new CANcoder(Constants.Climb.CanID, "canivore");
-
+    private final DigitalInput leftMagnet = new DigitalInput(9);
+    private final DigitalInput rightMagnet = new DigitalInput(8);
 
     /*** Real */
     public ClimberReal() {
@@ -42,7 +42,8 @@ public class ClimberReal implements ClimberIO {
         BaseStatusSignal.refreshAll(climbMotorPosition);
         inputs.climberPosition = climbMotorPosition.getValue();
         inputs.climberTouchSensor = climberTouchSensor.get();
-
+        inputs.leftMagnet = !leftMagnet.get();
+        inputs.rightMagnet = !rightMagnet.get();
     }
 
 

@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import choreo.auto.AutoRoutine;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -7,7 +8,8 @@ import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.lib.math.AllianceFlipUtil;
+import frc.lib.util.AllianceFlipUtil;
+import frc.robot.Constants;
 import frc.robot.subsystems.swerve.Swerve;
 
 /**
@@ -17,12 +19,13 @@ public class MoveToPose extends Command {
 
     private EventLoop eventLoop = CommandScheduler.getInstance().getDefaultButtonLoop();
     private AutoRoutine autoRoutine;
-    private Swerve swerve;
-    private Supplier<Pose2d> pose2dSupplier;
+    private final Swerve swerve;
+    private final Supplier<Pose2d> pose2dSupplier;
+    private final DoubleSupplier maxSpeedSupplier;
     private Pose2d pose2d;
-    private boolean flipForRed;
-    private double tol;
-    private double rotTol;
+    private final boolean flipForRed;
+    private final double tol;
+    private final double rotTol;
     /** If this trajectory us currently running */
     private boolean isActive = false;
     /** If the trajectory ran to completion */
@@ -33,18 +36,39 @@ public class MoveToPose extends Command {
      *
      * @param swerve Swerve Subsystem
      * @param pose2dSupplier Pose2d Supplier
+     * @param maxSpeedSupplier maximum speed to move at
      * @param flipForRed Whether to flip the pose2d for red alliance
      * @param tol Translational Tolerance
      * @param rotTol Rotational Tolerance
      */
-    public MoveToPose(Swerve swerve, Supplier<Pose2d> pose2dSupplier, boolean flipForRed,
-        double tol, double rotTol) {
+    public MoveToPose(Swerve swerve, Supplier<Pose2d> pose2dSupplier,
+        DoubleSupplier maxSpeedSupplier, boolean flipForRed, double tol, double rotTol) {
         this.swerve = swerve;
         this.pose2dSupplier = pose2dSupplier;
+        this.maxSpeedSupplier = maxSpeedSupplier;
         this.flipForRed = flipForRed;
         this.tol = tol;
         this.rotTol = rotTol;
         addRequirements(swerve);
+    }
+
+    /**
+     * Move to a specified Pose2d command
+     *
+     * @param swerve Swerve Subsystem
+     * @param pose2dSupplier Pose2d Supplier
+     * @param maxSpeedSupplier maximum speed to move at
+     * @param flipForRed Whether to flip the pose2d for red alliance
+     * @param tol Translational Tolerance
+     * @param rotTol Rotational Tolerance
+     * @param autoRoutine Choreo AutoRoutine to integrate command
+     */
+    public MoveToPose(Swerve swerve, Supplier<Pose2d> pose2dSupplier,
+        DoubleSupplier maxSpeedSupplier, boolean flipForRed, double tol, double rotTol,
+        AutoRoutine autoRoutine) {
+        this(swerve, pose2dSupplier, maxSpeedSupplier, flipForRed, tol, rotTol);
+        this.autoRoutine = autoRoutine;
+        this.eventLoop = autoRoutine.loop();
     }
 
     /**
@@ -59,7 +83,7 @@ public class MoveToPose extends Command {
      */
     public MoveToPose(Swerve swerve, Supplier<Pose2d> pose2dSupplier, boolean flipForRed,
         double tol, double rotTol, AutoRoutine autoRoutine) {
-        this(swerve, pose2dSupplier, flipForRed, tol, rotTol);
+        this(swerve, pose2dSupplier, () -> Constants.Swerve.maxSpeed, flipForRed, tol, rotTol);
         this.autoRoutine = autoRoutine;
         this.eventLoop = autoRoutine.loop();
     }
@@ -93,7 +117,7 @@ public class MoveToPose extends Command {
 
     @Override
     public void execute() {
-        swerve.moveToPose(pose2d);
+        swerve.moveToPose(pose2d, maxSpeedSupplier.getAsDouble());
     }
 
     @Override

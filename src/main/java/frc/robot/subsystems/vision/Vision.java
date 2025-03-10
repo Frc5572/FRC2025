@@ -8,10 +8,14 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.targeting.PhotonPipelineResult;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.IntArrayList;
+import frc.lib.util.LoggedTracer;
 import frc.lib.util.Tuples.Tuple3;
 import frc.robot.Constants;
 import frc.robot.RobotState;
@@ -26,6 +30,10 @@ public class Vision extends SubsystemBase {
     private final RobotState state;
 
     private final Transform3d[] robotToCamera;
+
+    private boolean seesMultitag = false;
+    public Trigger seesTwoAprilTags =
+        new Trigger(() -> twoAprilTags()).debounce(.3, Debouncer.DebounceType.kBoth);
 
     /** Vision Subsystem */
     public Vision(RobotState state, Function<Constants.Vision.CameraConstants[], VisionIO> io) {
@@ -59,12 +67,17 @@ public class Vision extends SubsystemBase {
                 results.add(new Tuple3<>(i, transform, result));
             }
         }
+
         results.sort(
             (a, b) -> Double.compare(a._2().getTimestampSeconds(), b._2().getTimestampSeconds()));
         for (var result : results) {
+            if (result._2().multitagResult.isPresent()) {
+                seesMultitag = true;
+            } else if (result._0() == 0) {
+                seesMultitag = false;
+            }
             state.addVisionObservation(result._2(), result._1(), result._0());
         }
-
         // Viz
         Pose3d robotPose = new Pose3d(state.getGlobalPoseEstimate());
         for (int i = 0; i < cameraInputs.length; i++) {
@@ -86,6 +99,12 @@ public class Vision extends SubsystemBase {
                 Logger.recordOutput("Vision/Camera" + i + "/AprilTagsCached", draw);
             }
         }
+        LoggedTracer.record("Vision");
+        SmartDashboard.putBoolean(Constants.DashboardValues.seeMultiTag, seesMultitag);
+    }
+
+    public boolean twoAprilTags() {
+        return seesMultitag;
     }
 
 }

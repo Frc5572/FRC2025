@@ -1,6 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Radians;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,17 +12,22 @@ import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.Container;
 import frc.lib.util.ScoringLocation.Height;
+import frc.lib.util.WebController;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
@@ -61,17 +65,19 @@ import frc.robot.subsystems.vision.VisionSimPhoton;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+    public static RobotRunType runType = RobotRunType.kReal;
+
     private final AutoFactory autoFactory;
     private final AutoChooser autoChooser;
 
 
     /* Controllers */
     public final CommandXboxController driver = new CommandXboxController(Constants.driverId);
+    public final WebController operator = new WebController(5801);
     public final CommandXboxController pitController =
         new CommandXboxController(Constants.PIT_CONTROLLER_ID);
     public final CommandXboxController altOperator =
         new CommandXboxController(Constants.ALT_OPERATOR_ID);
-    public final CommandXboxController operator = new CommandXboxController(1);
 
 
     /** Simulation */
@@ -82,22 +88,26 @@ public class RobotContainer {
     private final Viz2025 vis;
     /** State */
     private final RobotState state;
+    private final Container<Boolean> intakingAlgae = new Container<Boolean>(false);
 
 
     /* Subsystems */
     private ElevatorAlgae algae;
-    private LEDs leds = new LEDs();
+    private final AddressableLED leds = new AddressableLED(Constants.LEDs.LED_PORT);
+    private final AddressableLEDBuffer buffer = new AddressableLEDBuffer(Constants.LEDs.LED_LENGTH);
+    private LEDs ledsright = new LEDs(buffer, leds, 0, 59);
+    private LEDs ledsleft = new LEDs(buffer, leds, 60, 119);
     private Elevator elevator;
     private final Swerve swerve;
     private final Vision vision;
     private CoralScoring coralScoring;
     private Climber climb;
-    private OperatorStates operatorStates = new OperatorStates();
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer(RobotRunType runtimeType) {
+        runType = runtimeType;
         fieldVis = new FieldViz();
         vis = new Viz2025(fieldVis, "");
         state = new RobotState(vis);
@@ -133,18 +143,26 @@ public class RobotContainer {
         autoFactory = new AutoFactory(swerve::getPose, swerve::resetOdometry,
             swerve::followTrajectory, true, swerve);
 
-        AutoCommandFactory autos =
-            new AutoCommandFactory(autoFactory, swerve, elevator, coralScoring, leds);
+        AutoCommandFactory autos = new AutoCommandFactory(autoFactory, swerve, elevator,
+            coralScoring, algae, ledsleft, intakingAlgae);
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Example", autos::example);
+        autoChooser.addRoutine("Left Side L4 Coral", autos::l4left);
+        autoChooser.addRoutine("Right Side L4 Coral", autos::l4right);
+        autoChooser.addRoutine("Barge", autos::barge);
+        SmartDashboard.putData(Constants.DashboardValues.autoChooser, autoChooser);
 
-        SmartDashboard.putData("Dashboard/Auto/Auto Chooser", autoChooser);
-        RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler()
-            .andThen(Commands.runOnce(() -> swerve.setMotorsZero())));
+        RobotModeTriggers.autonomous()
+            .whileTrue(autoChooser.selectedCommandScheduler()
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+                .andThen(Commands.runOnce(() -> swerve.setMotorsZero())));
         RobotModeTriggers.disabled().onTrue(Commands.runOnce(() -> swerve.setMotorsZero()));
 
+
         /* Default Commands */
-        leds.setDefaultCommand(leds.setLEDsBreathe(Color.kRed));
+        ledsright.setDefaultCommand(ledsright.setLEDsBreathe(Color.kRed));
+        ledsleft.setDefaultCommand(ledsleft.setLEDsBreathe(Color.kRed));
+
         /* Button and Trigger Bindings */
 
         configureTriggerBindings();
@@ -179,6 +197,7 @@ public class RobotContainer {
 
     /** Setup buttons for newly attached controllers */
     public void queryControllers() {
+        operator.periodic();
         for (var setup : controllerSetups) {
             setup.run();
         }
@@ -193,13 +212,32 @@ public class RobotContainer {
      */
 
     private void setupDriver() {
-
-
         swerve.setDefaultCommand(swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
             Constants.Swerve.isOpenLoop));
 
+        Command autoScore = CommandFactory
+            .autoScore(swerve, elevator, coralScoring, algae, operator::getDesiredLocation,
+                operator::getDesiredHeight, operator::additionalAlgaeHeight, intakingAlgae,
+                operator::crossOut)
+            // .andThen(CommandFactory.doSomethingWithAlgae(swerve, elevator, intakingAlgae, algae,
+            // operator::whatToDoWithAlgae, () -> -driver.getLeftX()))
+            .andThen(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder))
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        System.out.println("autoscore requires: ");
+        for (var req : autoScore.getRequirements()) {
+            System.out.println(" - " + req.getName());
+        }
+        driver.a().and(operator.hasReefLocation()).whileTrue(autoScore)
+            .whileTrue(ledsleft.setLEDsBreathe(Color.kGreen)).negate()
+            .onTrue(coralScoring.runCoralIntake());
+        driver.b()
+            .whileTrue(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)
+                .andThen(swerve.run(() -> {
+                })))
+            .whileTrue(ledsleft.setLEDsBreathe(Color.kGreen));
+        driver.x().onTrue(elevator.home());
         driver.y().onTrue(Commands.runOnce(() -> swerve.resetFieldRelativeOffset()));
-        driver.rightTrigger().and(climb.reachedClimberStart.negate())
+        driver.start().and(climb.reachedClimberStart.negate())
             .onTrue(climb
                 .runClimberMotorCommand(Constants.Climb.PRE_CLIMB_VOLTAGE,
                     () -> climb.getClimberPosition()
@@ -207,19 +245,29 @@ public class RobotContainer {
                 .andThen(climb.runClimberMotorCommand(Constants.Climb.RESET_VOLTAGE,
                     () -> climb.getClimberPosition()
                         .in(Radians) <= Constants.Climb.CLIMBER_START_ANGLE.in(Radians))));
-
-        driver.rightTrigger().and(climb.reachedClimberStart)
+        driver.start().and(climb.reachedClimberStart)
             .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
+        driver.leftTrigger().whileTrue(Commands.runOnce(() -> {
+            intakingAlgae.value = false;
+        }).alongWith(algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE)));
+        driver.rightTrigger().whileTrue(elevator.p5()).onFalse(elevator.home());
+        driver.back().onTrue(elevator.stop());
     }
 
     private void setupAltOperatorController() {
         altOperator.y().onTrue(elevator.home());
         altOperator.x().and(coralScoring.coralAtOuttake).whileTrue(coralScoring.runCoralOuttake());
-        altOperator.rightTrigger().whileTrue(algae.algaeIntakeCommand());
-        altOperator.leftTrigger().whileTrue(algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE));
+        altOperator.rightTrigger().onTrue(Commands.runOnce(() -> {
+            intakingAlgae.value = true;
+        })).onFalse(Commands.runOnce(() -> {
+            intakingAlgae.value = false;
+        }));
+        altOperator.leftTrigger().whileTrue(Commands.runOnce(() -> {
+            intakingAlgae.value = false;
+        }).alongWith(algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE)));
         // manual mode
 
-
+        altOperator.povLeft().onTrue(elevator.moveTo(() -> Height.KP5.height));
 
         altOperator.a().whileTrue(elevator.heightSelector());
         altOperator.povUp()
@@ -238,27 +286,33 @@ public class RobotContainer {
             Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero))));
         // remove later
         SmartDashboard.putNumber("elevatorTargetHeight", 20);
-        driver.a().whileTrue(
-            elevator.moveTo(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
+        // driver.a().whileTrue(
+        // elevator.moveTo(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
         climb.resetButton.and(pitController.y()).onTrue(climb.resetEncoder());
     }
 
     private void configureTriggerBindings() {
         // Coral
-        coralScoring.coralAtIntake.whileTrue(leds.setLEDsSolid(Color.kOrange));
-        coralScoring.coralAtOuttake.whileTrue(leds.setLEDsSolid(Color.kCyan));
+        coralScoring.coralAtIntake.whileTrue(ledsleft.setLEDsSolid(Color.kOrange));
+        coralScoring.coralAtOuttake.whileTrue(ledsleft.setLEDsSolid(Color.kCyan));
+        vision.seesTwoAprilTags.whileTrue(ledsright.setRainbow());
+
+        algae.setDefaultCommand(algae.algaeIntakeCommand(() -> {
+            return intakingAlgae.value;
+        }).withName("Algae Default Command"));
+
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
         // Algae
         algae.hasAlgae.and(coralScoring.coralAtOuttake.negate())
-            .onTrue(leds.blinkLEDs(Color.kCyan, 2));
+            .onTrue(ledsleft.blinkLEDs(Color.kCyan, 2));
         // Climb
         climb.resetButton.onTrue(climb.resetEncoder());
-        // coralScoring.coralAtOuttake.and(RobotModeTriggers.teleop()).onTrue(elevator.p0());
         elevator.hightAboveP0.or(climb.reachedClimberStart)
             .onTrue(Commands.runOnce(() -> swerve.setSpeedMultiplier(0.15)).ignoringDisable(true))
             .onFalse(Commands.runOnce(() -> swerve.setSpeedMultiplier(1.0)).ignoringDisable(true));
-
+        climb.leftMagnet.whileTrue(ledsleft.blinkLEDs(Color.kDeepPink));
+        climb.rightMagnet.whileTrue(ledsright.blinkLEDs(Color.kDeepPink));
     }
 
     /**

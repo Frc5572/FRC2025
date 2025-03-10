@@ -12,7 +12,6 @@ public interface ElevatorAlgaeIO {
     @AutoLog
     public class AlgaeIOInputs {
         double algaeMotorCurrent;
-        boolean beamBrakeStatus;
     }
 
     public void setAlgaeMotorVoltage(double voltage);
