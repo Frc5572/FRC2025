@@ -190,14 +190,14 @@ public class CommandFactory {
 
     private static Command feederAfter(Swerve swerve, CoralScoring scoring) {
         return swerve.run(() -> {
-            swerve.setModuleStates(new ChassisSpeeds(0.0, -0.4, 0.0));
+            swerve.setModuleStates(new ChassisSpeeds(-0.4, 0.0, 0.0));
         }).until(scoring.coralAtIntake).withTimeout(3.0).andThen(swerve.stop());
     }
 
     private static final Pose2d leftFeederAway = new Pose2d(1.5196709632873535, 7.158551216125488,
-        Rotation2d.fromRadians(-2.4980917038665034));
+        Rotation2d.fromRadians(-2.4980917038665034).plus(Rotation2d.kCCW_90deg));
     private static final Pose2d leftFeeder = new Pose2d(1.4372355937957764, 7.302813529968262,
-        Rotation2d.fromRadians(-2.4980917038665034));
+        Rotation2d.fromRadians(-2.4980917038665034).plus(Rotation2d.kCCW_90deg));
 
     /** Move to left feeder */
     public static Command leftFeeder(Swerve swerve, Elevator elevator, CoralScoring coral) {
@@ -222,10 +222,10 @@ public class CommandFactory {
 
     private static final Pose2d rightFeederAway = new Pose2d(leftFeederAway.getX(),
         FieldConstants.fieldWidth.in(Meters) - leftFeederAway.getY(),
-        leftFeederAway.getRotation().unaryMinus().plus(Rotation2d.k180deg));
+        leftFeederAway.getRotation().unaryMinus());
     private static final Pose2d rightFeeder =
         new Pose2d(leftFeeder.getX(), FieldConstants.fieldWidth.in(Meters) - leftFeeder.getY(),
-            leftFeeder.getRotation().unaryMinus().plus(Rotation2d.k180deg));
+            leftFeeder.getRotation().unaryMinus());
 
     /** Move to right feeder */
     public static Command rightFeeder(Swerve swerve, Elevator elevator, CoralScoring coral) {
@@ -309,4 +309,10 @@ public class CommandFactory {
         }, true, Units.inchesToMeters(12), 3));
     }
 
+    public static Command bargeSpitAlgae(Elevator elevator, ElevatorAlgae algae,
+        Container<Boolean> intakeAlgae) {
+        return algae.algaeHoldCommand().until(() -> elevator.getHeight().in(Inches) > 65)
+            .andThen(algae.algaeOuttakeCommand().withTimeout(.5)).deadlineFor(elevator.p5())
+            .andThen(elevator.home()).andThen(Commands.runOnce(() -> intakeAlgae.value = false));
+    }
 }
