@@ -123,7 +123,7 @@ public class RobotContainer {
 
             case kSimulation:
                 driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
-                    new Pose2d(3, 3, Rotation2d.kZero));
+                    new Pose2d(4.07, 3.3, Rotation2d.fromDegrees(60)));
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
                 swerve = new Swerve(state, new SwerveSim(driveSimulation));
                 vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));

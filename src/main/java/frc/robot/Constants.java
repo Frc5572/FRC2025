@@ -376,7 +376,7 @@ public final class Constants {
                 new Transform3d(new Translation3d(Units.inchesToMeters(11),
                     -Units.inchesToMeters(12), Units.inchesToMeters(10)),
                     new Rotation3d(Math.PI, 0, 0)),
-                Units.inchesToMeters(1.6)),
+                Units.inchesToMeters(0.0)),
             new CameraConstants("cam1", 600, 800, Rotation2d.fromDegrees(60), Hertz.of(40),
                 Seconds.of(0.15), Seconds.of(0.02), 0.27, 0.08,
                 new Transform3d(
