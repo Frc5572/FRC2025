@@ -282,6 +282,7 @@ public class RobotContainer {
         pitController.y().whileTrue(climb.resetClimberCommand());
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());
         pitController.x().whileTrue(climb.manualClimb(() -> pitController.getLeftY()));
+        pitController.y().onTrue(climb.resetEncoder());
         pitController.start().and(RobotBase::isSimulation).onTrue(
             Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero))));
         // remove later
