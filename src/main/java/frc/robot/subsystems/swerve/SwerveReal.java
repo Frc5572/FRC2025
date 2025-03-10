@@ -4,6 +4,7 @@ package frc.robot.subsystems.swerve;
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Voltage;
 import frc.lib.util.swerve.SwerveModule;
 import frc.lib.util.swerve.SwerveModuleReal;
 import frc.robot.Constants;
@@ -51,5 +52,11 @@ public class SwerveReal implements SwerveIO {
     public void setPose(Pose2d pose) {
         // Intentionally do nothing
     }
+
+    @Override
+    public void setDriveMotorVoltage(Voltage volts) {
+        setDriveMotorVoltage(volts);
+    }
+
 
 }

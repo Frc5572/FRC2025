@@ -5,6 +5,7 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Voltage;
 import frc.lib.util.swerve.SwerveModule;
 import frc.lib.util.swerve.SwerveModuleSim;
 
@@ -39,6 +40,11 @@ public class SwerveSim implements SwerveIO {
     @Override
     public void setPose(Pose2d pose) {
         simulation.setSimulationWorldPose(pose);
+    }
+
+    @Override
+    public void setDriveMotorVoltage(Voltage volts) {
+        setDriveMotorVoltage(volts);
     }
 
 }
