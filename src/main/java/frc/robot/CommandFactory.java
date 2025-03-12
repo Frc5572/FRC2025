@@ -122,8 +122,8 @@ public class CommandFactory {
                         .andThen(reefAlign(swerve, location, 1).withTimeout(2.0))),
                     (elevator.moveTo(() -> height.get().height)
                         .alongWith(reefAlign(swerve, location, 1).withTimeout(2.0))),
-                    () -> additionalAlgae.value != null))
-                .andThen(Commands.waitSeconds(0.2))
+                    () -> additionalAlgae.value != null)
+                        .unless(() -> height.get() == additionalAlgae.value))
                 .andThen(new ConditionalCommand(Commands.runOnce(() -> {
                 }), coralScoring.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae))
                 .andThen(backAwayReef(swerve, location).withTimeout(2.0)));
