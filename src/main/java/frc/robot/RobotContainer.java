@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.lib.util.Container;
 import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.WebController;
 import frc.lib.util.viz.FieldViz;
@@ -88,8 +87,6 @@ public class RobotContainer {
     private final Viz2025 vis;
     /** State */
     private final RobotState state;
-    private final Container<Boolean> intakingAlgae = new Container<Boolean>(false);
-
 
     /* Subsystems */
     private ElevatorAlgae algae;
@@ -143,13 +140,13 @@ public class RobotContainer {
         autoFactory = new AutoFactory(swerve::getPose, swerve::resetOdometry,
             swerve::followTrajectory, true, swerve);
 
-        AutoCommandFactory autos = new AutoCommandFactory(autoFactory, swerve, elevator,
-            coralScoring, algae, ledsleft, intakingAlgae);
+        AutoCommandFactory autos =
+            new AutoCommandFactory(autoFactory, swerve, elevator, coralScoring, algae, ledsleft);
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Example", autos::example);
         autoChooser.addRoutine("Left Side L4 Coral", autos::l4left);
         autoChooser.addRoutine("Right Side L4 Coral", autos::l4right);
-        autoChooser.addRoutine("Barge", autos::barge);
+        // autoChooser.addRoutine("Barge", autos::barge);
         SmartDashboard.putData(Constants.DashboardValues.autoChooser, autoChooser);
 
         RobotModeTriggers.autonomous()
@@ -162,9 +159,9 @@ public class RobotContainer {
         /* Default Commands */
         ledsright.setDefaultCommand(ledsright.setLEDsBreathe(Color.kRed));
         ledsleft.setDefaultCommand(ledsleft.setLEDsBreathe(Color.kRed));
+        algae.setDefaultCommand(algae.algaeHoldCommand().withName("Algae Default Command"));
 
         /* Button and Trigger Bindings */
-
         configureTriggerBindings();
 
         if (runtimeType == RobotRunType.kSimulation) {
@@ -217,8 +214,7 @@ public class RobotContainer {
 
         Command autoScore = CommandFactory
             .autoScore(swerve, elevator, coralScoring, algae, operator::getDesiredLocation,
-                operator::getDesiredHeight, operator::additionalAlgaeHeight, intakingAlgae,
-                operator::crossOut)
+                operator::getDesiredHeight, operator::additionalAlgaeHeight, operator::crossOut)
             // .andThen(CommandFactory.doSomethingWithAlgae(swerve, elevator, intakingAlgae, algae,
             // operator::whatToDoWithAlgae, () -> -driver.getLeftX()))
             .andThen(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder))
@@ -247,11 +243,8 @@ public class RobotContainer {
                         .in(Radians) <= Constants.Climb.CLIMBER_START_ANGLE.in(Radians))));
         driver.start().and(climb.reachedClimberStart)
             .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
-        driver.leftTrigger().whileTrue(Commands.runOnce(() -> {
-            intakingAlgae.value = false;
-        }).alongWith(algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE)));
-        driver.rightTrigger()
-            .whileTrue(CommandFactory.bargeSpitAlgae(elevator, algae, intakingAlgae))
+        driver.leftTrigger().whileTrue(algae.algaeOuttakeCommand());
+        driver.rightTrigger().whileTrue(CommandFactory.bargeSpitAlgae(elevator, algae))
             .onFalse(elevator.home());
         driver.back().onTrue(elevator.stop());
     }
@@ -259,14 +252,8 @@ public class RobotContainer {
     private void setupAltOperatorController() {
         altOperator.y().onTrue(elevator.home());
         altOperator.x().and(coralScoring.coralAtOuttake).whileTrue(coralScoring.runCoralOuttake());
-        altOperator.rightTrigger().onTrue(Commands.runOnce(() -> {
-            intakingAlgae.value = true;
-        })).onFalse(Commands.runOnce(() -> {
-            intakingAlgae.value = false;
-        }));
-        altOperator.leftTrigger().whileTrue(Commands.runOnce(() -> {
-            intakingAlgae.value = false;
-        }).alongWith(algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE)));
+        altOperator.rightTrigger().whileTrue(algae.algaeIntakeCommand());
+        altOperator.leftTrigger().whileTrue(algae.algaeOuttakeCommand());
         // manual mode
 
         altOperator.povLeft().onTrue(elevator.moveTo(() -> Height.KP5.height));
@@ -298,10 +285,6 @@ public class RobotContainer {
         coralScoring.coralAtIntake.whileTrue(ledsleft.setLEDsSolid(Color.kOrange));
         coralScoring.coralAtOuttake.whileTrue(ledsleft.setLEDsSolid(Color.kCyan));
         vision.seesTwoAprilTags.whileTrue(ledsright.setRainbow());
-
-        algae.setDefaultCommand(algae.algaeIntakeCommand(() -> {
-            return intakingAlgae.value;
-        }).withName("Algae Default Command"));
 
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
