@@ -18,12 +18,14 @@ public class ElevatorAlgaeSim implements ElevatorAlgaeIO {
      */
     public ElevatorAlgaeSim() {}
 
+    @Override
     public void updateInputs(AlgaeIOInputs inputs) {
         motor.update(LoggedRobot.defaultPeriodSecs);
         inputs.algaeMotorCurrent = motor.getCurrentDrawAmps();
         inputs.motorRPM = RPM.of(motor.getAngularVelocityRPM());
     }
 
+    @Override
     public void setAlgaeMotorVoltage(double volts) {
         motor.setInputVoltage(volts);
     }
