@@ -55,30 +55,28 @@ public class ElevatorAlgae extends SubsystemBase {
         io.setAlgaeMotorVoltage(voltage);
     }
 
-    // /** Get if we're holding algae */
-    // public boolean hasAlgae() {
-    // return inputs.algaeMotorCurrent > Constants.Algae.HAS_ALGAE_CURRENT_THRESHOLD;
-    // }
-
     /** Run algae intake with given speed */
-    public Command runAlgaeMotor(double speed) { // set motor speed Command
-        return runEnd(() -> setAlgaeMotorVoltage(speed), () -> setAlgaeMotorVoltage(0));
-        // .until(() -> hasAlgae());
+    public Command runAlgaeMotor(double voltage) { // set motor speed Command
+        return runEnd(() -> {
+            setAlgaeMotorVoltage(voltage);
+            Logger.recordOutput("Algae/Running", true);
+        }, () -> {
+            setAlgaeMotorVoltage(0);
+            Logger.recordOutput("Algae/Running", false);
+        });
     }
 
     /** Run algae intake with given speed */
-    public Command runAlgaeMotor(DoubleSupplier speed) { // set motor speed Command
-        return runEnd(() -> setAlgaeMotorVoltage(speed.getAsDouble()),
+    public Command runAlgaeMotor(DoubleSupplier voltage) { // set motor speed Command
+        return runEnd(() -> setAlgaeMotorVoltage(voltage.getAsDouble()),
             () -> setAlgaeMotorVoltage(0));
-        // .until(() -> hasAlgae());
     }
 
     /**
      * Keeps algae intake motor running even after it has intaked an algae, but it lowers the speed
      */
     public Command algaeIntakeCommand() {
-        return runAlgaeMotor(Constants.Algae.VOLTAGE).until(hasAlgae)
-            .andThen(() -> setAlgaeMotorVoltage(Constants.Algae.SMALLER_VOLTAGE));
+        return runAlgaeMotor(Constants.Algae.VOLTAGE).until(hasAlgae).andThen(algaeHoldCommand());
     }
 
     /**
@@ -86,9 +84,17 @@ public class ElevatorAlgae extends SubsystemBase {
      */
     public Command algaeIntakeCommand(BooleanSupplier supplier) {
         return runAlgaeMotor(() -> supplier.getAsBoolean() ? Constants.Algae.VOLTAGE : 0)
-            .until(hasAlgae).andThen(runAlgaeMotor(Constants.Algae.SMALLER_VOLTAGE)
-                .until(() -> !supplier.getAsBoolean()))
+            .until(hasAlgae).andThen(algaeHoldCommand()).until(() -> !supplier.getAsBoolean())
             .repeatedly();
+    }
+
+    /**
+     * Hold Algae in mechanism
+     *
+     * @return Command
+     */
+    public Command algaeHoldCommand() {
+        return runAlgaeMotor(Constants.Algae.SMALLER_VOLTAGE);
     }
 
     /**
