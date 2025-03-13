@@ -122,7 +122,7 @@ public class CommandFactory {
             .andThen(new ConditionalCommand(Commands.runOnce(() -> {
             }), coralScoring.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae))
             .andThen(backAwayReef(swerve, location).withTimeout(2.0)))
-                .deadlineFor(Commands.either(algae.algaeIntakeCommand(), Commands.runOnce(() -> {
+                .deadlineFor(Commands.either(algae.algaeIntakeCommand().asProxy(), Commands.runOnce(() -> {
                 }), () -> height.get().isAlgae || additionalAlgaeHeight.get().isPresent()));
     }
 
