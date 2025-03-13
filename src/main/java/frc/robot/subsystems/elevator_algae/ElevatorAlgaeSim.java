@@ -6,10 +6,16 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
+/**
+ * Simulated Algae Subsystem
+ */
 public class ElevatorAlgaeSim implements ElevatorAlgaeIO {
     private DCMotorSim motor =
         new DCMotorSim(LinearSystemId.createDCMotorSystem(.01, .01), DCMotor.getNeoVortex(1));
 
+    /**
+     * Simulated Algae Subsystem
+     */
     public ElevatorAlgaeSim() {}
 
     public void updateInputs(AlgaeIOInputs inputs) {

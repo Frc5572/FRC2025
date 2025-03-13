@@ -79,18 +79,22 @@ public class ElevatorAlgae extends SubsystemBase {
         return runAlgaeMotor(Constants.Algae.VOLTAGE).until(hasAlgae).andThen(algaeHoldCommand());
     }
 
-    public Command algaeHoldCommand() {
-        return runAlgaeMotor(Constants.Algae.SMALLER_VOLTAGE);
-    }
-
     /**
      * Keeps algae intake motor running even after it has intaked an algae, but it lowers the speed
      */
     public Command algaeIntakeCommand(BooleanSupplier supplier) {
         return runAlgaeMotor(() -> supplier.getAsBoolean() ? Constants.Algae.VOLTAGE : 0)
-            .until(hasAlgae).andThen(runAlgaeMotor(Constants.Algae.SMALLER_VOLTAGE)
-                .until(() -> !supplier.getAsBoolean()))
+            .until(hasAlgae).andThen(algaeHoldCommand()).until(() -> !supplier.getAsBoolean())
             .repeatedly();
+    }
+
+    /**
+     * Hold Algae in mechanism
+     *
+     * @return Command
+     */
+    public Command algaeHoldCommand() {
+        return runAlgaeMotor(Constants.Algae.SMALLER_VOLTAGE);
     }
 
     /**

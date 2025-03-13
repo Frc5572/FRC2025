@@ -301,6 +301,13 @@ public class CommandFactory {
         }, true, Units.inchesToMeters(12), 3));
     }
 
+    /**
+     * Command to Raise Elevator and spit algae into the barge
+     *
+     * @param elevator Elevator Subsystem
+     * @param algae Algae Subsystem
+     * @return Command
+     */
     public static Command bargeSpitAlgae(Elevator elevator, ElevatorAlgae algae) {
         return algae.algaeHoldCommand().until(() -> elevator.getHeight().in(Inches) > 65)
             .andThen(algae.algaeOuttakeCommand().withTimeout(.5)).deadlineFor(elevator.p5())
