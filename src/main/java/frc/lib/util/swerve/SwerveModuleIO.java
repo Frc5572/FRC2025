@@ -3,6 +3,7 @@ package frc.lib.util.swerve;
 import org.littletonrobotics.junction.AutoLog;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 
 /** IO Class for SwerveModule */
 public interface SwerveModuleIO {
@@ -13,6 +14,7 @@ public interface SwerveModuleIO {
         public AngularVelocity driveMotorSelectedSensorVelocity;
         public Angle angleMotorSelectedPosition;
         public Angle absolutePositionAngleEncoder;
+        public Voltage driveMotorVoltage;
         // public double driveMotorTemp;
         // public double angleMotorTemp;
     }

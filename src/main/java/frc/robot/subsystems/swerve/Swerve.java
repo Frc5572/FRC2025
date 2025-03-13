@@ -63,9 +63,10 @@ public class Swerve extends SubsystemBase {
         this.swerveIO = swerveIO;
         swerveMods = swerveIO.createModules();
         fieldOffset = getGyroYaw().getDegrees();
-        this.sys =
-            new SysIdRoutine(new SysIdRoutine.Config(null, null, null), new SysIdRoutine.Mechanism(
-                (Volts) -> swerveIO.setDriveMotorVoltage(Volts), null, this));
+        this.sys = new SysIdRoutine(new SysIdRoutine.Config(),
+            new SysIdRoutine.Mechanism((Volts) -> swerveIO.setDriveMotorVoltage(Volts), log -> {
+                log.motor("drive-volage").voltage(inputs.driveMoterVoltage);
+            }, this));
         swerveIO.updateInputs(inputs);
 
         state.init(getModulePositions(), getGyroYaw());

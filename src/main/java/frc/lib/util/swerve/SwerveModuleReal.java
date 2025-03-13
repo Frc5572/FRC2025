@@ -16,6 +16,7 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import frc.lib.math.Conversions;
 import frc.robot.Constants;
 
@@ -35,6 +36,8 @@ public class SwerveModuleReal implements SwerveModuleIO {
     private StatusSignal<AngularVelocity> driveMotorSelectedSensorVelocity;
     private StatusSignal<Angle> angleMotorSelectedPosition;
     private StatusSignal<Angle> absolutePositionAngleEncoder;
+    private StatusSignal<Voltage> driveMotorVoltage;
+
 
     /* drive motor control requests */
     private final VelocityVoltage driveVelocity = new VelocityVoltage(0);
@@ -62,6 +65,7 @@ public class SwerveModuleReal implements SwerveModuleIO {
         driveMotorSelectedSensorVelocity = mDriveMotor.getVelocity();
         angleMotorSelectedPosition = mAngleMotor.getPosition();
         absolutePositionAngleEncoder = angleEncoder.getAbsolutePosition();
+        driveMotorVoltage = mDriveMotor.getMotorVoltage();
     }
 
     private void configAngleMotor() {
@@ -164,11 +168,12 @@ public class SwerveModuleReal implements SwerveModuleIO {
     @Override
     public void updateInputs(SwerveModuleInputs inputs) {
         BaseStatusSignal.refreshAll(driveMotorSelectedPosition, driveMotorSelectedSensorVelocity,
-            angleMotorSelectedPosition, absolutePositionAngleEncoder);
+            angleMotorSelectedPosition, absolutePositionAngleEncoder, driveMotorVoltage);
         inputs.driveMotorSelectedPosition = driveMotorSelectedPosition.getValue();
         inputs.driveMotorSelectedSensorVelocity = driveMotorSelectedSensorVelocity.getValue();
         inputs.angleMotorSelectedPosition = angleMotorSelectedPosition.getValue();
         inputs.absolutePositionAngleEncoder = absolutePositionAngleEncoder.getValue();
+        inputs.driveMotorVoltage = driveMotorVoltage.getValue();
         // inputs.driveMotorTemp = mDriveMotor.getDeviceTemp().getValueAsDouble();
         // inputs.angleMotorTemp = mAngleMotor.getDeviceTemp().getValueAsDouble();
     }
