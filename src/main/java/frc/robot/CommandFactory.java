@@ -99,7 +99,7 @@ public class CommandFactory {
             .deadlineFor(coralScoring.runCoralIntake()
                 .unless(() -> coralScoring.getOuttakeBeamBreakStatus()))
             .andThen(new ConditionalCommand(elevator.moveTo(() -> additionalAlgae.value.height)
-                .alongWith(reefAlign(swerve, location, -3).until(algae.hasAlgae).withTimeout(1.6))
+                .alongWith(reefAlign(swerve, location, -3).until(algae.hasAlgae).withTimeout(1.0))
                 .alongWith(Commands.runOnce(() -> {
                     crossOut.accept(additionalAlgae.value);
                 })).andThen(backAwayReef(swerve, location).withTimeout(2.0)),
@@ -121,8 +121,8 @@ public class CommandFactory {
                     .unless(() -> height.get() == additionalAlgae.value))
             .andThen(new ConditionalCommand(Commands.runOnce(() -> {
             }), coralScoring.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae))
-            .andThen(backAwayReef(swerve, location).withTimeout(2.0)))
-                .deadlineFor(Commands.either(algae.algaeIntakeCommand(), Commands.runOnce(() -> {
+            .andThen(backAwayReef(swerve, location).withTimeout(2.0))).deadlineFor(
+                Commands.either(algae.algaeIntakeCommand().asProxy(), Commands.runOnce(() -> {
                 }), () -> height.get().isAlgae || additionalAlgaeHeight.get().isPresent()));
     }
 

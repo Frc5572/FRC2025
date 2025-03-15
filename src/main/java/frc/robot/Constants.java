@@ -72,7 +72,7 @@ public final class Constants {
         public static final double HAS_ALGAE_CURRENT_THRESHOLD = 50;
         public static final int VOLTAGE = 12;
         public static final int NEGATIVE_VOLTAGE = -12;
-        public static final double SMALLER_VOLTAGE = 0.5;
+        public static final double SMALLER_VOLTAGE = 1.0;
         public static final double SMALLER_NEGATIVE_VOLTAGE = -1;
     }
 
