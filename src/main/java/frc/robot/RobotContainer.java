@@ -241,8 +241,7 @@ public class RobotContainer {
                 .andThen(climb.runClimberMotorCommand(Constants.Climb.RESET_VOLTAGE,
                     () -> climb.getClimberPosition()
                         .in(Radians) <= Constants.Climb.CLIMBER_START_ANGLE.in(Radians))));
-        driver.back().and(climb.reachedClimberStart)
-            .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
+        driver.back().whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
         driver.leftTrigger().whileTrue(algae.algaeOuttakeCommand());
         driver.rightTrigger().whileTrue(CommandFactory.bargeSpitAlgae(elevator, algae))
             .onFalse(elevator.home());
