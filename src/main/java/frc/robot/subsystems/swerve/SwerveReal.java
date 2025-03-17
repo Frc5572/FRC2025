@@ -2,6 +2,7 @@ package frc.robot.subsystems.swerve;
 
 
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
+import com.studica.frc.AHRS;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.lib.util.swerve.SwerveModule;
@@ -12,15 +13,21 @@ import frc.robot.Constants;
 public class SwerveReal implements SwerveIO {
 
     private Canandgyro gyro = new Canandgyro(1);
+    private AHRS navX = new AHRS(Constants.Swerve.navXID);
 
     /** Real Swerve Initializer */
-    public SwerveReal() {}
+    public SwerveReal() {
+        navX.setAngleAdjustment(180);
+    }
 
     @Override
     public void updateInputs(SwerveInputs inputs) {
-        inputs.yaw = gyro.getYaw();
-        inputs.pitch = gyro.getPitch();
-        inputs.roll = gyro.getRoll();
+        inputs.yawCanAndGyro = gyro.getYaw();
+        inputs.pitchCanAndGyro = gyro.getPitch();
+        inputs.rollCanAndGyro = gyro.getRoll();
+        inputs.yawNavX = navX.getYaw();
+        inputs.pitchNavX = navX.getPitch();
+        inputs.rollNavX = navX.getRoll();
 
     }
 
