@@ -92,8 +92,10 @@ public class RobotContainer {
     private ElevatorAlgae algae;
     private final AddressableLED leds = new AddressableLED(Constants.LEDs.LED_PORT);
     private final AddressableLEDBuffer buffer = new AddressableLEDBuffer(Constants.LEDs.LED_LENGTH);
-    private LEDs ledsright = new LEDs(buffer, leds, 0, 59);
-    private LEDs ledsleft = new LEDs(buffer, leds, 60, 119);
+    private LEDs ledsrightfrontside = new LEDs(buffer, leds, 0, 29);
+    private LEDs ledsrightbackside = new LEDs(buffer, leds, 30, 59);
+    private LEDs ledsleftfrontside = new LEDs(buffer, leds, 60, 90);
+    private LEDs ledsleftbackside = new LEDs(buffer, leds, 91, 119);
     private Elevator elevator;
     private final Swerve swerve;
     private final Vision vision;
@@ -140,8 +142,8 @@ public class RobotContainer {
         autoFactory = new AutoFactory(swerve::getPose, swerve::resetOdometry,
             swerve::followTrajectory, true, swerve);
 
-        AutoCommandFactory autos =
-            new AutoCommandFactory(autoFactory, swerve, elevator, coralScoring, algae, ledsleft);
+        AutoCommandFactory autos = new AutoCommandFactory(autoFactory, swerve, elevator,
+            coralScoring, algae, ledsleftfrontside);
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Example", autos::example);
         autoChooser.addRoutine("Left Side L4 Coral", autos::l4left);
@@ -157,8 +159,11 @@ public class RobotContainer {
 
 
         /* Default Commands */
-        ledsright.setDefaultCommand(ledsright.setLEDsBreathe(Color.kRed));
-        ledsleft.setDefaultCommand(ledsleft.setLEDsBreathe(Color.kRed));
+        ledsrightfrontside.setDefaultCommand(ledsrightfrontside.setLEDsBreathe(Color.kRed));
+        ledsrightbackside.setDefaultCommand(ledsrightbackside.setLEDsSolid(Color.kDarkRed));
+        ledsleftfrontside.setDefaultCommand(ledsleftfrontside.setLEDsBreathe(Color.kRed));
+        ledsleftbackside.setDefaultCommand(ledsleftbackside.setLEDsBreathe(Color.kRed));
+
         algae.setDefaultCommand(algae.algaeHoldCommand().withName("Algae Default Command"));
 
         /* Button and Trigger Bindings */
@@ -224,13 +229,13 @@ public class RobotContainer {
             System.out.println(" - " + req.getName());
         }
         driver.a().and(operator.hasReefLocation()).whileTrue(autoScore)
-            .whileTrue(ledsleft.setLEDsBreathe(Color.kGreen)).negate()
+            .whileTrue(ledsleftfrontside.setLEDsBreathe(Color.kGreen)).negate()
             .onTrue(coralScoring.runCoralIntake());
         driver.b()
             .whileTrue(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)
                 .andThen(swerve.run(() -> {
                 })))
-            .whileTrue(ledsleft.setLEDsBreathe(Color.kGreen));
+            .whileTrue(ledsleftfrontside.setLEDsBreathe(Color.kGreen));
         driver.x().onTrue(elevator.home());
         driver.y().onTrue(Commands.runOnce(() -> swerve.resetFieldRelativeOffset()));
         driver.start().and(climb.reachedClimberStart.negate())
@@ -282,15 +287,15 @@ public class RobotContainer {
 
     private void configureTriggerBindings() {
         // Coral
-        coralScoring.coralAtIntake.whileTrue(ledsleft.setLEDsSolid(Color.kOrange));
-        coralScoring.coralAtOuttake.whileTrue(ledsleft.setLEDsSolid(Color.kCyan));
-        vision.seesTwoAprilTags.whileTrue(ledsright.setRainbow());
+        coralScoring.coralAtIntake.whileTrue(ledsleftbackside.setLEDsSolid(Color.kOrange));
+        coralScoring.coralAtOuttake.whileTrue(ledsleftbackside.setLEDsSolid(Color.kCyan));
+        vision.seesTwoAprilTags.whileTrue(ledsrightfrontside.setRainbow());
 
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
         // Algae
         algae.hasAlgae.and(coralScoring.coralAtOuttake.negate())
-            .onTrue(ledsleft.blinkLEDs(Color.kCyan, 2));
+            .onTrue(ledsrightbackside.blinkLEDs(Color.kGreen, 2));
         // Climb
         elevator.hightAboveP0.or(climb.reachedClimberStart)
             .onTrue(Commands.runOnce(() -> swerve.setSpeedMultiplier(0.15)).ignoringDisable(true))
