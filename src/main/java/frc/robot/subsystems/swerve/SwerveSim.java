@@ -16,6 +16,7 @@ public class SwerveSim implements SwerveIO {
 
     public SwerveSim(SwerveDriveSimulation simulation) {
         this.gyroSim = simulation.getGyroSimulation();
+        this.gyroSim.setRotation(Rotation2d.fromRotations(Math.random() - 0.5));
         this.simulation = simulation;
     }
 
