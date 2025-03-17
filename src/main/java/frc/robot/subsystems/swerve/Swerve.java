@@ -211,6 +211,14 @@ public class Swerve extends SubsystemBase {
         fieldOffset = getGyroYaw().getDegrees();
     }
 
+    /**
+     * Set Field Relative Offset based on Pose
+     * Total GUESS TODO!!!!!!!
+     */
+    public void resetFieldRelativeOffsetBasedOnPose() {
+        fieldOffset = state.getGlobalPoseEstimate().getRotation().getDegrees() - getGyroYaw().getDegrees();
+    }
+
     @Override
     public void periodic() {
 
