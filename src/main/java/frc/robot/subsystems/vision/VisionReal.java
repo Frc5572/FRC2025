@@ -104,6 +104,11 @@ public class VisionReal implements VisionIO {
         return false;
     }
 
+    /**
+     * Create a thread to upload PV settings/April Tag field
+     *
+     * @param hostname hostname of the PV Co-Processor
+     */
     protected void createSettingsUploadThread(String hostname) {
         new Thread(() -> {
             Timer timer = new Timer();
