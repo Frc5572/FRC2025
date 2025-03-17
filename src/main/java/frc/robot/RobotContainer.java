@@ -294,8 +294,8 @@ public class RobotContainer {
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
         // Algae
-        algae.hasAlgae.and(coralScoring.coralAtOuttake.negate())
-            .onTrue(ledsrightbackside.blinkLEDs(Color.kGreen, 2));
+        // algae.hasAlgae.and(coralScoring.coralAtOuttake.negate())
+        // .onTrue(ledsrightbackside.blinkLEDs(Color.kGreen, 2));
         // Climb
         elevator.hightAboveP0.or(climb.reachedClimberStart)
             .onTrue(Commands.runOnce(() -> swerve.setSpeedMultiplier(0.15)).ignoringDisable(true))
