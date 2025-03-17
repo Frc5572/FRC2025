@@ -94,8 +94,8 @@ public class RobotContainer {
     private final AddressableLEDBuffer buffer = new AddressableLEDBuffer(Constants.LEDs.LED_LENGTH);
     private LEDs ledsrightfrontside = new LEDs(buffer, leds, 0, 29);
     private LEDs ledsrightbackside = new LEDs(buffer, leds, 30, 59);
-    private LEDs ledsleftfrontside = new LEDs(buffer, leds, 60, 90);
-    private LEDs ledsleftbackside = new LEDs(buffer, leds, 91, 119);
+    private LEDs ledsleftfrontside = new LEDs(buffer, leds, 60, 89);
+    private LEDs ledsleftbackside = new LEDs(buffer, leds, 90, 119);
     private Elevator elevator;
     private final Swerve swerve;
     private final Vision vision;
