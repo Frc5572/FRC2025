@@ -295,6 +295,7 @@ public class RobotContainer {
         elevator.hightAboveP0.or(climb.reachedClimberStart)
             .onTrue(Commands.runOnce(() -> swerve.setSpeedMultiplier(0.15)).ignoringDisable(true))
             .onFalse(Commands.runOnce(() -> swerve.setSpeedMultiplier(1.0)).ignoringDisable(true));
+        RobotModeTriggers.disabled().and(vision.seesTwoAprilTags).onTrue(Commands.runOnce(swerve.resetFieldRelativeOffsetBasedOnPose()));
     }
 
     /**
