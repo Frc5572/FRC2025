@@ -100,6 +100,9 @@ public class RobotContainer {
     private CoralScoring coralScoring;
     private Climber climb;
 
+    Pose2d blueStart = new Pose2d(7.247, 1.126, new Rotation2d(2.276));
+    Pose2d redStart = new Pose2d(10.025, 1.476, new Rotation2d(0.900));
+
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -119,8 +122,8 @@ public class RobotContainer {
                 break;
 
             case kSimulation:
-                driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
-                    new Pose2d(3, 3, Rotation2d.kZero));
+                driveSimulation =
+                    new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(), redStart);
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
                 swerve = new Swerve(state, new SwerveSim(driveSimulation));
                 vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
@@ -293,7 +296,8 @@ public class RobotContainer {
         elevator.hightAboveP0.or(climb.reachedClimberStart)
             .onTrue(Commands.runOnce(() -> swerve.setSpeedMultiplier(0.15)).ignoringDisable(true))
             .onFalse(Commands.runOnce(() -> swerve.setSpeedMultiplier(1.0)).ignoringDisable(true));
-        RobotModeTriggers.disabled().and(vision.seesTwoAprilTags).onTrue(Commands.runOnce(swerve.resetFieldRelativeOffsetBasedOnPose()));
+        RobotModeTriggers.disabled().negate().and(vision.seesTwoAprilTags)
+            .onTrue(Commands.runOnce(() -> swerve.resetFieldRelativeOffsetBasedOnPose()));
     }
 
     /**

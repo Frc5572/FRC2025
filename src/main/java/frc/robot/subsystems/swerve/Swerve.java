@@ -215,9 +215,9 @@ public class Swerve extends SubsystemBase {
      * Set Field Relative Offset based on Pose Total GUESS TODO!!!!!!!
      */
     public void resetFieldRelativeOffsetBasedOnPose() {
-        fieldOffset =
-            (getGyroYaw().getDegrees() - state.getGlobalPoseEstimate().getRotation().getDegrees())
-                % 180;
+        double redSideflip = shouldFlipPath() ? 180.0 : 0.0;
+        fieldOffset = (getGyroYaw().getDegrees()
+            - state.getGlobalPoseEstimate().getRotation().getDegrees() + redSideflip) % 180;
     }
 
     @Override
@@ -232,6 +232,7 @@ public class Swerve extends SubsystemBase {
         field.setRobotPose(getPose());
         SmartDashboard.putNumber("SpeedMultiplier", setSpeedMultiplier);
         LoggedTracer.record("Swerve");
+        Logger.recordOutput("Swerve/Field Offset", fieldOffset);
     }
 
     /**
