@@ -246,6 +246,7 @@ public class RobotContainer {
         driver.rightTrigger().whileTrue(CommandFactory.bargeSpitAlgae(elevator, algae))
             .onFalse(elevator.home());
         driver.back().onTrue(elevator.stop());
+        pitController.a().whileTrue(CommandFactory.scoreInBarge(swerve, elevator, algae));
     }
 
     private void setupAltOperatorController() {

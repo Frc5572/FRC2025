@@ -301,6 +301,20 @@ public class CommandFactory {
         }, true, Units.inchesToMeters(12), 3));
     }
 
+    private static final Pose2d bargeScorePose =
+        new Pose2d(10.199615478515625, 2.222221612930298, Rotation2d.kZero);
+
+    public static Command scoreInBarge(Swerve swerve, Elevator elevator, ElevatorAlgae algae) {
+        return ensureHome(elevator)
+            .alongWith(new MoveAndAvoidReef(swerve, () -> bargeScorePose, () -> {
+                if (elevator.hightAboveP0.getAsBoolean()) {
+                    return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
+                } else {
+                    return Constants.SwerveTransformPID.MAX_VELOCITY;
+                }
+            }, true, Units.inchesToMeters(12), 3)).andThen(bargeSpitAlgae(elevator, algae));
+    }
+
     /**
      * Command to Raise Elevator and spit algae into the barge
      *
