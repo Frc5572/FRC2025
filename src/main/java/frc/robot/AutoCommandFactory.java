@@ -8,8 +8,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.lib.util.ScoringLocation;
 import frc.lib.util.ScoringLocation.CoralLocation;
 import frc.lib.util.ScoringLocation.Height;
@@ -89,28 +91,8 @@ public class AutoCommandFactory {
      * @return Auto Routine
      */
     public AutoRoutine l4left() {
-        AutoRoutine routine = autoFactory.newRoutine("Test");
-        routine.active().onTrue(Commands.sequence(CommandFactory.autoScore(swerve, elevator, coral,
-            algae, () -> CoralLocation.I, () -> Height.KP4, () -> Optional.empty(), (x) -> {
-            }), CommandFactory.leftFeeder(swerve, elevator, coral),
-            coral.runCoralIntake().until(coral.coralAtIntake),
-            CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.K,
-                () -> Height.KP4, () -> Optional.empty(), (x) -> {
-                }),
-            CommandFactory.leftFeeder(swerve, elevator, coral),
-            coral.runCoralIntake().until(coral.coralAtIntake),
-            CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.J,
-                () -> Height.KP4, () -> Optional.empty(), (x) -> {
-                }),
-            CommandFactory.leftFeeder(swerve, elevator, coral),
-            coral.runCoralIntake().until(coral.coralAtIntake),
-            CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.L,
-                () -> Height.KP4, () -> Optional.empty(), (x) -> {
-                }),
-            CommandFactory.leftFeeder(swerve, elevator, coral),
-            coral.runCoralIntake().until(coral.coralAtIntake), swerve.stop())
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
-        return routine;
+        return scoreCoral("l4left", true, CoralLocation.I, CoralLocation.K, CoralLocation.A,
+            CoralLocation.L);
     }
 
     /**
@@ -119,27 +101,27 @@ public class AutoCommandFactory {
      * @return Auto Routine
      */
     public AutoRoutine l4right() {
-        AutoRoutine routine = autoFactory.newRoutine("Test2");
-        routine.active().onTrue(Commands.sequence(CommandFactory.autoScore(swerve, elevator, coral,
-            algae, () -> CoralLocation.E, () -> Height.KP4, () -> Optional.empty(), (x) -> {
-            }), CommandFactory.rightFeeder(swerve, elevator, coral),
-            coral.runCoralIntake().until(coral.coralAtIntake),
-            CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.C,
+        return scoreCoral("l4right", false, CoralLocation.E, CoralLocation.C, CoralLocation.F,
+            CoralLocation.D);
+    }
+
+    private AutoRoutine scoreCoral(String name, boolean isLeft, CoralLocation... locations) {
+        AutoRoutine routine = autoFactory.newRoutine(name);
+        Command ret = new InstantCommand();
+        for (var loc : locations) {
+            ret = ret.andThen(CommandFactory.autoScore(swerve, elevator, coral, algae, () -> loc,
                 () -> Height.KP4, () -> Optional.empty(), (x) -> {
-                }),
-            CommandFactory.rightFeeder(swerve, elevator, coral),
-            coral.runCoralIntake().until(coral.coralAtIntake),
-            CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.F,
-                () -> Height.KP4, () -> Optional.empty(), (x) -> {
-                }),
-            CommandFactory.rightFeeder(swerve, elevator, coral),
-            coral.runCoralIntake().until(coral.coralAtIntake),
-            CommandFactory.autoScore(swerve, elevator, coral, algae, () -> CoralLocation.D,
-                () -> Height.KP4, () -> Optional.empty(), (x) -> {
-                }),
-            CommandFactory.rightFeeder(swerve, elevator, coral),
-            coral.runCoralIntake().until(coral.coralAtIntake), swerve.stop())
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+                }));
+            if (isLeft) {
+                ret = ret.andThen(CommandFactory.leftFeeder(swerve, elevator, coral));
+            } else {
+                ret = ret.andThen(CommandFactory.rightFeeder(swerve, elevator, coral));
+            }
+            ret = ret.andThen(coral.runCoralIntake().until(coral.coralAtIntake));
+        }
+        ret =
+            ret.andThen(swerve.stop()).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        routine.active().onTrue(ret);
         return routine;
     }
 
