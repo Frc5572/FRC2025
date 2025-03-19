@@ -246,7 +246,6 @@ public class RobotContainer {
         driver.rightTrigger().whileTrue(CommandFactory.bargeSpitAlgae(elevator, algae))
             .onFalse(elevator.home());
         driver.back().onTrue(elevator.stop());
-        pitController.a().whileTrue(CommandFactory.scoreInBarge(swerve, elevator, algae));
     }
 
     private void setupAltOperatorController() {
@@ -267,6 +266,7 @@ public class RobotContainer {
     }
 
     private void setupPitController() {
+        pitController.a().whileTrue(CommandFactory.scoreInBarge(swerve, elevator, algae));
         pitController.b().onTrue(elevator.manualMove(altOperator));
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());
         pitController.x().whileTrue(climb.manualClimb(() -> pitController.getLeftY()));

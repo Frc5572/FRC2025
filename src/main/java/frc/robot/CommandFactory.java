@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.lib.util.AllianceFlipUtil;
@@ -302,17 +303,19 @@ public class CommandFactory {
     }
 
     private static final Pose2d bargeScorePose =
-        new Pose2d(10.199615478515625, 2.222221612930298, Rotation2d.kZero);
+        new Pose2d(7.558475971221924, 6.258963108062744, Rotation2d.kZero);
 
     public static Command scoreInBarge(Swerve swerve, Elevator elevator, ElevatorAlgae algae) {
-        return ensureHome(elevator)
+        return (ensureHome(elevator)
             .alongWith(new MoveAndAvoidReef(swerve, () -> bargeScorePose, () -> {
                 if (elevator.hightAboveP0.getAsBoolean()) {
                     return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
                 } else {
                     return Constants.SwerveTransformPID.MAX_VELOCITY;
                 }
-            }, true, Units.inchesToMeters(12), 3)).andThen(bargeSpitAlgae(elevator, algae));
+            }, true, Units.inchesToMeters(12), 3))).raceWith(algae.algaeHoldCommand())
+                .andThen(bargeSpitAlgae(elevator, algae)
+                    .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
     }
 
     /**
