@@ -305,6 +305,14 @@ public class CommandFactory {
     private static final Pose2d bargeScorePose =
         new Pose2d(7.558475971221924, 6.258963108062744, Rotation2d.kZero);
 
+    /**
+     * move and score in barge final
+     *
+     * @param swerve swerve
+     * @param elevator elevator
+     * @param algae algae
+     * @return move and score in barge
+     */
     public static Command scoreInBarge(Swerve swerve, Elevator elevator, ElevatorAlgae algae) {
         return (ensureHome(elevator)
             .alongWith(new MoveAndAvoidReef(swerve, () -> bargeScorePose, () -> {
