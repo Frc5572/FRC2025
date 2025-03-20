@@ -255,7 +255,7 @@ public class RobotContainer {
         altOperator.leftTrigger().whileTrue(algae.algaeOuttakeCommand());
         // manual mode
 
-        altOperator.povLeft().onTrue(elevator.moveTo(() -> Height.KP5.height));
+        altOperator.povLeft().onTrue(elevator.moveToFast(() -> Height.KP5.height));
 
         altOperator.a().whileTrue(elevator.heightSelector());
         altOperator.povUp()
