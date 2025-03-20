@@ -219,11 +219,13 @@ public class Swerve extends SubsystemBase {
     public void periodic() {
 
         swerveIO.updateInputs(inputsSwerve);
+        gyroIO.updateInputs(inputsGyro);
         for (var mod : swerveMods) {
             mod.periodic();
         }
         state.addSwerveObservation(getModulePositions(), getGyroYaw());
         Logger.processInputs("Swerve", inputsSwerve);
+        Logger.processInputs("gyro", inputsGyro);
         field.setRobotPose(getPose());
         SmartDashboard.putNumber("SpeedMultiplier", setSpeedMultiplier);
         LoggedTracer.record("Swerve");
