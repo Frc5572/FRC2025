@@ -13,6 +13,9 @@ public interface SwerveIO {
 
     @AutoLog
     public static class SwerveInputs {
+        public double yaw;
+        public double roll;
+        public double pitch;
     }
 
     public void updateInputs(SwerveInputs inputs);
