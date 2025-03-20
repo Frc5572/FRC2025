@@ -8,7 +8,6 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
@@ -32,11 +31,9 @@ public class CommandFactory {
 
     /** Move slightly to ensure algae intake is dropped. */
     public static Command dropAlgaeIntake(Swerve swerve) {
-        return new MoveToPose(swerve, () -> {
-            return swerve.getPose()
-                .plus(new Transform2d(Units.inchesToMeters(10), 0, Rotation2d.kZero));
-        }, () -> Constants.SwerveTransformPID.MAX_VELOCITY, false, Units.inchesToMeters(2), 10)
-            .andThen(swerve.stop());
+        return swerve.run(() -> {
+            swerve.setModuleStates(new ChassisSpeeds(4.0, 0.0, 0.0));
+        }).withTimeout(0.2);
     }
 
     /** Approach reef scoring location. Elevator can be home during this. */
@@ -99,27 +96,34 @@ public class CommandFactory {
             .deadlineFor(coralScoring.runCoralIntake()
                 .unless(() -> coralScoring.getOuttakeBeamBreakStatus()))
             .andThen(new ConditionalCommand(elevator.moveToFast(() -> additionalAlgae.value.height)
-                .alongWith(reefAlign(swerve, location, -3).until(algae.hasAlgae).withTimeout(1.0))
+                .alongWith(reefAlign(swerve, location, 12).withTimeout(0.7).andThen(
+                    reefAlign(swerve, location, -3).until(algae.hasAlgae).withTimeout(1.0)))
                 .alongWith(Commands.runOnce(() -> {
                     crossOut.accept(additionalAlgae.value);
                 })).andThen(backAwayReef(swerve, location).withTimeout(2.0)),
                 Commands.runOnce(() -> {
                 }), () -> {
                     var value = additionalAlgaeHeight.get();
+                    additionalAlgae.value = null;
                     if (value.isPresent()) {
                         additionalAlgae.value = value.get();
                         return true;
                     }
                     return false;
                 }))
-            .andThen(
+            .andThen(new ConditionalCommand(
                 (elevator.moveToFast(() -> height.get().height).andThen(Commands.waitSeconds(0.1))
-                    .alongWith(reefAlign(swerve, location, 1).withTimeout(2.4))))
+                    .andThen(reefAlign(swerve, location, 1).withTimeout(2.4))),
+                (elevator.moveToFast(() -> height.get().height).andThen(Commands.waitSeconds(0.1))
+                    .alongWith(reefAlign(swerve, location, 1).withTimeout(2.4))),
+                () -> additionalAlgae.value != null))
             .andThen(new ConditionalCommand(Commands.runOnce(() -> {
             }), coralScoring.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae)))
                 .deadlineFor(
                     Commands.either(algae.algaeIntakeCommand().asProxy(), Commands.runOnce(() -> {
-                    }), () -> height.get().isAlgae || additionalAlgaeHeight.get().isPresent()));
+                    }), () -> height.get().isAlgae || additionalAlgaeHeight.get().isPresent()))
+                .andThen(new ConditionalCommand(backAwayReef(swerve, location), Commands.none(),
+                    () -> additionalAlgae.value != null));
     }
 
     private static final Pose2d processorPose =

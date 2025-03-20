@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.lib.util.ScoringLocation;
 import frc.lib.util.ScoringLocation.CoralLocation;
 import frc.lib.util.ScoringLocation.Height;
@@ -107,7 +106,7 @@ public class AutoCommandFactory {
 
     private AutoRoutine scoreCoral(String name, boolean isLeft, CoralLocation... locations) {
         AutoRoutine routine = autoFactory.newRoutine(name);
-        Command ret = new InstantCommand();
+        Command ret = CommandFactory.dropAlgaeIntake(swerve);
         for (var loc : locations) {
             ret = ret.andThen(CommandFactory.autoScore(swerve, elevator, coral, algae, () -> loc,
                 () -> Height.KP4, () -> Optional.empty(), (x) -> {
