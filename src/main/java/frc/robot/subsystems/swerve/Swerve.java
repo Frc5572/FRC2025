@@ -216,13 +216,13 @@ public class Swerve extends SubsystemBase {
      */
     public void resetFieldRelativeOffsetBasedOnPose() {
         double redSideflip = shouldFlipPath() ? 180.0 : 0.0;
-        fieldOffset = (getGyroYaw().getDegrees()
-            - state.getGlobalPoseEstimate().getRotation().getDegrees() + redSideflip) % 180;
+        fieldOffset =
+            (getGyroYaw().getDegrees() - state.getGlobalPoseEstimate().getRotation().getDegrees()
+                + 180 + redSideflip) % 360 - 180;
     }
 
     @Override
     public void periodic() {
-
         swerveIO.updateInputs(inputs);
         for (var mod : swerveMods) {
             mod.periodic();
