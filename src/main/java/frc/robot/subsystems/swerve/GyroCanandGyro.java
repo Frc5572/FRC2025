@@ -4,6 +4,7 @@ import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import edu.wpi.first.math.geometry.Pose2d;
 import frc.lib.util.swerve.SwerveModule;
 
+/** IO layer for CanandGyro */
 public class GyroCanandGyro implements SwerveIO {
     private Canandgyro gyro = new Canandgyro(1);
 

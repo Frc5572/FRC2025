@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import frc.lib.util.swerve.SwerveModule;
 import frc.robot.Constants;
 
+/** IO class for NavX */
 public class GyroNavX implements SwerveIO {
     private AHRS gyro = new AHRS(Constants.Swerve.navXID);
 

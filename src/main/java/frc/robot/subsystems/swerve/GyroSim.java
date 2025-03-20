@@ -4,6 +4,7 @@ import org.ironmaple.simulation.drivesims.GyroSimulation;
 import edu.wpi.first.math.geometry.Pose2d;
 import frc.lib.util.swerve.SwerveModule;
 
+/** Simulated Gyro */
 public class GyroSim implements SwerveIO {
 
     private GyroSimulation navXSim;
