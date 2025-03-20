@@ -69,7 +69,6 @@ public class Swerve extends SubsystemBase {
 
         swerveIO.updateInputs(inputsSwerve);
         gyroIO.updateInputs(inputsGyro);
-
         state.init(getModulePositions(), getGyroYaw());
         SmartDashboard.putData(Constants.DashboardValues.field2d, field);
 

@@ -12,4 +12,9 @@ public interface GyroIO {
     }
 
     public void updateInputs(GyroInputs inputs);
+
+    public static class Empty implements GyroIO {
+        @Override
+        public void updateInputs(GyroInputs inputs) {};
+    }
 }
