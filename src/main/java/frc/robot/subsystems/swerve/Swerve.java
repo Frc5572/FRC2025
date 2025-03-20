@@ -38,8 +38,10 @@ public class Swerve extends SubsystemBase {
     public SwerveModule[] swerveMods;
     private final Field2d field = new Field2d();
     private double fieldOffset;
-    private SwerveInputsAutoLogged inputs = new SwerveInputsAutoLogged();
+    private SwerveInputsAutoLogged inputsSwerve = new SwerveInputsAutoLogged();
     private SwerveIO swerveIO;
+    private GyroInputsAutoLogged inputsGyro = new GyroInputsAutoLogged();
+    private GyroIO gyroIO;
     public final RobotState state;
     private double setSpeedMultiplier = 1.0;
     private final HolonomicDriveController holonomicDriveController = new HolonomicDriveController(
@@ -56,14 +58,16 @@ public class Swerve extends SubsystemBase {
     /**
      * Swerve Subsystem
      */
-    public Swerve(RobotState state, SwerveIO swerveIO) {
+    public Swerve(RobotState state, SwerveIO swerveIO, GyroIO gyroIO) {
         super("Swerve");
         this.state = state;
         this.swerveIO = swerveIO;
+        this.gyroIO = gyroIO;
         swerveMods = swerveIO.createModules();
         fieldOffset = getGyroYaw().getDegrees();
 
-        swerveIO.updateInputs(inputs);
+        swerveIO.updateInputs(inputsSwerve);
+        gyroIO.updateInputs(inputsGyro);
 
         state.init(getModulePositions(), getGyroYaw());
         SmartDashboard.putData(Constants.DashboardValues.field2d, field);
@@ -190,7 +194,7 @@ public class Swerve extends SubsystemBase {
      * @return Current rotation/yaw of gyro as {@link Rotation2d}
      */
     public Rotation2d getGyroYaw() {
-        double yaw = inputs.yawCanAndGyro;
+        double yaw = inputsGyro.yawCanAndGyro;
         return (Constants.Swerve.invertGyro) ? Rotation2d.fromRotations(-yaw)
             : Rotation2d.fromRotations(yaw);
     }
@@ -214,12 +218,12 @@ public class Swerve extends SubsystemBase {
     @Override
     public void periodic() {
 
-        swerveIO.updateInputs(inputs);
+        swerveIO.updateInputs(inputsSwerve);
         for (var mod : swerveMods) {
             mod.periodic();
         }
         state.addSwerveObservation(getModulePositions(), getGyroYaw());
-        Logger.processInputs("Swerve", inputs);
+        Logger.processInputs("Swerve", inputsSwerve);
         field.setRobotPose(getPose());
         SmartDashboard.putNumber("SpeedMultiplier", setSpeedMultiplier);
         LoggedTracer.record("Swerve");
