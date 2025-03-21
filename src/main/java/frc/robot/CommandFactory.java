@@ -2,8 +2,11 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -15,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.SelectCommand;
 import frc.lib.util.AllianceFlipUtil;
 import frc.lib.util.Container;
 import frc.lib.util.ScoringLocation;
@@ -131,55 +135,15 @@ public class CommandFactory {
         new Pose2d(6.342151165008545, 0.5018799304962158, Rotation2d.kCW_90deg);
 
     /** Do something with algae gotten. */
-    // public static Command doSomethingWithAlgae(Swerve swerve, Elevator elevator,
-    // Container<Boolean> intakingAlgae, ElevatorAlgae algae, Supplier<Character> whatToDo,
-    // DoubleSupplier leftRight) {
-    // return new ConditionalCommand(
-    // new SelectCommand<>(Map.of('d', Commands.sequence(Commands.runOnce(() -> {
-    // intakingAlgae.value = false;
-    // })), 'b',
-    // Commands
-    // .sequence(ensureHome(elevator).alongWith(new MoveAndAvoidReef(swerve,
-    // () -> new Pose2d(bargePose.getX(),
-    // bargePose.getY() + leftRight.getAsDouble(), bargePose.getRotation()),
-    // () -> {
-    // if (elevator.hightAboveP0.getAsBoolean()) {
-    // return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
-    // } else {
-    // return Constants.SwerveTransformPID.MAX_VELOCITY;
-    // }
-    // }, true, Units.inchesToMeters(4), 5)),
-    // elevator.moveTo(() -> ScoringLocation.Height.KP5.height),
-    // Commands.runOnce(() -> {
-    // intakingAlgae.value = false;
-    // }),
-    // algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE).withTimeout(0.4)
-    // .asProxy()),
-    // 'p', Commands
-    // .sequence(ensureHome(elevator).alongWith(new MoveAndAvoidReef(swerve, () -> {
-    // Pose2d desiredPose = processorPose;
-    // return new Pose2d(
-    // desiredPose.getTranslation().minus(new Translation2d(
-    // Units.inchesToMeters(12), desiredPose.getRotation())),
-    // desiredPose.getRotation());
-    // }, () -> {
-    // if (elevator.hightAboveP0.getAsBoolean()) {
-    // return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
-    // } else {
-    // return Constants.SwerveTransformPID.MAX_VELOCITY;
-    // }
-    // }, true, Units.inchesToMeters(12), 5)),
-    // new MoveToPose(swerve, () -> processorPose,
-    // () -> Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY, true,
-    // Units.inchesToMeters(4), 5),
-    // Commands.runOnce(() -> {
-    // intakingAlgae.value = false;
-    // }), algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE).withTimeout(0.4)
-    // .asProxy())),
-    // whatToDo),
-    // Commands.runOnce(() -> {
-    // }), () -> intakingAlgae.value);
-    // }
+    public static Command doSomethingWithAlgae(BooleanSupplier shouldDoSomething, Swerve swerve,
+        Elevator elevator, ElevatorAlgae algae, Supplier<Character> whatToDo,
+        DoubleSupplier leftRight) {
+        return new ConditionalCommand(new SelectCommand<>(
+            Map.of('d', Commands.sequence(), 'b',
+                Commands.sequence(scoreInBarge(swerve, elevator, algae)), 'p', Commands.sequence()),
+            whatToDo), Commands.runOnce(() -> {
+            }), shouldDoSomething);
+    }
 
     private static Command feederAfter(Swerve swerve, CoralScoring scoring) {
         return swerve.run(() -> {
@@ -317,9 +281,8 @@ public class CommandFactory {
                 } else {
                     return Constants.SwerveTransformPID.MAX_VELOCITY;
                 }
-            }, true, Units.inchesToMeters(12), 3))).raceWith(algae.algaeHoldCommand())
-                .andThen(bargeSpitAlgae(elevator, algae)
-                    .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+            }, true, Units.inchesToMeters(12), 3))).andThen(bargeSpitAlgae(elevator, algae)
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
     }
 
     /**
@@ -330,8 +293,8 @@ public class CommandFactory {
      * @return Command
      */
     public static Command bargeSpitAlgae(Elevator elevator, ElevatorAlgae algae) {
-        return algae.algaeHoldCommand().until(() -> elevator.getHeight().in(Inches) > 65)
-            .andThen(algae.algaeOuttakeCommand().withTimeout(.5)).deadlineFor(elevator.p5())
-            .andThen(elevator.home());
+        return Commands.idle().until(() -> elevator.getHeight().in(Inches) > 65)
+            .andThen(algae.algaeOuttakeCommand().withTimeout(.5).asProxy())
+            .deadlineFor(elevator.p5());
     }
 }

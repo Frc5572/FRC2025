@@ -215,8 +215,8 @@ public class RobotContainer {
         Command autoScore = CommandFactory
             .autoScore(swerve, elevator, coralScoring, algae, operator::getDesiredLocation,
                 operator::getDesiredHeight, operator::additionalAlgaeHeight, operator::crossOut)
-            // .andThen(CommandFactory.doSomethingWithAlgae(swerve, elevator, intakingAlgae, algae,
-            // operator::whatToDoWithAlgae, () -> -driver.getLeftX()))
+            .andThen(CommandFactory.doSomethingWithAlgae(() -> true, swerve, elevator, algae,
+                operator::whatToDoWithAlgae, () -> -driver.getLeftX()))
             .andThen(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder))
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
         System.out.println("autoscore requires: ");
