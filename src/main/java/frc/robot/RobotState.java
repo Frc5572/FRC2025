@@ -102,6 +102,11 @@ public class RobotState {
     private void addVisionObservation(Pose3d cameraPose, Pose3d robotPose, double timestamp,
         Vector<N3> baseUncertainty, List<PhotonTrackedTarget> targets, String prefix,
         boolean doInit, Circle circle) {
+        if (robotPose.getX() < 0 || robotPose.getY() < 0
+            || robotPose.getX() > FieldConstants.fieldLength.in(Meters)
+            || robotPose.getY() > FieldConstants.fieldWidth.in(Meters)) {
+            return;
+        }
         double totalDistance = 0.0;
         int count = 0;
         for (var tag : targets) {
