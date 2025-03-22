@@ -233,13 +233,13 @@ public class RobotContainer {
             System.out.println(" - " + req.getName());
         }
         driver.a().and(operator.hasReefLocation()).whileTrue(autoScore)
-            .whileTrue(ledsLeftFrontSide.setLEDsBreathe(Color.kGreen)).negate()
+            .whileTrue(ledsLeftFrontSide.setLEDsSolid(Color.kGreen)).negate()
             .onTrue(coralScoring.runCoralIntake());
         driver.b()
             .whileTrue(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)
                 .andThen(swerve.run(() -> {
                 })))
-            .whileTrue(ledsLeftFrontSide.setLEDsBreathe(Color.kGreen));
+            .whileTrue(ledsLeftFrontSide.setLEDsSolid(Color.kGreen));
         driver.x().onTrue(elevator.home());
         driver.y().onTrue(Commands.runOnce(() -> swerve.resetFieldRelativeOffset()));
         driver.start().and(climb.reachedClimberStart.negate())
@@ -289,8 +289,10 @@ public class RobotContainer {
 
     private void configureTriggerBindings() {
         // Coral
-        coralScoring.coralAtIntake.whileTrue(ledsLeftBackSide.setLEDsSolid(Color.kOrange));
-        coralScoring.coralAtOuttake.whileTrue(ledsLeftBackSide.setLEDsSolid(Color.kCyan));
+        coralScoring.coralAtIntake.whileTrue(ledsLeftBackSide.setLEDsSolid(Color.kOrange))
+            .whileTrue(ledsLeftFrontSide.setLEDsSolid(Color.kOrange));
+        coralScoring.coralAtOuttake.whileTrue(ledsLeftBackSide.setLEDsSolid(Color.kCyan))
+            .whileTrue(ledsLeftFrontSide.setLEDsSolid(Color.kCyan));
         vision.seesTwoAprilTags.whileTrue(ledsRightSide.setRainbow());
 
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
