@@ -102,6 +102,9 @@ public class RobotContainer {
     private CoralScoring coralScoring;
     private Climber climb;
 
+    Pose2d blueStart = new Pose2d(7.247, 1.126, new Rotation2d(2.276));
+    Pose2d redStart = new Pose2d(10.025, 1.476, new Rotation2d(0.900));
+
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
@@ -121,8 +124,8 @@ public class RobotContainer {
                 break;
 
             case kSimulation:
-                driveSimulation = new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(),
-                    new Pose2d(3, 3, Rotation2d.kZero));
+                driveSimulation =
+                    new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(), redStart);
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
                 swerve =
                     new Swerve(state, new SwerveSim(driveSimulation), new GyroSim(driveSimulation));
@@ -244,8 +247,7 @@ public class RobotContainer {
                 .andThen(climb.runClimberMotorCommand(Constants.Climb.RESET_VOLTAGE,
                     () -> climb.getClimberPosition()
                         .in(Radians) <= Constants.Climb.CLIMBER_START_ANGLE.in(Radians))));
-        driver.start().and(climb.reachedClimberStart)
-            .whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
+        driver.back().whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
         driver.leftTrigger().whileTrue(algae.algaeOuttakeCommand());
         driver.rightTrigger().whileTrue(CommandFactory.bargeSpitAlgae(elevator, algae))
             .onFalse(elevator.home());
@@ -259,7 +261,7 @@ public class RobotContainer {
         altOperator.leftTrigger().whileTrue(algae.algaeOuttakeCommand());
         // manual mode
 
-        altOperator.povLeft().onTrue(elevator.moveTo(() -> Height.KP5.height));
+        altOperator.povLeft().onTrue(elevator.moveToFast(() -> Height.KP5.height));
 
         altOperator.a().whileTrue(elevator.heightSelector());
         altOperator.povUp()
@@ -271,7 +273,6 @@ public class RobotContainer {
 
     private void setupPitController() {
         pitController.b().onTrue(elevator.manualMove(altOperator));
-        pitController.y().whileTrue(climb.resetClimberCommand());
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());
         pitController.x().whileTrue(climb.manualClimb(() -> pitController.getLeftY()));
         pitController.y().onTrue(climb.resetEncoder());
@@ -298,6 +299,8 @@ public class RobotContainer {
         elevator.hightAboveP0.or(climb.reachedClimberStart)
             .onTrue(Commands.runOnce(() -> swerve.setSpeedMultiplier(0.15)).ignoringDisable(true))
             .onFalse(Commands.runOnce(() -> swerve.setSpeedMultiplier(1.0)).ignoringDisable(true));
+        RobotModeTriggers.disabled().and(vision.seesTwoAprilTags).whileTrue(
+            Commands.run(() -> swerve.resetFieldRelativeOffsetBasedOnPose()).ignoringDisable(true));
     }
 
     /**
