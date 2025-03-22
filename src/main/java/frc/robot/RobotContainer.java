@@ -243,13 +243,21 @@ public class RobotContainer {
                     () -> climb.getClimberPosition()
                         .in(Radians) <= Constants.Climb.CLIMBER_START_ANGLE.in(Radians))));
         driver.back().whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
-        driver.leftTrigger()
-            .whileTrue(CommandFactory
-                .doSomethingWithAlgae(swerve, elevator, algae, operator::whatToDoWithAlgae).andThen(
-                    CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)));
+        // driver.leftTrigger()
+        // .whileTrue(CommandFactory
+        // .doSomethingWithAlgae(swerve, elevator, algae, operator::whatToDoWithAlgae).andThen(
+        // CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)));
         driver.rightTrigger().whileTrue(CommandFactory.bargeSpitAlgae(elevator, algae))
             .onFalse(elevator.home());
         driver.back().onTrue(elevator.stop());
+        driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'd')
+            .whileTrue(algae.algaeOuttakeCommand().withTimeout(1.0).andThen(
+                CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)));
+        driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'b')
+            .whileTrue(CommandFactory.scoreInBarge(swerve, elevator, algae).andThen(
+                CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)));
+        driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'p')
+            .whileTrue(Commands.none());
     }
 
     private void setupAltOperatorController() {

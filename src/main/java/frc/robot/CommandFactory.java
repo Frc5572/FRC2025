@@ -2,7 +2,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -16,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.SelectCommand;
 import frc.lib.util.AllianceFlipUtil;
 import frc.lib.util.Container;
 import frc.lib.util.ScoringLocation;
@@ -133,13 +131,13 @@ public class CommandFactory {
         new Pose2d(6.342151165008545, 0.5018799304962158, Rotation2d.kCW_90deg);
 
     /** Do something with algae gotten. */
-    public static Command doSomethingWithAlgae(Swerve swerve, Elevator elevator,
-        ElevatorAlgae algae, Supplier<Character> whatToDo) {
-        return new SelectCommand<>(Map.of('d',
-            Commands.sequence(algae.algaeOuttakeCommand().withTimeout(1.0).asProxy()), 'b',
-            Commands.sequence(scoreInBarge(swerve, elevator, algae)), 'p', Commands.sequence()),
-            whatToDo);
-    }
+    // public static Command doSomethingWithAlgae(Swerve swerve, Elevator elevator,
+    // ElevatorAlgae algae, Supplier<Character> whatToDo) {
+    // return new SelectCommand<>(Map.of('d',
+    // Commands.sequence(algae.algaeOuttakeCommand().withTimeout(1.0).asProxy()), 'b',
+    // Commands.sequence(scoreInBarge(swerve, elevator, algae)), 'p', Commands.sequence()),
+    // whatToDo);
+    // }
 
     private static Command feederAfter(Swerve swerve, CoralScoring scoring) {
         return swerve.run(() -> {
