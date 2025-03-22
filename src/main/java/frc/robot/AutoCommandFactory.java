@@ -100,8 +100,8 @@ public class AutoCommandFactory {
      * @return Auto Routine
      */
     public AutoRoutine l4right() {
-        return scoreCoral("l4right", false, CoralLocation.E, CoralLocation.C, CoralLocation.F,
-            CoralLocation.D);
+        return scoreCoral("l4right", false, CoralLocation.E, CoralLocation.C, CoralLocation.D,
+            CoralLocation.B);
     }
 
     private AutoRoutine scoreCoral(String name, boolean isLeft, CoralLocation... locations) {
@@ -118,9 +118,9 @@ public class AutoCommandFactory {
             }
             ret = ret.andThen(coral.runCoralIntake().until(coral.coralAtIntake));
         }
-        ret =
-            ret.andThen(swerve.stop()).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
-        routine.active().onTrue(ret);
+        ret = ret.andThen(swerve.stop());
+        routine.active().onTrue(ret.alongWith(algae.algaeOuttakeCommand().withTimeout(5.0))
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
         return routine;
     }
 

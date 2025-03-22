@@ -215,8 +215,6 @@ public class RobotContainer {
         Command autoScore = CommandFactory
             .autoScore(swerve, elevator, coralScoring, algae, operator::getDesiredLocation,
                 operator::getDesiredHeight, operator::additionalAlgaeHeight, operator::crossOut)
-            .andThen(CommandFactory.doSomethingWithAlgae(() -> true, swerve, elevator, algae,
-                operator::whatToDoWithAlgae, () -> -driver.getLeftX()))
             .andThen(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder))
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
         System.out.println("autoscore requires: ");
@@ -242,7 +240,10 @@ public class RobotContainer {
                     () -> climb.getClimberPosition()
                         .in(Radians) <= Constants.Climb.CLIMBER_START_ANGLE.in(Radians))));
         driver.back().whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
-        driver.leftTrigger().whileTrue(algae.algaeOuttakeCommand());
+        driver.leftTrigger()
+            .whileTrue(CommandFactory
+                .doSomethingWithAlgae(swerve, elevator, algae, operator::whatToDoWithAlgae).andThen(
+                    CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)));
         driver.rightTrigger().whileTrue(CommandFactory.bargeSpitAlgae(elevator, algae))
             .onFalse(elevator.home());
         driver.back().onTrue(elevator.stop());

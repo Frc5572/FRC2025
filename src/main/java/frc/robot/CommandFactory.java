@@ -4,9 +4,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -135,14 +133,12 @@ public class CommandFactory {
         new Pose2d(6.342151165008545, 0.5018799304962158, Rotation2d.kCW_90deg);
 
     /** Do something with algae gotten. */
-    public static Command doSomethingWithAlgae(BooleanSupplier shouldDoSomething, Swerve swerve,
-        Elevator elevator, ElevatorAlgae algae, Supplier<Character> whatToDo,
-        DoubleSupplier leftRight) {
-        return new ConditionalCommand(new SelectCommand<>(
-            Map.of('d', Commands.sequence(), 'b',
-                Commands.sequence(scoreInBarge(swerve, elevator, algae)), 'p', Commands.sequence()),
-            whatToDo), Commands.runOnce(() -> {
-            }), shouldDoSomething);
+    public static Command doSomethingWithAlgae(Swerve swerve, Elevator elevator,
+        ElevatorAlgae algae, Supplier<Character> whatToDo) {
+        return new SelectCommand<>(Map.of('d',
+            Commands.sequence(algae.algaeOuttakeCommand().withTimeout(1.0).asProxy()), 'b',
+            Commands.sequence(scoreInBarge(swerve, elevator, algae)), 'p', Commands.sequence()),
+            whatToDo);
     }
 
     private static Command feederAfter(Swerve swerve, CoralScoring scoring) {
@@ -262,8 +258,8 @@ public class CommandFactory {
         }, true, Units.inchesToMeters(12), 3));
     }
 
-    private static final Pose2d bargeScorePose =
-        new Pose2d(7.558475971221924, 6.258963108062744, Rotation2d.kZero);
+    private static final Pose2d bargeScorePose = new Pose2d(
+        7.558475971221924 + Units.inchesToMeters(9), 6.258963108062744, Rotation2d.kZero);
 
     /**
      * move and score in barge final
