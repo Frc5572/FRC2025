@@ -121,12 +121,12 @@ public final class Constants {
         public static final int LEFT_TALON_FX_ID = 3;
         public static final int RIGHT_TALON_FX_ID = 12;
         public static final int TOUCH_SENSOR_CHANNEL = 2;
-        public static final Angle CLIMB_ANGLE = Radians.of(610);
+        public static final Angle CLIMB_ANGLE = Radians.of(680);
         public static final Angle MAX_ANGLE = Radians.of(703);
         public static final Angle CLIMBER_OUT_ANGLE = Radians.of(300);
-        public static final Angle CLIMBER_START_ANGLE = Radians.of(170);
+        public static final Angle CLIMBER_START_ANGLE = Radians.of(146);
         public static final double GEAR_RATIO = 1;
-        public static final double CLIMB_VOLTAGE = 3.0;
+        public static final double CLIMB_VOLTAGE = 6.0;
         public static final double PRE_CLIMB_VOLTAGE = 5.5;
         public static final double RESET_VOLTAGE = -5.5;
 
