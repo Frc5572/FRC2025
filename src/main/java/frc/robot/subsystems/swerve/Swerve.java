@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.LoggedTracer;
 import frc.lib.util.swerve.SwerveModule;
 import frc.robot.Constants;
@@ -51,6 +52,8 @@ public class Swerve extends SubsystemBase {
             Constants.SwerveTransformPID.PID_TKI, Constants.SwerveTransformPID.PID_TKD,
             new TrapezoidProfile.Constraints(Constants.SwerveTransformPID.MAX_ANGULAR_VELOCITY,
                 Constants.SwerveTransformPID.MAX_ANGULAR_ACCELERATION)));
+    public boolean initGyroBool = true;
+    public Trigger initGyro = new Trigger(() -> initGyroBool);
 
 
     /**
@@ -211,9 +214,19 @@ public class Swerve extends SubsystemBase {
         fieldOffset = getGyroYaw().getDegrees();
     }
 
+    /**
+     * Set Field Relative Offset based on Pose
+     */
+    public void resetFieldRelativeOffsetBasedOnPose() {
+        double redSideflip = shouldFlipPath() ? 180.0 : 0.0;
+        fieldOffset =
+            (getGyroYaw().getDegrees() - state.getGlobalPoseEstimate().getRotation().getDegrees()
+                + 180 + redSideflip) % 360 - 180;
+        initGyroBool = false;
+    }
+
     @Override
     public void periodic() {
-
         swerveIO.updateInputs(inputs);
         for (var mod : swerveMods) {
             mod.periodic();
@@ -223,6 +236,7 @@ public class Swerve extends SubsystemBase {
         field.setRobotPose(getPose());
         SmartDashboard.putNumber("SpeedMultiplier", setSpeedMultiplier);
         LoggedTracer.record("Swerve");
+        Logger.recordOutput("Swerve/Field Offset", fieldOffset);
     }
 
     /**

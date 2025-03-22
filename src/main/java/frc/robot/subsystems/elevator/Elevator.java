@@ -74,27 +74,27 @@ public class Elevator extends SubsystemBase {
      *
      */
     public Command p0() {
-        return moveTo(() -> Constants.Elevator.P0);
+        return moveToFast(() -> Constants.Elevator.P0);
     }
 
     public Command p1() {
-        return moveTo(() -> Constants.Elevator.P1);
+        return moveToFast(() -> Constants.Elevator.P1);
     }
 
     public Command p2() {
-        return moveTo(() -> Constants.Elevator.P2);
+        return moveToFast(() -> Constants.Elevator.P2);
     }
 
     public Command p3() {
-        return moveTo(() -> Constants.Elevator.P3);
+        return moveToFast(() -> Constants.Elevator.P3);
     }
 
     public Command p4() {
-        return moveTo(() -> Constants.Elevator.P4);
+        return moveToFast(() -> Constants.Elevator.P4);
     }
 
     public Command p5() {
-        return moveTo(() -> Constants.Elevator.P5);
+        return moveToFast(() -> Constants.Elevator.P5);
     }
 
     public boolean hightAboveP0() {
@@ -112,6 +112,21 @@ public class Elevator extends SubsystemBase {
         return runOnce(() -> {
             Logger.recordOutput("targetHeight", height.get().in(Meters));
             io.setPositon(height.get().in(Meters));
+        }).andThen(Commands
+            .waitUntil(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1));
+    }
+
+    /**
+     * sets height of elevator
+     *
+     * @param height desired height of elevator
+     * @return elevator height change
+     *
+     */
+    public Command moveToFast(Supplier<Distance> height) {
+        return runOnce(() -> {
+            Logger.recordOutput("targetHeight", height.get().in(Meters));
+            io.setPositonFast(height.get().in(Meters));
         }).andThen(Commands
             .waitUntil(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1));
     }
@@ -142,7 +157,7 @@ public class Elevator extends SubsystemBase {
      * @return selected height
      */
     public Command heightSelector() {
-        return moveTo(() -> {
+        return moveToFast(() -> {
             var height = Height.getCurrentState();
             Logger.recordOutput(Constants.Elevator.heightName, height.displayName);
             return height.height;
