@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
-import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.AddressableLEDBufferView;
 import edu.wpi.first.wpilibj.LEDPattern;
@@ -11,14 +10,11 @@ import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 
 /**
  * LEDs subsystem
  */
 public class LEDs extends SubsystemBase {
-    private final AddressableLED leds;
-    private final AddressableLEDBuffer buffer;
     private final AddressableLEDBufferView chosenLEDside;
 
 
@@ -26,20 +22,18 @@ public class LEDs extends SubsystemBase {
     LEDPattern rainbowPattern = rainbow.scrollAtRelativeSpeed(Percent.per(Second).of(100));
 
     @Override
-    public void periodic() {
-        leds.setData(buffer);
-    }
+    public void periodic() {}
 
     /**
      * constructor
      */
-    public LEDs(AddressableLEDBuffer passedBuffer, AddressableLED passedLEDs, int start, int end) {
-        leds = passedLEDs;
-        buffer = passedBuffer;
-        chosenLEDside = buffer.createView(start, end);
-        leds.setLength(Constants.LEDs.LED_LENGTH);
-        leds.start();
+    public LEDs(AddressableLEDBuffer passedBuffer, int start, int end) {
+        this(passedBuffer, start, end, false);
+    }
 
+    public LEDs(AddressableLEDBuffer passedBuffer, int start, int end, boolean reversed) {
+        chosenLEDside = reversed ? passedBuffer.createView(start, end).reversed()
+            : passedBuffer.createView(start, end);
     }
 
     /**
