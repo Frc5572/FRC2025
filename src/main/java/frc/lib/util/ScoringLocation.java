@@ -90,10 +90,11 @@ public class ScoringLocation {
      */
     public enum Height {
 
-        KP0("Algae 1", Constants.Elevator.P0, true), KP1("Coral 1", Constants.Elevator.P1,
-            false), KP2("Algae 2", Constants.Elevator.P2, true), KP3("Coral 3",
-                Constants.Elevator.P3, false), KP4("Coral 4", Constants.Elevator.P4,
-                    false), KP5("Barge", Constants.Elevator.P5, true);
+        Trough("Trough", Constants.Elevator.TROUGH, false), KP0("Algae 1", Constants.Elevator.P0,
+            true), KP1("Coral 1", Constants.Elevator.P1, false), KP2("Algae 2",
+                Constants.Elevator.P2,
+                true), KP3("Coral 3", Constants.Elevator.P3, false), KP4("Coral 4",
+                    Constants.Elevator.P4, false), KP5("Barge", Constants.Elevator.P5, true);
 
         public final String displayName;
         public final Distance height;
@@ -127,7 +128,7 @@ public class ScoringLocation {
         public static Height fromInt(int value) {
             switch (value) {
                 case 0:
-                    return KP0;
+                    return Trough;
                 case 1:
                     return KP1;
                 case 2:
