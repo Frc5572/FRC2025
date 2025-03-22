@@ -215,7 +215,7 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Set Field Relative Offset based on Pose Total GUESS TODO!!!!!!!
+     * Set Field Relative Offset based on Pose
      */
     public void resetFieldRelativeOffsetBasedOnPose() {
         double redSideflip = shouldFlipPath() ? 180.0 : 0.0;
