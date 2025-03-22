@@ -92,10 +92,10 @@ public class RobotContainer {
     private ElevatorAlgae algae;
     private final AddressableLED leds = new AddressableLED(Constants.LEDs.LED_PORT);
     private final AddressableLEDBuffer buffer = new AddressableLEDBuffer(Constants.LEDs.LED_LENGTH);
-    private LEDs ledsrightfrontside = new LEDs(buffer, leds, 0, 29);
-    private LEDs ledsrightbackside = new LEDs(buffer, leds, 30, 59);
-    private LEDs ledsleftfrontside = new LEDs(buffer, leds, 60, 89);
-    private LEDs ledsleftbackside = new LEDs(buffer, leds, 90, 119);
+    private LEDs ledsRightFrontside = new LEDs(buffer, leds, 0, 29);
+    private LEDs ledsRightBackside = new LEDs(buffer, leds, 30, 59);
+    private LEDs ledsLeftFrontside = new LEDs(buffer, leds, 60, 89);
+    private LEDs ledsLeftBackside = new LEDs(buffer, leds, 90, 119);
     private Elevator elevator;
     private final Swerve swerve;
     private final Vision vision;
@@ -143,7 +143,7 @@ public class RobotContainer {
             swerve::followTrajectory, true, swerve);
 
         AutoCommandFactory autos = new AutoCommandFactory(autoFactory, swerve, elevator,
-            coralScoring, algae, ledsleftfrontside);
+            coralScoring, algae, ledsLeftFrontside);
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Example", autos::example);
         autoChooser.addRoutine("Left Side L4 Coral", autos::l4left);
@@ -159,10 +159,10 @@ public class RobotContainer {
 
 
         /* Default Commands */
-        ledsrightfrontside.setDefaultCommand(ledsrightfrontside.setLEDsBreathe(Color.kRed));
-        ledsrightbackside.setDefaultCommand(ledsrightbackside.setLEDsSolid(Color.kDarkRed));
-        ledsleftfrontside.setDefaultCommand(ledsleftfrontside.setLEDsBreathe(Color.kRed));
-        ledsleftbackside.setDefaultCommand(ledsleftbackside.setLEDsBreathe(Color.kRed));
+        ledsRightFrontside.setDefaultCommand(ledsRightFrontside.setLEDsBreathe(Color.kRed));
+        ledsRightBackside.setDefaultCommand(ledsRightBackside.setLEDsSolid(Color.kDarkRed));
+        ledsLeftFrontside.setDefaultCommand(ledsLeftFrontside.setLEDsBreathe(Color.kRed));
+        ledsLeftBackside.setDefaultCommand(ledsLeftBackside.setLEDsBreathe(Color.kRed));
 
         algae.setDefaultCommand(algae.algaeHoldCommand().withName("Algae Default Command"));
 
@@ -229,13 +229,13 @@ public class RobotContainer {
             System.out.println(" - " + req.getName());
         }
         driver.a().and(operator.hasReefLocation()).whileTrue(autoScore)
-            .whileTrue(ledsleftfrontside.setLEDsBreathe(Color.kGreen)).negate()
+            .whileTrue(ledsLeftFrontside.setLEDsBreathe(Color.kGreen)).negate()
             .onTrue(coralScoring.runCoralIntake());
         driver.b()
             .whileTrue(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)
                 .andThen(swerve.run(() -> {
                 })))
-            .whileTrue(ledsleftfrontside.setLEDsBreathe(Color.kGreen));
+            .whileTrue(ledsLeftFrontside.setLEDsBreathe(Color.kGreen));
         driver.x().onTrue(elevator.home());
         driver.y().onTrue(Commands.runOnce(() -> swerve.resetFieldRelativeOffset()));
         driver.start().and(climb.reachedClimberStart.negate())
@@ -287,9 +287,9 @@ public class RobotContainer {
 
     private void configureTriggerBindings() {
         // Coral
-        coralScoring.coralAtIntake.whileTrue(ledsleftbackside.setLEDsSolid(Color.kOrange));
-        coralScoring.coralAtOuttake.whileTrue(ledsleftbackside.setLEDsSolid(Color.kCyan));
-        vision.seesTwoAprilTags.whileTrue(ledsrightfrontside.setRainbow());
+        coralScoring.coralAtIntake.whileTrue(ledsLeftBackside.setLEDsSolid(Color.kOrange));
+        coralScoring.coralAtOuttake.whileTrue(ledsLeftBackside.setLEDsSolid(Color.kCyan));
+        vision.seesTwoAprilTags.whileTrue(ledsRightFrontside.setRainbow());
 
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
