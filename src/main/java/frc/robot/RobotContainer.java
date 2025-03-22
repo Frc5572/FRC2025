@@ -162,8 +162,8 @@ public class RobotContainer {
 
         /* Default Commands */
         ledsRightSide.setDefaultCommand(ledsRightSide.setLEDsBreathe(Color.kRed));
-        ledsLeftFrontSide.setDefaultCommand(ledsLeftFrontSide.setLEDsSolid(Color.kPurple));
-        ledsLeftBackSide.setDefaultCommand(ledsLeftBackSide.setLEDsSolid(Color.kRed));
+        ledsLeftFrontSide.setDefaultCommand(ledsLeftFrontSide.setLEDsBreathe(Color.kRed));
+        ledsLeftBackSide.setDefaultCommand(ledsLeftBackSide.setLEDsBreathe(Color.kRed));
 
         algae.setDefaultCommand(algae.algaeHoldCommand().withName("Algae Default Command"));
 
