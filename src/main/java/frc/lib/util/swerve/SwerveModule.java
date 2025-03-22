@@ -33,7 +33,6 @@ public class SwerveModule {
 
         // lastAngle = getState().angle.getDegrees();
         io.updateInputs(inputs);
-        Logger.processInputs("SwerveModule" + moduleNumber, inputs);
     }
 
     /**
@@ -43,7 +42,7 @@ public class SwerveModule {
         // Robot.profiler.push("updateInputs");
         io.updateInputs(inputs);
         // Robot.profiler.swap("processInputs");
-        Logger.processInputs("SwerveModule" + moduleNumber, inputs);
+        Logger.processInputs("Drive/Swerve/SwerveModule" + moduleNumber, inputs);
         // Robot.profiler.pop();
     }
 
