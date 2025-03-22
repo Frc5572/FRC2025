@@ -134,6 +134,7 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().run();
         robotContainer.updateSimulation();
         robotContainer.updateViz();
+        robotContainer.periodic();
     }
 
     @Override

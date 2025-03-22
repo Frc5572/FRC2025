@@ -92,10 +92,10 @@ public class RobotContainer {
     private ElevatorAlgae algae;
     private final AddressableLED leds = new AddressableLED(Constants.LEDs.LED_PORT);
     private final AddressableLEDBuffer buffer = new AddressableLEDBuffer(Constants.LEDs.LED_LENGTH);
-    private LEDs ledsRightFrontside = new LEDs(buffer, leds, 0, 29);
-    private LEDs ledsRightBackside = new LEDs(buffer, leds, 30, 59);
-    private LEDs ledsLeftFrontside = new LEDs(buffer, leds, 60, 89);
-    private LEDs ledsLeftBackside = new LEDs(buffer, leds, 90, 119);
+    private LEDs ledsRightFrontside = new LEDs(buffer, 0, 29);
+    private LEDs ledsRightBackside = new LEDs(buffer, 30, 59);
+    private LEDs ledsLeftFrontside = new LEDs(buffer, 60, 89);
+    private LEDs ledsLeftBackside = new LEDs(buffer, 90, 119);
     private Elevator elevator;
     private final Swerve swerve;
     private final Vision vision;
@@ -110,6 +110,8 @@ public class RobotContainer {
         fieldVis = new FieldViz();
         vis = new Viz2025(fieldVis, "");
         state = new RobotState(vis);
+        leds.setLength(Constants.LEDs.LED_LENGTH);
+        leds.start();
         switch (runtimeType) {
             case kReal:
                 elevator = new Elevator(new ElevatorReal(), vis);
@@ -338,5 +340,9 @@ public class RobotContainer {
             vis.setActualPose(driveSimulation.getSimulatedDriveTrainPose());
 
         }
+    }
+
+    public void periodic() {
+        leds.setData(buffer);
     }
 }
