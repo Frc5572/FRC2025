@@ -92,10 +92,10 @@ public class RobotContainer {
     private ElevatorAlgae algae;
     private final AddressableLED leds = new AddressableLED(Constants.LEDs.LED_PORT);
     private final AddressableLEDBuffer buffer = new AddressableLEDBuffer(Constants.LEDs.LED_LENGTH);
-    private LEDs ledsRightFrontside = new LEDs(buffer, 0, 29);
-    private LEDs ledsRightBackside = new LEDs(buffer, 30, 59);
-    private LEDs ledsLeftFrontside = new LEDs(buffer, 60, 89);
-    private LEDs ledsLeftBackside = new LEDs(buffer, 90, 119);
+    private LEDs ledsRightSide = new LEDs(buffer, 0, 59);
+    private LEDs ledsLeftFrontSide = new LEDs(buffer, 60, 89);
+    private LEDs ledsLeftBackSide = new LEDs(buffer, 90, 119);
+
     private Elevator elevator;
     private final Swerve swerve;
     private final Vision vision;
@@ -145,7 +145,7 @@ public class RobotContainer {
             swerve::followTrajectory, true, swerve);
 
         AutoCommandFactory autos = new AutoCommandFactory(autoFactory, swerve, elevator,
-            coralScoring, algae, ledsLeftFrontside);
+            coralScoring, algae, ledsLeftFrontSide);
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Example", autos::example);
         autoChooser.addRoutine("Left Side L4 Coral", autos::l4left);
@@ -161,10 +161,9 @@ public class RobotContainer {
 
 
         /* Default Commands */
-        ledsRightFrontside.setDefaultCommand(ledsRightFrontside.setLEDsBreathe(Color.kRed));
-        ledsRightBackside.setDefaultCommand(ledsRightBackside.setLEDsSolid(Color.kHotPink));
-        ledsLeftFrontside.setDefaultCommand(ledsLeftFrontside.setLEDsBreathe(Color.kRed));
-        ledsLeftBackside.setDefaultCommand(ledsLeftBackside.setLEDsBreathe(Color.kPurple));
+        ledsRightSide.setDefaultCommand(ledsRightSide.setLEDsBreathe(Color.kRed));
+        ledsLeftFrontSide.setDefaultCommand(ledsLeftFrontSide.setLEDsSolid(Color.kPurple));
+        ledsLeftBackSide.setDefaultCommand(ledsLeftBackSide.setLEDsSolid(Color.kRed));
 
         algae.setDefaultCommand(algae.algaeHoldCommand().withName("Algae Default Command"));
 
@@ -231,13 +230,13 @@ public class RobotContainer {
             System.out.println(" - " + req.getName());
         }
         driver.a().and(operator.hasReefLocation()).whileTrue(autoScore)
-            .whileTrue(ledsLeftFrontside.setLEDsBreathe(Color.kGreen)).negate()
+            .whileTrue(ledsLeftFrontSide.setLEDsBreathe(Color.kGreen)).negate()
             .onTrue(coralScoring.runCoralIntake());
         driver.b()
             .whileTrue(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)
                 .andThen(swerve.run(() -> {
                 })))
-            .whileTrue(ledsLeftFrontside.setLEDsBreathe(Color.kGreen));
+            .whileTrue(ledsLeftFrontSide.setLEDsBreathe(Color.kGreen));
         driver.x().onTrue(elevator.home());
         driver.y().onTrue(Commands.runOnce(() -> swerve.resetFieldRelativeOffset()));
         driver.start().and(climb.reachedClimberStart.negate())
@@ -289,9 +288,9 @@ public class RobotContainer {
 
     private void configureTriggerBindings() {
         // Coral
-        coralScoring.coralAtIntake.whileTrue(ledsLeftBackside.setLEDsSolid(Color.kOrange));
-        coralScoring.coralAtOuttake.whileTrue(ledsLeftBackside.setLEDsSolid(Color.kCyan));
-        vision.seesTwoAprilTags.whileTrue(ledsRightFrontside.setRainbow());
+        coralScoring.coralAtIntake.whileTrue(ledsLeftBackSide.setLEDsSolid(Color.kOrange));
+        coralScoring.coralAtOuttake.whileTrue(ledsLeftBackSide.setLEDsSolid(Color.kCyan));
+        vision.seesTwoAprilTags.whileTrue(ledsRightSide.setRainbow());
 
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());

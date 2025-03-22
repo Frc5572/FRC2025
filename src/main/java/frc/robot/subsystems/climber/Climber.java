@@ -24,10 +24,13 @@ public class Climber extends SubsystemBase {
     public Trigger reachedClimberStart = new Trigger(() -> reachedClimberStart());
 
 
+
     public Climber(ClimberIO io, Viz2025 viz) {
         this.io = io;
         this.viz = viz;
     }
+
+
 
     @Override
     public void periodic() {
