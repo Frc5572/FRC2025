@@ -8,14 +8,20 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import frc.lib.util.swerve.SwerveModule;
 import frc.lib.util.swerve.SwerveModuleSim;
 
-/** Simulated Swerve Drive */
+/**
+ * Simulated Swerve Drive
+ */
 public class SwerveSim implements SwerveIO {
 
     private final GyroSimulation gyroSim;
     private final SwerveDriveSimulation simulation;
 
+    /**
+     * Simulated Swerve Drive
+     */
     public SwerveSim(SwerveDriveSimulation simulation) {
         this.gyroSim = simulation.getGyroSimulation();
+        this.gyroSim.setRotation(Rotation2d.fromRotations(Math.random() - 0.5));
         this.simulation = simulation;
     }
 

@@ -72,7 +72,7 @@ public final class Constants {
         public static final double HAS_ALGAE_CURRENT_THRESHOLD = 50;
         public static final int VOLTAGE = 12;
         public static final int NEGATIVE_VOLTAGE = -12;
-        public static final double SMALLER_VOLTAGE = 0.5;
+        public static final double SMALLER_VOLTAGE = 1.0;
         public static final double SMALLER_NEGATIVE_VOLTAGE = -1;
     }
 
@@ -121,12 +121,12 @@ public final class Constants {
         public static final int LEFT_TALON_FX_ID = 3;
         public static final int RIGHT_TALON_FX_ID = 12;
         public static final int TOUCH_SENSOR_CHANNEL = 2;
-        public static final Angle CLIMB_ANGLE = Radians.of(610);
+        public static final Angle CLIMB_ANGLE = Radians.of(680);
         public static final Angle MAX_ANGLE = Radians.of(703);
         public static final Angle CLIMBER_OUT_ANGLE = Radians.of(300);
-        public static final Angle CLIMBER_START_ANGLE = Radians.of(140);
+        public static final Angle CLIMBER_START_ANGLE = Radians.of(146);
         public static final double GEAR_RATIO = 1;
-        public static final double CLIMB_VOLTAGE = 3.0;
+        public static final double CLIMB_VOLTAGE = 6.0;
         public static final double PRE_CLIMB_VOLTAGE = 5.5;
         public static final double RESET_VOLTAGE = -5.5;
 
@@ -322,7 +322,7 @@ public final class Constants {
         public static final NeutralModeValue BREAK = NeutralModeValue.Brake;
 
         // PID and feedforward
-        public static final double KP = 60.0;
+        public static final double KP = 70.0;
         public static final double KI = 0.0;
         public static final double KD = 0.0;
         public static final double KS = 0.2675;
@@ -330,7 +330,8 @@ public final class Constants {
         public static final double KA = 0.0;
         public static final double KG = 0.3375;
         public static final double CVeleocity = 2.0;
-        public static final double Acceleration = 12.0;
+        public static final double FastVelocity = 9.0;
+        public static final double Acceleration = 30.0;
         public static final double Jerk = 6000000.0;
 
         public static final AngularVelocity MAX_VELOCITY = RotationsPerSecond.of(0.0);
@@ -392,7 +393,7 @@ public final class Constants {
 
     /** State Estimator Constants */
     public static class StateEstimator {
-        public static final boolean keepInField = true;
+        public static final boolean keepInField = false;
         public static final boolean keepOutOfReefs = true;
         public static final LoggedTunableNumber globalVisionTrust =
             new LoggedTunableNumber("globalVisionTrust", 0.2);
@@ -423,13 +424,13 @@ public final class Constants {
         public static final double PID_TKI = 0.0;
         public static final double PID_TKD = 0.0;
 
-        public static final double MAX_VELOCITY = 2.0;
+        public static final double MAX_VELOCITY = 6.0;
         public static final double MAX_ACCELERATION = 3;
 
         public static final double MAX_ANGULAR_VELOCITY = 8;
         public static final double MAX_ANGULAR_ACCELERATION = 16;
 
-        public static final double MAX_ELEVATOR_UP_VELOCITY = 0.3;
+        public static final double MAX_ELEVATOR_UP_VELOCITY = 1.2;
     }
 
     public static final Rotation2d CIRCLE_REEF_LOOKAHEAD_ANGLE = Rotation2d.fromDegrees(45);
