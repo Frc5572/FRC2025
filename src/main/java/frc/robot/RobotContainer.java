@@ -46,6 +46,9 @@ import frc.robot.subsystems.elevator.ElevatorSim;
 import frc.robot.subsystems.elevator_algae.ElevatorAlgae;
 import frc.robot.subsystems.elevator_algae.ElevatorAlgaeIO;
 import frc.robot.subsystems.elevator_algae.ElevatorAlgaeReal;
+import frc.robot.subsystems.swerve.GyroCanandGyro;
+import frc.robot.subsystems.swerve.GyroIO;
+import frc.robot.subsystems.swerve.GyroSim;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
 import frc.robot.subsystems.swerve.SwerveReal;
@@ -81,7 +84,6 @@ public class RobotContainer {
 
     /** Simulation */
     private SwerveDriveSimulation driveSimulation;
-
     /** Visualization */
     private final FieldViz fieldVis;
     private final Viz2025 vis;
@@ -118,7 +120,7 @@ public class RobotContainer {
         switch (runtimeType) {
             case kReal:
                 elevator = new Elevator(new ElevatorReal(), vis);
-                swerve = new Swerve(state, new SwerveReal());
+                swerve = new Swerve(state, new SwerveReal(), new GyroCanandGyro());
                 vision = new Vision(state, VisionReal::new);
                 coralScoring = new CoralScoring(new CoralScoringReal(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeReal(), vis);
@@ -129,7 +131,8 @@ public class RobotContainer {
                 driveSimulation =
                     new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(), redStart);
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
-                swerve = new Swerve(state, new SwerveSim(driveSimulation));
+                swerve =
+                    new Swerve(state, new SwerveSim(driveSimulation), new GyroSim(driveSimulation));
                 vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
                 elevator = new Elevator(new ElevatorSim(), vis);
                 coralScoring = new CoralScoring(new CoralScoringSim(), vis);
@@ -138,7 +141,7 @@ public class RobotContainer {
                 break;
             default:
                 elevator = new Elevator(new ElevatorIO.Empty(), vis);
-                swerve = new Swerve(state, new SwerveIO.Empty());
+                swerve = new Swerve(state, new SwerveIO.Empty(), new GyroIO.Empty());
                 vision = new Vision(state, VisionIO::empty);
                 coralScoring = new CoralScoring(new CoralScoringIO.Empty(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
