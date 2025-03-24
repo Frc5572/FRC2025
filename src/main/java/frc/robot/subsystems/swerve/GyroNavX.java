@@ -1,5 +1,6 @@
 package frc.robot.subsystems.swerve;
 
+import static edu.wpi.first.units.Units.Degrees;
 import com.studica.frc.AHRS;
 import frc.robot.Constants;
 
@@ -9,8 +10,6 @@ public class GyroNavX implements GyroIO {
 
     @Override
     public void updateInputs(GyroInputs inputs) {
-        inputs.pitch = gyro.getPitch();
-        inputs.roll = gyro.getRoll();
-        inputs.yaw = gyro.getYaw();
+        inputs.yaw = Degrees.of(-gyro.getYaw());
     }
 }

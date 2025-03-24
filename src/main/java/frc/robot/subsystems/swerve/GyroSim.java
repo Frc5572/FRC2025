@@ -1,5 +1,6 @@
 package frc.robot.subsystems.swerve;
 
+import static edu.wpi.first.units.Units.Rotation;
 import org.ironmaple.simulation.drivesims.GyroSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 
@@ -14,6 +15,6 @@ public class GyroSim implements GyroIO {
 
     @Override
     public void updateInputs(GyroInputs inputs) {
-        inputs.yaw = gyro.getGyroReading().getRotations();
+        inputs.yaw = Rotation.of(gyro.getGyroReading().getRotations());
     }
 }

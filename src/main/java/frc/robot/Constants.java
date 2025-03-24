@@ -322,16 +322,16 @@ public final class Constants {
         public static final NeutralModeValue BREAK = NeutralModeValue.Brake;
 
         // PID and feedforward
-        public static final double KP = 70.0;
+        public static final double KP = 30.0;
         public static final double KI = 0.0;
         public static final double KD = 0.0;
-        public static final double KS = 0.2675;
+        public static final double KS = 0.5675;
         public static final double KV = 0.0;
         public static final double KA = 0.0;
-        public static final double KG = 0.3375;
-        public static final double CVeleocity = 2.0;
+        public static final double KG = 0.7375;
+        public static final double CVeleocity = 4.0;
         public static final double FastVelocity = 9.0;
-        public static final double Acceleration = 30.0;
+        public static final double Acceleration = 10.0;
         public static final double Jerk = 6000000.0;
 
         public static final AngularVelocity MAX_VELOCITY = RotationsPerSecond.of(0.0);

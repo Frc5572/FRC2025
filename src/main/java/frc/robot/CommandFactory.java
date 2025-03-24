@@ -217,7 +217,7 @@ public class CommandFactory {
 
     /** Move to right feeder */
     public static Command rightFeeder(Swerve swerve, Elevator elevator, CoralScoring coral) {
-        return ensureHome(elevator)
+        return (Commands.waitSeconds(0.2).andThen(ensureHome(elevator)))
             .alongWith(new MoveAndAvoidReef(swerve, () -> rightFeederAway, () -> {
                 if (elevator.hightAboveP0.getAsBoolean()) {
                     return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
@@ -240,28 +240,8 @@ public class CommandFactory {
         Logger.recordOutput("leftFeeder", leftFeeder);
         Logger.recordOutput("rightFeeder", rightFeeder);
 
-        return ensureHome(elevator).alongWith(new MoveAndAvoidReef(swerve, () -> {
-            if ((swerve.state.getGlobalPoseEstimate().getY() > FieldConstants.fieldWidth.in(Meters)
-                / 2) != AllianceFlipUtil.shouldFlip()) {
-                return leftFeeder;
-            } else {
-                return rightFeeder;
-            }
-        }, () -> {
-            if (elevator.hightAboveP0.getAsBoolean()) {
-                return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
-            } else {
-                return Constants.SwerveTransformPID.MAX_VELOCITY;
-            }
-        }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve, coral));
-    }
-
-    /** Move to feeder depending on webcontroller code */
-    public static Command selectFeeder(Swerve swerve, Elevator elevator, CoralScoring coral,
-        Supplier<Character> charSupplier) {
-        return ensureHome(elevator).alongWith(new MoveAndAvoidReef(swerve, () -> {
-            char target = charSupplier.get();
-            if (target == 'f') {
+        return (Commands.waitSeconds(0.2).andThen(ensureHome(elevator)))
+            .alongWith(new MoveAndAvoidReef(swerve, () -> {
                 if ((swerve.state.getGlobalPoseEstimate()
                     .getY() > FieldConstants.fieldWidth.in(Meters) / 2) != AllianceFlipUtil
                         .shouldFlip()) {
@@ -269,18 +249,41 @@ public class CommandFactory {
                 } else {
                     return rightFeeder;
                 }
-            } else if (target == 'r') {
-                return rightFeeder;
-            } else {
-                return leftFeeder;
-            }
-        }, () -> {
-            if (elevator.hightAboveP0.getAsBoolean()) {
-                return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
-            } else {
-                return Constants.SwerveTransformPID.MAX_VELOCITY;
-            }
-        }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve, coral));
+            }, () -> {
+                if (elevator.hightAboveP0.getAsBoolean()) {
+                    return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
+                } else {
+                    return Constants.SwerveTransformPID.MAX_VELOCITY;
+                }
+            }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve, coral));
+    }
+
+    /** Move to feeder depending on webcontroller code */
+    public static Command selectFeeder(Swerve swerve, Elevator elevator, CoralScoring coral,
+        Supplier<Character> charSupplier) {
+        return (Commands.waitSeconds(0.2).andThen(ensureHome(elevator)))
+            .alongWith(new MoveAndAvoidReef(swerve, () -> {
+                char target = charSupplier.get();
+                if (target == 'f') {
+                    if ((swerve.state.getGlobalPoseEstimate()
+                        .getY() > FieldConstants.fieldWidth.in(Meters) / 2) != AllianceFlipUtil
+                            .shouldFlip()) {
+                        return leftFeeder;
+                    } else {
+                        return rightFeeder;
+                    }
+                } else if (target == 'r') {
+                    return rightFeeder;
+                } else {
+                    return leftFeeder;
+                }
+            }, () -> {
+                if (elevator.hightAboveP0.getAsBoolean()) {
+                    return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
+                } else {
+                    return Constants.SwerveTransformPID.MAX_VELOCITY;
+                }
+            }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve, coral));
     }
 
     private static final Pose2d bargePose = new Pose2d(FieldConstants.fieldLength.in(Meters) - 9.49,

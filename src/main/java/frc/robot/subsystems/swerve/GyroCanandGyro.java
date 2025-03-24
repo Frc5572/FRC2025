@@ -1,5 +1,6 @@
 package frc.robot.subsystems.swerve;
 
+import static edu.wpi.first.units.Units.Rotation;
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 
 /** IO layer for CanandGyro */
@@ -8,8 +9,6 @@ public class GyroCanandGyro implements GyroIO {
 
     @Override
     public void updateInputs(GyroInputs inputs) {
-        inputs.pitch = gyro.getPitch();
-        inputs.roll = gyro.getRoll();
-        inputs.yaw = gyro.getYaw();
+        inputs.yaw = Rotation.of(gyro.getYaw());
     }
 }

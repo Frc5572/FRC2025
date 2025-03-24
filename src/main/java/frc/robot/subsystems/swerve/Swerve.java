@@ -1,6 +1,7 @@
 
 package frc.robot.subsystems.swerve;
 
+import static edu.wpi.first.units.Units.Rotation;
 import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -197,9 +198,7 @@ public class Swerve extends SubsystemBase {
      * @return Current rotation/yaw of gyro as {@link Rotation2d}
      */
     public Rotation2d getGyroYaw() {
-        double yaw = inputsGyro.yaw;
-        return (Constants.Swerve.invertGyro) ? Rotation2d.fromRotations(-yaw)
-            : Rotation2d.fromRotations(yaw);
+        return Rotation2d.fromRotations(inputsGyro.yaw.in(Rotation));
     }
 
     /**
