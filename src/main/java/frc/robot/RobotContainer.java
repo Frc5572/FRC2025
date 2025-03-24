@@ -46,6 +46,9 @@ import frc.robot.subsystems.elevator.ElevatorSim;
 import frc.robot.subsystems.elevator_algae.ElevatorAlgae;
 import frc.robot.subsystems.elevator_algae.ElevatorAlgaeIO;
 import frc.robot.subsystems.elevator_algae.ElevatorAlgaeReal;
+import frc.robot.subsystems.swerve.GyroCanandGyro;
+import frc.robot.subsystems.swerve.GyroIO;
+import frc.robot.subsystems.swerve.GyroSim;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
 import frc.robot.subsystems.swerve.SwerveReal;
@@ -81,7 +84,6 @@ public class RobotContainer {
 
     /** Simulation */
     private SwerveDriveSimulation driveSimulation;
-
     /** Visualization */
     private final FieldViz fieldVis;
     private final Viz2025 vis;
@@ -92,8 +94,10 @@ public class RobotContainer {
     private ElevatorAlgae algae;
     private final AddressableLED leds = new AddressableLED(Constants.LEDs.LED_PORT);
     private final AddressableLEDBuffer buffer = new AddressableLEDBuffer(Constants.LEDs.LED_LENGTH);
-    private LEDs ledsright = new LEDs(buffer, leds, 0, 59);
-    private LEDs ledsleft = new LEDs(buffer, leds, 60, 119);
+    private LEDs ledsRightSide = new LEDs(buffer, 0, 59);
+    private LEDs ledsLeftFrontSide = new LEDs(buffer, 60, 89);
+    private LEDs ledsLeftBackSide = new LEDs(buffer, 90, 119);
+
     private Elevator elevator;
     private final Swerve swerve;
     private final Vision vision;
@@ -111,10 +115,12 @@ public class RobotContainer {
         fieldVis = new FieldViz();
         vis = new Viz2025(fieldVis, "");
         state = new RobotState(vis);
+        leds.setLength(Constants.LEDs.LED_LENGTH);
+        leds.start();
         switch (runtimeType) {
             case kReal:
                 elevator = new Elevator(new ElevatorReal(), vis);
-                swerve = new Swerve(state, new SwerveReal());
+                swerve = new Swerve(state, new SwerveReal(), new GyroCanandGyro());
                 vision = new Vision(state, VisionReal::new);
                 coralScoring = new CoralScoring(new CoralScoringReal(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeReal(), vis);
@@ -125,7 +131,8 @@ public class RobotContainer {
                 driveSimulation =
                     new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(), redStart);
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
-                swerve = new Swerve(state, new SwerveSim(driveSimulation));
+                swerve =
+                    new Swerve(state, new SwerveSim(driveSimulation), new GyroSim(driveSimulation));
                 vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
                 elevator = new Elevator(new ElevatorSim(), vis);
                 coralScoring = new CoralScoring(new CoralScoringSim(), vis);
@@ -134,7 +141,7 @@ public class RobotContainer {
                 break;
             default:
                 elevator = new Elevator(new ElevatorIO.Empty(), vis);
-                swerve = new Swerve(state, new SwerveIO.Empty());
+                swerve = new Swerve(state, new SwerveIO.Empty(), new GyroIO.Empty());
                 vision = new Vision(state, VisionIO::empty);
                 coralScoring = new CoralScoring(new CoralScoringIO.Empty(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
@@ -143,8 +150,8 @@ public class RobotContainer {
         autoFactory = new AutoFactory(swerve::getPose, swerve::resetOdometry,
             swerve::followTrajectory, true, swerve);
 
-        AutoCommandFactory autos =
-            new AutoCommandFactory(autoFactory, swerve, elevator, coralScoring, algae, ledsleft);
+        AutoCommandFactory autos = new AutoCommandFactory(autoFactory, swerve, elevator,
+            coralScoring, algae, ledsLeftFrontSide);
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Example", autos::example);
         autoChooser.addRoutine("Left Side L4 Coral", autos::l4left);
@@ -160,8 +167,10 @@ public class RobotContainer {
 
 
         /* Default Commands */
-        ledsright.setDefaultCommand(ledsright.setLEDsBreathe(Color.kRed));
-        ledsleft.setDefaultCommand(ledsleft.setLEDsBreathe(Color.kRed));
+        ledsRightSide.setDefaultCommand(ledsRightSide.setLEDsBreathe(Color.kRed));
+        ledsLeftFrontSide.setDefaultCommand(ledsLeftFrontSide.setLEDsBreathe(Color.kRed));
+        ledsLeftBackSide.setDefaultCommand(ledsLeftBackSide.setLEDsBreathe(Color.kRed));
+
         algae.setDefaultCommand(algae.algaeHoldCommand().withName("Algae Default Command"));
 
         /* Button and Trigger Bindings */
@@ -225,13 +234,13 @@ public class RobotContainer {
             System.out.println(" - " + req.getName());
         }
         driver.a().and(operator.hasReefLocation()).whileTrue(autoScore)
-            .whileTrue(ledsleft.setLEDsBreathe(Color.kGreen)).negate()
+            .whileTrue(ledsLeftFrontSide.setLEDsSolid(Color.kGreen)).negate()
             .onTrue(coralScoring.runCoralIntake());
         driver.b()
             .whileTrue(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)
                 .andThen(swerve.run(() -> {
                 })))
-            .whileTrue(ledsleft.setLEDsBreathe(Color.kGreen));
+            .whileTrue(ledsLeftFrontSide.setLEDsSolid(Color.kGreen));
         driver.x().onTrue(elevator.home());
         driver.y().onTrue(Commands.runOnce(() -> swerve.resetFieldRelativeOffset()));
         driver.start().and(climb.reachedClimberStart.negate())
@@ -293,15 +302,17 @@ public class RobotContainer {
 
     private void configureTriggerBindings() {
         // Coral
-        coralScoring.coralAtIntake.whileTrue(ledsleft.setLEDsSolid(Color.kOrange));
-        coralScoring.coralAtOuttake.whileTrue(ledsleft.setLEDsSolid(Color.kCyan));
-        vision.seesTwoAprilTags.whileTrue(ledsright.setRainbow());
+        coralScoring.coralAtIntake.whileTrue(ledsLeftBackSide.setLEDsSolid(Color.kOrange))
+            .whileTrue(ledsLeftFrontSide.setLEDsSolid(Color.kOrange));
+        coralScoring.coralAtOuttake.whileTrue(ledsLeftBackSide.setLEDsSolid(Color.kCyan))
+            .whileTrue(ledsLeftFrontSide.setLEDsSolid(Color.kCyan));
+        vision.seesTwoAprilTags.whileTrue(ledsRightSide.setRainbow());
 
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
         // Algae
-        algae.hasAlgae.and(coralScoring.coralAtOuttake.negate())
-            .onTrue(ledsleft.blinkLEDs(Color.kCyan, 2));
+        // algae.hasAlgae.and(coralScoring.coralAtOuttake.negate())
+        // .onTrue(ledsrightbackside.blinkLEDs(Color.kGreen, 2));
         // Climb
         elevator.hightAboveP0.or(climb.reachedClimberStart)
             .onTrue(Commands.runOnce(() -> swerve.setSpeedMultiplier(0.15)).ignoringDisable(true))
@@ -346,5 +357,9 @@ public class RobotContainer {
             vis.setActualPose(driveSimulation.getSimulatedDriveTrainPose());
 
         }
+    }
+
+    public void periodic() {
+        leds.setData(buffer);
     }
 }
