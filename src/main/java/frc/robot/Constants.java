@@ -328,7 +328,7 @@ public final class Constants {
         public static final double KS = 0.5675;
         public static final double KV = 0.0;
         public static final double KA = 0.0;
-        public static final double KG = 0.7375;
+        public static final double KG = 0.9375;
         public static final double CVeleocity = 4.0;
         public static final double FastVelocity = 9.0;
         public static final double Acceleration = 10.0;

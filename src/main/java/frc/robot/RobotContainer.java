@@ -234,13 +234,15 @@ public class RobotContainer {
             System.out.println(" - " + req.getName());
         }
         driver.a().and(operator.hasReefLocation()).whileTrue(autoScore)
-            .whileTrue(ledsLeftFrontSide.setLEDsSolid(Color.kGreen)).negate()
-            .onTrue(coralScoring.runCoralIntake());
+            .whileTrue(ledsLeftFrontSide.setLEDsSolid(Color.kGreen)
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming))
+            .negate().onTrue(coralScoring.runCoralIntake());
         driver.b()
             .whileTrue(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)
                 .andThen(swerve.run(() -> {
                 })))
-            .whileTrue(ledsLeftFrontSide.setLEDsSolid(Color.kGreen));
+            .whileTrue(ledsLeftFrontSide.setLEDsSolid(Color.kGreen)
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
         driver.x().onTrue(elevator.home());
         driver.y().onTrue(Commands.runOnce(() -> swerve.resetFieldRelativeOffset()));
         driver.start().and(climb.reachedClimberStart.negate())
