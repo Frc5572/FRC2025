@@ -290,8 +290,9 @@ public class CommandFactory {
      * @return Command
      */
     public static Command bargeSpitAlgae(Elevator elevator, ElevatorAlgae algae) {
-        return Commands.idle().until(() -> elevator.getHeight().in(Inches) > 65)
-            .andThen(algae.algaeOuttakeCommand().withTimeout(.5).asProxy())
-            .deadlineFor(elevator.p5());
+        return Commands.waitUntil(() -> elevator.getHeight().in(Inches) > 65)
+            .deadlineFor(elevator.p5())
+            .andThen(algae.algaeOuttakeCommand().withTimeout(.3).asProxy())
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 }
