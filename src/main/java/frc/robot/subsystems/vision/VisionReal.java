@@ -110,6 +110,7 @@ public class VisionReal implements VisionIO {
      * @param hostname hostname of the PV Co-Processor
      */
     protected void createSettingsUploadThread(String hostname) {
+        System.out.println("Uploading settings for PV: " + hostname);
         new Thread(() -> {
             Timer timer = new Timer();
             boolean run = true;
