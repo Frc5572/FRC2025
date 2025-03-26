@@ -1,6 +1,7 @@
 
 package frc.robot.subsystems.swerve;
 
+import static edu.wpi.first.units.Units.Rotation;
 import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -24,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.LoggedTracer;
 import frc.lib.util.swerve.SwerveModule;
 import frc.robot.Constants;
@@ -38,8 +40,11 @@ public class Swerve extends SubsystemBase {
     public SwerveModule[] swerveMods;
     private final Field2d field = new Field2d();
     private double fieldOffset;
-    private SwerveInputsAutoLogged inputs = new SwerveInputsAutoLogged();
+    private SwerveInputsAutoLogged inputsSwerve = new SwerveInputsAutoLogged();
     private SwerveIO swerveIO;
+    private GyroIO gyroIO;
+    private GyroInputsAutoLogged inputsGyro = new GyroInputsAutoLogged();
+
     public final RobotState state;
     private double setSpeedMultiplier = 1.0;
     private final HolonomicDriveController holonomicDriveController = new HolonomicDriveController(
@@ -51,20 +56,23 @@ public class Swerve extends SubsystemBase {
             Constants.SwerveTransformPID.PID_TKI, Constants.SwerveTransformPID.PID_TKD,
             new TrapezoidProfile.Constraints(Constants.SwerveTransformPID.MAX_ANGULAR_VELOCITY,
                 Constants.SwerveTransformPID.MAX_ANGULAR_ACCELERATION)));
+    public boolean initGyroBool = true;
+    public Trigger initGyro = new Trigger(() -> initGyroBool);
 
 
     /**
      * Swerve Subsystem
      */
-    public Swerve(RobotState state, SwerveIO swerveIO) {
+    public Swerve(RobotState state, SwerveIO swerveIO, GyroIO gyroIO) {
         super("Swerve");
         this.state = state;
         this.swerveIO = swerveIO;
+        this.gyroIO = gyroIO;
         swerveMods = swerveIO.createModules();
         fieldOffset = getGyroYaw().getDegrees();
 
-        swerveIO.updateInputs(inputs);
-
+        swerveIO.updateInputs(inputsSwerve);
+        gyroIO.updateInputs(inputsGyro);
         state.init(getModulePositions(), getGyroYaw());
         SmartDashboard.putData(Constants.DashboardValues.field2d, field);
 
@@ -190,9 +198,7 @@ public class Swerve extends SubsystemBase {
      * @return Current rotation/yaw of gyro as {@link Rotation2d}
      */
     public Rotation2d getGyroYaw() {
-        double yaw = inputs.yaw;
-        return (Constants.Swerve.invertGyro) ? Rotation2d.fromRotations(-yaw)
-            : Rotation2d.fromRotations(yaw);
+        return Rotation2d.fromRotations(inputsGyro.yaw.in(Rotation));
     }
 
     /**
@@ -211,18 +217,34 @@ public class Swerve extends SubsystemBase {
         fieldOffset = getGyroYaw().getDegrees();
     }
 
+    /**
+     * Set Field Relative Offset based on Pose
+     */
+    public void resetFieldRelativeOffsetBasedOnPose() {
+        double redSideflip = shouldFlipPath() ? 180.0 : 0.0;
+        fieldOffset =
+            (getGyroYaw().getDegrees() - state.getGlobalPoseEstimate().getRotation().getDegrees()
+                + 180 + redSideflip) % 360 - 180;
+        initGyroBool = false;
+    }
+
     @Override
     public void periodic() {
 
-        swerveIO.updateInputs(inputs);
+
+        swerveIO.updateInputs(inputsSwerve);
+        gyroIO.updateInputs(inputsGyro);
+
         for (var mod : swerveMods) {
             mod.periodic();
         }
         state.addSwerveObservation(getModulePositions(), getGyroYaw());
-        Logger.processInputs("Swerve", inputs);
+        Logger.processInputs("Drive/Swerve", inputsSwerve);
+        Logger.processInputs("Drive/gyro", inputsGyro);
         field.setRobotPose(getPose());
         SmartDashboard.putNumber("SpeedMultiplier", setSpeedMultiplier);
         LoggedTracer.record("Swerve");
+        Logger.recordOutput("Swerve/Field Offset", fieldOffset);
     }
 
     /**

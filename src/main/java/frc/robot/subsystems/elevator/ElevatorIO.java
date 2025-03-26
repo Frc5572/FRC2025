@@ -33,6 +33,8 @@ public interface ElevatorIO {
 
     public void setPositon(double position);
 
+    public void setPositonFast(double position);
+
     public default void setPower(double power) {}
 
     /** Empty Elevator implementation (for replay) */
@@ -55,6 +57,9 @@ public interface ElevatorIO {
 
         @Override
         public void setPositon(double position) {}
+
+        @Override
+        public void setPositonFast(double position) {}
 
     }
 
