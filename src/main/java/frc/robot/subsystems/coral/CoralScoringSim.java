@@ -27,7 +27,7 @@ public class CoralScoringSim implements CoralScoringIO {
         coralMotor.update(LoggedRobot.defaultPeriodSecs);
         // For sim, just assume we have coral all the time.
         inputs.outtakeBeamBreak = true;
-        inputs.intakeBeamBreak = true;
+        inputs.intakeBeamBreak = false;
         inputs.scoringRPM = RPM.of(coralMotor.getAngularVelocityRPM());
     }
 

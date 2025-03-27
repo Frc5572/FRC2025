@@ -1,10 +1,12 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meters;
 import java.util.Optional;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -14,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.lib.util.ScoringLocation;
 import frc.lib.util.ScoringLocation.CoralLocation;
 import frc.lib.util.ScoringLocation.Height;
+import frc.robot.commands.MoveAndAvoidReef;
 import frc.robot.commands.MoveToPose;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.coral.CoralScoring;
@@ -104,6 +107,38 @@ public class AutoCommandFactory {
             CoralLocation.B);
     }
 
+    /**
+     * Middle L4 Auto using Right Station
+     */
+    public AutoRoutine l4middleRightStation() {
+        return scoreWideBerthCoral("l4middleRightStation", false, false, CoralLocation.G,
+            CoralLocation.H);
+    }
+
+    /**
+     * Middle L4 Auto using Left Station
+     */
+    public AutoRoutine l4middleLeftStation() {
+        return scoreWideBerthCoral("l4middleLeftStation", false, true, CoralLocation.G,
+            CoralLocation.H);
+    }
+
+    /**
+     * Go around and score the front using Right Station
+     */
+    public AutoRoutine l4FrontRightStation() {
+        return scoreWideBerthCoral("l4frontRightStation", true, false, CoralLocation.A,
+            CoralLocation.B);
+    }
+
+    /**
+     * Middle L4 Auto using Left Station
+     */
+    public AutoRoutine l4FrontLeftStation() {
+        return scoreWideBerthCoral("l4frontLeftStation", true, true, CoralLocation.A,
+            CoralLocation.B);
+    }
+
     private AutoRoutine scoreCoral(String name, boolean isLeft, CoralLocation... locations) {
         AutoRoutine routine = autoFactory.newRoutine(name);
         Command ret = CommandFactory.dropAlgaeIntake(swerve);
@@ -117,6 +152,76 @@ public class AutoCommandFactory {
                 ret = ret.andThen(CommandFactory.rightFeeder(swerve, elevator, coral));
             }
             ret = ret.andThen(coral.runCoralIntake().until(coral.coralAtIntake));
+        }
+        ret = ret.andThen(swerve.stop());
+        routine.active().onTrue(ret.alongWith(algae.algaeOuttakeCommand().withTimeout(5.0))
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+        return routine;
+    }
+
+    private static final Pose2d wideBerthFar = new Pose2d(6.259715557098389, 6.828808784484863,
+        Rotation2d.fromRadians(-2.219791763555776));
+
+    private static final Pose2d wideBerthClose =
+        new Pose2d(0.5716622471809387, 5.0152268409729, Rotation2d.kZero);
+
+    private AutoRoutine scoreWideBerthCoral(String name, boolean wideBerthFirst, boolean isLeft,
+        CoralLocation... locations) {
+        AutoRoutine routine = autoFactory.newRoutine(name);
+        Command ret = CommandFactory.dropAlgaeIntake(swerve);
+        boolean isFirst = true;
+        for (var loc : locations) {
+            if (!isFirst || wideBerthFirst) {
+                Pose2d berthPose =
+                    (isFirst || loc.pose.getX() > FieldConstants.Reef.center.getX()) ? wideBerthFar
+                        : wideBerthClose;
+                if (isLeft) {
+                    ret = ret.andThen(new MoveAndAvoidReef(swerve, () -> berthPose,
+                        () -> Constants.SwerveTransformPID.MAX_VELOCITY, true,
+                        Units.inchesToMeters(24), 180));
+                } else {
+                    ret = ret.andThen(new MoveAndAvoidReef(swerve,
+                        () -> new Pose2d(berthPose.getX(),
+                            FieldConstants.fieldWidth.in(Meters) - berthPose.getY(),
+                            berthPose.getRotation().unaryMinus()),
+                        () -> Constants.SwerveTransformPID.MAX_VELOCITY, true,
+                        Units.inchesToMeters(24), 180));
+                }
+            }
+            isFirst = false;
+            ret = ret.andThen(CommandFactory.autoScore(swerve, elevator, coral, algae, () -> loc,
+                () -> Height.KP4, () -> Optional.empty(), (x) -> {
+                }));
+            boolean isFar = loc.pose.getX() > FieldConstants.Reef.center.getX();
+            Command feederCommand;
+            Command wideBerthCommand;
+            Pose2d berthPose = isFar ? wideBerthFar : wideBerthClose;
+            if (isLeft) {
+                if (isFar) {
+                    feederCommand = CommandFactory.leftFeeder(swerve, elevator, coral);
+                } else {
+                    feederCommand = CommandFactory.leftFeederClose(swerve, elevator, coral);
+                }
+                wideBerthCommand = new MoveAndAvoidReef(swerve, () -> berthPose,
+                    () -> Constants.SwerveTransformPID.MAX_VELOCITY, true, Units.inchesToMeters(24),
+                    180, routine);
+            } else {
+                if (isFar) {
+                    feederCommand = CommandFactory.rightFeeder(swerve, elevator, coral);
+                } else {
+                    feederCommand = CommandFactory.rightFeederClose(swerve, elevator, coral);
+                }
+                wideBerthCommand = new MoveAndAvoidReef(swerve,
+                    () -> new Pose2d(berthPose.getX(),
+                        FieldConstants.fieldWidth.in(Meters) - berthPose.getY(),
+                        berthPose.getRotation().unaryMinus()),
+                    () -> Constants.SwerveTransformPID.MAX_VELOCITY, true, Units.inchesToMeters(24),
+                    180, routine);
+            }
+            ret = ret.andThen(
+                wideBerthCommand.alongWith(Commands.waitSeconds(0.2)
+                    .andThen(CommandFactory.ensureHome(elevator).withTimeout(1.0))),
+                feederCommand, coral.runCoralIntake().until(coral.coralAtIntake));
         }
         ret = ret.andThen(swerve.stop());
         routine.active().onTrue(ret.alongWith(algae.algaeOuttakeCommand().withTimeout(5.0))

@@ -166,6 +166,25 @@ public class CommandFactory {
             .andThen(feederAfter(swerve, coral));
     }
 
+    private static final Pose2d leftFeederClose = new Pose2d(0.6334888935089111, 6.746373176574707,
+        Rotation2d.fromRadians(-0.9272955650632482));
+
+    /** Move to left feeder close */
+    public static Command leftFeederClose(Swerve swerve, Elevator elevator, CoralScoring coral) {
+        return (Commands.waitSeconds(0.2).andThen(ensureHome(elevator)))
+            .alongWith(new MoveAndAvoidReef(swerve, () -> leftFeederClose, () -> {
+
+                return Constants.SwerveTransformPID.MAX_VELOCITY;
+
+            }, true, Units.inchesToMeters(100), 45).until(coral.coralAtIntake)
+                .andThen(new MoveToPose(swerve, () -> leftFeederClose, () -> {
+
+                    return Constants.SwerveTransformPID.MAX_VELOCITY;
+
+                }, true, Units.inchesToMeters(12), 20).until(coral.coralAtIntake)))
+            .andThen(feederAfter(swerve, coral));
+    }
+
 
     private static final Pose2d rightFeederAway = new Pose2d(leftFeederAway.getX(),
         FieldConstants.fieldWidth.in(Meters) - leftFeederAway.getY(),
@@ -191,6 +210,28 @@ public class CommandFactory {
                         return Constants.SwerveTransformPID.MAX_VELOCITY;
                     }
                 }, true, Units.inchesToMeters(12), 20)))
+            .andThen(feederAfter(swerve, coral));
+    }
+
+
+
+    private static final Pose2d rightFeederClose = new Pose2d(leftFeederClose.getX(),
+        FieldConstants.fieldWidth.in(Meters) - leftFeederClose.getY(),
+        leftFeederClose.getRotation().unaryMinus());;
+
+    /** Move to left feeder close */
+    public static Command rightFeederClose(Swerve swerve, Elevator elevator, CoralScoring coral) {
+        return (Commands.waitSeconds(0.2).andThen(ensureHome(elevator)))
+            .alongWith(new MoveAndAvoidReef(swerve, () -> rightFeederClose, () -> {
+
+                return Constants.SwerveTransformPID.MAX_VELOCITY;
+
+            }, true, Units.inchesToMeters(100), 45).until(coral.coralAtIntake)
+                .andThen(new MoveToPose(swerve, () -> rightFeederClose, () -> {
+
+                    return Constants.SwerveTransformPID.MAX_VELOCITY;
+
+                }, true, Units.inchesToMeters(12), 20).until(coral.coralAtIntake)))
             .andThen(feederAfter(swerve, coral));
     }
 
