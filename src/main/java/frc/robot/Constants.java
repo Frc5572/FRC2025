@@ -72,7 +72,7 @@ public final class Constants {
         public static final double HAS_ALGAE_CURRENT_THRESHOLD = 50;
         public static final int VOLTAGE = 12;
         public static final int NEGATIVE_VOLTAGE = -12;
-        public static final double SMALLER_VOLTAGE = 1.0;
+        public static final double SMALLER_VOLTAGE = 3.0;
         public static final double SMALLER_NEGATIVE_VOLTAGE = -1;
     }
 
@@ -121,7 +121,7 @@ public final class Constants {
         public static final int LEFT_TALON_FX_ID = 3;
         public static final int RIGHT_TALON_FX_ID = 12;
         public static final int TOUCH_SENSOR_CHANNEL = 2;
-        public static final Angle CLIMB_ANGLE = Radians.of(680);
+        public static final Angle CLIMB_ANGLE = Radians.of(650);
         public static final Angle MAX_ANGLE = Radians.of(703);
         public static final Angle CLIMBER_OUT_ANGLE = Radians.of(300);
         public static final Angle CLIMBER_START_ANGLE = Radians.of(146);
@@ -328,7 +328,7 @@ public final class Constants {
         public static final double KS = 0.5675;
         public static final double KV = 0.0;
         public static final double KA = 0.0;
-        public static final double KG = 0.7375;
+        public static final double KG = 0.9375;
         public static final double CVeleocity = 4.0;
         public static final double FastVelocity = 9.0;
         public static final double Acceleration = 10.0;

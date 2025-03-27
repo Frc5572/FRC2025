@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.lib.util.AllianceFlipUtil;
@@ -131,53 +132,11 @@ public class CommandFactory {
 
     /** Do something with algae gotten. */
     // public static Command doSomethingWithAlgae(Swerve swerve, Elevator elevator,
-    // Container<Boolean> intakingAlgae, ElevatorAlgae algae, Supplier<Character> whatToDo,
-    // DoubleSupplier leftRight) {
-    // return new ConditionalCommand(
-    // new SelectCommand<>(Map.of('d', Commands.sequence(Commands.runOnce(() -> {
-    // intakingAlgae.value = false;
-    // })), 'b',
-    // Commands
-    // .sequence(ensureHome(elevator).alongWith(new MoveAndAvoidReef(swerve,
-    // () -> new Pose2d(bargePose.getX(),
-    // bargePose.getY() + leftRight.getAsDouble(), bargePose.getRotation()),
-    // () -> {
-    // if (elevator.hightAboveP0.getAsBoolean()) {
-    // return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
-    // } else {
-    // return Constants.SwerveTransformPID.MAX_VELOCITY;
-    // }
-    // }, true, Units.inchesToMeters(4), 5)),
-    // elevator.moveTo(() -> ScoringLocation.Height.KP5.height),
-    // Commands.runOnce(() -> {
-    // intakingAlgae.value = false;
-    // }),
-    // algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE).withTimeout(0.4)
-    // .asProxy()),
-    // 'p', Commands
-    // .sequence(ensureHome(elevator).alongWith(new MoveAndAvoidReef(swerve, () -> {
-    // Pose2d desiredPose = processorPose;
-    // return new Pose2d(
-    // desiredPose.getTranslation().minus(new Translation2d(
-    // Units.inchesToMeters(12), desiredPose.getRotation())),
-    // desiredPose.getRotation());
-    // }, () -> {
-    // if (elevator.hightAboveP0.getAsBoolean()) {
-    // return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
-    // } else {
-    // return Constants.SwerveTransformPID.MAX_VELOCITY;
-    // }
-    // }, true, Units.inchesToMeters(12), 5)),
-    // new MoveToPose(swerve, () -> processorPose,
-    // () -> Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY, true,
-    // Units.inchesToMeters(4), 5),
-    // Commands.runOnce(() -> {
-    // intakingAlgae.value = false;
-    // }), algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE).withTimeout(0.4)
-    // .asProxy())),
-    // whatToDo),
-    // Commands.runOnce(() -> {
-    // }), () -> intakingAlgae.value);
+    // ElevatorAlgae algae, Supplier<Character> whatToDo) {
+    // return new SelectCommand<>(Map.of('d',
+    // Commands.sequence(algae.algaeOuttakeCommand().withTimeout(1.0).asProxy()), 'b',
+    // Commands.sequence(scoreInBarge(swerve, elevator, algae)), 'p', Commands.sequence()),
+    // whatToDo);
     // }
 
     private static Command feederAfter(Swerve swerve, CoralScoring scoring) {
@@ -300,6 +259,29 @@ public class CommandFactory {
         }, true, Units.inchesToMeters(12), 3));
     }
 
+    private static final Pose2d bargeScorePose = new Pose2d(
+        7.558475971221924 + Units.inchesToMeters(9), 6.258963108062744, Rotation2d.kZero);
+
+    /**
+     * move and score in barge final
+     *
+     * @param swerve swerve
+     * @param elevator elevator
+     * @param algae algae
+     * @return move and score in barge
+     */
+    public static Command scoreInBarge(Swerve swerve, Elevator elevator, ElevatorAlgae algae) {
+        return (ensureHome(elevator)
+            .alongWith(new MoveAndAvoidReef(swerve, () -> bargeScorePose, () -> {
+                if (elevator.hightAboveP0.getAsBoolean()) {
+                    return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
+                } else {
+                    return Constants.SwerveTransformPID.MAX_VELOCITY;
+                }
+            }, true, Units.inchesToMeters(12), 3))).andThen(bargeSpitAlgae(elevator, algae)
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+    }
+
     /**
      * Command to Raise Elevator and spit algae into the barge
      *
@@ -308,8 +290,9 @@ public class CommandFactory {
      * @return Command
      */
     public static Command bargeSpitAlgae(Elevator elevator, ElevatorAlgae algae) {
-        return algae.algaeHoldCommand().until(() -> elevator.getHeight().in(Inches) > 65)
-            .andThen(algae.algaeOuttakeCommand().withTimeout(.5)).deadlineFor(elevator.p5())
-            .andThen(elevator.home());
+        return Commands.waitUntil(() -> elevator.getHeight().in(Inches) > 65)
+            .deadlineFor(elevator.p5())
+            .andThen(algae.algaeOuttakeCommand().withTimeout(.3).asProxy())
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 }

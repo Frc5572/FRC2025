@@ -227,8 +227,6 @@ public class RobotContainer {
         Command autoScore = CommandFactory
             .autoScore(swerve, elevator, coralScoring, algae, operator::getDesiredLocation,
                 operator::getDesiredHeight, operator::additionalAlgaeHeight, operator::crossOut)
-            // .andThen(CommandFactory.doSomethingWithAlgae(swerve, elevator, intakingAlgae, algae,
-            // operator::whatToDoWithAlgae, () -> -driver.getLeftX()))
             .andThen(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder))
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
         System.out.println("autoscore requires: ");
@@ -236,13 +234,15 @@ public class RobotContainer {
             System.out.println(" - " + req.getName());
         }
         driver.a().and(operator.hasReefLocation()).whileTrue(autoScore)
-            .whileTrue(ledsLeftFrontSide.setLEDsSolid(Color.kGreen)).negate()
-            .onTrue(coralScoring.runCoralIntake());
+            .whileTrue(ledsLeftFrontSide.setLEDsSolid(Color.kGreen)
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming))
+            .negate().onTrue(coralScoring.runCoralIntake());
         driver.b()
             .whileTrue(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)
                 .andThen(swerve.run(() -> {
                 })))
-            .whileTrue(ledsLeftFrontSide.setLEDsSolid(Color.kGreen));
+            .whileTrue(ledsLeftFrontSide.setLEDsSolid(Color.kGreen)
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
         driver.x().onTrue(elevator.home());
         driver.y().onTrue(Commands.runOnce(() -> swerve.resetFieldRelativeOffset()));
         driver.start().and(climb.reachedClimberStart.negate())
@@ -254,10 +254,21 @@ public class RobotContainer {
                     () -> climb.getClimberPosition()
                         .in(Radians) <= Constants.Climb.CLIMBER_START_ANGLE.in(Radians))));
         driver.back().whileTrue(climb.runClimberMotorCommand(climb.passedClimbAngle()));
-        driver.leftTrigger().whileTrue(algae.algaeOuttakeCommand());
+        // driver.leftTrigger()
+        // .whileTrue(CommandFactory
+        // .doSomethingWithAlgae(swerve, elevator, algae, operator::whatToDoWithAlgae).andThen(
+        // CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)));
         driver.rightTrigger().whileTrue(CommandFactory.bargeSpitAlgae(elevator, algae))
             .onFalse(elevator.home());
         driver.back().onTrue(elevator.stop());
+        driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'd')
+            .whileTrue(algae.algaeOuttakeCommand().withTimeout(1.0).andThen(
+                CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)));
+        driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'b')
+            .whileTrue(CommandFactory.scoreInBarge(swerve, elevator, algae).andThen(
+                CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)));
+        driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'p')
+            .whileTrue(Commands.none());
     }
 
     private void setupAltOperatorController() {
@@ -278,6 +289,7 @@ public class RobotContainer {
     }
 
     private void setupPitController() {
+        pitController.a().whileTrue(CommandFactory.scoreInBarge(swerve, elevator, algae));
         pitController.b().onTrue(elevator.manualMove(altOperator));
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());
         pitController.x().whileTrue(climb.manualClimb(() -> pitController.getLeftY()));
