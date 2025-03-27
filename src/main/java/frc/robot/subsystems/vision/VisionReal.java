@@ -30,32 +30,8 @@ public class VisionReal implements VisionIO {
     public VisionReal(Constants.Vision.CameraConstants[] constants) {
         cameras = Stream.of(constants).map((consts) -> new PhotonCamera(consts.name()))
             .toArray(PhotonCamera[]::new);
-        for (String copro : coprocessorNames) {
-            new Thread(() -> {
-                Timer timer = new Timer();
-                boolean run = true;
-                int counter = 0;
-                timer.start();
-                while (run) {
-                    if (counter >= 12) {
-                        run = false;
-                    }
-                    if (timer.advanceIfElapsed(5.0)) {
-                        try {
-                            if (!waitForPV(copro)) {
-                                continue;
-                            }
-                            if (uploadAprilTagMap(copro)) {
-                                run = false;
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        counter++;
-                    }
-                    Thread.yield();
-                }
-            }).start();
+        for (String hostname : coprocessorNames) {
+            createSettingsUploadThread(hostname);
         }
 
     }
@@ -126,5 +102,39 @@ public class VisionReal implements VisionIO {
             }
         }
         return false;
+    }
+
+    /**
+     * Create a thread to upload PV settings/April Tag field
+     *
+     * @param hostname hostname of the PV Co-Processor
+     */
+    protected void createSettingsUploadThread(String hostname) {
+        System.out.println("Uploading settings for PV: " + hostname);
+        new Thread(() -> {
+            Timer timer = new Timer();
+            boolean run = true;
+            int counter = 0;
+            timer.start();
+            while (run) {
+                if (counter >= 12) {
+                    run = false;
+                }
+                if (timer.advanceIfElapsed(5.0)) {
+                    try {
+                        if (!waitForPV(hostname)) {
+                            continue;
+                        }
+                        if (uploadAprilTagMap(hostname)) {
+                            run = false;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    counter++;
+                }
+                Thread.yield();
+            }
+        }).start();
     }
 }
