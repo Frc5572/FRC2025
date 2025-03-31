@@ -104,7 +104,8 @@ public class RobotState {
         boolean doInit, Circle circle) {
         if (robotPose.getX() < 0 || robotPose.getY() < 0
             || robotPose.getX() > FieldConstants.fieldLength.in(Meters)
-            || robotPose.getY() > FieldConstants.fieldWidth.in(Meters)) {
+            || robotPose.getY() > FieldConstants.fieldWidth.in(Meters)
+                && Constants.StateEstimator.keepInField) {
             return;
         }
         double totalDistance = 0.0;
