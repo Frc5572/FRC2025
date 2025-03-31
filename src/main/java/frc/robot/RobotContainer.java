@@ -266,8 +266,7 @@ public class RobotContainer {
             .onFalse(elevator.home());
         driver.back().onTrue(elevator.stop());
         driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'd')
-            .whileTrue(algae.algaeOuttakeCommand().withTimeout(1.0).andThen(
-                CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)));
+            .whileTrue(algae.algaeOuttakeCommand().withTimeout(1.0));
         driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'b')
             .whileTrue(CommandFactory.scoreInBarge(swerve, elevator, algae).andThen(
                 CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)));
