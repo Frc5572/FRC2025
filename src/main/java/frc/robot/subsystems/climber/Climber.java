@@ -24,10 +24,13 @@ public class Climber extends SubsystemBase {
     public Trigger reachedClimberStart = new Trigger(() -> reachedClimberStart());
 
 
+
     public Climber(ClimberIO io, Viz2025 viz) {
         this.io = io;
         this.viz = viz;
     }
+
+
 
     @Override
     public void periodic() {
@@ -68,7 +71,7 @@ public class Climber extends SubsystemBase {
      * @return Set Motor Voltage until reached certain angle
      */
     public Command manualClimb(DoubleSupplier volts) { // run
-        return Commands.runEnd(() -> setClimberMotorVoltage(volts.getAsDouble() * 6), () -> {
+        return Commands.runEnd(() -> setClimberMotorVoltage(volts.getAsDouble() * 3), () -> {
             setClimberMotorVoltage(0);
             System.out.println("Climber Done!");
         }, this).until(passedMaxAngle()).unless(passedMaxAngle());
