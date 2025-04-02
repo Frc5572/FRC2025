@@ -322,7 +322,7 @@ public final class Constants {
         public static final NeutralModeValue BREAK = NeutralModeValue.Brake;
 
         // PID and feedforward
-        public static final double KP = 30.0;
+        public static final double KP = 50.0;
         public static final double KI = 0.0;
         public static final double KD = 0.0;
         public static final double KS = 0.9;
