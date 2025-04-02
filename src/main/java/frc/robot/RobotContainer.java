@@ -156,6 +156,10 @@ public class RobotContainer {
         autoChooser.addRoutine("Example", autos::example);
         autoChooser.addRoutine("Left Side L4 Coral", autos::l4left);
         autoChooser.addRoutine("Right Side L4 Coral", autos::l4right);
+        autoChooser.addRoutine("Middle L4 Coral Right Station", autos::l4middleRightStation);
+        autoChooser.addRoutine("Middle L4 Coral Left Station", autos::l4middleLeftStation);
+        autoChooser.addRoutine("Front L4 Coral Right Station", autos::l4FrontRightStation);
+        autoChooser.addRoutine("Front L4 Coral Left Station", autos::l4FrontLeftStation);
         // autoChooser.addRoutine("Barge", autos::barge);
         SmartDashboard.putData(Constants.DashboardValues.autoChooser, autoChooser);
 
@@ -262,8 +266,7 @@ public class RobotContainer {
             .onFalse(elevator.home());
         driver.back().onTrue(elevator.stop());
         driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'd')
-            .whileTrue(algae.algaeOuttakeCommand().withTimeout(1.0).andThen(
-                CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)));
+            .whileTrue(algae.algaeOuttakeCommand().withTimeout(1.0));
         driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'b')
             .whileTrue(CommandFactory.scoreInBarge(swerve, elevator, algae).andThen(
                 CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)));
