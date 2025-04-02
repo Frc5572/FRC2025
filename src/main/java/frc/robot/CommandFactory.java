@@ -217,7 +217,7 @@ public class CommandFactory {
 
     private static final Pose2d rightFeederClose = new Pose2d(leftFeederClose.getX(),
         FieldConstants.fieldWidth.in(Meters) - leftFeederClose.getY(),
-        leftFeederClose.getRotation().unaryMinus());;
+        leftFeederClose.getRotation().unaryMinus());
 
     /** Move to left feeder close */
     public static Command rightFeederClose(Swerve swerve, Elevator elevator, CoralScoring coral) {
