@@ -286,22 +286,23 @@ public class CommandFactory {
             }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve, coral));
     }
 
-    private static final Pose2d bargePose = new Pose2d(FieldConstants.fieldLength.in(Meters) - 9.49,
-        5.551057815551758, Rotation2d.kZero);
+    // private static final Pose2d bargePose = new Pose2d(FieldConstants.fieldLength.in(Meters) -
+    // 9.49,
+    // 5.551057815551758, Rotation2d.kZero);
 
-    /** Move to barge position */
-    public static Command barge(Swerve swerve, Elevator elevator) {
-        return ensureHome(elevator).alongWith(new MoveAndAvoidReef(swerve, () -> bargePose, () -> {
-            if (elevator.hightAboveP0.getAsBoolean()) {
-                return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
-            } else {
-                return Constants.SwerveTransformPID.MAX_VELOCITY;
-            }
-        }, true, Units.inchesToMeters(12), 3));
-    }
+    // /** Move to barge position */
+    // public static Command barge(Swerve swerve, Elevator elevator) {
+    // return ensureHome(elevator).alongWith(new MoveAndAvoidReef(swerve, () -> bargePose, () -> {
+    // if (elevator.hightAboveP0.getAsBoolean()) {
+    // return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
+    // } else {
+    // return Constants.SwerveTransformPID.MAX_VELOCITY;
+    // }
+    // }, true, Units.inchesToMeters(12), 3));
+    // }
 
     private static final Pose2d bargeScorePose = new Pose2d(
-        7.558475971221924 + Units.inchesToMeters(9), 6.258963108062744, Rotation2d.kZero);
+        7.558475971221924 + Units.inchesToMeters(15), 6.258963108062744, Rotation2d.kZero);
 
     /**
      * move and score in barge final
@@ -319,7 +320,7 @@ public class CommandFactory {
                 } else {
                     return Constants.SwerveTransformPID.MAX_VELOCITY;
                 }
-            }, true, Units.inchesToMeters(12), 3))).andThen(bargeSpitAlgae(elevator, algae)
+            }, true, Units.inchesToMeters(6), 3))).andThen(bargeSpitAlgae(elevator, algae)
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
     }
 
