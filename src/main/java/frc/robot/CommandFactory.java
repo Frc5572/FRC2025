@@ -34,7 +34,7 @@ public class CommandFactory {
     public static Command dropAlgaeIntake(Swerve swerve) {
         return swerve.run(() -> {
             swerve.setModuleStates(new ChassisSpeeds(4.0, 0.0, 0.0));
-        }).withTimeout(0.2).andThen(swerve.stop()).andThen(Commands.waitSeconds(0.5));
+        }).withTimeout(0.2).andThen(swerve.stop()).andThen(Commands.waitSeconds(0.25));
     }
 
     /** Approach reef scoring location. Elevator can be home during this. */
