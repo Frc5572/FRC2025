@@ -147,9 +147,11 @@ public class AutoCommandFactory {
                 () -> Height.KP4, () -> Optional.empty(), (x) -> {
                 }));
             if (isLeft) {
-                ret = ret.andThen(CommandFactory.leftFeeder(swerve, elevator, coral));
+                ret = ret.andThen(
+                    CommandFactory.leftFeeder(swerve, elevator, coral).until(coral.coralAtIntake));
             } else {
-                ret = ret.andThen(CommandFactory.rightFeeder(swerve, elevator, coral));
+                ret = ret.andThen(
+                    CommandFactory.rightFeeder(swerve, elevator, coral).until(coral.coralAtIntake));
             }
             ret = ret.andThen(coral.runCoralIntake().until(coral.coralAtIntake));
         }
