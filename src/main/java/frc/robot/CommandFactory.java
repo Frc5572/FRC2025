@@ -302,7 +302,7 @@ public class CommandFactory {
     // }
 
     private static final Pose2d bargeScorePose = new Pose2d(
-        7.558475971221924 + Units.inchesToMeters(15), 6.258963108062744, Rotation2d.kZero);
+        7.558475971221924 + Units.inchesToMeters(12), 6.258963108062744, Rotation2d.kZero);
 
     /**
      * move and score in barge final
