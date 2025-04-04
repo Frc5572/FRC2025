@@ -417,7 +417,7 @@ public final class Constants {
      * MoveToPos constants.
      */
     public static class SwerveTransformPID {
-        public static final double PID_XKP = 2.5;
+        public static final double PID_XKP = 2.2;
         public static final double PID_XKI = 0.0;
         public static final double PID_XKD = 0.0;
         public static final double PID_TKP = 2.5;
