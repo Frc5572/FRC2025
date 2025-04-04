@@ -90,11 +90,10 @@ public class CommandFactory {
 
         final Container<ScoringLocation.Height> additionalAlgae = new Container<>(null);
 
-        return (reefPreAlign(swerve, location).deadlineFor(ensureHome(elevator))
-            .andThen(new ConditionalCommand(
-                Commands.waitUntil(() -> coralScoring.getOuttakeBeamBreakStatus()),
-                Commands.runOnce(() -> {
-                }), () -> !height.get().isAlgae))
+        return (reefPreAlign(swerve, location).andThen(new ConditionalCommand(
+            Commands.waitUntil(() -> coralScoring.getOuttakeBeamBreakStatus()),
+            Commands.runOnce(() -> {
+            }), () -> !height.get().isAlgae))
             .deadlineFor(coralScoring.runCoralIntake()
                 .unless(() -> coralScoring.getOuttakeBeamBreakStatus()))
             .andThen(new ConditionalCommand(elevator.moveToFast(() -> additionalAlgae.value.height)
