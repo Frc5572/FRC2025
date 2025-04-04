@@ -163,7 +163,7 @@ public class VisionReal implements VisionIO {
                         if (!waitForPV(hostname)) {
                             continue;
                         }
-                        if (uploadSettings(hostname) && uploadAprilTagMap(hostname)) {
+                        if (uploadSettings(hostname)) {
                             run = false;
                         }
                     } catch (Exception e) {
