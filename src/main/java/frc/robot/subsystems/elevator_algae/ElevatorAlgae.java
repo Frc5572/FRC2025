@@ -49,6 +49,7 @@ public class ElevatorAlgae extends SubsystemBase {
         }
         SmartDashboard.putString(Constants.DashboardValues.haveAlgae, temp.toHexString());
         LoggedTracer.record("Algae");
+        Logger.recordOutput("Algae/SpeedMultiplier", speedMultiplier);
     }
 
 
