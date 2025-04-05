@@ -324,6 +324,8 @@ public class RobotContainer {
             .onFalse(Commands.runOnce(() -> swerve.setSpeedMultiplier(1.0)).ignoringDisable(true));
         RobotModeTriggers.disabled().and(vision.seesTwoAprilTags).whileTrue(
             Commands.run(() -> swerve.resetFieldRelativeOffsetBasedOnPose()).ignoringDisable(true));
+        elevator.heightAboveHome.onFalse(algae.setSpeedMultiplier(.25))
+            .onTrue(algae.setSpeedMultiplier(1.0));
     }
 
     /**

@@ -97,7 +97,7 @@ public class CoralScoring extends SubsystemBase {
      */
     public Command runCoralIntake() {
         return motorStartEndCommand(Constants.CoralScoringConstants.INTAKE_POWER)
-            .until(() -> getOuttakeBeamBreakStatus());
+            .until(() -> getOuttakeBeamBreakStatus()).unless(() -> getOuttakeBeamBreakStatus());
     }
 
     /**

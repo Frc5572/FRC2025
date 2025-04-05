@@ -6,6 +6,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.LoggedTracer;
@@ -19,6 +20,7 @@ public class ElevatorAlgae extends SubsystemBase {
     ElevatorAlgaeIO io;
     AlgaeIOInputsAutoLogged inputs = new AlgaeIOInputsAutoLogged();
     private final Viz2025 viz;
+    private double speedMultiplier = 1;
 
     /** Get if algae is held */
     public Trigger hasAlgae =
@@ -47,6 +49,7 @@ public class ElevatorAlgae extends SubsystemBase {
         }
         SmartDashboard.putString(Constants.DashboardValues.haveAlgae, temp.toHexString());
         LoggedTracer.record("Algae");
+        Logger.recordOutput("Algae/SpeedMultiplier", speedMultiplier);
     }
 
 
@@ -56,9 +59,10 @@ public class ElevatorAlgae extends SubsystemBase {
     }
 
     /** Run algae intake with given speed */
-    public Command runAlgaeMotor(double voltage) { // set motor speed Command
+    public Command runAlgaeMotor(double voltage, DoubleSupplier speedSupplier) { // set motor speed
+                                                                                 // Command
         return runEnd(() -> {
-            setAlgaeMotorVoltage(voltage);
+            setAlgaeMotorVoltage(voltage * speedSupplier.getAsDouble());
             Logger.recordOutput("Algae/Running", true);
         }, () -> {
             setAlgaeMotorVoltage(0);
@@ -76,7 +80,8 @@ public class ElevatorAlgae extends SubsystemBase {
      * Keeps algae intake motor running even after it has intaked an algae, but it lowers the speed
      */
     public Command algaeIntakeCommand() {
-        return runAlgaeMotor(Constants.Algae.VOLTAGE).until(hasAlgae).andThen(algaeHoldCommand());
+        return runAlgaeMotor(Constants.Algae.VOLTAGE, () -> 1).until(hasAlgae)
+            .andThen(algaeHoldCommand());
     }
 
     /**
@@ -94,7 +99,7 @@ public class ElevatorAlgae extends SubsystemBase {
      * @return Command
      */
     public Command algaeHoldCommand() {
-        return runAlgaeMotor(Constants.Algae.SMALLER_VOLTAGE);
+        return runAlgaeMotor(Constants.Algae.SMALLER_VOLTAGE, () -> 1);
     }
 
     /**
@@ -103,6 +108,10 @@ public class ElevatorAlgae extends SubsystemBase {
      * @return Command to outtake algae
      */
     public Command algaeOuttakeCommand() {
-        return runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE);
+        return runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE, () -> speedMultiplier);
+    }
+
+    public Command setSpeedMultiplier(double value) {
+        return Commands.runOnce(() -> speedMultiplier = value);
     }
 }
