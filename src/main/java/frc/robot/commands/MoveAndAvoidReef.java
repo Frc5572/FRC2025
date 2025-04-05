@@ -135,7 +135,7 @@ public class MoveAndAvoidReef extends Command implements Drawable {
 
     @Override
     public void end(boolean interrupted) {
-        swerve.setMotorsZero();
+        // swerve.setMotorsZero();
         isActive = false;
         isCompleted = !interrupted;
     }
