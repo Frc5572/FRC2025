@@ -58,9 +58,10 @@ public class ElevatorAlgae extends SubsystemBase {
         io.setAlgaeMotorVoltage(voltage);
     }
 
-    /** Run algae intake with given speed */
-    public Command runAlgaeMotor(double voltage, DoubleSupplier speedSupplier) { // set motor speed
-                                                                                 // Command
+    /**
+     * Run algae intake with given speed
+     */
+    public Command runAlgaeMotor(double voltage, DoubleSupplier speedSupplier) {
         return runEnd(() -> {
             setAlgaeMotorVoltage(voltage * speedSupplier.getAsDouble());
             Logger.recordOutput("Algae/Running", true);
@@ -68,6 +69,13 @@ public class ElevatorAlgae extends SubsystemBase {
             setAlgaeMotorVoltage(0);
             Logger.recordOutput("Algae/Running", false);
         });
+    }
+
+    /**
+     * Run algae intake with given speed
+     */
+    public Command runAlgaeMotor(double voltage) {
+        return runAlgaeMotor(Constants.Algae.VOLTAGE, () -> 1);
     }
 
     /** Run algae intake with given speed */
@@ -80,8 +88,7 @@ public class ElevatorAlgae extends SubsystemBase {
      * Keeps algae intake motor running even after it has intaked an algae, but it lowers the speed
      */
     public Command algaeIntakeCommand() {
-        return runAlgaeMotor(Constants.Algae.VOLTAGE, () -> 1).until(hasAlgae)
-            .andThen(algaeHoldCommand());
+        return runAlgaeMotor(Constants.Algae.VOLTAGE).until(hasAlgae).andThen(algaeHoldCommand());
     }
 
     /**
@@ -99,7 +106,7 @@ public class ElevatorAlgae extends SubsystemBase {
      * @return Command
      */
     public Command algaeHoldCommand() {
-        return runAlgaeMotor(Constants.Algae.SMALLER_VOLTAGE, () -> 1);
+        return runAlgaeMotor(Constants.Algae.SMALLER_VOLTAGE);
     }
 
     /**
