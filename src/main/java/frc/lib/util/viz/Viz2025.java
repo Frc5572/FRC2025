@@ -1,5 +1,6 @@
 package frc.lib.util.viz;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import java.util.stream.Stream;
@@ -25,8 +26,6 @@ public class Viz2025 implements Drawable {
     private final String prefix;
     private double elevatorHeight = 0.0;
     private double algaeAngle = 0.0;
-    private double algaeAngularVelocity = 0.0;
-    private boolean algaeDropped = false;
     private Pose2d estimatedPose;
     private Pose2d actualPose = new Pose2d();
     private final Pose3d[] mechanisms = new Pose3d[11];
@@ -121,10 +120,13 @@ public class Viz2025 implements Drawable {
     public void reset(Pose2d pose) {
         elevatorHeight = 0.0;
         algaeAngle = 0.0;
-        algaeDropped = false;
         estimatedPose = pose;
         actualPose = pose;
         mechanisms[CLIMBER_ID] = new Pose3d(Translation3d.kZero, Rotation3d.kZero);
+    }
+
+    public void setAlgaeAngle(Angle angle) {
+        algaeAngle = angle.in(Degrees);
     }
 
     /** Publish all values to Logger */
