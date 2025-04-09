@@ -2,6 +2,7 @@ package frc.robot.subsystems.elevator_algae;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -27,6 +28,7 @@ public class ElevatorAlgaeReal implements ElevatorAlgaeIO {
     private final TalonFXConfiguration pivotConfig = new TalonFXConfiguration();
     private final SparkFlexConfig algaeMotorConfig = new SparkFlexConfig();
     private final CANcoder canCoder = new CANcoder(0);
+    private final CANcoderConfiguration canCoderConfig = new CANcoderConfiguration();
     private final MotionMagicVoltage motionMagic = new MotionMagicVoltage(0);
     private final StatusSignal<Angle> pivotPosition = canCoder.getAbsolutePosition();
 
@@ -39,7 +41,6 @@ public class ElevatorAlgaeReal implements ElevatorAlgaeIO {
         algaeMotor.configure(algaeMotorConfig, ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters);
         pivotConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        pivotConfig.Feedback.SensorToMechanismRatio = 0;
         pivotConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         pivotConfig.Slot0.kP = 0.0;
         pivotConfig.Slot0.kI = 0.0;
@@ -51,9 +52,10 @@ public class ElevatorAlgaeReal implements ElevatorAlgaeIO {
         pivotConfig.MotionMagic.MotionMagicAcceleration = 0.0;
         pivotConfig.MotionMagic.MotionMagicCruiseVelocity = 0.0;
         pivotConfig.MotionMagic.MotionMagicJerk = 0.0;
+        canCoderConfig.MagnetSensor.MagnetOffset = 0.0;
 
         pivotMotor.getConfigurator().apply(pivotConfig);
-
+        canCoder.getConfigurator().apply(canCoderConfig);
     }
 
     @Override
