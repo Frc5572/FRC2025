@@ -74,6 +74,9 @@ public final class Constants {
         public static final int NEGATIVE_VOLTAGE = -12;
         public static final double SMALLER_VOLTAGE = 1.5;
         public static final double SMALLER_NEGATIVE_VOLTAGE = -1;
+
+
+        public static final int CANCODER_ID = 0;
     }
 
     // pit and alt operator controllers
@@ -97,7 +100,8 @@ public final class Constants {
          * Algae Motor CAN id's
          */
         public static final class AlgaeMotors {
-            public static final int ALGAE_MOTOR_ID = 6;
+            public static final int ALGAE_WRIST_MOTOR_ID = 0;
+            public static final int ALGAE_ROLLER_MOTOR_ID = 6;
         }
 
     }
@@ -344,6 +348,9 @@ public final class Constants {
         public static final Distance P3 = Inches.of(43.6); // Coral L3
         public static final Distance P4 = Inches.of(68.9); // Coral L4
         public static final Distance P5 = Inches.of(74); // Barge
+
+        public static final Distance HEIGHT_PER_METER_AWAY =
+            Inches.of(2).div(Units.inchesToMeters(1));
 
         public static final double gearRatio = 1.0;
         public static final Distance INCHES_AT_TOP = Inches.of(72.0);

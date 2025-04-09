@@ -13,7 +13,7 @@ import frc.robot.Constants;
  */
 public class ElevatorAlgaeReal implements ElevatorAlgaeIO {
     private final SparkFlex algaeMotor = // Algae motor
-        new SparkFlex(Constants.Motors.AlgaeMotors.ALGAE_MOTOR_ID, MotorType.kBrushless);
+        new SparkFlex(Constants.Motors.AlgaeMotors.ALGAE_ROLLER_MOTOR_ID, MotorType.kBrushless);
     private final SparkFlexConfig algaeMotorConfig = new SparkFlexConfig();
 
     /**
