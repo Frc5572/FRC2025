@@ -22,14 +22,11 @@ import frc.robot.Constants;
  * Algae Real Class
  */
 public class ElevatorAlgaeReal implements ElevatorAlgaeIO {
-    private final SparkFlex algaeMotor = // Algae motor
-<<<<<<< HEAD
-        new SparkFlex(Constants.Motors.AlgaeMotors.ALGAE_MOTOR_ID, MotorType.kBrushless);
+    private final SparkFlex algaeMotor =
+        new SparkFlex(Constants.Motors.AlgaeMotors.ALGAE_ROLLER_MOTOR_ID, MotorType.kBrushless);// Algae
+    // motor
     private final TalonFX pivotMotor = new TalonFX(0);
     private final TalonFXConfiguration pivotConfig = new TalonFXConfiguration();
-=======
-        new SparkFlex(Constants.Motors.AlgaeMotors.ALGAE_ROLLER_MOTOR_ID, MotorType.kBrushless);
->>>>>>> 8b7de9710080f9e3ebda2b397bfc5199bf228fe4
     private final SparkFlexConfig algaeMotorConfig = new SparkFlexConfig();
     private final CANcoder canCoder = new CANcoder(0);
     private final CANcoderConfiguration canCoderConfig = new CANcoderConfiguration();
