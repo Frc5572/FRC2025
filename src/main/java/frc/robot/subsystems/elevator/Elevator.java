@@ -1,5 +1,6 @@
 package frc.robot.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.Inch;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import java.util.function.Supplier;
@@ -25,6 +26,8 @@ public class Elevator extends SubsystemBase {
     private ElevatorInputsAutoLogged inputs = new ElevatorInputsAutoLogged();
     public Trigger hightAboveP0 = new Trigger(() -> hightAboveP0());
     public Trigger heightAboveHome = new Trigger(() -> heightAboveHome());
+
+    private Distance targetLocation = Inch.of(0);
 
     /** Elevator Subsystem */
     public Elevator(ElevatorIO io, Viz2025 viz) {
@@ -106,6 +109,13 @@ public class Elevator extends SubsystemBase {
         return (inputs.position).in(Inches) >= (Constants.Elevator.HOME).in(Inches) + 5;
     }
 
+    public Distance getTargetLocation() {
+        return targetLocation;
+    }
+
+    public boolean atTargetLocation() {
+        return Math.abs(inputs.position.in(Inches) - targetLocation.in(Inches)) < 1;
+    }
 
     /**
      * sets height of elevator
@@ -117,9 +127,9 @@ public class Elevator extends SubsystemBase {
     public Command moveTo(Supplier<Distance> height) {
         return runOnce(() -> {
             Logger.recordOutput("targetHeight", height.get().in(Meters));
-            io.setPositon(height.get().in(Meters));
-        }).andThen(Commands
-            .waitUntil(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1));
+            targetLocation = height.get();
+            io.setPositon(targetLocation.in(Meters));
+        }).andThen(Commands.waitUntil(this::atTargetLocation));
     }
 
     /**
@@ -131,17 +141,18 @@ public class Elevator extends SubsystemBase {
      */
     public Command moveToFast(Supplier<Distance> height) {
         return runOnce(() -> {
-            Logger.recordOutput("targetHeight", height.get().in(Meters));
-            io.setPositonFast(height.get().in(Meters));
-        }).andThen(Commands
-            .waitUntil(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1));
+            targetLocation = height.get();
+            Logger.recordOutput("targetHeight", targetLocation.in(Meters));
+            io.setPositonFast(targetLocation.in(Meters));
+        }).andThen(Commands.waitUntil(this::atTargetLocation));
     }
 
     /** Continuously sets the height of the elevator */
     public Command follow(Supplier<Distance> height) {
         return run(() -> {
-            Logger.recordOutput("targetHeight", height.get().in(Meters));
-            io.setPositonFast(height.get().in(Meters));
+            targetLocation = height.get();
+            Logger.recordOutput("targetHeight", targetLocation.in(Meters));
+            io.setPositonFast(targetLocation.in(Meters));
         });
     }
 
