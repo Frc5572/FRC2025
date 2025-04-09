@@ -15,6 +15,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
@@ -23,7 +24,7 @@ import frc.robot.Constants;
 public class VisionReal implements VisionIO {
 
     protected final PhotonCamera[] cameras;
-    private final String[] coprocessorNames = new String[] {"orangepi2.local", "orangepi3.local"};
+    private final String[] coprocessorNames = new String[] {"orangepi2", "orangepi3"};
     String tempDir = System.getProperty("java.io.tmpdir");
 
     /** PhotonVision-attached implementation */
@@ -54,10 +55,11 @@ public class VisionReal implements VisionIO {
      * @throws IOException IOException for HTTP request
      */
     public boolean uploadAprilTagMap(String hostname) throws IOException {
+        System.out.println("Uploading April Tag Map for PV: " + hostname);
         String tempFile = tempDir + "/" + hostname + "-pv-tags-upload.json";
         try (final CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost postReq =
-                new HttpPost("http://" + hostname + ":5800/api/settings/aprilTagFieldLayout");
+                new HttpPost("http://" + hostname + ".local:5800/api/settings/aprilTagFieldLayout");
             Constants.Vision.fieldLayout.serialize(tempFile);
             HttpEntity entity = MultipartEntityBuilder.create()
                 .addPart("data", new FileBody(new File(tempFile))).build();
@@ -75,6 +77,42 @@ public class VisionReal implements VisionIO {
                     }
                 } else {
                     SmartDashboard.putString("uploadSettings/" + hostname + "/AprilTags/content",
+                        "null");
+                }
+                return response.getStatusLine().getStatusCode() == 200;
+            }
+        }
+    }
+
+    /**
+     * Upload saved settings to PV Co-Processors
+     *
+     * @param hostname Hostname of Co-Processor
+     * @return True when completed
+     * @throws IOException IOException for HTTP request
+     */
+    public boolean uploadSettings(String hostname) throws IOException {
+        System.out.println("Uploading ALL settings for PV: " + hostname);
+        try (final CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPost postReq = new HttpPost("http://" + hostname + ".local:5800/api/settings");
+            HttpEntity entity = MultipartEntityBuilder.create()
+                .addPart("data", new FileBody(new File(Filesystem.getDeployDirectory().getPath()
+                    + "/localization/" + hostname + ".zip")))
+                .build();
+            postReq.setEntity(entity);
+            try (CloseableHttpResponse response = httpClient.execute(postReq)) {
+                SmartDashboard.putString("uploadSettings/" + hostname + "/AllSettings/status",
+                    response.getStatusLine().getStatusCode() + ": "
+                        + response.getStatusLine().getReasonPhrase());
+                var ent = response.getEntity();
+                if (ent != null) {
+                    try (InputStream stream = ent.getContent()) {
+                        String text = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+                        SmartDashboard
+                            .putString("uploadSettings/" + hostname + "/AllSettings/content", text);
+                    }
+                } else {
+                    SmartDashboard.putString("uploadSettings/" + hostname + "/AllSettings/content",
                         "null");
                 }
                 return response.getStatusLine().getStatusCode() == 200;
@@ -110,7 +148,7 @@ public class VisionReal implements VisionIO {
      * @param hostname hostname of the PV Co-Processor
      */
     protected void createSettingsUploadThread(String hostname) {
-        System.out.println("Uploading settings for PV: " + hostname);
+        System.out.println("Starting upload thread for PV: " + hostname);
         new Thread(() -> {
             Timer timer = new Timer();
             boolean run = true;
@@ -125,7 +163,7 @@ public class VisionReal implements VisionIO {
                         if (!waitForPV(hostname)) {
                             continue;
                         }
-                        if (uploadAprilTagMap(hostname)) {
+                        if (uploadSettings(hostname)) {
                             run = false;
                         }
                     } catch (Exception e) {

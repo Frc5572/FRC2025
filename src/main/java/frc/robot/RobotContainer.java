@@ -262,16 +262,16 @@ public class RobotContainer {
         // .whileTrue(CommandFactory
         // .doSomethingWithAlgae(swerve, elevator, algae, operator::whatToDoWithAlgae).andThen(
         // CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)));
-        driver.rightTrigger().whileTrue(CommandFactory.bargeSpitAlgae(elevator, algae))
-            .onFalse(elevator.home());
+        driver.rightTrigger().whileTrue(elevator.p5()).onFalse(elevator.home());
         driver.back().onTrue(elevator.stop());
-        driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'd')
-            .whileTrue(algae.algaeOuttakeCommand().withTimeout(1.0));
-        driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'b')
-            .whileTrue(CommandFactory.scoreInBarge(swerve, elevator, algae).andThen(
-                CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)));
-        driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'p')
-            .whileTrue(Commands.none());
+        driver.leftTrigger().whileTrue(algae.algaeOuttakeCommand());
+        // driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'd')
+        // .whileTrue(algae.algaeOuttakeCommand().withTimeout(1.0));
+        // driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'b')
+        // .whileTrue(CommandFactory.scoreInBarge(swerve, elevator, algae).andThen(
+        // CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)));
+        // driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'p')
+        // .whileTrue(Commands.none());
     }
 
     private void setupAltOperatorController() {
@@ -324,6 +324,8 @@ public class RobotContainer {
             .onFalse(Commands.runOnce(() -> swerve.setSpeedMultiplier(1.0)).ignoringDisable(true));
         RobotModeTriggers.disabled().and(vision.seesTwoAprilTags).whileTrue(
             Commands.run(() -> swerve.resetFieldRelativeOffsetBasedOnPose()).ignoringDisable(true));
+        elevator.heightAboveHome.onFalse(algae.setSpeedMultiplier(.25))
+            .onTrue(algae.setSpeedMultiplier(1.0));
     }
 
     /**

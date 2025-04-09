@@ -141,15 +141,17 @@ public class AutoCommandFactory {
 
     private AutoRoutine scoreCoral(String name, boolean isLeft, CoralLocation... locations) {
         AutoRoutine routine = autoFactory.newRoutine(name);
-        Command ret = CommandFactory.dropAlgaeIntake(swerve);
+        Command ret = CommandFactory.dropAlgaeIntake(swerve).deadlineFor(coral.runCoralIntake());
         for (var loc : locations) {
             ret = ret.andThen(CommandFactory.autoScore(swerve, elevator, coral, algae, () -> loc,
                 () -> Height.KP4, () -> Optional.empty(), (x) -> {
                 }));
             if (isLeft) {
-                ret = ret.andThen(CommandFactory.leftFeeder(swerve, elevator, coral));
+                ret = ret.andThen(
+                    CommandFactory.leftFeeder(swerve, elevator, coral).until(coral.coralAtIntake));
             } else {
-                ret = ret.andThen(CommandFactory.rightFeeder(swerve, elevator, coral));
+                ret = ret.andThen(
+                    CommandFactory.rightFeeder(swerve, elevator, coral).until(coral.coralAtIntake));
             }
             ret = ret.andThen(coral.runCoralIntake().until(coral.coralAtIntake));
         }

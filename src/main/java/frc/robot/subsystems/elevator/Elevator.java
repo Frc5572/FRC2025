@@ -24,6 +24,7 @@ public class Elevator extends SubsystemBase {
     private final Viz2025 viz;
     private ElevatorInputsAutoLogged inputs = new ElevatorInputsAutoLogged();
     public Trigger hightAboveP0 = new Trigger(() -> hightAboveP0());
+    public Trigger heightAboveHome = new Trigger(() -> heightAboveHome());
 
     /** Elevator Subsystem */
     public Elevator(ElevatorIO io, Viz2025 viz) {
@@ -100,6 +101,11 @@ public class Elevator extends SubsystemBase {
     public boolean hightAboveP0() {
         return (inputs.position).in(Inches) >= (Constants.Elevator.P0).in(Inches) + 5;
     }
+
+    public boolean heightAboveHome() {
+        return (inputs.position).in(Inches) >= (Constants.Elevator.HOME).in(Inches) + 5;
+    }
+
 
     /**
      * sets height of elevator

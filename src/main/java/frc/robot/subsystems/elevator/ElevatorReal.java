@@ -47,8 +47,13 @@ public class ElevatorReal implements ElevatorIO {
 
         // right conf
         elevatorConf.MotorOutput.NeutralMode = Constants.Elevator.BREAK;
-
         elevatorConf.Feedback.SensorToMechanismRatio = Constants.Elevator.SensorToMechanismRatio;
+        elevatorConf.CurrentLimits.StatorCurrentLimit = 150;
+        elevatorConf.CurrentLimits.StatorCurrentLimitEnable = true;
+        elevatorConf.CurrentLimits.SupplyCurrentLimit = 100;
+        elevatorConf.CurrentLimits.SupplyCurrentLimitEnable = true;
+        elevatorConf.CurrentLimits.SupplyCurrentLowerTime = 5.0;
+        elevatorConf.CurrentLimits.SupplyCurrentLowerLimit = 40.0;
 
 
         // PID and feedforward
