@@ -20,7 +20,6 @@ public class ClimberReal implements ClimberIO {
         rightConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         // rightConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         // leftConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        // climberMotorLeft.getConfigurator().apply(leftConfig);
         climberMotorRight.getConfigurator().apply(rightConfig);
 
 
