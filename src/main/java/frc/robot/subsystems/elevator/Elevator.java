@@ -137,14 +137,6 @@ public class Elevator extends SubsystemBase {
             .waitUntil(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1));
     }
 
-    /** Continuously sets the height of the elevator */
-    public Command follow(Supplier<Distance> height) {
-        return run(() -> {
-            Logger.recordOutput("targetHeight", height.get().in(Meters));
-            io.setPositonFast(height.get().in(Meters));
-        });
-    }
-
     public Command manualMove(CommandXboxController leftStick) {
         return run(() -> io.setPower(leftStick.getLeftY()));
     }

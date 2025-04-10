@@ -29,11 +29,4 @@ public class ElevatorAlgaeSim implements ElevatorAlgaeIO {
     public void setAlgaeMotorVoltage(double volts) {
         motor.setInputVoltage(volts);
     }
-
-    @Override
-    public void setPivotVoltage(double voltage) {}
-
-    @Override
-    public void setPosition(double position) {}
-
 }

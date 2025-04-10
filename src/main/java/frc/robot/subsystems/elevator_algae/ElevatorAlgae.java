@@ -1,11 +1,8 @@
 package frc.robot.subsystems.elevator_algae;
 
-import static edu.wpi.first.units.Units.Degrees;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -123,17 +120,5 @@ public class ElevatorAlgae extends SubsystemBase {
 
     public Command setSpeedMultiplier(double value) {
         return Commands.runOnce(() -> speedMultiplier = value);
-    }
-
-    public Command moveTo(Supplier<Angle> Angle) {
-        return runOnce(() -> {
-            Logger.recordOutput("targetHeight", Angle.get().in(Degrees));
-            io.setPosition(Angle.get().in(Degrees));
-        }).andThen(Commands.waitUntil(
-            () -> Math.abs(inputs.pivotPositon.in(Degrees) - Angle.get().in(Degrees)) < 1));
-    }
-
-    public Command voltage(DoubleSupplier voltage) {
-        return runEnd(() -> io.setPivotVoltage(voltage.getAsDouble()), () -> io.setPivotVoltage(0));
     }
 }
