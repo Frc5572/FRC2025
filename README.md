@@ -26,7 +26,7 @@ Climber Left - 3
 Climber Right - 12  
 Coral - 5  
 Algae - 6  
-Voltage Convertors for Orange Pi and LEDS - 16
+Voltage Converters for Orange Pi and LEDS - 16
 RoboRIO - 20
 CANivore - 21
 VRM - 22
