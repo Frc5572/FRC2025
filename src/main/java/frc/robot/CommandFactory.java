@@ -78,11 +78,6 @@ public class CommandFactory {
             Units.inchesToMeters(4), 5).withTimeout(1.5);
     }
 
-    /** Go home, no exception */
-    public static Command ensureHome(Elevator elevator) {
-        return elevator.home().repeatedly().until(() -> elevator.getHeight().in(Inches) < 0.5);
-    }
-
     public static Command scoreWithElevator(Swerve swerve, Elevator elevator,
         Supplier<ScoringLocation.CoralLocation> location, Supplier<ScoringLocation.Height> height) {
         return reefAlign(swerve, location, 1).alongWith(elevator.follow(() -> {
@@ -94,6 +89,11 @@ public class CommandFactory {
                 * MathUtil.clamp(proj.in(Inches), 0, 3) + height.get().height.in(Inches));
             return adjHeight;
         }));
+    }
+
+    /** Go home, no exception */
+    public static Command ensureHome(Elevator elevator) {
+        return elevator.home().repeatedly().until(() -> elevator.getHeight().in(Inches) < 0.5);
     }
 
     public static Command maybeScoreCoral(Swerve swerve, Elevator elevator,
