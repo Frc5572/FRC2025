@@ -21,8 +21,8 @@ Back Right Angle Motor - 10
 Back Right canCoder - 3  
 
 ### Other
+Elevator Right - 4  
 Elevator Right - 7  
-Climber Left - 3  
 Climber Right - 12  
 Coral - 5  
 Algae - 6  
