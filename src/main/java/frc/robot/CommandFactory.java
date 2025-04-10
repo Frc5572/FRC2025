@@ -6,16 +6,19 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.lib.util.AllianceFlipUtil;
+import frc.lib.util.Container;
 import frc.lib.util.ScoringLocation;
 import frc.robot.commands.MoveAndAvoidReef;
 import frc.robot.commands.MoveToPose;
@@ -75,8 +78,6 @@ public class CommandFactory {
             Units.inchesToMeters(4), 5).withTimeout(1.5);
     }
 
-<<<<<<< HEAD
-=======
     public static Command scoreWithElevator(Swerve swerve, Elevator elevator,
         Supplier<ScoringLocation.CoralLocation> location, Supplier<ScoringLocation.Height> height) {
         return reefAlign(swerve, location, 1).alongWith(elevator.follow(() -> {
@@ -90,14 +91,11 @@ public class CommandFactory {
         }));
     }
 
->>>>>>> parent of 8b7de97 (redoing some auto scoring)
     /** Go home, no exception */
     public static Command ensureHome(Elevator elevator) {
         return elevator.home().repeatedly().until(() -> elevator.getHeight().in(Inches) < 0.5);
     }
 
-<<<<<<< HEAD
-=======
     public static Command maybeScoreCoral(Swerve swerve, Elevator elevator,
         CoralScoring coralScoring, ElevatorAlgae algae,
         Supplier<ScoringLocation.CoralLocation> location, Supplier<ScoringLocation.Height> height) {
@@ -122,7 +120,6 @@ public class CommandFactory {
         }); // TODO
     }
 
->>>>>>> parent of 8b7de97 (redoing some auto scoring)
     /** Move and score coral or retrieve algae. */
     public static Command autoScore(Swerve swerve, Elevator elevator, CoralScoring coralScoring,
         ElevatorAlgae algae, Supplier<ScoringLocation.CoralLocation> location,
