@@ -75,7 +75,7 @@ public class ElevatorAlgae extends SubsystemBase {
      * Run algae intake with given speed
      */
     public Command runAlgaeMotor(double voltage) {
-        return runAlgaeMotor(Constants.Algae.VOLTAGE, () -> 1);
+        return runAlgaeMotor(voltage, () -> 1);
     }
 
     /** Run algae intake with given speed */
