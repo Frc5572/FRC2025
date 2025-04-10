@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.lib.util.AllianceFlipUtil;
-import frc.lib.util.Container;
 import frc.lib.util.ScoringLocation;
 import frc.robot.commands.MoveAndAvoidReef;
 import frc.robot.commands.MoveToPose;
@@ -76,11 +75,54 @@ public class CommandFactory {
             Units.inchesToMeters(4), 5).withTimeout(1.5);
     }
 
+<<<<<<< HEAD
+=======
+    public static Command scoreWithElevator(Swerve swerve, Elevator elevator,
+        Supplier<ScoringLocation.CoralLocation> location, Supplier<ScoringLocation.Height> height) {
+        return reefAlign(swerve, location, 1).alongWith(elevator.follow(() -> {
+            Pose2d pose = location.get().pose;
+            Translation2d q = pose.getTranslation().minus(swerve.getPose().getTranslation());
+            Distance proj = Meters.of(
+                q.getX() * pose.getRotation().getCos() + q.getY() * pose.getRotation().getSin());
+            Distance adjHeight = Inches.of(Constants.Elevator.HEIGHT_PER_METER_AWAY.in(Inches)
+                * MathUtil.clamp(proj.in(Inches), 0, 3) + height.get().height.in(Inches));
+            return adjHeight;
+        }));
+    }
+
+>>>>>>> parent of 8b7de97 (redoing some auto scoring)
     /** Go home, no exception */
     public static Command ensureHome(Elevator elevator) {
         return elevator.home().repeatedly().until(() -> elevator.getHeight().in(Inches) < 0.5);
     }
 
+<<<<<<< HEAD
+=======
+    public static Command maybeScoreCoral(Swerve swerve, Elevator elevator,
+        CoralScoring coralScoring, ElevatorAlgae algae,
+        Supplier<ScoringLocation.CoralLocation> location, Supplier<ScoringLocation.Height> height) {
+        return reefPreAlign(swerve, location).andThen(new ConditionalCommand(Commands
+            .waitUntil(() -> coralScoring.getOuttakeBeamBreakStatus()).deadlineFor(swerve.stop()),
+            Commands.runOnce(() -> {
+            }), () -> !height.get().isAlgae))
+            .deadlineFor(coralScoring.runCoralIntake()
+                .unless(() -> coralScoring.getOuttakeBeamBreakStatus()))
+            .andThen(new ConditionalCommand(
+                scoreWithElevator(swerve, elevator, location, height).withTimeout(2.4),
+                Commands.runOnce(() -> {
+                }), () -> !height.get().isAlgae))
+            .andThen(new ConditionalCommand(Commands.runOnce(() -> {
+            }), coralScoring.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae));
+    }
+
+    public static Command maybePickupAlgae(Swerve swerve, Elevator elevator, ElevatorAlgae algae,
+        Supplier<Optional<ScoringLocation.Height>> algaeHeight,
+        Consumer<ScoringLocation.Height> crossOut) {
+        return Commands.runOnce(() -> {
+        }); // TODO
+    }
+
+>>>>>>> parent of 8b7de97 (redoing some auto scoring)
     /** Move and score coral or retrieve algae. */
     public static Command autoScore(Swerve swerve, Elevator elevator, CoralScoring coralScoring,
         ElevatorAlgae algae, Supplier<ScoringLocation.CoralLocation> location,
