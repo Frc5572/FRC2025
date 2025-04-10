@@ -74,6 +74,8 @@ public final class Constants {
         public static final int NEGATIVE_VOLTAGE = -12;
         public static final double SMALLER_VOLTAGE = 1.5;
         public static final double SMALLER_NEGATIVE_VOLTAGE = -1;
+
+        public static final int CANCODER_ID = 0;
     }
 
     // pit and alt operator controllers
@@ -97,7 +99,8 @@ public final class Constants {
          * Algae Motor CAN id's
          */
         public static final class AlgaeMotors {
-            public static final int ALGAE_MOTOR_ID = 6;
+            public static final int ALGAE_WRIST_MOTOR_ID = 0;
+            public static final int ALGAE_ROLLER_MOTOR_ID = 6;
         }
 
     }

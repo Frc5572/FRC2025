@@ -135,8 +135,6 @@ public class Elevator extends SubsystemBase {
             io.setPositonFast(height.get().in(Meters));
         }).andThen(Commands
             .waitUntil(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1));
-<<<<<<< HEAD
-=======
     }
 
     /** Continuously sets the height of the elevator */
@@ -145,8 +143,8 @@ public class Elevator extends SubsystemBase {
             Logger.recordOutput("targetHeight", height.get().in(Meters));
             io.setPositonFast(height.get().in(Meters));
         });
->>>>>>> parent of 8b7de97 (redoing some auto scoring)
     }
+
 
     public Command manualMove(CommandXboxController leftStick) {
         return run(() -> io.setPower(leftStick.getLeftY()));

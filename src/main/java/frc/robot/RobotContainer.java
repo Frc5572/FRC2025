@@ -1,6 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -328,16 +327,6 @@ public class RobotContainer {
             Commands.run(() -> swerve.resetFieldRelativeOffsetBasedOnPose()).ignoringDisable(true));
         elevator.heightAboveHome.onFalse(algae.setSpeedMultiplier(.25))
             .onTrue(algae.setSpeedMultiplier(1.0));
-    }
-
-    public void test() {
-        SmartDashboard.putNumber("pivotAngle", 0);
-        testController.a()
-            .onTrue(algae.moveTo(() -> Degrees.of(SmartDashboard.getNumber("pivotAngle", 0))));
-        SmartDashboard.putNumber("pivotVoltage", 0);
-        testController.b()
-            .onTrue(algae.voltage(() -> (SmartDashboard.getNumber("pivotVoltage", 0))));
-
     }
 
     /**
