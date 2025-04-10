@@ -349,7 +349,8 @@ public final class Constants {
         public static final Distance P4 = Inches.of(68.9); // Coral L4
         public static final Distance P5 = Inches.of(74); // Barge
 
-        public static final double HEIGHT_PER_METER_AWAY = 2.0 / 1.0;
+        public static final Distance HEIGHT_PER_METER_AWAY =
+            Inches.of(2).div(Units.inchesToMeters(1));
 
         public static final double gearRatio = 1.0;
         public static final Distance INCHES_AT_TOP = Inches.of(72.0);
