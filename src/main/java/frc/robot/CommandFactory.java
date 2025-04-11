@@ -22,6 +22,7 @@ import frc.lib.util.Container;
 import frc.lib.util.ScoringLocation;
 import frc.robot.commands.MoveAndAvoidReef;
 import frc.robot.commands.MoveToPose;
+import frc.robot.subsystems.algaewrist.AlgaeWrist;
 import frc.robot.subsystems.coral.CoralScoring;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator_algae.ElevatorAlgae;
@@ -351,7 +352,8 @@ public class CommandFactory {
      * @param algae algae
      * @return move and score in barge
      */
-    public static Command scoreInBarge(Swerve swerve, Elevator elevator, ElevatorAlgae algae) {
+    public static Command scoreInBarge(Swerve swerve, Elevator elevator, ElevatorAlgae algae,
+        AlgaeWrist wirst) {
         return (ensureHome(elevator)
             .alongWith(new MoveAndAvoidReef(swerve, () -> bargeScorePose, () -> {
                 if (elevator.hightAboveP0.getAsBoolean()) {
@@ -359,7 +361,7 @@ public class CommandFactory {
                 } else {
                     return Constants.SwerveTransformPID.MAX_VELOCITY;
                 }
-            }, true, Units.inchesToMeters(6), 3))).andThen(bargeSpitAlgae(elevator, algae)
+            }, true, Units.inchesToMeters(6), 3))).andThen(bargeSpitAlgae(elevator, algae, wirst)
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
     }
 
@@ -370,10 +372,11 @@ public class CommandFactory {
      * @param algae Algae Subsystem
      * @return Command
      */
-    public static Command bargeSpitAlgae(Elevator elevator, ElevatorAlgae algae) {
+    public static Command bargeSpitAlgae(Elevator elevator, ElevatorAlgae algae, AlgaeWrist wirst) {
         return Commands.waitUntil(() -> elevator.getHeight().in(Inches) > 65)
-            .deadlineFor(elevator.p5())
-            .andThen(algae.algaeOuttakeCommand().withTimeout(.3).asProxy())
+            .deadlineFor(elevator.barge())
+            .andThen(
+                wirst.bargeAngle().andThen(algae.algaeOuttakeCommand()).withTimeout(.3).asProxy())
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 }

@@ -2,6 +2,7 @@ package frc.robot.subsystems.algaewrist;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.units.measure.Angle;
@@ -9,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.viz.Viz2025;
+import frc.robot.Constants;
 
 public class AlgaeWrist extends SubsystemBase {
 
@@ -42,4 +44,19 @@ public class AlgaeWrist extends SubsystemBase {
         });
     }
 
+    public Command bargeAngle() {
+        return followAngle(() -> Constants.Algae.BARGE_ANGLE);
+    }
+
+    public Command homeAngle() {
+        return followAngle(() -> Constants.Algae.HOME_ANGLE);
+    }
+
+    public Command reefAngle() {
+        return followAngle(() -> Constants.Algae.REEF_ANGLE);
+    }
+
+    public Command setVoltage(DoubleSupplier volts) {
+        return runEnd(() -> io.setVoltage(volts.getAsDouble()), () -> io.setVoltage(0));
+    }
 }

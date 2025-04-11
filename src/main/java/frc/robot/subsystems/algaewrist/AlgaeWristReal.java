@@ -82,4 +82,9 @@ public class AlgaeWristReal implements AlgaeWristIO {
         wristMotor.setControl(mmVoltage.withPosition(angle));
     }
 
+    @Override
+    public void setVoltage(double volts) {
+        wristMotor.setVoltage(volts);
+    }
+
 }

@@ -98,6 +98,10 @@ public class Elevator extends SubsystemBase {
         return moveToFast(() -> Constants.Elevator.P5);
     }
 
+    public Command barge() {
+        return moveToFast(() -> Constants.Elevator.BARGE_HEIGHT);
+    }
+
     public boolean hightAboveP0() {
         return (inputs.position).in(Inches) >= (Constants.Elevator.P0).in(Inches) + 5;
     }

@@ -1,5 +1,6 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -31,6 +32,10 @@ import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
 import frc.robot.subsystems.LEDs;
+import frc.robot.subsystems.algaewrist.AlgaeWrist;
+import frc.robot.subsystems.algaewrist.AlgaeWristIO;
+import frc.robot.subsystems.algaewrist.AlgaeWristReal;
+import frc.robot.subsystems.algaewrist.AlgaeWristSim;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberReal;
@@ -81,7 +86,7 @@ public class RobotContainer {
     public final CommandXboxController altOperator =
         new CommandXboxController(Constants.ALT_OPERATOR_ID);
     public final CommandXboxController testController = new CommandXboxController(5);
-
+    public final CommandXboxController test = new CommandXboxController(7);
 
     /** Simulation */
     private SwerveDriveSimulation driveSimulation;
@@ -104,6 +109,7 @@ public class RobotContainer {
     private final Vision vision;
     private CoralScoring coralScoring;
     private Climber climb;
+    private AlgaeWrist wrist;
 
     Pose2d blueStart = new Pose2d(7.247, 1.126, new Rotation2d(2.276));
     Pose2d redStart = new Pose2d(10.025, 1.476, new Rotation2d(0.900));
@@ -126,6 +132,7 @@ public class RobotContainer {
                 coralScoring = new CoralScoring(new CoralScoringReal(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeReal(), vis);
                 climb = new Climber(new ClimberReal(), vis);
+                wrist = new AlgaeWrist(vis, new AlgaeWristReal());
                 break;
 
             case kSimulation:
@@ -139,6 +146,7 @@ public class RobotContainer {
                 coralScoring = new CoralScoring(new CoralScoringSim(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
                 climb = new Climber(new ClimberSim(), vis);
+                wrist = new AlgaeWrist(vis, new AlgaeWristSim());
                 break;
             default:
                 elevator = new Elevator(new ElevatorIO.Empty(), vis);
@@ -147,6 +155,7 @@ public class RobotContainer {
                 coralScoring = new CoralScoring(new CoralScoringIO.Empty(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
                 climb = new Climber(new ClimberIO.Empty(), vis);
+                wrist = new AlgaeWrist(vis, new AlgaeWristIO.Empty());
         }
         autoFactory = new AutoFactory(swerve::getPose, swerve::resetOdometry,
             swerve::followTrajectory, true, swerve);
@@ -180,6 +189,8 @@ public class RobotContainer {
 
         /* Button and Trigger Bindings */
         configureTriggerBindings();
+
+        test();
 
         if (runtimeType == RobotRunType.kSimulation) {
             maybeController("Driver", driver, this::setupDriver);
@@ -293,7 +304,7 @@ public class RobotContainer {
     }
 
     private void setupPitController() {
-        pitController.a().whileTrue(CommandFactory.scoreInBarge(swerve, elevator, algae));
+        pitController.a().whileTrue(CommandFactory.scoreInBarge(swerve, elevator, algae, wrist));
         pitController.b().onTrue(elevator.manualMove(altOperator));
         pitController.leftBumper().whileTrue(climb.resetClimberCommand());
         pitController.x().whileTrue(climb.manualClimb(() -> pitController.getLeftY()));
@@ -327,6 +338,15 @@ public class RobotContainer {
             Commands.run(() -> swerve.resetFieldRelativeOffsetBasedOnPose()).ignoringDisable(true));
         elevator.heightAboveHome.onFalse(algae.setSpeedMultiplier(.25))
             .onTrue(algae.setSpeedMultiplier(1.0));
+    }
+
+    private void test() {
+        SmartDashboard.putNumber("wrist/Pos", 0);
+        SmartDashboard.putNumber("wrist/Volts", 0);
+        test.a()
+            .onTrue(wrist.followAngle(() -> Degrees.of(SmartDashboard.getNumber("wrist/Pos", 0))));
+        test.b().whileTrue(wrist.setVoltage(() -> SmartDashboard.getNumber("wrist/Volts", 0)));
+
     }
 
     /**
