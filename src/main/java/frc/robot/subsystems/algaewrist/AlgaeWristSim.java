@@ -21,4 +21,9 @@ public class AlgaeWristSim implements AlgaeWristIO {
         this.angle = angle;
     }
 
+    @Override
+    public void setWristVoltage(double volts) {
+
+    }
+
 }

@@ -25,12 +25,16 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.Container;
 import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.WebController;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
 import frc.robot.subsystems.LEDs;
+import frc.robot.subsystems.algaewrist.AlgaeWrist;
+import frc.robot.subsystems.algaewrist.AlgaeWristReal;
+import frc.robot.subsystems.algaewrist.AlgaeWristSim;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberReal;
@@ -98,6 +102,7 @@ public class RobotContainer {
     private LEDs ledsLeftFrontSide = new LEDs(buffer, 60, 89);
     private LEDs ledsLeftBackSide = new LEDs(buffer, 90, 119);
 
+    private final AlgaeWrist algaeWrist;
     private Elevator elevator;
     private final Swerve swerve;
     private final Vision vision;
@@ -125,6 +130,7 @@ public class RobotContainer {
                 coralScoring = new CoralScoring(new CoralScoringReal(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeReal(), vis);
                 climb = new Climber(new ClimberReal(), vis);
+                algaeWrist = new AlgaeWrist(vis, new AlgaeWristReal());
                 break;
 
             case kSimulation:
@@ -138,6 +144,7 @@ public class RobotContainer {
                 coralScoring = new CoralScoring(new CoralScoringSim(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
                 climb = new Climber(new ClimberSim(), vis);
+                algaeWrist = new AlgaeWrist(vis, new AlgaeWristSim());
                 break;
             default:
                 elevator = new Elevator(new ElevatorIO.Empty(), vis);
@@ -146,6 +153,7 @@ public class RobotContainer {
                 coralScoring = new CoralScoring(new CoralScoringIO.Empty(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
                 climb = new Climber(new ClimberIO.Empty(), vis);
+                algaeWrist = new AlgaeWrist(vis, new AlgaeWristSim());
         }
         autoFactory = new AutoFactory(swerve::getPose, swerve::resetOdometry,
             swerve::followTrajectory, true, swerve);
@@ -175,7 +183,7 @@ public class RobotContainer {
         ledsLeftFrontSide.setDefaultCommand(ledsLeftFrontSide.setLEDsBreathe(Color.kRed));
         ledsLeftBackSide.setDefaultCommand(ledsLeftBackSide.setLEDsBreathe(Color.kRed));
 
-        algae.setDefaultCommand(algae.algaeHoldCommand().withName("Algae Default Command"));
+        // algae.setDefaultCommand(algae.algaeHoldCommand().withName("Algae Default Command"));
 
         /* Button and Trigger Bindings */
         configureTriggerBindings();
@@ -301,6 +309,16 @@ public class RobotContainer {
             Commands.runOnce(() -> swerve.resetOdometry(new Pose2d(7.24, 4.05, Rotation2d.kZero))));
         // remove later
         SmartDashboard.putNumber("elevatorTargetHeight", 20);
+
+        final Container<Double> wristVoltage = new Container<Double>(0.0);
+        new Trigger(() -> {
+            return Math.abs(pitController.getLeftY()) > 0.1;
+        }).whileTrue(Commands.run(() -> {
+            double add = pitController.getLeftY() > 0 ? -0.1 : 0.1;
+            wristVoltage.value += add + pitController.getLeftY();
+            SmartDashboard.putNumber("wristVoltage", wristVoltage.value);
+        }));
+        pitController.leftBumper().whileTrue(algaeWrist.runVolts(() -> wristVoltage.value));
         // driver.a().whileTrue(
         // elevator.moveTo(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
     }
@@ -314,7 +332,7 @@ public class RobotContainer {
         vision.seesTwoAprilTags.whileTrue(ledsRightSide.setRainbow());
 
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
-        RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
+        // RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
         // Algae
         // algae.hasAlgae.and(coralScoring.coralAtOuttake.negate())
         // .onTrue(ledsrightbackside.blinkLEDs(Color.kGreen, 2));

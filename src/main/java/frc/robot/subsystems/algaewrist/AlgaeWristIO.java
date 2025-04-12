@@ -21,4 +21,6 @@ public interface AlgaeWristIO {
 
     public void setWristSetpoint(Angle angle);
 
+    public void setWristVoltage(double volts);
+
 }

@@ -2,6 +2,7 @@ package frc.robot.subsystems.algaewrist;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.units.measure.Angle;
@@ -27,6 +28,10 @@ public class AlgaeWrist extends SubsystemBase {
         Logger.processInputs("AlgaeWrist", inputs);
 
         viz.setAlgaeAngle(inputs.wristAngle);
+    }
+
+    public Command runVolts(DoubleSupplier volts) {
+        return this.run(() -> io.setWristVoltage(volts.getAsDouble()));
     }
 
     public Command goToAngle(Supplier<Angle> angle) {

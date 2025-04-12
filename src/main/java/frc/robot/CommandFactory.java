@@ -6,13 +6,11 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -80,26 +78,8 @@ public class CommandFactory {
 
     public static Command scoreWithElevator(Swerve swerve, Elevator elevator,
         Supplier<ScoringLocation.CoralLocation> location, Supplier<ScoringLocation.Height> height) {
-        return reefAlign(swerve, location, 1).alongWith(elevator.follow(() -> {
-            Pose2d pose = AllianceFlipUtil.apply(location.get().pose);
-            Translation2d q = pose.getTranslation().minus(swerve.getPose().getTranslation());
-            Logger.recordOutput("q", q);
-            Distance proj = Meters
-                .of(q.getX() * pose.getRotation().getCos() + q.getY() * pose.getRotation().getSin())
-                .minus(Inches.of(1));
-            Logger.recordOutput("proj", proj);
-            Distance adjHeight = Inches
-                .of(Constants.Elevator.HEIGHT_PER_METER_AWAY * MathUtil.clamp(proj.in(Inches), 0, 8)
-                    + height.get().height.in(Inches));
-            return adjHeight;
-        })).until(() -> {
-            double speed = Math.hypot(swerve.getChassisSpeeds().vxMetersPerSecond,
-                swerve.getChassisSpeeds().vyMetersPerSecond);
-            Logger.recordOutput("swerveSpeed", speed);
-            boolean swerveSlow = speed < 0.5;
-            boolean elevatorThere = elevator.atTargetLocation();
-            return swerveSlow && elevatorThere;
-        });
+        return reefAlign(swerve, location, 1)
+            .alongWith(elevator.moveToFast(() -> height.get().height));
     }
 
     /** Go home, no exception */
