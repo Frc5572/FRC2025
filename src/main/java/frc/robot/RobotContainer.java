@@ -98,9 +98,9 @@ public class RobotContainer {
     private ElevatorAlgae algae;
     private final AddressableLED leds = new AddressableLED(Constants.LEDs.LED_PORT);
     private final AddressableLEDBuffer buffer = new AddressableLEDBuffer(Constants.LEDs.LED_LENGTH);
-    private LEDs ledsRightSide = new LEDs(buffer, 0, 59);
-    private LEDs ledsLeftFrontSide = new LEDs(buffer, 60, 89);
-    private LEDs ledsLeftBackSide = new LEDs(buffer, 90, 119);
+    private LEDs ledsRightSide = new LEDs(buffer, 0, 79);
+    private LEDs ledsLeftFrontSide = new LEDs(buffer, 80, 119);
+    private LEDs ledsLeftBackSide = new LEDs(buffer, 120, 159);
 
     private final AlgaeWrist algaeWrist;
     private Elevator elevator;

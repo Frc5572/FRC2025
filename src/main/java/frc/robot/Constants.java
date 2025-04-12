@@ -112,7 +112,7 @@ public final class Constants {
      */
     public static final class LEDs {
         public static final int LED_PORT = 0;
-        public static final int LED_LENGTH = 120;
+        public static final int LED_LENGTH = 160;
     }
 
 
@@ -121,8 +121,6 @@ public final class Constants {
      * Climb Constants.
      */
     public static final class Climb {
-
-        public static final int LEFT_TALON_FX_ID = 3;
         public static final int RIGHT_TALON_FX_ID = 12;
         public static final int TOUCH_SENSOR_CHANNEL = 2;
         public static final Angle CLIMB_ANGLE = Radians.of(600);
