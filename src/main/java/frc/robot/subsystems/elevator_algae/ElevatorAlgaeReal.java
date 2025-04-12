@@ -35,5 +35,4 @@ public class ElevatorAlgaeReal implements ElevatorAlgaeIO {
     public void setAlgaeMotorVoltage(double voltage) { // set hardware speed
         algaeMotor.setVoltage(voltage);
     }
-
 }

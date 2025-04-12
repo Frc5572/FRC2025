@@ -1,6 +1,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
@@ -75,8 +76,18 @@ public final class Constants {
         public static final double SMALLER_VOLTAGE = 1.5;
         public static final double SMALLER_NEGATIVE_VOLTAGE = -1;
 
-
         public static final int CANCODER_ID = 0;
+
+        public static final Angle BARGE_ANGLE = Degrees.of(0.0);
+        public static final Angle HOME_ANGLE = Degrees.of(0.0);
+        public static final Angle REEF_ANGLE = Degrees.of(0.0);
+
+        public static final double KP = 0.0;
+        public static final double KI = 0.0;
+        public static final double KD = 0.0;
+
+        public static final double KG = 0.0;
+        public static final double KS = 0.0;
     }
 
     // pit and alt operator controllers
@@ -348,6 +359,7 @@ public final class Constants {
         public static final Distance P5 = Inches.of(74); // Barge
 
         public static final double HEIGHT_PER_METER_AWAY = 2.4 / 1.0;
+        public static final Distance BARGE_HEIGHT = P5;
 
         public static final double gearRatio = 1.0;
         public static final Distance INCHES_AT_TOP = Inches.of(72.0);

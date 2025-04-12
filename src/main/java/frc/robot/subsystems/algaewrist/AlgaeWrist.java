@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.viz.Viz2025;
+import frc.robot.Constants;
 
 public class AlgaeWrist extends SubsystemBase {
 
@@ -47,4 +48,15 @@ public class AlgaeWrist extends SubsystemBase {
         });
     }
 
+    public Command bargeAngle() {
+        return goToAngle(() -> Constants.Algae.BARGE_ANGLE);
+    }
+
+    public Command homeAngle() {
+        return goToAngle(() -> Constants.Algae.HOME_ANGLE);
+    }
+
+    public Command reefAngle() {
+        return goToAngle(() -> Constants.Algae.REEF_ANGLE);
+    }
 }

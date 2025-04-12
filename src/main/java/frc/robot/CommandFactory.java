@@ -20,6 +20,7 @@ import frc.lib.util.Container;
 import frc.lib.util.ScoringLocation;
 import frc.robot.commands.MoveAndAvoidReef;
 import frc.robot.commands.MoveToPose;
+import frc.robot.subsystems.algaewrist.AlgaeWrist;
 import frc.robot.subsystems.coral.CoralScoring;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator_algae.ElevatorAlgae;
@@ -90,36 +91,25 @@ public class CommandFactory {
     public static Command maybeScoreCoral(Swerve swerve, Elevator elevator,
         CoralScoring coralScoring, ElevatorAlgae algae,
         Supplier<ScoringLocation.CoralLocation> location, Supplier<ScoringLocation.Height> height) {
-        return reefPreAlign(swerve, location)
-            .andThen(new ConditionalCommand(
-                Commands.waitUntil(() -> coralScoring.getOuttakeBeamBreakStatus())
-                    .deadlineFor(swerve.stop()),
-                Commands.none(), () -> !height.get().isAlgae))
+        return reefPreAlign(swerve, location).andThen(new ConditionalCommand(Commands
+            .waitUntil(() -> coralScoring.getOuttakeBeamBreakStatus()).deadlineFor(swerve.stop()),
+            Commands.runOnce(() -> {
+            }), () -> !height.get().isAlgae))
             .deadlineFor(coralScoring.runCoralIntake()
                 .unless(() -> coralScoring.getOuttakeBeamBreakStatus()))
             .andThen(new ConditionalCommand(
                 scoreWithElevator(swerve, elevator, location, height).withTimeout(2.4),
-                Commands.none(), () -> !height.get().isAlgae))
-            .andThen(new ConditionalCommand(Commands.none(),
-                coralScoring.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae));
-    }
-
-    public static Command pickupAlgae(Swerve swerve, Elevator elevator, ElevatorAlgae algae,
-        Supplier<ScoringLocation.Height> algaeHeight, Consumer<ScoringLocation.Height> crossOut) {
-        // TODO
-        return Commands.none();
+                Commands.runOnce(() -> {
+                }), () -> !height.get().isAlgae))
+            .andThen(new ConditionalCommand(Commands.runOnce(() -> {
+            }), coralScoring.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae));
     }
 
     public static Command maybePickupAlgae(Swerve swerve, Elevator elevator, ElevatorAlgae algae,
         Supplier<Optional<ScoringLocation.Height>> algaeHeight,
         Consumer<ScoringLocation.Height> crossOut) {
-        final Container<Optional<ScoringLocation.Height>> algaeHeightStore =
-            new Container<>(Optional.empty());
         return Commands.runOnce(() -> {
-            algaeHeightStore.value = algaeHeight.get();
-        }).andThen(new ConditionalCommand(
-            pickupAlgae(swerve, elevator, algae, () -> algaeHeightStore.value.get(), crossOut),
-            Commands.none(), () -> algaeHeightStore.value.isPresent()));
+        }); // TODO
     }
 
     /** Move and score coral or retrieve algae. */
@@ -129,15 +119,43 @@ public class CommandFactory {
         Supplier<Optional<ScoringLocation.Height>> additionalAlgaeHeight,
         Consumer<ScoringLocation.Height> crossOut) {
 
-        return maybeScoreCoral(swerve, elevator, coralScoring, algae, location, height)
-            .andThen(maybePickupAlgae(swerve, elevator, algae, () -> {
-                ScoringLocation.Height currentHeight = height.get();
-                if (currentHeight.isAlgae) {
-                    return Optional.of(currentHeight);
-                } else {
-                    return additionalAlgaeHeight.get();
-                }
-            }, crossOut));
+        final Container<ScoringLocation.Height> additionalAlgae = new Container<>(null);
+
+        return (reefPreAlign(swerve, location).andThen(new ConditionalCommand(
+            Commands.waitUntil(() -> coralScoring.getOuttakeBeamBreakStatus()),
+            Commands.runOnce(() -> {
+            }), () -> !height.get().isAlgae))
+            .deadlineFor(coralScoring.runCoralIntake()
+                .unless(() -> coralScoring.getOuttakeBeamBreakStatus()))
+            .andThen(new ConditionalCommand(elevator.moveToFast(() -> additionalAlgae.value.height)
+                .alongWith(reefAlign(swerve, location, 12).withTimeout(0.7).andThen(
+                    reefAlign(swerve, location, -3).until(algae.hasAlgae).withTimeout(1.0)))
+                .alongWith(Commands.runOnce(() -> {
+                    crossOut.accept(additionalAlgae.value);
+                })).andThen(backAwayReef(swerve, location).withTimeout(2.0)),
+                Commands.runOnce(() -> {
+                }), () -> {
+                    var value = additionalAlgaeHeight.get();
+                    additionalAlgae.value = null;
+                    if (value.isPresent()) {
+                        additionalAlgae.value = value.get();
+                        return true;
+                    }
+                    return false;
+                }))
+            .andThen(new ConditionalCommand(
+                (elevator.moveToFast(() -> height.get().height).andThen(Commands.waitSeconds(0.1))
+                    .andThen(reefAlign(swerve, location, 1).withTimeout(2.4))),
+                (elevator.moveToFast(() -> height.get().height).andThen(Commands.waitSeconds(0.1))
+                    .alongWith(reefAlign(swerve, location, 1).withTimeout(2.4))),
+                () -> additionalAlgae.value != null))
+            .andThen(new ConditionalCommand(Commands.runOnce(() -> {
+            }), coralScoring.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae)))
+                .deadlineFor(
+                    Commands.either(algae.algaeIntakeCommand().asProxy(), Commands.runOnce(() -> {
+                    }), () -> height.get().isAlgae || additionalAlgaeHeight.get().isPresent()))
+                .andThen(new ConditionalCommand(backAwayReef(swerve, location), Commands.none(),
+                    () -> additionalAlgae.value != null));
     }
 
     private static final Pose2d processorPose =
@@ -325,7 +343,8 @@ public class CommandFactory {
      * @param algae algae
      * @return move and score in barge
      */
-    public static Command scoreInBarge(Swerve swerve, Elevator elevator, ElevatorAlgae algae) {
+    public static Command scoreInBarge(Swerve swerve, Elevator elevator, ElevatorAlgae algae,
+        AlgaeWrist wrist) {
         return (ensureHome(elevator)
             .alongWith(new MoveAndAvoidReef(swerve, () -> bargeScorePose, () -> {
                 if (elevator.hightAboveP0.getAsBoolean()) {
@@ -333,7 +352,7 @@ public class CommandFactory {
                 } else {
                     return Constants.SwerveTransformPID.MAX_VELOCITY;
                 }
-            }, true, Units.inchesToMeters(6), 3))).andThen(bargeSpitAlgae(elevator, algae)
+            }, true, Units.inchesToMeters(6), 3))).andThen(bargeSpitAlgae(elevator, algae, wrist)
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
     }
 
@@ -344,10 +363,11 @@ public class CommandFactory {
      * @param algae Algae Subsystem
      * @return Command
      */
-    public static Command bargeSpitAlgae(Elevator elevator, ElevatorAlgae algae) {
+    public static Command bargeSpitAlgae(Elevator elevator, ElevatorAlgae algae, AlgaeWrist wrist) {
         return Commands.waitUntil(() -> elevator.getHeight().in(Inches) > 65)
-            .deadlineFor(elevator.p5())
-            .andThen(algae.algaeOuttakeCommand().withTimeout(.3).asProxy())
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+            .deadlineFor(elevator.barge())
+            .andThen(
+                wrist.bargeAngle().andThen(algae.algaeOuttakeCommand()).withTimeout(.3).asProxy())
+            .andThen(wrist.homeAngle()).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 }

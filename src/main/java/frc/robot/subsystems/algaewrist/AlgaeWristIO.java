@@ -23,4 +23,16 @@ public interface AlgaeWristIO {
 
     public void setWristVoltage(double volts);
 
+    public static class Empty implements AlgaeWristIO {
+
+        @Override
+        public void updateInputs(AlgaeWristInputs inputs) {}
+
+        @Override
+        public void setWristSetpoint(Angle angle) {}
+
+        @Override
+        public void setWristVoltage(double volts) {}
+    }
 }
+

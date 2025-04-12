@@ -25,5 +25,6 @@ public class AlgaeWristSim implements AlgaeWristIO {
     public void setWristVoltage(double volts) {
 
     }
-
 }
+
+     

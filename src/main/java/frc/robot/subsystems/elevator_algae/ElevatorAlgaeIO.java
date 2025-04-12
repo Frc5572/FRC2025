@@ -34,7 +34,6 @@ public interface ElevatorAlgaeIO {
         public void updateInputs(AlgaeIOInputs inputs) {
 
         }
-
     }
 
 }

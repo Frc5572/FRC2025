@@ -1,6 +1,5 @@
 package frc.robot.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.Inch;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import java.util.function.Supplier;
@@ -26,8 +25,6 @@ public class Elevator extends SubsystemBase {
     private ElevatorInputsAutoLogged inputs = new ElevatorInputsAutoLogged();
     public Trigger hightAboveP0 = new Trigger(() -> hightAboveP0());
     public Trigger heightAboveHome = new Trigger(() -> heightAboveHome());
-
-    private Distance targetLocation = Inch.of(0);
 
     /** Elevator Subsystem */
     public Elevator(ElevatorIO io, Viz2025 viz) {
@@ -101,6 +98,10 @@ public class Elevator extends SubsystemBase {
         return moveToFast(() -> Constants.Elevator.P5);
     }
 
+    public Command barge() {
+        return moveToFast(() -> Constants.Elevator.BARGE_HEIGHT);
+    }
+
     public boolean hightAboveP0() {
         return (inputs.position).in(Inches) >= (Constants.Elevator.P0).in(Inches) + 5;
     }
@@ -109,13 +110,6 @@ public class Elevator extends SubsystemBase {
         return (inputs.position).in(Inches) >= (Constants.Elevator.HOME).in(Inches) + 5;
     }
 
-    public Distance getTargetLocation() {
-        return targetLocation;
-    }
-
-    public boolean atTargetLocation() {
-        return Math.abs(inputs.position.in(Inches) - targetLocation.in(Inches)) < 1;
-    }
 
     /**
      * sets height of elevator
@@ -127,9 +121,9 @@ public class Elevator extends SubsystemBase {
     public Command moveTo(Supplier<Distance> height) {
         return runOnce(() -> {
             Logger.recordOutput("targetHeight", height.get().in(Meters));
-            targetLocation = height.get();
-            io.setPositon(targetLocation.in(Meters));
-        }).andThen(Commands.waitUntil(this::atTargetLocation));
+            io.setPositon(height.get().in(Meters));
+        }).andThen(Commands
+            .waitUntil(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1));
     }
 
     /**
@@ -141,20 +135,20 @@ public class Elevator extends SubsystemBase {
      */
     public Command moveToFast(Supplier<Distance> height) {
         return runOnce(() -> {
-            targetLocation = height.get();
-            Logger.recordOutput("targetHeight", targetLocation.in(Meters));
-            io.setPositonFast(targetLocation.in(Meters));
-        }).andThen(Commands.waitUntil(this::atTargetLocation));
+            Logger.recordOutput("targetHeight", height.get().in(Meters));
+            io.setPositonFast(height.get().in(Meters));
+        }).andThen(Commands
+            .waitUntil(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1));
     }
 
     /** Continuously sets the height of the elevator */
     public Command follow(Supplier<Distance> height) {
         return run(() -> {
-            targetLocation = height.get();
-            Logger.recordOutput("targetHeight", targetLocation.in(Meters));
-            io.setPositonFast(targetLocation.in(Meters));
+            Logger.recordOutput("targetHeight", height.get().in(Meters));
+            io.setPositonFast(height.get().in(Meters));
         });
     }
+
 
     public Command manualMove(CommandXboxController leftStick) {
         return run(() -> io.setPower(leftStick.getLeftY()));
