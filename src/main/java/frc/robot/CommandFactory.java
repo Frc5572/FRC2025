@@ -353,7 +353,7 @@ public class CommandFactory {
      * @return move and score in barge
      */
     public static Command scoreInBarge(Swerve swerve, Elevator elevator, ElevatorAlgae algae,
-        AlgaeWrist wirst) {
+        AlgaeWrist wrist) {
         return (ensureHome(elevator)
             .alongWith(new MoveAndAvoidReef(swerve, () -> bargeScorePose, () -> {
                 if (elevator.hightAboveP0.getAsBoolean()) {
@@ -361,7 +361,7 @@ public class CommandFactory {
                 } else {
                     return Constants.SwerveTransformPID.MAX_VELOCITY;
                 }
-            }, true, Units.inchesToMeters(6), 3))).andThen(bargeSpitAlgae(elevator, algae, wirst)
+            }, true, Units.inchesToMeters(6), 3))).andThen(bargeSpitAlgae(elevator, algae, wrist)
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
     }
 
@@ -372,11 +372,11 @@ public class CommandFactory {
      * @param algae Algae Subsystem
      * @return Command
      */
-    public static Command bargeSpitAlgae(Elevator elevator, ElevatorAlgae algae, AlgaeWrist wirst) {
+    public static Command bargeSpitAlgae(Elevator elevator, ElevatorAlgae algae, AlgaeWrist wrist) {
         return Commands.waitUntil(() -> elevator.getHeight().in(Inches) > 65)
             .deadlineFor(elevator.barge())
             .andThen(
-                wirst.bargeAngle().andThen(algae.algaeOuttakeCommand()).withTimeout(.3).asProxy())
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+                wrist.bargeAngle().andThen(algae.algaeOuttakeCommand()).withTimeout(.3).asProxy())
+            .andThen(wrist.homeAngle()).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 }

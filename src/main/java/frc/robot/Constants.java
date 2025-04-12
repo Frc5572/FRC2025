@@ -82,6 +82,12 @@ public final class Constants {
         public static final Angle HOME_ANGLE = Degrees.of(0.0);
         public static final Angle REEF_ANGLE = Degrees.of(0.0);
 
+        public static final double KP = 0.0;
+        public static final double KI = 0.0;
+        public static final double KD = 0.0;
+
+        public static final double KG = 0.0;
+        public static final double KS = 0.0;
     }
 
     // pit and alt operator controllers
