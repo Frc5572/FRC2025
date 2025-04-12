@@ -313,10 +313,10 @@ public class RobotContainer {
 
         final Container<Double> wristVoltage = new Container<Double>(0.0);
         new Trigger(() -> {
-            return Math.abs(pitController.getLeftY()) > 0.1;
+            return Math.abs(pitController.getRightY()) > 0.1;
         }).whileTrue(Commands.run(() -> {
-            double add = pitController.getLeftY() > 0 ? -0.1 : 0.1;
-            wristVoltage.value += add + pitController.getLeftY();
+            double add = pitController.getRightY() > 0 ? -0.1 : 0.1;
+            wristVoltage.value += add + pitController.getRightY();
             SmartDashboard.putNumber("wristVoltage", wristVoltage.value);
         }));
         pitController.leftBumper().whileTrue(wrist.runVolts(() -> wristVoltage.value));
