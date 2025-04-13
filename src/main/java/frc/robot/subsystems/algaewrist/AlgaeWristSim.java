@@ -25,6 +25,9 @@ public class AlgaeWristSim implements AlgaeWristIO {
     public void setWristVoltage(double volts) {
 
     }
+
+    @Override
+    public void setBrakeMode(boolean brake) {
+    }
 }
 
-     

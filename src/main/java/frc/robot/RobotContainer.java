@@ -1,5 +1,6 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,7 +26,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.lib.util.Container;
 import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.WebController;
 import frc.lib.util.viz.FieldViz;
@@ -160,7 +160,7 @@ public class RobotContainer {
             swerve::followTrajectory, true, swerve);
 
         AutoCommandFactory autos = new AutoCommandFactory(autoFactory, swerve, elevator,
-            coralScoring, algae, ledsLeftFrontSide);
+            coralScoring, algae, ledsLeftFrontSide, wrist);
         autoChooser = new AutoChooser();
         autoChooser.addRoutine("Example", autos::example);
         autoChooser.addRoutine("Left Side L4 Coral", autos::l4left);
@@ -173,9 +173,10 @@ public class RobotContainer {
         SmartDashboard.putData(Constants.DashboardValues.autoChooser, autoChooser);
 
         RobotModeTriggers.autonomous()
-            .whileTrue(autoChooser.selectedCommandScheduler()
+            .whileTrue(wrist.homeAngle().andThen(autoChooser.selectedCommandScheduler())
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
                 .andThen(Commands.runOnce(() -> swerve.setMotorsZero())));
+        // RobotModeTriggers.teleop().onTrue(wrist.homeAngle());
         RobotModeTriggers.disabled().onTrue(Commands.runOnce(() -> swerve.setMotorsZero()));
 
 
@@ -238,7 +239,7 @@ public class RobotContainer {
             Constants.Swerve.isOpenLoop));
 
         Command autoScore = CommandFactory
-            .autoScore(swerve, elevator, coralScoring, algae, operator::getDesiredLocation,
+            .autoScore(swerve, elevator, coralScoring, algae, wrist, operator::getDesiredLocation,
                 operator::getDesiredHeight, operator::additionalAlgaeHeight, operator::crossOut)
             .andThen(CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder))
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
@@ -271,9 +272,14 @@ public class RobotContainer {
         // .whileTrue(CommandFactory
         // .doSomethingWithAlgae(swerve, elevator, algae, operator::whatToDoWithAlgae).andThen(
         // CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)));
-        driver.rightTrigger().whileTrue(elevator.p5()).onFalse(elevator.home());
+        driver.rightTrigger().whileTrue(elevator.p5().deadlineFor(wrist.bargeAngle()))
+            .onFalse(elevator.home().deadlineFor(wrist.homeAngle()));
         driver.back().onTrue(elevator.stop());
         driver.leftTrigger().whileTrue(algae.algaeOuttakeCommand());
+        driver.leftBumper().whileTrue(wrist.groundAngle().alongWith(algae.algaeIntakeCommand()))
+            .onFalse(wrist.homeAngle().withTimeout(0.5));
+        driver.rightBumper().whileTrue(wrist.groundAngle())
+            .onFalse(wrist.homeAngle().withTimeout(0.5));
         // driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'd')
         // .whileTrue(algae.algaeOuttakeCommand().withTimeout(1.0));
         // driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'b')
@@ -301,9 +307,9 @@ public class RobotContainer {
     }
 
     private void setupPitController() {
-        pitController.a().whileTrue(CommandFactory.scoreInBarge(swerve, elevator, algae, wrist));
+        // pitController.a().whileTrue(CommandFactory.scoreInBarge(swerve, elevator, algae, wrist));
         pitController.b().onTrue(elevator.manualMove(altOperator));
-        pitController.leftBumper().whileTrue(climb.resetClimberCommand());
+        // pitController.leftBumper().whileTrue(climb.resetClimberCommand());
         pitController.x().whileTrue(climb.manualClimb(() -> pitController.getLeftY()));
         pitController.y().onTrue(climb.resetEncoder());
         pitController.start().and(RobotBase::isSimulation).onTrue(
@@ -311,15 +317,14 @@ public class RobotContainer {
         // remove later
         SmartDashboard.putNumber("elevatorTargetHeight", 20);
 
-        final Container<Double> wristVoltage = new Container<Double>(0.0);
-        new Trigger(() -> {
-            return Math.abs(pitController.getRightY()) > 0.1;
-        }).whileTrue(Commands.run(() -> {
-            double add = pitController.getRightY() > 0 ? -0.1 : 0.1;
-            wristVoltage.value += add + pitController.getRightY();
-            SmartDashboard.putNumber("wristVoltage", wristVoltage.value);
-        }));
-        pitController.leftBumper().whileTrue(wrist.runVolts(() -> wristVoltage.value));
+        SmartDashboard.putNumber("wristVoltage", 0.5);
+
+        pitController.leftBumper()
+            .whileTrue(wrist.runVolts(() -> SmartDashboard.getNumber("wristVoltage", 0)))
+            .onFalse(wrist.runVolts(() -> 0.0).withTimeout(0.5));
+        pitController.rightBumper().whileTrue(wrist.coast());
+        pitController.a().whileTrue(wrist.goToAngle(() -> Degrees.of(-22)))
+            .onFalse(wrist.runVolts(() -> 0.0));
         // driver.a().whileTrue(
         // elevator.moveTo(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
     }
@@ -333,7 +338,7 @@ public class RobotContainer {
         vision.seesTwoAprilTags.whileTrue(ledsRightSide.setRainbow());
 
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
-        // RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
+        RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
         // Algae
         // algae.hasAlgae.and(coralScoring.coralAtOuttake.negate())
         // .onTrue(ledsrightbackside.blinkLEDs(Color.kGreen, 2));

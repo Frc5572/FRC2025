@@ -13,6 +13,7 @@ public interface AlgaeWristIO {
     @AutoLog
     public static class AlgaeWristInputs {
         public Angle wristAngle = Degrees.of(0);
+        public Angle wristAngleAbsolute = Degrees.of(0);
         public Voltage voltage = Volts.of(0);
         public Current current = Amps.of(0);
     }
@@ -22,6 +23,8 @@ public interface AlgaeWristIO {
     public void setWristSetpoint(Angle angle);
 
     public void setWristVoltage(double volts);
+
+    public void setBrakeMode(boolean brake);
 
     public static class Empty implements AlgaeWristIO {
 
@@ -33,6 +36,9 @@ public interface AlgaeWristIO {
 
         @Override
         public void setWristVoltage(double volts) {}
+
+        @Override
+        public void setBrakeMode(boolean brake) {}
     }
 }
 

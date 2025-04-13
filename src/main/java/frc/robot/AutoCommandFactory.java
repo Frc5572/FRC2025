@@ -19,6 +19,7 @@ import frc.lib.util.ScoringLocation.Height;
 import frc.robot.commands.MoveAndAvoidReef;
 import frc.robot.commands.MoveToPose;
 import frc.robot.subsystems.LEDs;
+import frc.robot.subsystems.algaewrist.AlgaeWrist;
 import frc.robot.subsystems.coral.CoralScoring;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator_algae.ElevatorAlgae;
@@ -35,6 +36,7 @@ public class AutoCommandFactory {
     CoralScoring coral;
     LEDs leds;
     ElevatorAlgae algae;
+    AlgaeWrist wrist;
 
     private SendableChooser<ScoringLocation.Height> algaeHeight =
         new SendableChooser<ScoringLocation.Height>();
@@ -49,13 +51,14 @@ public class AutoCommandFactory {
      * @param leds LED Subsystem
      */
     public AutoCommandFactory(AutoFactory autoFactory, Swerve swerve, Elevator elevator,
-        CoralScoring coral, ElevatorAlgae algae, LEDs leds) {
+        CoralScoring coral, ElevatorAlgae algae, LEDs leds, AlgaeWrist wrist) {
         this.autoFactory = autoFactory;
         this.swerve = swerve;
         this.elevator = elevator;
         this.coral = coral;
         this.algae = algae;
         this.leds = leds;
+        this.wrist = wrist;
 
         algaeHeight.setDefaultOption("High", ScoringLocation.Height.KP2);
         algaeHeight.addOption("Low", ScoringLocation.Height.KP0);
@@ -143,8 +146,8 @@ public class AutoCommandFactory {
         AutoRoutine routine = autoFactory.newRoutine(name);
         Command ret = CommandFactory.dropAlgaeIntake(swerve).deadlineFor(coral.runCoralIntake());
         for (var loc : locations) {
-            ret = ret.andThen(CommandFactory.autoScore(swerve, elevator, coral, algae, () -> loc,
-                () -> Height.KP4, () -> Optional.empty(), (x) -> {
+            ret = ret.andThen(CommandFactory.autoScore(swerve, elevator, coral, algae, wrist,
+                () -> loc, () -> Height.KP4, () -> Optional.empty(), (x) -> {
                 }));
             if (isLeft) {
                 ret = ret.andThen(
@@ -156,8 +159,7 @@ public class AutoCommandFactory {
             ret = ret.andThen(coral.runCoralIntake().until(coral.coralAtIntake));
         }
         ret = ret.andThen(swerve.stop());
-        routine.active().onTrue(ret.alongWith(algae.algaeOuttakeCommand().withTimeout(5.0))
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+        routine.active().onTrue(ret.withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
         return routine;
     }
 
@@ -191,8 +193,8 @@ public class AutoCommandFactory {
                 }
             }
             isFirst = false;
-            ret = ret.andThen(CommandFactory.autoScore(swerve, elevator, coral, algae, () -> loc,
-                () -> Height.KP4, () -> Optional.empty(), (x) -> {
+            ret = ret.andThen(CommandFactory.autoScore(swerve, elevator, coral, algae, wrist,
+                () -> loc, () -> Height.KP4, () -> Optional.empty(), (x) -> {
                 }));
             boolean isFar = loc.pose.getX() > FieldConstants.Reef.center.getX();
             Command feederCommand;

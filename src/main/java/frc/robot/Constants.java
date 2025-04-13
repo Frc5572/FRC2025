@@ -73,14 +73,15 @@ public final class Constants {
         public static final double HAS_ALGAE_CURRENT_THRESHOLD = 50;
         public static final int VOLTAGE = 12;
         public static final int NEGATIVE_VOLTAGE = -12;
-        public static final double SMALLER_VOLTAGE = 1.5;
-        public static final double SMALLER_NEGATIVE_VOLTAGE = -1;
+        public static final double SMALLER_VOLTAGE = 12;
+        public static final double SMALLER_NEGATIVE_VOLTAGE = -12;
 
-        public static final int CANCODER_ID = 0;
+        public static final int CANCODER_ID = 48;
 
-        public static final Angle BARGE_ANGLE = Degrees.of(0.0);
-        public static final Angle HOME_ANGLE = Degrees.of(0.0);
-        public static final Angle REEF_ANGLE = Degrees.of(0.0);
+        public static final Angle BARGE_ANGLE = Degrees.of(50.0);
+        public static final Angle HOME_ANGLE = Degrees.of(80.0);
+        public static final Angle GROUND_ANGLE = Degrees.of(-37.0);
+        public static final Angle REEF_ANGLE = Degrees.of(-20.0);
 
         public static final double KP = 0.0;
         public static final double KI = 0.0;
@@ -111,7 +112,7 @@ public final class Constants {
          * Algae Motor CAN id's
          */
         public static final class AlgaeMotors {
-            public static final int ALGAE_WRIST_MOTOR_ID = 0;
+            public static final int ALGAE_WRIST_MOTOR_ID = 3;
             public static final int ALGAE_ROLLER_MOTOR_ID = 6;
         }
 
@@ -134,7 +135,7 @@ public final class Constants {
     public static final class Climb {
         public static final int RIGHT_TALON_FX_ID = 12;
         public static final int TOUCH_SENSOR_CHANNEL = 2;
-        public static final Angle CLIMB_ANGLE = Radians.of(600);
+        public static final Angle CLIMB_ANGLE = Radians.of(650);
         public static final Angle MAX_ANGLE = Radians.of(703);
         public static final Angle CLIMBER_OUT_ANGLE = Radians.of(300);
         public static final Angle CLIMBER_START_ANGLE = Radians.of(146);
@@ -351,12 +352,12 @@ public final class Constants {
 
         // positions
         public static final Distance HOME = Inches.of(2);
-        public static final Distance P0 = Inches.of(16.5); // Algae 1
+        public static final Distance P0 = Inches.of(21.5); // Algae 1
         public static final Distance P1 = Inches.of(26.45); // Coral l1
-        public static final Distance P2 = Inches.of(31.2); // Algae 2
+        public static final Distance P2 = Inches.of(36.2); // Algae 2
         public static final Distance P3 = Inches.of(43.6); // Coral L3
         public static final Distance P4 = Inches.of(68.9); // Coral L4
-        public static final Distance P5 = Inches.of(74); // Barge
+        public static final Distance P5 = Inches.of(60); // Barge
 
         public static final double HEIGHT_PER_METER_AWAY = 2.4 / 1.0;
         public static final Distance BARGE_HEIGHT = P5;

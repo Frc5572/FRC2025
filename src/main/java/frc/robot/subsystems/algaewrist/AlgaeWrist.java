@@ -32,7 +32,7 @@ public class AlgaeWrist extends SubsystemBase {
     }
 
     public Command runVolts(DoubleSupplier volts) {
-        return this.run(() -> io.setWristVoltage(volts.getAsDouble()));
+        return this.runOnce(() -> io.setWristVoltage(volts.getAsDouble()));
     }
 
     public Command goToAngle(Supplier<Angle> angle) {
@@ -56,7 +56,15 @@ public class AlgaeWrist extends SubsystemBase {
         return goToAngle(() -> Constants.Algae.HOME_ANGLE);
     }
 
+    public Command groundAngle() {
+        return goToAngle(() -> Constants.Algae.GROUND_ANGLE);
+    }
+
     public Command reefAngle() {
         return goToAngle(() -> Constants.Algae.REEF_ANGLE);
+    }
+
+    public Command coast() {
+        return Commands.runEnd(() -> io.setBrakeMode(false), () -> io.setBrakeMode(true), this);
     }
 }
