@@ -233,6 +233,69 @@ public class AutoCommandFactory {
         return routine;
     }
 
+    public AutoRoutine bargeRight() {
+        return coralThenBarge("bargeRight", ScoringLocation.CoralLocation.G, AlgaeLocation.D,
+            AlgaeLocation.C);
+    }
+
+    public AutoRoutine bargeLeft() {
+        return coralThenBarge("bargeLeft", ScoringLocation.CoralLocation.G, AlgaeLocation.D,
+            AlgaeLocation.E);
+    }
+
+    private static enum AlgaeLocation {
+        // @formatter:off
+        A(ScoringLocation.CoralLocation.B, ScoringLocation.Height.KP2), 
+        B(ScoringLocation.CoralLocation.D, ScoringLocation.Height.KP0), 
+        C(ScoringLocation.CoralLocation.F, ScoringLocation.Height.KP2), 
+        D(ScoringLocation.CoralLocation.H, ScoringLocation.Height.KP0), 
+        E(ScoringLocation.CoralLocation.J, ScoringLocation.Height.KP2), 
+        F(ScoringLocation.CoralLocation.L, ScoringLocation.Height.KP0);
+        // @formatter:on
+
+        public final ScoringLocation.CoralLocation location;
+        public final ScoringLocation.Height height;
+
+        AlgaeLocation(ScoringLocation.CoralLocation location, ScoringLocation.Height height) {
+            this.location = location;
+            this.height = height;
+        }
+    }
+
+    private static final Pose2d bargePose = new Pose2d(7.558475971221924 + Units.inchesToMeters(0),
+        6.258963108062744, Rotation2d.kZero);
+
+    private AutoRoutine coralThenBarge(String name,
+        ScoringLocation.CoralLocation coralScoreLocation, AlgaeLocation... algaeScoreLocations) {
+        AutoRoutine routine = autoFactory.newRoutine(name);
+
+        Command run = CommandFactory.maybeScoreCoral(swerve, elevator, coral, algae, wrist,
+            () -> coralScoreLocation, () -> ScoringLocation.Height.KP4);
+
+        for (var algaeLoc : algaeScoreLocations) {
+            run = run.andThen(
+                CommandFactory.reefPreAlign(swerve, () -> algaeLoc.location)
+                    .deadlineFor(elevator.home()),
+                CommandFactory.maybePickupAlgae(swerve, elevator, algae, wrist,
+                    () -> algaeLoc.location, () -> algaeLoc.height, (x) -> {
+                    }),
+                new MoveAndAvoidReef(swerve,
+                    () -> new Pose2d(bargePose.getTranslation(),
+                        FieldConstants.Reef.center.minus(bargePose.getTranslation()).getAngle()),
+                    () -> Constants.SwerveTransformPID.MAX_VELOCITY, true, Units.inchesToMeters(36),
+                    180, routine).deadlineFor(CommandFactory.ensureHome(elevator)),
+                new MoveToPose(swerve, () -> bargePose,
+                    () -> Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY, true,
+                    Units.inchesToMeters(6), 15, routine),
+                elevator.p5(), algae.algaeOuttakeCommand().withTimeout(0.7));
+        }
+
+        run = run.andThen(swerve.stop(), elevator.home());
+        routine.active().onTrue(run.withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+
+        return routine;
+    }
+
     // /** Barge auto */
     // public AutoRoutine barge() {
 

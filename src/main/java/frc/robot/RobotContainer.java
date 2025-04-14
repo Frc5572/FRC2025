@@ -112,7 +112,7 @@ public class RobotContainer {
     private AlgaeWrist wrist;
 
     Pose2d blueStart = new Pose2d(7.247, 1.126, new Rotation2d(2.276));
-    Pose2d redStart = new Pose2d(10.025, 1.476, new Rotation2d(0.900));
+    Pose2d redStart = new Pose2d(10.025, 3.476, new Rotation2d(0));
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -170,6 +170,8 @@ public class RobotContainer {
         autoChooser.addRoutine("Middle L4 Coral Left Station", autos::l4middleLeftStation);
         autoChooser.addRoutine("Front L4 Coral Right Station", autos::l4FrontRightStation);
         autoChooser.addRoutine("Front L4 Coral Left Station", autos::l4FrontLeftStation);
+        autoChooser.addRoutine("Barge Right", autos::bargeRight);
+        autoChooser.addRoutine("Barge Left", autos::bargeLeft);
         // autoChooser.addRoutine("Barge", autos::barge);
         SmartDashboard.putData(Constants.DashboardValues.autoChooser, autoChooser);
 
