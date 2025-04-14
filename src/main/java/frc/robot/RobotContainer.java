@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
@@ -176,7 +177,9 @@ public class RobotContainer {
             .whileTrue(wrist.homeAngle().andThen(autoChooser.selectedCommandScheduler())
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
                 .andThen(Commands.runOnce(() -> swerve.setMotorsZero())));
-        // RobotModeTriggers.teleop().onTrue(wrist.homeAngle());
+        RobotModeTriggers.teleop()
+            .and(() -> DriverStation.isFMSAttached() || !pitController.isConnected())
+            .onTrue(wrist.homeAngle());
         RobotModeTriggers.disabled().onTrue(Commands.runOnce(() -> swerve.setMotorsZero()));
 
 
