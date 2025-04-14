@@ -13,7 +13,6 @@ public interface AlgaeWristIO {
     @AutoLog
     public static class AlgaeWristInputs {
         public Angle wristAngle = Degrees.of(0);
-        public Angle wristAngleAbsolute = Degrees.of(0);
         public Voltage voltage = Volts.of(0);
         public Current current = Amps.of(0);
     }
