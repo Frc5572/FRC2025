@@ -16,6 +16,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants;
 
+/** Real implementation */
 public class AlgaeWristReal implements AlgaeWristIO {
 
     private final TalonFX wristMotor =
@@ -25,6 +26,7 @@ public class AlgaeWristReal implements AlgaeWristIO {
     private StatusSignal<Voltage> wristVoltage = wristMotor.getMotorVoltage();
     private StatusSignal<Current> motorCurrent = wristMotor.getStatorCurrent();
 
+    /** Real implementation */
     public AlgaeWristReal() {
         configMotor();
 

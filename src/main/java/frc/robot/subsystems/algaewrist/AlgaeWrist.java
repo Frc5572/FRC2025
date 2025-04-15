@@ -12,12 +12,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Constants;
 
+/** Algae Wrist */
 public class AlgaeWrist extends SubsystemBase {
 
     private final Viz2025 viz;
     private final AlgaeWristIO io;
     private final AlgaeWristInputsAutoLogged inputs = new AlgaeWristInputsAutoLogged();
 
+    /** Algae Wrist */
     public AlgaeWrist(Viz2025 viz, AlgaeWristIO io) {
         this.viz = viz;
         this.io = io;
@@ -31,10 +33,12 @@ public class AlgaeWrist extends SubsystemBase {
         viz.setAlgaeAngle(inputs.wristAngle);
     }
 
+    /** set wrist voltage */
     public Command runVolts(DoubleSupplier volts) {
         return this.runOnce(() -> io.setWristVoltage(volts.getAsDouble()));
     }
 
+    /** Get within 5 degrees of a desired angle */
     public Command goToAngle(Supplier<Angle> angle) {
         return this.runOnce(() -> io.setWristSetpoint(angle.get())).andThen(Commands.waitUntil(
             () -> Math.abs(inputs.wristAngle.in(Rotations) - angle.get().in(Rotations)) < Degrees
@@ -48,22 +52,27 @@ public class AlgaeWrist extends SubsystemBase {
         });
     }
 
+    /** Angle for barge */
     public Command bargeAngle() {
         return goToAngle(() -> Constants.Algae.BARGE_ANGLE);
     }
 
+    /** Angle for home */
     public Command homeAngle() {
         return goToAngle(() -> Constants.Algae.HOME_ANGLE);
     }
 
+    /** Angle for ground intake */
     public Command groundAngle() {
         return goToAngle(() -> Constants.Algae.GROUND_ANGLE);
     }
 
+    /** Angle for picking off of reef */
     public Command reefAngle() {
         return goToAngle(() -> Constants.Algae.REEF_ANGLE);
     }
 
+    /** Make wrist backdrivable */
     public Command coast() {
         return Commands.runEnd(() -> io.setBrakeMode(false), () -> io.setBrakeMode(true), this);
     }

@@ -74,6 +74,7 @@ public class CommandFactory {
             Units.inchesToMeters(4), 5).withTimeout(1.5);
     }
 
+    /** Score coral */
     public static Command scoreWithElevator(Swerve swerve, Elevator elevator,
         Supplier<ScoringLocation.CoralLocation> location, Supplier<ScoringLocation.Height> height) {
         return reefAlign(swerve, location, 1).alongWith(
@@ -85,6 +86,7 @@ public class CommandFactory {
         return elevator.home().repeatedly().until(() -> elevator.getHeight().in(Inches) < 0.5);
     }
 
+    /** Score coral if coral height selected */
     public static Command maybeScoreCoral(Swerve swerve, Elevator elevator,
         CoralScoring coralScoring, ElevatorAlgae algae, AlgaeWrist wrist,
         Supplier<ScoringLocation.CoralLocation> location, Supplier<ScoringLocation.Height> height) {
@@ -102,6 +104,7 @@ public class CommandFactory {
                 coralScoring.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae));
     }
 
+    /** Pick algae off of reef */
     public static Command maybePickupAlgae(Swerve swerve, Elevator elevator, ElevatorAlgae algae,
         AlgaeWrist wrist, Supplier<ScoringLocation.CoralLocation> location,
         Supplier<ScoringLocation.Height> algaeHeight, Consumer<ScoringLocation.Height> crossOut) {

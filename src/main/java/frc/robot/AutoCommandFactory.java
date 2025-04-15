@@ -233,11 +233,13 @@ public class AutoCommandFactory {
         return routine;
     }
 
+    /** Score one coral, 2 barge */
     public AutoRoutine bargeRight() {
         return coralThenBarge("bargeRight", ScoringLocation.CoralLocation.H, AlgaeLocation.D,
             AlgaeLocation.C);
     }
 
+    /** Score one coral, 2 barge */
     public AutoRoutine bargeLeft() {
         return coralThenBarge("bargeLeft", ScoringLocation.CoralLocation.H, AlgaeLocation.D,
             AlgaeLocation.E);

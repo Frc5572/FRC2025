@@ -3,10 +3,12 @@ package frc.robot.subsystems.algaewrist;
 import static edu.wpi.first.units.Units.Degrees;
 import edu.wpi.first.units.measure.Angle;
 
+/** Sim implementation */
 public class AlgaeWristSim implements AlgaeWristIO {
 
     Angle angle = Degrees.of(45);
 
+    /** Sim implementation */
     public AlgaeWristSim() {
 
     }
@@ -27,7 +29,6 @@ public class AlgaeWristSim implements AlgaeWristIO {
     }
 
     @Override
-    public void setBrakeMode(boolean brake) {
-    }
+    public void setBrakeMode(boolean brake) {}
 }
 
