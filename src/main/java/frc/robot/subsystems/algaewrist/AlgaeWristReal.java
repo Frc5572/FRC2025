@@ -41,7 +41,7 @@ public class AlgaeWristReal implements AlgaeWristIO {
         // Gear ratio
         wristConf.Feedback.SensorToMechanismRatio = 180.0;
         wristConf.Feedback.RotorToSensorRatio = 1.0;
-        wristConf.ClosedLoopGeneral.ContinuousWrap = true;
+        wristConf.ClosedLoopGeneral.ContinuousWrap = false;
 
         wristConf.Slot0.kP = 80.0;
         wristConf.Slot0.kI = 0.0;

@@ -76,8 +76,8 @@ public class CommandFactory {
 
     public static Command scoreWithElevator(Swerve swerve, Elevator elevator,
         Supplier<ScoringLocation.CoralLocation> location, Supplier<ScoringLocation.Height> height) {
-        return reefAlign(swerve, location, 1)
-            .alongWith(elevator.moveToFast(() -> height.get().height));
+        return reefAlign(swerve, location, 1).alongWith(
+            elevator.moveToFast(() -> height.get().height).andThen(Commands.waitSeconds(0.2)));
     }
 
     /** Go home, no exception */
