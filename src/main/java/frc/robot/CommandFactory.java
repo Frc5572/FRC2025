@@ -16,10 +16,10 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.lib.util.AllianceFlipUtil;
-import frc.lib.util.Container;
 import frc.lib.util.ScoringLocation;
 import frc.robot.commands.MoveAndAvoidReef;
 import frc.robot.commands.MoveToPose;
+import frc.robot.subsystems.algaewrist.AlgaeWrist;
 import frc.robot.subsystems.coral.CoralScoring;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator_algae.ElevatorAlgae;
@@ -32,9 +32,7 @@ public class CommandFactory {
 
     /** Move slightly to ensure algae intake is dropped. */
     public static Command dropAlgaeIntake(Swerve swerve) {
-        return swerve.run(() -> {
-            swerve.setModuleStates(new ChassisSpeeds(4.0, 0.0, 0.0));
-        }).withTimeout(0.2).andThen(swerve.stop()).andThen(Commands.waitSeconds(0.25));
+        return Commands.none();
     }
 
     /** Approach reef scoring location. Elevator can be home during this. */
@@ -76,55 +74,67 @@ public class CommandFactory {
             Units.inchesToMeters(4), 5).withTimeout(1.5);
     }
 
+    /** Score coral */
+    public static Command scoreWithElevator(Swerve swerve, Elevator elevator,
+        Supplier<ScoringLocation.CoralLocation> location, Supplier<ScoringLocation.Height> height) {
+        return reefAlign(swerve, location, 1).alongWith(
+            elevator.moveToFast(() -> height.get().height).andThen(Commands.waitSeconds(0.2)));
+    }
+
     /** Go home, no exception */
     public static Command ensureHome(Elevator elevator) {
         return elevator.home().repeatedly().until(() -> elevator.getHeight().in(Inches) < 0.5);
     }
 
+    /** Score coral if coral height selected */
+    public static Command maybeScoreCoral(Swerve swerve, Elevator elevator,
+        CoralScoring coralScoring, ElevatorAlgae algae, AlgaeWrist wrist,
+        Supplier<ScoringLocation.CoralLocation> location, Supplier<ScoringLocation.Height> height) {
+        return reefPreAlign(swerve, location).deadlineFor(wrist.homeAngle())
+            .andThen(new ConditionalCommand(
+                Commands.waitUntil(() -> coralScoring.getOuttakeBeamBreakStatus())
+                    .deadlineFor(swerve.stop()),
+                Commands.none(), () -> !height.get().isAlgae))
+            .deadlineFor(coralScoring.runCoralIntake()
+                .unless(() -> coralScoring.getOuttakeBeamBreakStatus()))
+            .andThen(new ConditionalCommand(
+                scoreWithElevator(swerve, elevator, location, height).withTimeout(2.4),
+                Commands.none(), () -> !height.get().isAlgae))
+            .andThen(new ConditionalCommand(Commands.none(),
+                coralScoring.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae));
+    }
+
+    /** Pick algae off of reef */
+    public static Command maybePickupAlgae(Swerve swerve, Elevator elevator, ElevatorAlgae algae,
+        AlgaeWrist wrist, Supplier<ScoringLocation.CoralLocation> location,
+        Supplier<ScoringLocation.Height> algaeHeight, Consumer<ScoringLocation.Height> crossOut) {
+        return reefAlign(swerve, location, 12)
+            .alongWith(elevator.moveToFast(() -> algaeHeight.get().height)).withTimeout(0.7)
+            .alongWith(Commands.waitSeconds(0.4).andThen(wrist.reefAngle().withTimeout(0.8)))
+            .andThen(reefAlign(swerve, location, -3).withTimeout(0.7)
+                .deadlineFor(algae.algaeIntakeCommand()))
+            .andThen(backAwayReef(swerve, location).withTimeout(1.0)
+                .alongWith(Commands.waitSeconds(0.6).andThen(wrist.bargeAngle().withTimeout(0.1))));
+    }
+
     /** Move and score coral or retrieve algae. */
     public static Command autoScore(Swerve swerve, Elevator elevator, CoralScoring coralScoring,
-        ElevatorAlgae algae, Supplier<ScoringLocation.CoralLocation> location,
+        ElevatorAlgae algae, AlgaeWrist wrist, Supplier<ScoringLocation.CoralLocation> location,
         Supplier<ScoringLocation.Height> height,
         Supplier<Optional<ScoringLocation.Height>> additionalAlgaeHeight,
         Consumer<ScoringLocation.Height> crossOut) {
 
-        final Container<ScoringLocation.Height> additionalAlgae = new Container<>(null);
-
-        return (reefPreAlign(swerve, location).andThen(new ConditionalCommand(
-            Commands.waitUntil(() -> coralScoring.getOuttakeBeamBreakStatus()),
-            Commands.runOnce(() -> {
-            }), () -> !height.get().isAlgae))
-            .deadlineFor(coralScoring.runCoralIntake()
-                .unless(() -> coralScoring.getOuttakeBeamBreakStatus()))
-            .andThen(new ConditionalCommand(elevator.moveToFast(() -> additionalAlgae.value.height)
-                .alongWith(reefAlign(swerve, location, 12).withTimeout(0.7).andThen(
-                    reefAlign(swerve, location, -3).until(algae.hasAlgae).withTimeout(1.0)))
-                .alongWith(Commands.runOnce(() -> {
-                    crossOut.accept(additionalAlgae.value);
-                })).andThen(backAwayReef(swerve, location).withTimeout(2.0)),
-                Commands.runOnce(() -> {
-                }), () -> {
-                    var value = additionalAlgaeHeight.get();
-                    additionalAlgae.value = null;
-                    if (value.isPresent()) {
-                        additionalAlgae.value = value.get();
-                        return true;
-                    }
-                    return false;
-                }))
+        return maybeScoreCoral(swerve, elevator, coralScoring, algae, wrist, location, height)
             .andThen(new ConditionalCommand(
-                (elevator.moveToFast(() -> height.get().height).andThen(Commands.waitSeconds(0.1))
-                    .andThen(reefAlign(swerve, location, 1).withTimeout(2.4))),
-                (elevator.moveToFast(() -> height.get().height).andThen(Commands.waitSeconds(0.1))
-                    .alongWith(reefAlign(swerve, location, 1).withTimeout(2.4))),
-                () -> additionalAlgae.value != null))
-            .andThen(new ConditionalCommand(Commands.runOnce(() -> {
-            }), coralScoring.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae)))
-                .deadlineFor(
-                    Commands.either(algae.algaeIntakeCommand().asProxy(), Commands.runOnce(() -> {
-                    }), () -> height.get().isAlgae || additionalAlgaeHeight.get().isPresent()))
-                .andThen(new ConditionalCommand(backAwayReef(swerve, location), Commands.none(),
-                    () -> additionalAlgae.value != null));
+                maybePickupAlgae(swerve, elevator, algae, wrist, location, () -> {
+                    var h = height.get();
+                    if (h.isAlgae) {
+                        return h;
+                    } else {
+                        return additionalAlgaeHeight.get().get();
+                    }
+                }, crossOut), Commands.none(),
+                () -> additionalAlgaeHeight.get().isPresent() || height.get().isAlgae));
     }
 
     private static final Pose2d processorPose =
@@ -312,7 +322,8 @@ public class CommandFactory {
      * @param algae algae
      * @return move and score in barge
      */
-    public static Command scoreInBarge(Swerve swerve, Elevator elevator, ElevatorAlgae algae) {
+    public static Command scoreInBarge(Swerve swerve, Elevator elevator, ElevatorAlgae algae,
+        AlgaeWrist wrist) {
         return (ensureHome(elevator)
             .alongWith(new MoveAndAvoidReef(swerve, () -> bargeScorePose, () -> {
                 if (elevator.hightAboveP0.getAsBoolean()) {
@@ -320,7 +331,7 @@ public class CommandFactory {
                 } else {
                     return Constants.SwerveTransformPID.MAX_VELOCITY;
                 }
-            }, true, Units.inchesToMeters(6), 3))).andThen(bargeSpitAlgae(elevator, algae)
+            }, true, Units.inchesToMeters(6), 3))).andThen(bargeSpitAlgae(elevator, algae, wrist)
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
     }
 
@@ -331,10 +342,11 @@ public class CommandFactory {
      * @param algae Algae Subsystem
      * @return Command
      */
-    public static Command bargeSpitAlgae(Elevator elevator, ElevatorAlgae algae) {
+    public static Command bargeSpitAlgae(Elevator elevator, ElevatorAlgae algae, AlgaeWrist wrist) {
         return Commands.waitUntil(() -> elevator.getHeight().in(Inches) > 65)
-            .deadlineFor(elevator.p5())
-            .andThen(algae.algaeOuttakeCommand().withTimeout(.3).asProxy())
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+            .deadlineFor(elevator.barge())
+            .andThen(
+                wrist.bargeAngle().andThen(algae.algaeOuttakeCommand()).withTimeout(.3).asProxy())
+            .andThen(wrist.homeAngle()).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 }

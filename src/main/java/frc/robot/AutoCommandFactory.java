@@ -19,6 +19,7 @@ import frc.lib.util.ScoringLocation.Height;
 import frc.robot.commands.MoveAndAvoidReef;
 import frc.robot.commands.MoveToPose;
 import frc.robot.subsystems.LEDs;
+import frc.robot.subsystems.algaewrist.AlgaeWrist;
 import frc.robot.subsystems.coral.CoralScoring;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator_algae.ElevatorAlgae;
@@ -35,6 +36,7 @@ public class AutoCommandFactory {
     CoralScoring coral;
     LEDs leds;
     ElevatorAlgae algae;
+    AlgaeWrist wrist;
 
     private SendableChooser<ScoringLocation.Height> algaeHeight =
         new SendableChooser<ScoringLocation.Height>();
@@ -49,13 +51,14 @@ public class AutoCommandFactory {
      * @param leds LED Subsystem
      */
     public AutoCommandFactory(AutoFactory autoFactory, Swerve swerve, Elevator elevator,
-        CoralScoring coral, ElevatorAlgae algae, LEDs leds) {
+        CoralScoring coral, ElevatorAlgae algae, LEDs leds, AlgaeWrist wrist) {
         this.autoFactory = autoFactory;
         this.swerve = swerve;
         this.elevator = elevator;
         this.coral = coral;
         this.algae = algae;
         this.leds = leds;
+        this.wrist = wrist;
 
         algaeHeight.setDefaultOption("High", ScoringLocation.Height.KP2);
         algaeHeight.addOption("Low", ScoringLocation.Height.KP0);
@@ -143,8 +146,8 @@ public class AutoCommandFactory {
         AutoRoutine routine = autoFactory.newRoutine(name);
         Command ret = CommandFactory.dropAlgaeIntake(swerve).deadlineFor(coral.runCoralIntake());
         for (var loc : locations) {
-            ret = ret.andThen(CommandFactory.autoScore(swerve, elevator, coral, algae, () -> loc,
-                () -> Height.KP4, () -> Optional.empty(), (x) -> {
+            ret = ret.andThen(CommandFactory.autoScore(swerve, elevator, coral, algae, wrist,
+                () -> loc, () -> Height.KP4, () -> Optional.empty(), (x) -> {
                 }));
             if (isLeft) {
                 ret = ret.andThen(
@@ -156,8 +159,7 @@ public class AutoCommandFactory {
             ret = ret.andThen(coral.runCoralIntake().until(coral.coralAtIntake));
         }
         ret = ret.andThen(swerve.stop());
-        routine.active().onTrue(ret.alongWith(algae.algaeOuttakeCommand().withTimeout(5.0))
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+        routine.active().onTrue(ret.withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
         return routine;
     }
 
@@ -191,8 +193,8 @@ public class AutoCommandFactory {
                 }
             }
             isFirst = false;
-            ret = ret.andThen(CommandFactory.autoScore(swerve, elevator, coral, algae, () -> loc,
-                () -> Height.KP4, () -> Optional.empty(), (x) -> {
+            ret = ret.andThen(CommandFactory.autoScore(swerve, elevator, coral, algae, wrist,
+                () -> loc, () -> Height.KP4, () -> Optional.empty(), (x) -> {
                 }));
             boolean isFar = loc.pose.getX() > FieldConstants.Reef.center.getX();
             Command feederCommand;
@@ -228,6 +230,78 @@ public class AutoCommandFactory {
         ret = ret.andThen(swerve.stop());
         routine.active().onTrue(ret.alongWith(algae.algaeOuttakeCommand().withTimeout(5.0))
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+        return routine;
+    }
+
+    /** Score one coral, 2 barge */
+    public AutoRoutine bargeRight() {
+        return coralThenBarge("bargeRight", ScoringLocation.CoralLocation.H, AlgaeLocation.D,
+            AlgaeLocation.C);
+    }
+
+    /** Score one coral, 2 barge */
+    public AutoRoutine bargeLeft() {
+        return coralThenBarge("bargeLeft", ScoringLocation.CoralLocation.H, AlgaeLocation.D,
+            AlgaeLocation.E);
+    }
+
+    private static enum AlgaeLocation {
+        // @formatter:off
+        A(ScoringLocation.CoralLocation.B, ScoringLocation.Height.KP2),
+        B(ScoringLocation.CoralLocation.D, ScoringLocation.Height.KP0),
+        C(ScoringLocation.CoralLocation.F, ScoringLocation.Height.KP2),
+        D(ScoringLocation.CoralLocation.H, ScoringLocation.Height.KP0),
+        E(ScoringLocation.CoralLocation.J, ScoringLocation.Height.KP2),
+        F(ScoringLocation.CoralLocation.L, ScoringLocation.Height.KP0);
+        // @formatter:on
+
+        public final ScoringLocation.CoralLocation location;
+        public final ScoringLocation.Height height;
+
+        AlgaeLocation(ScoringLocation.CoralLocation location, ScoringLocation.Height height) {
+            this.location = location;
+            this.height = height;
+        }
+    }
+
+    private static final Pose2d bargePose = new Pose2d(7.558475971221924 + Units.inchesToMeters(0),
+        6.258963108062744, Rotation2d.kZero);
+
+    private AutoRoutine coralThenBarge(String name,
+        ScoringLocation.CoralLocation coralScoreLocation, AlgaeLocation... algaeScoreLocations) {
+        AutoRoutine routine = autoFactory.newRoutine(name);
+
+        Command run = CommandFactory.maybeScoreCoral(swerve, elevator, coral, algae, wrist,
+            () -> coralScoreLocation, () -> ScoringLocation.Height.KP4);
+
+        for (var algaeLoc : algaeScoreLocations) {
+            run = run.andThen(
+                CommandFactory.reefPreAlign(swerve, () -> algaeLoc.location)
+                    .deadlineFor(elevator.home(), wrist.homeAngle()),
+                CommandFactory.maybePickupAlgae(swerve, elevator, algae, wrist,
+                    () -> algaeLoc.location, () -> algaeLoc.height, (x) -> {
+                    }),
+                new MoveAndAvoidReef(swerve,
+                    () -> new Pose2d(bargePose.getTranslation(),
+                        FieldConstants.Reef.center.minus(bargePose.getTranslation()).getAngle()),
+                    () -> Constants.SwerveTransformPID.MAX_VELOCITY, true, Units.inchesToMeters(36),
+                    180, routine).deadlineFor(CommandFactory.ensureHome(elevator)),
+                new MoveToPose(swerve, () -> bargePose,
+                    () -> Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY, true,
+                    Units.inchesToMeters(6), 15, routine),
+                elevator.p5().andThen(algae.algaeOuttakeCommand().withTimeout(0.7))
+                    .deadlineFor(wrist.bargeAngle()),
+                new MoveToPose(swerve,
+                    () -> new Pose2d(bargePose.getTranslation(),
+                        FieldConstants.Reef.center.minus(bargePose.getTranslation()).getAngle()),
+                    () -> Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY, true,
+                    Units.inchesToMeters(180), 15, routine)
+                        .deadlineFor(CommandFactory.ensureHome(elevator)));
+        }
+
+        run = run.andThen(swerve.stop(), elevator.home());
+        routine.active().onTrue(run.withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+
         return routine;
     }
 
