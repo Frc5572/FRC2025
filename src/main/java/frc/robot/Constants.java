@@ -410,7 +410,7 @@ public final class Constants {
 
     /** State Estimator Constants */
     public static class StateEstimator {
-        public static final boolean keepInField = false;
+        public static final boolean keepInField = true;
         public static final boolean keepOutOfReefs = true;
         public static final LoggedTunableNumber globalVisionTrust =
             new LoggedTunableNumber("globalVisionTrust", 0.2);
