@@ -94,7 +94,7 @@ public class AutoCommandFactory {
      * @return Auto Routine
      */
     public AutoRoutine l4left() {
-        return scoreCoral("l4left", true, CoralLocation.I, CoralLocation.K, CoralLocation.A,
+        return scoreCoral("l4left", true, CoralLocation.J, CoralLocation.K, CoralLocation.L,
             CoralLocation.L);
     }
 
