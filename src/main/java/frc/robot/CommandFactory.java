@@ -95,8 +95,10 @@ public class CommandFactory {
                 Commands.waitUntil(() -> coralScoring.getOuttakeBeamBreakStatus())
                     .deadlineFor(swerve.stop()),
                 Commands.none(), () -> !height.get().isAlgae))
-            .deadlineFor(coralScoring.runCoralIntake()
-                .unless(() -> coralScoring.getOuttakeBeamBreakStatus()))
+            .deadlineFor(
+                coralScoring.runCoralIntake()
+                    .unless(() -> coralScoring.getOuttakeBeamBreakStatus()),
+                CommandFactory.ensureHome(elevator))
             .andThen(new ConditionalCommand(
                 scoreWithElevator(swerve, elevator, location, height).withTimeout(2.4),
                 Commands.none(), () -> !height.get().isAlgae))
