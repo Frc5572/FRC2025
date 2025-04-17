@@ -80,7 +80,7 @@ public final class Constants {
 
         public static final Angle BARGE_ANGLE = Degrees.of(50.0);
         public static final Angle HOME_ANGLE = Degrees.of(80.0);
-        public static final Angle GROUND_ANGLE = Degrees.of(-46s.0);
+        public static final Angle GROUND_ANGLE = Degrees.of(-46.0);
         public static final Angle REEF_ANGLE = Degrees.of(-20.0);
 
         public static final double KP = 0.0;
