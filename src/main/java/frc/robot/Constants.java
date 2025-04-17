@@ -80,7 +80,7 @@ public final class Constants {
 
         public static final Angle BARGE_ANGLE = Degrees.of(50.0);
         public static final Angle HOME_ANGLE = Degrees.of(80.0);
-        public static final Angle GROUND_ANGLE = Degrees.of(-44.0);
+        public static final Angle GROUND_ANGLE = Degrees.of(-50.0);
         public static final Angle REEF_ANGLE = Degrees.of(-20.0);
 
         public static final double KP = 0.0;
@@ -135,7 +135,7 @@ public final class Constants {
     public static final class Climb {
         public static final int RIGHT_TALON_FX_ID = 12;
         public static final int TOUCH_SENSOR_CHANNEL = 2;
-        public static final Angle CLIMB_ANGLE = Radians.of(650);
+        public static final Angle CLIMB_ANGLE = Radians.of(675);
         public static final Angle MAX_ANGLE = Radians.of(703);
         public static final Angle CLIMBER_OUT_ANGLE = Radians.of(300);
         public static final Angle CLIMBER_START_ANGLE = Radians.of(146);
