@@ -352,8 +352,8 @@ public final class Constants {
 
         // positions
         public static final Distance HOME = Inches.of(2);
-        public static final Distance P0 = Inches.of(21.5); // Algae 1
-        public static final Distance P1 = Inches.of(26.45); // Coral l1
+        public static final Distance P0 = Inches.of(20.5); // Algae 1
+        public static final Distance P1 = Inches.of(27.45); // Coral l1
         public static final Distance P2 = Inches.of(36.2); // Algae 2
         public static final Distance P3 = Inches.of(43.6); // Coral L3
         public static final Distance P4 = Inches.of(68.9); // Coral L4
