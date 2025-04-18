@@ -106,6 +106,31 @@ public class CommandFactory {
                 coralScoring.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae));
     }
 
+    /** Score coral if coral height selected */
+    public static Command scoreCoralAutoStart(Swerve swerve, Elevator elevator,
+        CoralScoring coralScoring, ElevatorAlgae algae, AlgaeWrist wrist,
+        Supplier<ScoringLocation.CoralLocation> location, Supplier<ScoringLocation.Height> height) {
+        return new MoveToPose(swerve, () -> {
+            Pose2d finalLoc = location.get().pose;
+            return new Pose2d(
+                finalLoc.getTranslation()
+                    .minus(new Translation2d(Units.inchesToMeters(12), finalLoc.getRotation())),
+                finalLoc.getRotation());
+        }, () -> Constants.SwerveTransformPID.MAX_VELOCITY, true, Units.inchesToMeters(24), 15)
+            .deadlineFor(wrist.homeAngle())
+            .andThen(new ConditionalCommand(
+                Commands.waitUntil(() -> coralScoring.getOuttakeBeamBreakStatus())
+                    .deadlineFor(swerve.stop()),
+                Commands.none(), () -> !height.get().isAlgae))
+            .deadlineFor(coralScoring.runCoralIntake()
+                .unless(() -> coralScoring.getOuttakeBeamBreakStatus()))
+            .andThen(new ConditionalCommand(
+                scoreWithElevator(swerve, elevator, location, height).withTimeout(2.4),
+                Commands.none(), () -> !height.get().isAlgae))
+            .andThen(new ConditionalCommand(Commands.none(),
+                coralScoring.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae));
+    }
+
     /** Pick algae off of reef */
     public static Command maybePickupAlgae(Swerve swerve, Elevator elevator, ElevatorAlgae algae,
         AlgaeWrist wrist, Supplier<ScoringLocation.CoralLocation> location,
