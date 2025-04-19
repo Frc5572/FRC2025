@@ -262,7 +262,7 @@ public class AutoCommandFactory {
         }
     }
 
-    private static final Pose2d bargePose = new Pose2d(7.558475971221924 + Units.inchesToMeters(0),
+    private static final Pose2d bargePose = new Pose2d(7.558475971221924 + Units.inchesToMeters(-3),
         6.258963108062744, Rotation2d.kZero);
 
     private static final Pose2d middleStartLocation = new Pose2d(
