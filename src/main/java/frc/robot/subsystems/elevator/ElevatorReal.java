@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -29,6 +30,8 @@ public class ElevatorReal implements ElevatorIO {
     private StatusSignal<AngularVelocity> elevatorVelocity = rightElevatorMotor.getVelocity();
     private StatusSignal<Current> motorCurrent = rightElevatorMotor.getStatorCurrent();
     private final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
+    private final DynamicMotionMagicVoltage m_requestFast = new DynamicMotionMagicVoltage(0,
+        Constants.Elevator.FastVelocity, Constants.Elevator.Acceleration, Constants.Elevator.Jerk);
 
     /** Real Elevator Initializer */
     public ElevatorReal() {
@@ -44,8 +47,13 @@ public class ElevatorReal implements ElevatorIO {
 
         // right conf
         elevatorConf.MotorOutput.NeutralMode = Constants.Elevator.BREAK;
-
         elevatorConf.Feedback.SensorToMechanismRatio = Constants.Elevator.SensorToMechanismRatio;
+        elevatorConf.CurrentLimits.StatorCurrentLimit = 150;
+        elevatorConf.CurrentLimits.StatorCurrentLimitEnable = true;
+        elevatorConf.CurrentLimits.SupplyCurrentLimit = 100;
+        elevatorConf.CurrentLimits.SupplyCurrentLimitEnable = true;
+        elevatorConf.CurrentLimits.SupplyCurrentLowerTime = 5.0;
+        elevatorConf.CurrentLimits.SupplyCurrentLowerLimit = 40.0;
 
 
         // PID and feedforward
@@ -94,6 +102,11 @@ public class ElevatorReal implements ElevatorIO {
 
     public void resetHome() {
         rightElevatorMotor.setPosition(0);
+    }
+
+    @Override
+    public void setPositonFast(double position) {
+        rightElevatorMotor.setControl(m_requestFast.withPosition(position));
     }
 
 

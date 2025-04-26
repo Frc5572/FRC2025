@@ -24,6 +24,7 @@ public class Elevator extends SubsystemBase {
     private final Viz2025 viz;
     private ElevatorInputsAutoLogged inputs = new ElevatorInputsAutoLogged();
     public Trigger hightAboveP0 = new Trigger(() -> hightAboveP0());
+    public Trigger heightAboveHome = new Trigger(() -> heightAboveHome());
 
     /** Elevator Subsystem */
     public Elevator(ElevatorIO io, Viz2025 viz) {
@@ -74,32 +75,41 @@ public class Elevator extends SubsystemBase {
      *
      */
     public Command p0() {
-        return moveTo(() -> Constants.Elevator.P0);
+        return moveToFast(() -> Constants.Elevator.P0);
     }
 
     public Command p1() {
-        return moveTo(() -> Constants.Elevator.P1);
+        return moveToFast(() -> Constants.Elevator.P1);
     }
 
     public Command p2() {
-        return moveTo(() -> Constants.Elevator.P2);
+        return moveToFast(() -> Constants.Elevator.P2);
     }
 
     public Command p3() {
-        return moveTo(() -> Constants.Elevator.P3);
+        return moveToFast(() -> Constants.Elevator.P3);
     }
 
     public Command p4() {
-        return moveTo(() -> Constants.Elevator.P4);
+        return moveToFast(() -> Constants.Elevator.P4);
     }
 
     public Command p5() {
-        return moveTo(() -> Constants.Elevator.P5);
+        return moveToFast(() -> Constants.Elevator.P5);
+    }
+
+    public Command barge() {
+        return moveToFast(() -> Constants.Elevator.BARGE_HEIGHT);
     }
 
     public boolean hightAboveP0() {
         return (inputs.position).in(Inches) >= (Constants.Elevator.P0).in(Inches) + 5;
     }
+
+    public boolean heightAboveHome() {
+        return (inputs.position).in(Inches) >= (Constants.Elevator.HOME).in(Inches) + 5;
+    }
+
 
     /**
      * sets height of elevator
@@ -115,6 +125,30 @@ public class Elevator extends SubsystemBase {
         }).andThen(Commands
             .waitUntil(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1));
     }
+
+    /**
+     * sets height of elevator
+     *
+     * @param height desired height of elevator
+     * @return elevator height change
+     *
+     */
+    public Command moveToFast(Supplier<Distance> height) {
+        return runOnce(() -> {
+            Logger.recordOutput("targetHeight", height.get().in(Meters));
+            io.setPositonFast(height.get().in(Meters));
+        }).andThen(Commands
+            .waitUntil(() -> Math.abs(inputs.position.in(Inches) - height.get().in(Inches)) < 1));
+    }
+
+    /** Continuously sets the height of the elevator */
+    public Command follow(Supplier<Distance> height) {
+        return run(() -> {
+            Logger.recordOutput("targetHeight", height.get().in(Meters));
+            io.setPositonFast(height.get().in(Meters));
+        });
+    }
+
 
     public Command manualMove(CommandXboxController leftStick) {
         return run(() -> io.setPower(leftStick.getLeftY()));
@@ -142,7 +176,7 @@ public class Elevator extends SubsystemBase {
      * @return selected height
      */
     public Command heightSelector() {
-        return moveTo(() -> {
+        return moveToFast(() -> {
             var height = Height.getCurrentState();
             Logger.recordOutput(Constants.Elevator.heightName, height.displayName);
             return height.height;

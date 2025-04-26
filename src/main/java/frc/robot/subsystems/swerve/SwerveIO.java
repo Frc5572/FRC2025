@@ -14,10 +14,8 @@ public interface SwerveIO {
 
     @AutoLog
     public static class SwerveInputs {
-        public double yaw;
-        public double roll;
-        public double pitch;
         public Voltage driveMoterVoltage;
+
     }
 
     public void updateInputs(SwerveInputs inputs);

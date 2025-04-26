@@ -6,6 +6,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.LoggedTracer;
@@ -19,6 +20,7 @@ public class ElevatorAlgae extends SubsystemBase {
     ElevatorAlgaeIO io;
     AlgaeIOInputsAutoLogged inputs = new AlgaeIOInputsAutoLogged();
     private final Viz2025 viz;
+    private double speedMultiplier = 1;
 
     /** Get if algae is held */
     public Trigger hasAlgae =
@@ -47,6 +49,7 @@ public class ElevatorAlgae extends SubsystemBase {
         }
         SmartDashboard.putString(Constants.DashboardValues.haveAlgae, temp.toHexString());
         LoggedTracer.record("Algae");
+        Logger.recordOutput("Algae/SpeedMultiplier", speedMultiplier);
     }
 
 
@@ -55,30 +58,37 @@ public class ElevatorAlgae extends SubsystemBase {
         io.setAlgaeMotorVoltage(voltage);
     }
 
-    // /** Get if we're holding algae */
-    // public boolean hasAlgae() {
-    // return inputs.algaeMotorCurrent > Constants.Algae.HAS_ALGAE_CURRENT_THRESHOLD;
-    // }
+    /**
+     * Run algae intake with given speed
+     */
+    public Command runAlgaeMotor(double voltage, DoubleSupplier speedSupplier) {
+        return runEnd(() -> {
+            setAlgaeMotorVoltage(voltage * speedSupplier.getAsDouble());
+            Logger.recordOutput("Algae/Running", true);
+        }, () -> {
+            setAlgaeMotorVoltage(0);
+            Logger.recordOutput("Algae/Running", false);
+        });
+    }
 
-    /** Run algae intake with given speed */
-    public Command runAlgaeMotor(double speed) { // set motor speed Command
-        return runEnd(() -> setAlgaeMotorVoltage(speed), () -> setAlgaeMotorVoltage(0));
-        // .until(() -> hasAlgae());
+    /**
+     * Run algae intake with given speed
+     */
+    public Command runAlgaeMotor(double voltage) {
+        return runAlgaeMotor(voltage, () -> 1);
     }
 
     /** Run algae intake with given speed */
-    public Command runAlgaeMotor(DoubleSupplier speed) { // set motor speed Command
-        return runEnd(() -> setAlgaeMotorVoltage(speed.getAsDouble()),
+    public Command runAlgaeMotor(DoubleSupplier voltage) { // set motor speed Command
+        return runEnd(() -> setAlgaeMotorVoltage(voltage.getAsDouble()),
             () -> setAlgaeMotorVoltage(0));
-        // .until(() -> hasAlgae());
     }
 
     /**
      * Keeps algae intake motor running even after it has intaked an algae, but it lowers the speed
      */
     public Command algaeIntakeCommand() {
-        return runAlgaeMotor(Constants.Algae.VOLTAGE).until(hasAlgae)
-            .andThen(() -> setAlgaeMotorVoltage(Constants.Algae.SMALLER_VOLTAGE));
+        return runAlgaeMotor(Constants.Algae.VOLTAGE).until(hasAlgae).andThen(algaeHoldCommand());
     }
 
     /**
@@ -86,9 +96,17 @@ public class ElevatorAlgae extends SubsystemBase {
      */
     public Command algaeIntakeCommand(BooleanSupplier supplier) {
         return runAlgaeMotor(() -> supplier.getAsBoolean() ? Constants.Algae.VOLTAGE : 0)
-            .until(hasAlgae).andThen(runAlgaeMotor(Constants.Algae.SMALLER_VOLTAGE)
-                .until(() -> !supplier.getAsBoolean()))
+            .until(hasAlgae).andThen(algaeHoldCommand()).until(() -> !supplier.getAsBoolean())
             .repeatedly();
+    }
+
+    /**
+     * Hold Algae in mechanism
+     *
+     * @return Command
+     */
+    public Command algaeHoldCommand() {
+        return runAlgaeMotor(Constants.Algae.SMALLER_VOLTAGE);
     }
 
     /**
@@ -97,6 +115,10 @@ public class ElevatorAlgae extends SubsystemBase {
      * @return Command to outtake algae
      */
     public Command algaeOuttakeCommand() {
-        return runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE);
+        return runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE, () -> speedMultiplier);
+    }
+
+    public Command setSpeedMultiplier(double value) {
+        return Commands.runOnce(() -> speedMultiplier = value);
     }
 }

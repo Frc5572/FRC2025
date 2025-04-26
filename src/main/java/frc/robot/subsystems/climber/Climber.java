@@ -21,16 +21,16 @@ public class Climber extends SubsystemBase {
     private ClimberIO io;
     private ClimberInputsAutoLogged climberAutoLogged = new ClimberInputsAutoLogged();
     private final Viz2025 viz;
-    public Trigger resetButton = new Trigger(() -> getClimberTouchSensorStatus());
     public Trigger reachedClimberStart = new Trigger(() -> reachedClimberStart());
-    public Trigger leftMagnet = new Trigger(() -> climberAutoLogged.leftMagnet);
-    public Trigger rightMagnet = new Trigger(() -> climberAutoLogged.rightMagnet);
+
 
 
     public Climber(ClimberIO io, Viz2025 viz) {
         this.io = io;
         this.viz = viz;
     }
+
+
 
     @Override
     public void periodic() {
@@ -44,10 +44,6 @@ public class Climber extends SubsystemBase {
     public void setClimberMotorVoltage(double voltage) {
         Logger.recordOutput("/Climber/Climber Voltage", voltage);
         io.setClimbMotorVoltage(voltage);
-    }
-
-    public boolean getClimberTouchSensorStatus() {
-        return climberAutoLogged.climberTouchSensor;
     }
 
     /**
@@ -75,7 +71,7 @@ public class Climber extends SubsystemBase {
      * @return Set Motor Voltage until reached certain angle
      */
     public Command manualClimb(DoubleSupplier volts) { // run
-        return Commands.runEnd(() -> setClimberMotorVoltage(volts.getAsDouble() * 6), () -> {
+        return Commands.runEnd(() -> setClimberMotorVoltage(volts.getAsDouble() * 3), () -> {
             setClimberMotorVoltage(0);
             System.out.println("Climber Done!");
         }, this).until(passedMaxAngle()).unless(passedMaxAngle());
@@ -116,7 +112,7 @@ public class Climber extends SubsystemBase {
      */
     public Command resetClimberCommand() { // reset
         return runEnd(() -> setClimberMotorVoltage(Constants.Climb.RESET_VOLTAGE),
-            () -> setClimberMotorVoltage(0)).until(resetButton).unless(resetButton);
+            () -> setClimberMotorVoltage(0));
     }
 
     public Command resetEncoder() {

@@ -1,5 +1,6 @@
 package frc.lib.util.viz;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import java.util.stream.Stream;
@@ -163,4 +164,7 @@ public class Viz2025 implements Drawable {
             .map(cam -> new Pose3d(actualPose).plus(cam.robotToCamera())).toArray(Pose3d[]::new));
     }
 
+    public void setAlgaeAngle(Angle angle) {
+        algaeAngle = angle.in(Degrees);
+    }
 }

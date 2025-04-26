@@ -1,7 +1,6 @@
 package frc.robot.subsystems.swerve;
 
 
-import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Voltage;
@@ -12,18 +11,11 @@ import frc.robot.Constants;
 /** Real Class for Swerve */
 public class SwerveReal implements SwerveIO {
 
-    private Canandgyro gyro = new Canandgyro(1);
-
     /** Real Swerve Initializer */
     public SwerveReal() {}
 
     @Override
-    public void updateInputs(SwerveInputs inputs) {
-        inputs.yaw = gyro.getYaw();
-        inputs.pitch = gyro.getPitch();
-        inputs.roll = gyro.getRoll();
-
-    }
+    public void updateInputs(SwerveInputs inputs) {}
 
     public SwerveModule createSwerveModule(int moduleNumber, int driveMotorID, int angleMotorID,
         int cancoderID, Rotation2d angleOffset) {

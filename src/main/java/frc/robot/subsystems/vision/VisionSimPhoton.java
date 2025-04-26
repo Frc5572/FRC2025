@@ -49,4 +49,8 @@ public class VisionSimPhoton extends VisionReal {
         super.updateInputs(inputs);
     }
 
+    @Override
+    protected void createSettingsUploadThread(String hostname) {
+        System.out.println("Not uploading settings for PV Sim: " + hostname);
+    }
 }

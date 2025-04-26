@@ -1,6 +1,5 @@
 package frc.robot.subsystems.swerve;
 
-import org.ironmaple.simulation.drivesims.GyroSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -9,21 +8,23 @@ import edu.wpi.first.units.measure.Voltage;
 import frc.lib.util.swerve.SwerveModule;
 import frc.lib.util.swerve.SwerveModuleSim;
 
-/** Simulated Swerve Drive */
+/**
+ * Simulated Swerve Drive
+ */
 public class SwerveSim implements SwerveIO {
 
-    private final GyroSimulation gyroSim;
     private final SwerveDriveSimulation simulation;
 
+    /**
+     * Simulated Swerve Drive
+     */
     public SwerveSim(SwerveDriveSimulation simulation) {
-        this.gyroSim = simulation.getGyroSimulation();
+
         this.simulation = simulation;
     }
 
     @Override
-    public void updateInputs(SwerveInputs inputs) {
-        inputs.yaw = gyroSim.getGyroReading().getRotations();
-    }
+    public void updateInputs(SwerveInputs inputs) {}
 
     @Override
     public SwerveModule[] createModules() {

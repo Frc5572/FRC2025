@@ -1,6 +1,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
@@ -69,11 +70,25 @@ public final class Constants {
         /**
          * Current threshold that indicates an algae is in possestion
          */
-        public static final double HAS_ALGAE_CURRENT_THRESHOLD = 70;
-        public static final int VOLTAGE = 4;
-        public static final int NEGATIVE_VOLTAGE = -2;
-        public static final double SMALLER_VOLTAGE = 0.5;
-        public static final double SMALLER_NEGATIVE_VOLTAGE = -1;
+        public static final double HAS_ALGAE_CURRENT_THRESHOLD = 50;
+        public static final int VOLTAGE = 12;
+        public static final int NEGATIVE_VOLTAGE = -12;
+        public static final double SMALLER_VOLTAGE = 12;
+        public static final double SMALLER_NEGATIVE_VOLTAGE = -12;
+
+        public static final int CANCODER_ID = 48;
+
+        public static final Angle BARGE_ANGLE = Degrees.of(50.0);
+        public static final Angle HOME_ANGLE = Degrees.of(80.0);
+        public static final Angle GROUND_ANGLE = Degrees.of(-44.0);
+        public static final Angle REEF_ANGLE = Degrees.of(-20.0);
+
+        public static final double KP = 0.0;
+        public static final double KI = 0.0;
+        public static final double KD = 0.0;
+
+        public static final double KG = 0.0;
+        public static final double KS = 0.0;
     }
 
     // pit and alt operator controllers
@@ -97,7 +112,8 @@ public final class Constants {
          * Algae Motor CAN id's
          */
         public static final class AlgaeMotors {
-            public static final int ALGAE_MOTOR_ID = 6;
+            public static final int ALGAE_WRIST_MOTOR_ID = 3;
+            public static final int ALGAE_ROLLER_MOTOR_ID = 6;
         }
 
     }
@@ -108,7 +124,7 @@ public final class Constants {
      */
     public static final class LEDs {
         public static final int LED_PORT = 0;
-        public static final int LED_LENGTH = 120;
+        public static final int LED_LENGTH = 160;
     }
 
 
@@ -117,16 +133,14 @@ public final class Constants {
      * Climb Constants.
      */
     public static final class Climb {
-
-        public static final int LEFT_TALON_FX_ID = 3;
         public static final int RIGHT_TALON_FX_ID = 12;
         public static final int TOUCH_SENSOR_CHANNEL = 2;
-        public static final Angle CLIMB_ANGLE = Radians.of(610);
+        public static final Angle CLIMB_ANGLE = Radians.of(650);
         public static final Angle MAX_ANGLE = Radians.of(703);
         public static final Angle CLIMBER_OUT_ANGLE = Radians.of(300);
-        public static final Angle CLIMBER_START_ANGLE = Radians.of(140);
+        public static final Angle CLIMBER_START_ANGLE = Radians.of(146);
         public static final double GEAR_RATIO = 1;
-        public static final double CLIMB_VOLTAGE = 3.0;
+        public static final double CLIMB_VOLTAGE = 6.0;
         public static final double PRE_CLIMB_VOLTAGE = 5.5;
         public static final double RESET_VOLTAGE = -5.5;
 
@@ -322,27 +336,31 @@ public final class Constants {
         public static final NeutralModeValue BREAK = NeutralModeValue.Brake;
 
         // PID and feedforward
-        public static final double KP = 60.0;
+        public static final double KP = 50.0;
         public static final double KI = 0.0;
         public static final double KD = 0.0;
-        public static final double KS = 0.2675;
+        public static final double KS = 0.9;
         public static final double KV = 0.0;
         public static final double KA = 0.0;
-        public static final double KG = 0.3375;
-        public static final double CVeleocity = 2.0;
-        public static final double Acceleration = 12.0;
+        public static final double KG = 0.9375;
+        public static final double CVeleocity = 4.0;
+        public static final double FastVelocity = 9.0;
+        public static final double Acceleration = 10.0;
         public static final double Jerk = 6000000.0;
 
         public static final AngularVelocity MAX_VELOCITY = RotationsPerSecond.of(0.0);
 
         // positions
         public static final Distance HOME = Inches.of(2);
-        public static final Distance P0 = Inches.of(16.5); // Algae 1
+        public static final Distance P0 = Inches.of(21.5); // Algae 1
         public static final Distance P1 = Inches.of(26.45); // Coral l1
-        public static final Distance P2 = Inches.of(31.2); // Algae 2
+        public static final Distance P2 = Inches.of(36.2); // Algae 2
         public static final Distance P3 = Inches.of(43.6); // Coral L3
         public static final Distance P4 = Inches.of(68.9); // Coral L4
-        public static final Distance P5 = Inches.of(74); // Barge
+        public static final Distance P5 = Inches.of(60); // Barge
+
+        public static final double HEIGHT_PER_METER_AWAY = 2.4 / 1.0;
+        public static final Distance BARGE_HEIGHT = P5;
 
         public static final double gearRatio = 1.0;
         public static final Distance INCHES_AT_TOP = Inches.of(72.0);
@@ -392,7 +410,7 @@ public final class Constants {
 
     /** State Estimator Constants */
     public static class StateEstimator {
-        public static final boolean keepInField = true;
+        public static final boolean keepInField = false;
         public static final boolean keepOutOfReefs = true;
         public static final LoggedTunableNumber globalVisionTrust =
             new LoggedTunableNumber("globalVisionTrust", 0.2);
@@ -419,17 +437,17 @@ public final class Constants {
         public static final double PID_XKP = 1.0;
         public static final double PID_XKI = 0.0;
         public static final double PID_XKD = 0.0;
-        public static final double PID_TKP = 3.0;
+        public static final double PID_TKP = 2.5;
         public static final double PID_TKI = 0.0;
         public static final double PID_TKD = 0.0;
 
-        public static final double MAX_VELOCITY = 2.0;
+        public static final double MAX_VELOCITY = 6.0;
         public static final double MAX_ACCELERATION = 3;
 
         public static final double MAX_ANGULAR_VELOCITY = 8;
         public static final double MAX_ANGULAR_ACCELERATION = 16;
 
-        public static final double MAX_ELEVATOR_UP_VELOCITY = 0.3;
+        public static final double MAX_ELEVATOR_UP_VELOCITY = 1.2;
     }
 
     public static final Rotation2d CIRCLE_REEF_LOOKAHEAD_ANGLE = Rotation2d.fromDegrees(45);

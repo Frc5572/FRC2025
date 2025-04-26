@@ -2,27 +2,24 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.SelectCommand;
 import frc.lib.util.AllianceFlipUtil;
-import frc.lib.util.Container;
 import frc.lib.util.ScoringLocation;
 import frc.robot.commands.MoveAndAvoidReef;
 import frc.robot.commands.MoveToPose;
+import frc.robot.subsystems.algaewrist.AlgaeWrist;
 import frc.robot.subsystems.coral.CoralScoring;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator_algae.ElevatorAlgae;
@@ -35,11 +32,7 @@ public class CommandFactory {
 
     /** Move slightly to ensure algae intake is dropped. */
     public static Command dropAlgaeIntake(Swerve swerve) {
-        return new MoveToPose(swerve, () -> {
-            return swerve.getPose()
-                .plus(new Transform2d(Units.inchesToMeters(10), 0, Rotation2d.kZero));
-        }, () -> Constants.SwerveTransformPID.MAX_VELOCITY, false, Units.inchesToMeters(2), 10)
-            .andThen(swerve.stop());
+        return Commands.none();
     }
 
     /** Approach reef scoring location. Elevator can be home during this. */
@@ -50,8 +43,8 @@ public class CommandFactory {
             return new Pose2d(
                 finalLoc.getTranslation()
                     .minus(new Translation2d(Units.inchesToMeters(12), finalLoc.getRotation())),
-                finalLoc.getRotation().plus(Rotation2d.fromDegrees(15)));
-        }, () -> Constants.SwerveTransformPID.MAX_VELOCITY, true, Units.inchesToMeters(12), 5);
+                finalLoc.getRotation().plus(Rotation2d.fromDegrees(10)));
+        }, () -> Constants.SwerveTransformPID.MAX_VELOCITY, true, Units.inchesToMeters(24), 15);
     }
 
     /** Align to a given scoring location, assuming elevator is at the right height. */
@@ -81,155 +74,138 @@ public class CommandFactory {
             Units.inchesToMeters(4), 5).withTimeout(1.5);
     }
 
+    /** Score coral */
+    public static Command scoreWithElevator(Swerve swerve, Elevator elevator,
+        Supplier<ScoringLocation.CoralLocation> location, Supplier<ScoringLocation.Height> height) {
+        return reefAlign(swerve, location, 1).alongWith(
+            elevator.moveToFast(() -> height.get().height).andThen(Commands.waitSeconds(0.2)));
+    }
+
     /** Go home, no exception */
     public static Command ensureHome(Elevator elevator) {
         return elevator.home().repeatedly().until(() -> elevator.getHeight().in(Inches) < 0.5);
     }
 
+    /** Score coral if coral height selected */
+    public static Command maybeScoreCoral(Swerve swerve, Elevator elevator,
+        CoralScoring coralScoring, ElevatorAlgae algae, AlgaeWrist wrist,
+        Supplier<ScoringLocation.CoralLocation> location, Supplier<ScoringLocation.Height> height) {
+        return reefPreAlign(swerve, location).deadlineFor(wrist.homeAngle())
+            .andThen(new ConditionalCommand(
+                Commands.waitUntil(() -> coralScoring.getOuttakeBeamBreakStatus())
+                    .deadlineFor(swerve.stop()),
+                Commands.none(), () -> !height.get().isAlgae))
+            .deadlineFor(coralScoring.runCoralIntake()
+                .unless(() -> coralScoring.getOuttakeBeamBreakStatus()))
+            .andThen(new ConditionalCommand(
+                scoreWithElevator(swerve, elevator, location, height).withTimeout(2.4),
+                Commands.none(), () -> !height.get().isAlgae))
+            .andThen(new ConditionalCommand(Commands.none(),
+                coralScoring.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae));
+    }
+
+    /** Pick algae off of reef */
+    public static Command maybePickupAlgae(Swerve swerve, Elevator elevator, ElevatorAlgae algae,
+        AlgaeWrist wrist, Supplier<ScoringLocation.CoralLocation> location,
+        Supplier<ScoringLocation.Height> algaeHeight, Consumer<ScoringLocation.Height> crossOut) {
+        return reefAlign(swerve, location, 12)
+            .alongWith(elevator.moveToFast(() -> algaeHeight.get().height)).withTimeout(0.7)
+            .alongWith(Commands.waitSeconds(0.4).andThen(wrist.reefAngle().withTimeout(0.8)))
+            .andThen(reefAlign(swerve, location, -3).withTimeout(0.7)
+                .deadlineFor(algae.algaeIntakeCommand()))
+            .andThen(backAwayReef(swerve, location).withTimeout(1.0)
+                .alongWith(Commands.waitSeconds(0.6).andThen(wrist.bargeAngle().withTimeout(0.1))));
+    }
+
     /** Move and score coral or retrieve algae. */
     public static Command autoScore(Swerve swerve, Elevator elevator, CoralScoring coralScoring,
-        ElevatorAlgae algae, Supplier<ScoringLocation.CoralLocation> location,
+        ElevatorAlgae algae, AlgaeWrist wrist, Supplier<ScoringLocation.CoralLocation> location,
         Supplier<ScoringLocation.Height> height,
         Supplier<Optional<ScoringLocation.Height>> additionalAlgaeHeight,
-        Container<Boolean> intakingAlgae, Consumer<ScoringLocation.Height> crossOut) {
+        Consumer<ScoringLocation.Height> crossOut) {
 
-        final Container<ScoringLocation.Height> additionalAlgae =
-            new Container<>(ScoringLocation.Height.KP0);
-
-        return (reefPreAlign(swerve, location).andThen(new ConditionalCommand(
-            Commands.waitUntil(() -> coralScoring.getOuttakeBeamBreakStatus()),
-            Commands.runOnce(() -> {
-            }), () -> !height.get().isAlgae)))
-                .alongWith(coralScoring.runCoralIntake()
-                    .unless(() -> coralScoring.getOuttakeBeamBreakStatus()))
-                .andThen(new ConditionalCommand(Commands.runOnce(() -> {
-                    intakingAlgae.value = true;
-                }), Commands.runOnce(() -> {
-                }), () -> height.get().isAlgae || additionalAlgaeHeight.get().isPresent()))
-                .andThen(new ConditionalCommand(elevator.moveTo(() -> additionalAlgae.value.height)
-                    .alongWith(
-                        reefAlign(swerve, location, -3).until(algae.hasAlgae).withTimeout(1.6))
-                    .alongWith(Commands.runOnce(() -> {
-                        crossOut.accept(additionalAlgae.value);
-                    })).andThen(backAwayReef(swerve, location).withTimeout(2.0)),
-                    Commands.runOnce(() -> {
-                    }), () -> {
-                        var value = additionalAlgaeHeight.get();
-                        if (value.isPresent()) {
-                            additionalAlgae.value = value.get();
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }))
-                .andThen(new ConditionalCommand(
-                    (elevator.moveTo(() -> height.get().height)
-                        .andThen(reefAlign(swerve, location, 1).withTimeout(2.0))),
-                    (elevator.moveTo(() -> height.get().height)
-                        .alongWith(reefAlign(swerve, location, 1).withTimeout(2.0))),
-                    () -> intakingAlgae.value))
-                .andThen(Commands.waitSeconds(0.2))
-                .andThen(new ConditionalCommand(Commands.runOnce(() -> {
-                }), coralScoring.runCoralOuttake().withTimeout(0.4), () -> height.get().isAlgae))
-                .andThen(backAwayReef(swerve, location).withTimeout(2.0));
+        return maybeScoreCoral(swerve, elevator, coralScoring, algae, wrist, location, height)
+            .andThen(new ConditionalCommand(
+                maybePickupAlgae(swerve, elevator, algae, wrist, location, () -> {
+                    var h = height.get();
+                    if (h.isAlgae) {
+                        return h;
+                    } else {
+                        return additionalAlgaeHeight.get().get();
+                    }
+                }, crossOut), Commands.none(),
+                () -> additionalAlgaeHeight.get().isPresent() || height.get().isAlgae));
     }
 
     private static final Pose2d processorPose =
         new Pose2d(6.342151165008545, 0.5018799304962158, Rotation2d.kCW_90deg);
 
     /** Do something with algae gotten. */
-    public static Command doSomethingWithAlgae(Swerve swerve, Elevator elevator,
-        Container<Boolean> intakingAlgae, ElevatorAlgae algae, Supplier<Character> whatToDo,
-        DoubleSupplier leftRight) {
-        return new ConditionalCommand(
-            new SelectCommand<>(Map.of('d', Commands.sequence(Commands.runOnce(() -> {
-                intakingAlgae.value = false;
-            })), 'b',
-                Commands
-                    .sequence(ensureHome(elevator).alongWith(new MoveAndAvoidReef(swerve,
-                        () -> new Pose2d(bargePose.getX(),
-                            bargePose.getY() + leftRight.getAsDouble(), bargePose.getRotation()),
-                        () -> {
-                            if (elevator.hightAboveP0.getAsBoolean()) {
-                                return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
-                            } else {
-                                return Constants.SwerveTransformPID.MAX_VELOCITY;
-                            }
-                        }, true, Units.inchesToMeters(4), 5)),
-                        elevator.moveTo(() -> ScoringLocation.Height.KP5.height),
-                        Commands.runOnce(() -> {
-                            intakingAlgae.value = false;
-                        }),
-                        algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE).withTimeout(0.4)
-                            .asProxy()),
-                'p', Commands
-                    .sequence(ensureHome(elevator).alongWith(new MoveAndAvoidReef(swerve, () -> {
-                        Pose2d desiredPose = processorPose;
-                        return new Pose2d(
-                            desiredPose.getTranslation().minus(new Translation2d(
-                                Units.inchesToMeters(12), desiredPose.getRotation())),
-                            desiredPose.getRotation());
-                    }, () -> {
-                        if (elevator.hightAboveP0.getAsBoolean()) {
-                            return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
-                        } else {
-                            return Constants.SwerveTransformPID.MAX_VELOCITY;
-                        }
-                    }, true, Units.inchesToMeters(12), 5)),
-                        new MoveToPose(swerve, () -> processorPose,
-                            () -> Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY, true,
-                            Units.inchesToMeters(4), 5),
-                        Commands.runOnce(() -> {
-                            intakingAlgae.value = false;
-                        }), algae.runAlgaeMotor(Constants.Algae.NEGATIVE_VOLTAGE).withTimeout(0.4)
-                            .asProxy())),
-                whatToDo),
-            Commands.runOnce(() -> {
-            }), () -> intakingAlgae.value);
-    }
+    // public static Command doSomethingWithAlgae(Swerve swerve, Elevator elevator,
+    // ElevatorAlgae algae, Supplier<Character> whatToDo) {
+    // return new SelectCommand<>(Map.of('d',
+    // Commands.sequence(algae.algaeOuttakeCommand().withTimeout(1.0).asProxy()), 'b',
+    // Commands.sequence(scoreInBarge(swerve, elevator, algae)), 'p', Commands.sequence()),
+    // whatToDo);
+    // }
 
     private static Command feederAfter(Swerve swerve, CoralScoring scoring) {
         return swerve.run(() -> {
-            swerve.setModuleStates(new ChassisSpeeds(0.0, -0.4, 0.0));
-        }).until(scoring.coralAtIntake).withTimeout(3.0).andThen(swerve.stop());
+            swerve.setModuleStates(new ChassisSpeeds(-0.1, 0.0, 0.0));
+        }).until(scoring.coralAtIntake).withTimeout(1.0).andThen(swerve.stop());
     }
 
     private static final Pose2d leftFeederAway = new Pose2d(1.5196709632873535, 7.158551216125488,
-        Rotation2d.fromRadians(-2.4980917038665034));
-    private static final Pose2d leftFeeder = new Pose2d(1.4372355937957764, 7.302813529968262,
-        Rotation2d.fromRadians(-2.4980917038665034));
+        Rotation2d.fromRadians(-2.4980917038665034).plus(Rotation2d.kCCW_90deg));
+    private static final Pose2d leftFeeder = new Pose2d(1.1899291276931763, 7.560424327850342,
+        Rotation2d.fromRadians(-2.4980917038665034).plus(Rotation2d.kCCW_90deg));
 
     /** Move to left feeder */
     public static Command leftFeeder(Swerve swerve, Elevator elevator, CoralScoring coral) {
-        return ensureHome(elevator)
+        return (Commands.waitSeconds(0.2).andThen(ensureHome(elevator)))
             .alongWith(new MoveAndAvoidReef(swerve, () -> leftFeederAway, () -> {
-                if (elevator.hightAboveP0.getAsBoolean()) {
-                    return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
-                } else {
-                    return Constants.SwerveTransformPID.MAX_VELOCITY;
-                }
-            }, true, Units.inchesToMeters(24), 45)
+
+                return Constants.SwerveTransformPID.MAX_VELOCITY;
+
+            }, true, Units.inchesToMeters(100), 45).until(coral.coralAtIntake)
                 .andThen(new MoveToPose(swerve, () -> leftFeeder, () -> {
-                    if (elevator.hightAboveP0.getAsBoolean()) {
-                        return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
-                    } else {
-                        return Constants.SwerveTransformPID.MAX_VELOCITY;
-                    }
-                }, true, Units.inchesToMeters(12), 20)))
+
+                    return Constants.SwerveTransformPID.MAX_VELOCITY;
+
+                }, true, Units.inchesToMeters(12), 20).until(coral.coralAtIntake)))
+            .andThen(feederAfter(swerve, coral));
+    }
+
+    private static final Pose2d leftFeederClose = new Pose2d(0.6334888935089111, 6.746373176574707,
+        Rotation2d.fromRadians(-0.9272955650632482));
+
+    /** Move to left feeder close */
+    public static Command leftFeederClose(Swerve swerve, Elevator elevator, CoralScoring coral) {
+        return (Commands.waitSeconds(0.2).andThen(ensureHome(elevator)))
+            .alongWith(new MoveAndAvoidReef(swerve, () -> leftFeederClose, () -> {
+
+                return Constants.SwerveTransformPID.MAX_VELOCITY;
+
+            }, true, Units.inchesToMeters(100), 45).until(coral.coralAtIntake)
+                .andThen(new MoveToPose(swerve, () -> leftFeederClose, () -> {
+
+                    return Constants.SwerveTransformPID.MAX_VELOCITY;
+
+                }, true, Units.inchesToMeters(12), 20).until(coral.coralAtIntake)))
             .andThen(feederAfter(swerve, coral));
     }
 
 
     private static final Pose2d rightFeederAway = new Pose2d(leftFeederAway.getX(),
         FieldConstants.fieldWidth.in(Meters) - leftFeederAway.getY(),
-        leftFeederAway.getRotation().unaryMinus().plus(Rotation2d.k180deg));
+        leftFeederAway.getRotation().unaryMinus());
     private static final Pose2d rightFeeder =
         new Pose2d(leftFeeder.getX(), FieldConstants.fieldWidth.in(Meters) - leftFeeder.getY(),
-            leftFeeder.getRotation().unaryMinus().plus(Rotation2d.k180deg));
+            leftFeeder.getRotation().unaryMinus());
 
     /** Move to right feeder */
     public static Command rightFeeder(Swerve swerve, Elevator elevator, CoralScoring coral) {
-        return ensureHome(elevator)
+        return (Commands.waitSeconds(0.2).andThen(ensureHome(elevator)))
             .alongWith(new MoveAndAvoidReef(swerve, () -> rightFeederAway, () -> {
                 if (elevator.hightAboveP0.getAsBoolean()) {
                     return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
@@ -247,33 +223,35 @@ public class CommandFactory {
             .andThen(feederAfter(swerve, coral));
     }
 
+
+
+    private static final Pose2d rightFeederClose = new Pose2d(leftFeederClose.getX(),
+        FieldConstants.fieldWidth.in(Meters) - leftFeederClose.getY(),
+        leftFeederClose.getRotation().unaryMinus());
+
+    /** Move to left feeder close */
+    public static Command rightFeederClose(Swerve swerve, Elevator elevator, CoralScoring coral) {
+        return (Commands.waitSeconds(0.2).andThen(ensureHome(elevator)))
+            .alongWith(new MoveAndAvoidReef(swerve, () -> rightFeederClose, () -> {
+
+                return Constants.SwerveTransformPID.MAX_VELOCITY;
+
+            }, true, Units.inchesToMeters(100), 45).until(coral.coralAtIntake)
+                .andThen(new MoveToPose(swerve, () -> rightFeederClose, () -> {
+
+                    return Constants.SwerveTransformPID.MAX_VELOCITY;
+
+                }, true, Units.inchesToMeters(12), 20).until(coral.coralAtIntake)))
+            .andThen(feederAfter(swerve, coral));
+    }
+
     /** Move to faster feeder */
     public static Command fasterFeeder(Swerve swerve, Elevator elevator, CoralScoring coral) {
         Logger.recordOutput("leftFeeder", leftFeeder);
         Logger.recordOutput("rightFeeder", rightFeeder);
 
-        return ensureHome(elevator).alongWith(new MoveAndAvoidReef(swerve, () -> {
-            if ((swerve.state.getGlobalPoseEstimate().getY() > FieldConstants.fieldWidth.in(Meters)
-                / 2) != AllianceFlipUtil.shouldFlip()) {
-                return leftFeeder;
-            } else {
-                return rightFeeder;
-            }
-        }, () -> {
-            if (elevator.hightAboveP0.getAsBoolean()) {
-                return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
-            } else {
-                return Constants.SwerveTransformPID.MAX_VELOCITY;
-            }
-        }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve, coral));
-    }
-
-    /** Move to feeder depending on webcontroller code */
-    public static Command selectFeeder(Swerve swerve, Elevator elevator, CoralScoring coral,
-        Supplier<Character> charSupplier) {
-        return ensureHome(elevator).alongWith(new MoveAndAvoidReef(swerve, () -> {
-            char target = charSupplier.get();
-            if (target == 'f') {
+        return (Commands.waitSeconds(0.2).andThen(ensureHome(elevator)))
+            .alongWith(new MoveAndAvoidReef(swerve, () -> {
                 if ((swerve.state.getGlobalPoseEstimate()
                     .getY() > FieldConstants.fieldWidth.in(Meters) / 2) != AllianceFlipUtil
                         .shouldFlip()) {
@@ -281,32 +259,94 @@ public class CommandFactory {
                 } else {
                     return rightFeeder;
                 }
-            } else if (target == 'r') {
-                return rightFeeder;
-            } else {
-                return leftFeeder;
-            }
-        }, () -> {
-            if (elevator.hightAboveP0.getAsBoolean()) {
-                return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
-            } else {
-                return Constants.SwerveTransformPID.MAX_VELOCITY;
-            }
-        }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve, coral));
+            }, () -> {
+                if (elevator.hightAboveP0.getAsBoolean()) {
+                    return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
+                } else {
+                    return Constants.SwerveTransformPID.MAX_VELOCITY;
+                }
+            }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve, coral));
     }
 
-    private static final Pose2d bargePose = new Pose2d(FieldConstants.fieldLength.in(Meters) - 9.49,
-        5.551057815551758, Rotation2d.kZero);
-
-    /** Move to barge position */
-    public static Command barge(Swerve swerve, Elevator elevator) {
-        return ensureHome(elevator).alongWith(new MoveAndAvoidReef(swerve, () -> bargePose, () -> {
-            if (elevator.hightAboveP0.getAsBoolean()) {
-                return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
-            } else {
-                return Constants.SwerveTransformPID.MAX_VELOCITY;
-            }
-        }, true, Units.inchesToMeters(12), 3));
+    /** Move to feeder depending on webcontroller code */
+    public static Command selectFeeder(Swerve swerve, Elevator elevator, CoralScoring coral,
+        Supplier<Character> charSupplier) {
+        return (Commands.waitSeconds(0.2).andThen(ensureHome(elevator)))
+            .alongWith(new MoveAndAvoidReef(swerve, () -> {
+                char target = charSupplier.get();
+                if (target == 'f') {
+                    if ((swerve.state.getGlobalPoseEstimate()
+                        .getY() > FieldConstants.fieldWidth.in(Meters) / 2) != AllianceFlipUtil
+                            .shouldFlip()) {
+                        return leftFeeder;
+                    } else {
+                        return rightFeeder;
+                    }
+                } else if (target == 'r') {
+                    return rightFeeder;
+                } else {
+                    return leftFeeder;
+                }
+            }, () -> {
+                if (elevator.hightAboveP0.getAsBoolean()) {
+                    return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
+                } else {
+                    return Constants.SwerveTransformPID.MAX_VELOCITY;
+                }
+            }, true, Units.inchesToMeters(12), 20)).andThen(feederAfter(swerve, coral));
     }
 
+    // private static final Pose2d bargePose = new Pose2d(FieldConstants.fieldLength.in(Meters) -
+    // 9.49,
+    // 5.551057815551758, Rotation2d.kZero);
+
+    // /** Move to barge position */
+    // public static Command barge(Swerve swerve, Elevator elevator) {
+    // return ensureHome(elevator).alongWith(new MoveAndAvoidReef(swerve, () -> bargePose, () -> {
+    // if (elevator.hightAboveP0.getAsBoolean()) {
+    // return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
+    // } else {
+    // return Constants.SwerveTransformPID.MAX_VELOCITY;
+    // }
+    // }, true, Units.inchesToMeters(12), 3));
+    // }
+
+    private static final Pose2d bargeScorePose = new Pose2d(
+        7.558475971221924 + Units.inchesToMeters(9), 6.258963108062744, Rotation2d.kZero);
+
+    /**
+     * move and score in barge final
+     *
+     * @param swerve swerve
+     * @param elevator elevator
+     * @param algae algae
+     * @return move and score in barge
+     */
+    public static Command scoreInBarge(Swerve swerve, Elevator elevator, ElevatorAlgae algae,
+        AlgaeWrist wrist) {
+        return (ensureHome(elevator)
+            .alongWith(new MoveAndAvoidReef(swerve, () -> bargeScorePose, () -> {
+                if (elevator.hightAboveP0.getAsBoolean()) {
+                    return Constants.SwerveTransformPID.MAX_ELEVATOR_UP_VELOCITY;
+                } else {
+                    return Constants.SwerveTransformPID.MAX_VELOCITY;
+                }
+            }, true, Units.inchesToMeters(6), 3))).andThen(bargeSpitAlgae(elevator, algae, wrist)
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+    }
+
+    /**
+     * Command to Raise Elevator and spit algae into the barge
+     *
+     * @param elevator Elevator Subsystem
+     * @param algae Algae Subsystem
+     * @return Command
+     */
+    public static Command bargeSpitAlgae(Elevator elevator, ElevatorAlgae algae, AlgaeWrist wrist) {
+        return Commands.waitUntil(() -> elevator.getHeight().in(Inches) > 65)
+            .deadlineFor(elevator.barge())
+            .andThen(
+                wrist.bargeAngle().andThen(algae.algaeOuttakeCommand()).withTimeout(.3).asProxy())
+            .andThen(wrist.homeAngle()).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+    }
 }
