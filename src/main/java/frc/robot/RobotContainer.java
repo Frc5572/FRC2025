@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.WebController;
 import frc.lib.util.viz.FieldViz;
@@ -312,6 +313,11 @@ public class RobotContainer {
     }
 
     private void setupPitController() {
+        pitController.povUp().onTrue(swerve.sysIdDynamic(Direction.kForward));
+        pitController.povDown().onTrue(swerve.sysIdDynamic(Direction.kReverse));
+        pitController.povLeft().onTrue(swerve.sysIdQuasistatic(Direction.kForward));
+        pitController.povRight().onTrue(swerve.sysIdQuasistatic(Direction.kReverse));
+
         // pitController.a().whileTrue(CommandFactory.scoreInBarge(swerve, elevator, algae, wrist));
         pitController.b().onTrue(elevator.manualMove(altOperator));
         // pitController.leftBumper().whileTrue(climb.resetClimberCommand());
