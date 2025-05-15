@@ -16,7 +16,7 @@ import frc.robot.subsystems.visionObject.VisionObjectIO.VisionObjectInputs;
 
 public class VisionObject extends SubsystemBase {
     private VisionObjectIO io;
-    private VisionObjectInputs[] inputs;
+    private VisionObjectInputs inputs;
     private final RobotState state;
     private Transform3d[] robotToCamera;
     PhotonPipelineResult[] results;
@@ -31,18 +31,15 @@ public class VisionObject extends SubsystemBase {
         this.io = io.apply(Constants.Vision.cameras);
         this.robotToCamera = Stream.of(Constants.Vision.cameras).map(x -> x.robotToCamera())
             .toArray(Transform3d[]::new);
-        inputs = new VisionObjectInputs[Constants.Vision.cameras.length];
-        for (int i = 0; i < Constants.Vision.cameras.length; i++) {
-            inputs[i] = new VisionObjectInputs();
-        }
+        inputs = new VisionObjectInputs();
     }
 
     @Override
     public void periodic() {
         io.updateInputs(inputs);
-        Logger.processInputs(logIntro, inputs[0]);
+        Logger.processInputs(logIntro, inputs);
 
-        results = inputs[0].results;
+        results = inputs.results;
 
         // targetTransform = calcTransform();
         targetTransform = new Transform2d(10.0, 10.0, Rotation2d.k180deg);
@@ -54,7 +51,7 @@ public class VisionObject extends SubsystemBase {
     /** just using slang */
 
     private double calcDistance() {
-        // var result = results[0].getBestTarget();
+        // var result = results.getBestTarget();
         return PhotonUtils.calculateDistanceToTargetMeters(robotToCamera[2].getZ(), 1000000,
             robotToCamera[2].getRotation().getAngle(), 1000000);
     }

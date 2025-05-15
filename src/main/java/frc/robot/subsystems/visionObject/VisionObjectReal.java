@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.stream.Stream;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -23,7 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
 public class VisionObjectReal implements VisionObjectIO {
-    protected final PhotonCamera[] camera;
+    protected final PhotonCamera camera;
     private final String coprocessor = "changeMe";
     String tempDir = System.getProperty("java.io.tmpdir");
     String name;
@@ -32,8 +30,7 @@ public class VisionObjectReal implements VisionObjectIO {
 
 
     public VisionObjectReal(Constants.Vision.CameraConstants[] constants) {
-        camera = Stream.of(constants).map((consts) -> new PhotonCamera(consts.name()))
-            .toArray(PhotonCamera[]::new);
+        camera = new PhotonCamera(constants[2].name());
         createSettingsUploadThread(coprocessor);
 
     }
@@ -168,33 +165,10 @@ public class VisionObjectReal implements VisionObjectIO {
     }
 
     @Override
-    public void updateInputs(VisionObjectInputs[] inputs) {
+    public void updateInputs(VisionObjectInputs inputs) {
+        inputs.results = camera.getAllUnreadResults().toArray(PhotonPipelineResult[]::new);
+        inputs.cameraMatrix = camera.getCameraMatrix();
+        inputs.distCoeffs = camera.getDistCoeffs();
 
-        for (int i = 0; i < camera.length; i++) {
-            inputs[i].results =
-                camera[i].getAllUnreadResults().toArray(PhotonPipelineResult[]::new);
-            inputs[i].cameraMatrix = camera[i].getCameraMatrix();
-            inputs[i].distCoeffs = camera[i].getDistCoeffs();
-            inputs[i].isConnected = camera[i].isConnected();
-
-        }
-
-        List<PhotonPipelineResult> result = camera[0].getAllUnreadResults();
-
-        if (!result.isEmpty()) {
-            PhotonPipelineResult latestResult = result.get(result.size() - 1);
-            if (latestResult.hasTargets()) {
-                inputs[0].yaw = latestResult.getBestTarget().getYaw();
-                inputs[0].pitch = latestResult.getBestTarget().getPitch();
-                inputs[0].area = latestResult.getBestTarget().getArea();
-                inputs[0].seesTarget = true;
-            } else {
-                inputs[0].yaw = 0.0;
-                inputs[0].pitch = 0.0;
-                inputs[0].area = 0.0;
-
-                inputs[0].seesTarget = false;
-            }
-        }
     }
 }

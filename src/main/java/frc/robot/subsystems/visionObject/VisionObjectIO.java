@@ -93,7 +93,7 @@ public interface VisionObjectIO {
     }
 
 
-    public void updateInputs(VisionObjectInputs[] inputs);
+    public void updateInputs(VisionObjectInputs inputs);
 
 
     public static VisionObjectIO empty(CameraConstants[] _c) {
@@ -104,7 +104,7 @@ public interface VisionObjectIO {
     public static class Empty implements VisionObjectIO {
 
         @Override
-        public void updateInputs(VisionObjectInputs[] inputs) {
+        public void updateInputs(VisionObjectInputs inputs) {
             // TODO Auto-generated method stub
         }
 
