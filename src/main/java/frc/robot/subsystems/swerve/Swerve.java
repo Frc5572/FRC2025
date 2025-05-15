@@ -391,4 +391,10 @@ public class Swerve extends SubsystemBase {
             Constants.SwerveTransformPID.MAX_ACCELERATION);
     }
 
+
+
+    public Command DTACMD(Rotation2d rot) {
+        return this
+            .run(() -> this.drive(new Translation2d(100, 0), rot.getRotations(), true, true));
+    }
 }

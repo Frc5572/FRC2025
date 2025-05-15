@@ -24,6 +24,7 @@ import frc.robot.subsystems.coral.CoralScoring;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator_algae.ElevatorAlgae;
 import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.visionObject.VisionObject;
 
 /**
  * Factory for Composed Commands
@@ -348,5 +349,20 @@ public class CommandFactory {
             .andThen(
                 wrist.bargeAngle().andThen(algae.algaeOuttakeCommand()).withTimeout(.3).asProxy())
             .andThen(wrist.homeAngle()).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+    }
+
+
+
+    public static Command getFoundAlgae(Elevator elevator, ElevatorAlgae algae, AlgaeWrist wirst,
+        Swerve swerve, VisionObject piece, RobotState state) {
+        return Commands
+            .waitUntil(() -> elevator.getHeight().in(Inches) == Constants.Elevator.HOME.in(Inches))
+            .deadlineFor(elevator.home())
+            .alongWith(new MoveAndAvoidReef(swerve,
+                () -> state.getGlobalPoseEstimate().transformBy(piece.targetTransform),
+                () -> Constants.Swerve.AUTO_MAX_SPEED, false, 0, 0))
+            .alongWith(wirst.groundAngle().andThen(algae.algaeIntakeCommand()))
+            .until(algae.hasAlgae).asProxy().andThen(wirst.homeAngle())
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 }

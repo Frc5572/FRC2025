@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -63,6 +64,9 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionReal;
 import frc.robot.subsystems.vision.VisionSimPhoton;
+import frc.robot.subsystems.visionObject.VisionObject;
+import frc.robot.subsystems.visionObject.VisionObjectIO;
+import frc.robot.subsystems.visionObject.VisionObjectReal;
 
 
 
@@ -87,6 +91,7 @@ public class RobotContainer {
     public final CommandXboxController altOperator =
         new CommandXboxController(Constants.ALT_OPERATOR_ID);
     public final CommandXboxController testController = new CommandXboxController(5);
+    public final CommandPS5Controller simCOntroller = new CommandPS5Controller(4);
 
     /** Simulation */
     private SwerveDriveSimulation driveSimulation;
@@ -104,12 +109,14 @@ public class RobotContainer {
     private LEDs ledsLeftFrontSide = new LEDs(buffer, 80, 119);
     private LEDs ledsLeftBackSide = new LEDs(buffer, 120, 159);
 
+    private VisionObject objDetect;
     private Elevator elevator;
     private final Swerve swerve;
     private final Vision vision;
     private CoralScoring coralScoring;
     private Climber climb;
     private AlgaeWrist wrist;
+
 
     Pose2d blueStart = new Pose2d(7.247, 1.126, new Rotation2d(2.276));
     Pose2d redStart = new Pose2d(10.025, 3.476, new Rotation2d(0));
@@ -133,6 +140,7 @@ public class RobotContainer {
                 algae = new ElevatorAlgae(new ElevatorAlgaeReal(), vis);
                 climb = new Climber(new ClimberReal(), vis);
                 wrist = new AlgaeWrist(vis, new AlgaeWristReal());
+                objDetect = new VisionObject(state, VisionObjectReal::new);
                 break;
 
             case kSimulation:
@@ -147,6 +155,7 @@ public class RobotContainer {
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
                 climb = new Climber(new ClimberSim(), vis);
                 wrist = new AlgaeWrist(vis, new AlgaeWristSim());
+                // objDetect = new VisionObject(state, VisionObjectSim.partial(driveSimulation));
                 break;
             default:
                 elevator = new Elevator(new ElevatorIO.Empty(), vis);
@@ -156,6 +165,7 @@ public class RobotContainer {
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
                 climb = new Climber(new ClimberIO.Empty(), vis);
                 wrist = new AlgaeWrist(vis, new AlgaeWristIO.Empty());
+                objDetect = new VisionObject(state, VisionObjectIO::empty);
         }
         autoFactory = new AutoFactory(swerve::getPose, swerve::resetOdometry,
             swerve::followTrajectory, true, swerve);
@@ -292,6 +302,9 @@ public class RobotContainer {
         // CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)));
         // driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'p')
         // .whileTrue(Commands.none());
+
+        simCOntroller.cross().whileTrue(
+            CommandFactory.getFoundAlgae(elevator, algae, wrist, swerve, objDetect, state));
     }
 
     private void setupAltOperatorController() {

@@ -388,6 +388,7 @@ public final class Constants {
             }
         }
 
+
         public static final CameraConstants[] cameras = new CameraConstants[] {
             new CameraConstants("cam0", 800, 1280, Rotation2d.fromDegrees(80), Hertz.of(20),
                 Seconds.of(0.3), Seconds.of(0.02), 0.8, 0.08,
@@ -401,7 +402,12 @@ public final class Constants {
                     new Translation3d(Units.inchesToMeters(9.2), Units.inchesToMeters(13.5),
                         Units.inchesToMeters(10)),
                     new Rotation3d(0, 0, -Units.degreesToRadians(45))),
-                Units.inchesToMeters(0.0))};
+                Units.inchesToMeters(0.0)),
+            new CameraConstants("camObj", 800, 1280, Rotation2d.fromDegrees(1000000), Hertz.of(240),
+                Seconds.of(0.3), Seconds.of(0.02), 0.0, 0.0,
+                new Transform3d(0.0, 0.0, 0.0, new Rotation3d(Math.PI, 0, 0)),
+                Units.inchesToMeters(1000000))};
+
 
         public static final double zMargin = 0.75;
         public static final double fieldBorderMargin = 0.5;
@@ -468,6 +474,13 @@ public final class Constants {
         public static final String haveCoral = "Dashboard/Main Driver/Have Coral";
         public static final String haveAlgae = "Dashboard/Main Driver/Have Algae";
 
+    }
+
+    public static class Gamepieces {
+        public static final Distance NOTE_INNER_RADIUS = Meters.of(0.127);
+        public static final Distance NOTE_OUTER_RADIUS = Meters.of(0.1778);
+        public static final Distance NOTE_TOLERANCE = Inches.of(20.0);
+        public static final double NOTE_PERSISTENCE = 0.5;
     }
 }
 
