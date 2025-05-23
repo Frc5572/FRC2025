@@ -52,8 +52,9 @@ public class VisionObject extends SubsystemBase {
 
     private double calcDistance() {
         // var result = results.getBestTarget();
-        return PhotonUtils.calculateDistanceToTargetMeters(robotToCamera[2].getZ(), 1000000,
-            robotToCamera[2].getRotation().getAngle(), 1000000);
+        return PhotonUtils.calculateDistanceToTargetMeters(robotToCamera[2].getZ(),
+            results[0].getBestTarget().area, robotToCamera[2].getRotation().getAngle(),
+            results[0].getBestTarget().getYaw());
     }
 
     private Rotation2d calcRotation() {
