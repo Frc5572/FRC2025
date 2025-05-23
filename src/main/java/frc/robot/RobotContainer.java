@@ -172,6 +172,8 @@ public class RobotContainer {
         autoChooser.addRoutine("Front L4 Coral Left Station", autos::l4FrontLeftStation);
         autoChooser.addRoutine("Barge Right", autos::bargeRight);
         autoChooser.addRoutine("Barge Left", autos::bargeLeft);
+        autoChooser.addRoutine("fourPiece", autos::fourPiece);
+
         // autoChooser.addRoutine("Barge", autos::barge);
         SmartDashboard.putData(Constants.DashboardValues.autoChooser, autoChooser);
 

@@ -142,6 +142,10 @@ public class AutoCommandFactory {
             CoralLocation.B);
     }
 
+    public AutoRoutine fourPiece() {
+        return fourPiece("fourPiece", false);
+    }
+
     private AutoRoutine scoreCoral(String name, boolean isLeft, CoralLocation... locations) {
         AutoRoutine routine = autoFactory.newRoutine(name);
         Command ret = CommandFactory.dropAlgaeIntake(swerve).deadlineFor(coral.runCoralIntake());
@@ -305,6 +309,25 @@ public class AutoCommandFactory {
         return routine;
     }
 
+    public AutoRoutine fourPiece(String name, boolean isLeft) {
+        AutoRoutine routine = autoFactory.newRoutine(name);
+        CoralLocation[] locations = new CoralLocation[] {CoralLocation.J, CoralLocation.K};
+        Height[] scoringHeight = new Height[] {Height.KP4, Height.KP3, Height.KP2};
+        for (var height : scoringHeight)
+            for (var loc : locations) {
+                CommandFactory.autoScore(swerve, elevator, coral, algae, wrist, () -> loc,
+                    () -> height, () -> Optional.empty(), (x) -> {
+                    });
+                if (isLeft) {
+                    CommandFactory.leftFeeder(swerve, elevator, coral).until(coral.coralAtIntake);
+                } else {
+                    CommandFactory.rightFeeder(swerve, elevator, coral).until(coral.coralAtIntake);
+                }
+            }
+
+        return routine;
+    }
+
     // /** Barge auto */
     // public AutoRoutine barge() {
 
@@ -331,5 +354,7 @@ public class AutoCommandFactory {
     // CommandFactory.ensureHome(elevator), swerve.stop()));
     // return routine;
     // }
+
+
 
 }
