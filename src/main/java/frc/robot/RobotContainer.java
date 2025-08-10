@@ -32,6 +32,7 @@ import frc.lib.util.WebController;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
+import frc.robot.commands.AutoScore;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.algaewrist.AlgaeWrist;
 import frc.robot.subsystems.algaewrist.AlgaeWristIO;
@@ -110,6 +111,7 @@ public class RobotContainer {
     private CoralScoring coralScoring;
     private Climber climb;
     private AlgaeWrist wrist;
+    AutoScore autoScore = new AutoScore();
 
     Pose2d blueStart = new Pose2d(7.247, 1.126, new Rotation2d(2.276));
     Pose2d redStart = new Pose2d(10.025, 3.476, new Rotation2d(0));
@@ -309,6 +311,10 @@ public class RobotContainer {
         altOperator.povDown()
             .onTrue(Commands.runOnce(() -> Height.decrementState()).ignoringDisable(true));
         altOperator.b().whileTrue(elevator.p0());
+        Command scoreCommandL4 =
+            autoScore.autoScoreCMD(swerve, elevator, coralScoring, algae, wrist, Height.KP4);
+        altOperator.rightBumper().whileTrue(scoreCommandL4);
+
     }
 
     private void setupPitController() {
