@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.lib.util.AllianceFlipUtil;
 import frc.lib.util.ScoringLocation;
+import frc.robot.commands.AutoScore;
 import frc.robot.commands.MoveAndAvoidReef;
 import frc.robot.commands.MoveToPose;
 import frc.robot.subsystems.algaewrist.AlgaeWrist;
@@ -349,4 +350,17 @@ public class CommandFactory {
                 wrist.bargeAngle().andThen(algae.algaeOuttakeCommand()).withTimeout(.3).asProxy())
             .andThen(wrist.homeAngle()).withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
+
+    public static Command bigCommandThatNeedsANameChange(Swerve swerve, Elevator elevator,
+        CoralScoring coralScoring, ElevatorAlgae algae, AlgaeWrist wrist) {
+
+        AutoScore autoScore = new AutoScore(); // single instance so flags stay meaningful
+
+        return ensureHome(elevator).andThen(
+            // wait for BOTH TopAll and midAll to finish
+            Commands.sequence(autoScore.TopAll(swerve, elevator, coralScoring, algae, wrist),
+                autoScore.midAll(swerve, elevator, coralScoring, algae, wrist)))
+            .andThen(autoScore.lowAll(swerve, elevator, coralScoring, algae, wrist));
+    }
+
 }

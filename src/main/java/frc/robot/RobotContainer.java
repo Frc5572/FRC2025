@@ -311,10 +311,10 @@ public class RobotContainer {
         altOperator.povDown()
             .onTrue(Commands.runOnce(() -> Height.decrementState()).ignoringDisable(true));
         altOperator.b().whileTrue(elevator.p0());
-        Command scoreCommandL4 =
-            autoScore.autoScoreCMD(swerve, elevator, coralScoring, algae, wrist, Height.KP4);
-        altOperator.rightBumper().whileTrue(scoreCommandL4);
-
+        Command scoreCommandL4 = CommandFactory.bigCommandThatNeedsANameChange(swerve, elevator,
+            coralScoring, algae, wrist);
+        altOperator.rightBumper().onTrue(scoreCommandL4);
+        autoScore.elasticButtons();
     }
 
     private void setupPitController() {
