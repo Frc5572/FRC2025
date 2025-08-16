@@ -24,7 +24,7 @@ public class ScoringLocation {
         F(coralPose(Rotation2d.fromDegrees(120), false, 0, 0), 22),
         G(coralPose(Rotation2d.k180deg, true, 0, 0), 21),
         H(coralPose(Rotation2d.k180deg, false, 0, 0), 21),
-        I(coralPose(Rotation2d.fromDegrees(240), true,0, 0), 20),
+        I(coralPose(Rotation2d.fromDegrees(240), true, 0, 0), 20),
         J(coralPose(Rotation2d.fromDegrees(240), false, 0, 0), 20),
         K(coralPose(Rotation2d.fromDegrees(300), true, 0, 0), 19),
         L(coralPose(Rotation2d.fromDegrees(300), false, 0, 0), 19);
