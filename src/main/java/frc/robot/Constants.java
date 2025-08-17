@@ -135,7 +135,7 @@ public final class Constants {
     public static final class Climb {
         public static final int RIGHT_TALON_FX_ID = 12;
         public static final int TOUCH_SENSOR_CHANNEL = 2;
-        public static final Angle CLIMB_ANGLE = Radians.of(650);
+        public static final Angle CLIMB_ANGLE = Radians.of(675);
         public static final Angle MAX_ANGLE = Radians.of(703);
         public static final Angle CLIMBER_OUT_ANGLE = Radians.of(300);
         public static final Angle CLIMBER_START_ANGLE = Radians.of(146);
@@ -352,8 +352,8 @@ public final class Constants {
 
         // positions
         public static final Distance HOME = Inches.of(2);
-        public static final Distance P0 = Inches.of(21.5); // Algae 1
-        public static final Distance P1 = Inches.of(26.45); // Coral l1
+        public static final Distance P0 = Inches.of(20.5); // Algae 1
+        public static final Distance P1 = Inches.of(27.45); // Coral l1
         public static final Distance P2 = Inches.of(36.2); // Algae 2
         public static final Distance P3 = Inches.of(43.6); // Coral L3
         public static final Distance P4 = Inches.of(68.9); // Coral L4
@@ -410,7 +410,7 @@ public final class Constants {
 
     /** State Estimator Constants */
     public static class StateEstimator {
-        public static final boolean keepInField = false;
+        public static final boolean keepInField = true;
         public static final boolean keepOutOfReefs = true;
         public static final LoggedTunableNumber globalVisionTrust =
             new LoggedTunableNumber("globalVisionTrust", 0.2);
