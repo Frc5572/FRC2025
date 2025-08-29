@@ -20,4 +20,15 @@ public interface QuestIO {
     public void commandPeriodic();
 
     public void setPose(Pose2d pose);
+
+    public class Empty implements QuestIO {
+        @Override
+        public void updateInputs(QuestInputs inputs) {}
+
+        @Override
+        public void commandPeriodic() {}
+
+        @Override
+        public void setPose(Pose2d pose) {}
+    }
 }

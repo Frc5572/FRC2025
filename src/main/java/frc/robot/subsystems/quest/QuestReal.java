@@ -30,6 +30,4 @@ public class QuestReal implements QuestIO {
     public void setPose(Pose2d pose) {
         quest.setPose(pose);
     }
-
-
 }
