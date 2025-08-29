@@ -56,6 +56,7 @@ import frc.robot.subsystems.quest.Quest;
 import frc.robot.subsystems.quest.QuestIO;
 import frc.robot.subsystems.quest.QuestReal;
 import frc.robot.subsystems.quest.QuestSim;
+import frc.robot.subsystems.quest.QuestUtils;
 import frc.robot.subsystems.swerve.GyroCanandGyro;
 import frc.robot.subsystems.swerve.GyroIO;
 import frc.robot.subsystems.swerve.GyroSim;
@@ -115,6 +116,7 @@ public class RobotContainer {
     private Climber climb;
     private AlgaeWrist wrist;
     private final Quest quest;
+    private final QuestUtils qu = new QuestUtils();
 
     Pose2d blueStart = new Pose2d(7.247, 1.126, new Rotation2d(2.276));
     Pose2d redStart = new Pose2d(10.025, 3.476, new Rotation2d(0));
