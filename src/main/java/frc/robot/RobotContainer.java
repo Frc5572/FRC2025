@@ -5,14 +5,18 @@ import static edu.wpi.first.units.Units.Radians;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -27,6 +31,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.AllianceFlipUtil;
+import frc.lib.util.Container;
+import frc.lib.util.KeyboardAndMouse;
+import frc.lib.util.ScoringLocation;
 import frc.lib.util.ScoringLocation.Height;
 import frc.lib.util.WebController;
 import frc.lib.util.viz.FieldViz;
@@ -194,6 +202,7 @@ public class RobotContainer {
 
         /* Button and Trigger Bindings */
         configureTriggerBindings();
+        setupKeyboard();
 
         if (runtimeType == RobotRunType.kSimulation) {
             maybeController("Driver", driver, this::setupDriver);
@@ -232,17 +241,159 @@ public class RobotContainer {
         controllerSetups.clear();
     }
 
+    private void setupKeyboard() {
+        var kbd = KeyboardAndMouse.getInstance();
+        var w = kbd.key("w");
+        var a = kbd.key("a");
+        var s = kbd.key("s");
+        var d = kbd.key("d");
+
+        swerve.setDefaultCommand(swerve.driveTeleop(() -> {
+            kbd.update();
+            double x = (a.getAsBoolean() ? 1.0 : 0.0) + (d.getAsBoolean() ? -1.0 : 0.0);
+            double y = (w.getAsBoolean() ? 1.0 : 0.0) + (s.getAsBoolean() ? -1.0 : 0.0);
+            double r = MathUtil.clamp(-kbd.getX() / 400.0, -3.0, 3.0);
+            return new ChassisSpeeds(x, y, r);
+        }, false, Constants.Swerve.isOpenLoop));
+
+        var f = kbd.key("f");
+        var q = kbd.key("q");
+        var e = kbd.key("e");
+        var g = kbd.key("g");
+        var lmb = kbd.mouse(0);
+        var rmb = kbd.mouse(2);
+        var mmb = kbd.mouse(1);
+
+        final Container<ScoringLocation.Height> heightSelection =
+            new Container<ScoringLocation.Height>(Height.KP4);
+        q.onTrue(Commands.runOnce(() -> {
+            switch (heightSelection.value) {
+                case KP0:
+                    heightSelection.value = Height.KP1;
+                    break;
+                case KP1:
+                    heightSelection.value = Height.KP3;
+                    break;
+                case KP2:
+                    heightSelection.value = Height.KP3;
+                    break;
+                case KP3:
+                    heightSelection.value = Height.KP4;
+                    break;
+                case KP4:
+                    heightSelection.value = Height.KP4;
+                    break;
+                case KP5:
+                    heightSelection.value = Height.KP4;
+                    break;
+                default:
+                    heightSelection.value = Height.KP4;
+                    break;
+
+            }
+        }));
+        e.onTrue(Commands.runOnce(() -> {
+            switch (heightSelection.value) {
+                case KP0:
+                    heightSelection.value = Height.KP1;
+                    break;
+                case KP1:
+                    heightSelection.value = Height.KP1;
+                    break;
+                case KP2:
+                    heightSelection.value = Height.KP1;
+                    break;
+                case KP3:
+                    heightSelection.value = Height.KP1;
+                    break;
+                case KP4:
+                    heightSelection.value = Height.KP3;
+                    break;
+                case KP5:
+                    heightSelection.value = Height.KP4;
+                    break;
+                default:
+                    heightSelection.value = Height.KP1;
+                    break;
+
+            }
+        }));
+
+        double cos30 = Rotation2d.fromDegrees(30).getCos();
+
+        Supplier<ScoringLocation.CoralLocation> leftPost = () -> {
+            var bluePose = AllianceFlipUtil.apply(state.getGlobalPoseEstimate());
+            var diff = bluePose.getTranslation().minus(FieldConstants.Reef.center);
+            Rotation2d angle = diff.getAngle();
+            double cos = angle.getCos();
+            double sin = angle.getSin();
+
+            if (cos > cos30) {
+                return ScoringLocation.CoralLocation.H;
+            } else if (cos < -cos30) {
+                return ScoringLocation.CoralLocation.A;
+            } else if (cos > 0.0) {
+                if (sin > 0.0) {
+                    return ScoringLocation.CoralLocation.I;
+                } else {
+                    return ScoringLocation.CoralLocation.E;
+                }
+            } else {
+                if (sin > 0.0) {
+                    return ScoringLocation.CoralLocation.K;
+                } else {
+                    return ScoringLocation.CoralLocation.C;
+                }
+            }
+        };
+
+        RobotModeTriggers.teleop().whileTrue(Commands.run(() -> {
+            Logger.recordOutput("leftPost", leftPost.get().toString());
+        }));
+
+        Supplier<ScoringLocation.CoralLocation> rightPost = () -> {
+            var bluePose = AllianceFlipUtil.apply(state.getGlobalPoseEstimate());
+            var diff = bluePose.getTranslation().minus(FieldConstants.Reef.center);
+            Rotation2d angle = diff.getAngle();
+            double cos = angle.getCos();
+            double sin = angle.getSin();
+
+            if (cos > cos30) {
+                return ScoringLocation.CoralLocation.G;
+            } else if (cos < -cos30) {
+                return ScoringLocation.CoralLocation.B;
+            } else if (cos > 0.0) {
+                if (sin > 0.0) {
+                    return ScoringLocation.CoralLocation.J;
+                } else {
+                    return ScoringLocation.CoralLocation.F;
+                }
+            } else {
+                if (sin > 0.0) {
+                    return ScoringLocation.CoralLocation.L;
+                } else {
+                    return ScoringLocation.CoralLocation.D;
+                }
+            }
+        };
+
+        f.negate().and(lmb).whileTrue(CommandFactory.autoScore(swerve, elevator, coralScoring,
+            algae, wrist, leftPost, () -> heightSelection.value, () -> Optional.empty(), (x) -> {
+            }).andThen(CommandFactory.fasterFeeder(swerve, elevator, coralScoring))
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+        rmb.whileTrue(CommandFactory.autoScore(swerve, elevator, coralScoring, algae, wrist,
+            rightPost, () -> heightSelection.value, () -> Optional.empty(), (x) -> {
+            }).andThen(CommandFactory.fasterFeeder(swerve, elevator, coralScoring))
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+    }
+
     /**
      * Use this method to vol your button->command mappings. Buttons can be created by instantiating
      * a {@link GenericHID} or one of its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or
      * {@link XboxController}), and then passing it to a
      * {@link edu1.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
-
     private void setupDriver() {
-        swerve.setDefaultCommand(swerve.teleOpDrive(driver, Constants.Swerve.isFieldRelative,
-            Constants.Swerve.isOpenLoop));
-
         Command autoScore = CommandFactory
             .autoScore(swerve, elevator, coralScoring, algae, wrist, operator::getDesiredLocation,
                 operator::getDesiredHeight, operator::additionalAlgaeHeight, operator::crossOut)
