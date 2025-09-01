@@ -152,6 +152,15 @@ public final class Constants {
      * Swerve Constants
      */
     public static final class Swerve {
+
+        public static final class Characterization {
+            public static final double ffStartDelay = 2.0; // Secs
+            public static final double ffRampRate = 0.1; // Volts/Sec
+            public static final double wheelRadiusMaxVelocity = 0.25; // Rad/Sec
+            public static final double wheelRadiusRampRate = 0.05; // Rad/Sec^2
+        }
+
+
         public static final double AUTO_ROTATION_KP = 5.0;
         public static final double AUTO_ROTATION_KI = 0.0;
         public static final double AUTO_ROTATION_KD = 0.0;
