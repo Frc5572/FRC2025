@@ -112,8 +112,9 @@ public class SwerveModule {
             Rotation2d.fromRotations(inputs.angleMotorSelectedPosition.in(Rotations)));
     }
 
+    /** Run motor at given voltage with angle motor pointing forward */
     public void runCharacterization(double output) {
-        io.setDriveMotor(output);
+        io.setDriveMotorPower(output);
         io.setAngleMotor(0.0);
     }
 

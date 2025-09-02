@@ -153,6 +153,7 @@ public final class Constants {
      */
     public static final class Swerve {
 
+        /** Constants for sysid routines */
         public static final class Characterization {
             public static final double ffStartDelay = 2.0; // Secs
             public static final double ffRampRate = 0.1; // Volts/Sec

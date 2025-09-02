@@ -420,6 +420,7 @@ public class Swerve extends SubsystemBase {
         return values;
     }
 
+    /** Sysid routine to determine kS and kV */
     public Command feedforwardCharacterization() {
         List<Double> velocitySamples = new LinkedList<>();
         List<Double> voltageSamples = new LinkedList<>();
@@ -467,9 +468,12 @@ public class Swerve extends SubsystemBase {
                     System.out.println("********** Drive FF Characterization Results **********");
                     System.out.println("\tkS: " + formatter.format(kS));
                     System.out.println("\tkV: " + formatter.format(kV));
+                    Logger.recordOutput("Sysid/FF/kS", kS);
+                    Logger.recordOutput("Sysid/FF/kV", kV);
                 }));
     }
 
+    /** Sysid routine to determine wheel radius */
     public Command wheelRadiusCharacterization() {
         SlewRateLimiter limiter =
             new SlewRateLimiter(Constants.Swerve.Characterization.wheelRadiusRampRate);
@@ -540,6 +544,7 @@ public class Swerve extends SubsystemBase {
                         System.out.println(
                             "\tWheel Radius: " + formatter.format(wheelRadius) + " meters, "
                                 + formatter.format(Units.metersToInches(wheelRadius)) + " inches");
+                        Logger.recordOutput("Sysid/FF/radius", wheelRadius);
                     })));
     }
 
