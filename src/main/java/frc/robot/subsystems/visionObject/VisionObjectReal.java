@@ -22,7 +22,7 @@ import frc.robot.Constants;
 
 public class VisionObjectReal implements VisionObjectIO {
     protected final PhotonCamera camera;
-    private final String coprocessor = "changeMe";
+    private final String coprocessor = "orangepi2";
     String tempDir = System.getProperty("java.io.tmpdir");
     String name;
 

@@ -91,7 +91,7 @@ public class RobotContainer {
     public final CommandXboxController altOperator =
         new CommandXboxController(Constants.ALT_OPERATOR_ID);
     public final CommandXboxController testController = new CommandXboxController(5);
-    public final CommandPS5Controller simCOntroller = new CommandPS5Controller(4);
+    public final CommandPS5Controller simController = new CommandPS5Controller(4);
 
     /** Simulation */
     private SwerveDriveSimulation driveSimulation;
@@ -140,7 +140,7 @@ public class RobotContainer {
                 algae = new ElevatorAlgae(new ElevatorAlgaeReal(), vis);
                 climb = new Climber(new ClimberReal(), vis);
                 wrist = new AlgaeWrist(vis, new AlgaeWristReal());
-                objDetect = new VisionObject(state, VisionObjectReal::new);
+                objDetect = new VisionObject(VisionObjectReal::new);
                 break;
 
             case kSimulation:
@@ -165,7 +165,7 @@ public class RobotContainer {
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
                 climb = new Climber(new ClimberIO.Empty(), vis);
                 wrist = new AlgaeWrist(vis, new AlgaeWristIO.Empty());
-                objDetect = new VisionObject(state, VisionObjectIO::empty);
+                objDetect = new VisionObject(VisionObjectIO::empty);
         }
         autoFactory = new AutoFactory(swerve::getPose, swerve::resetOdometry,
             swerve::followTrajectory, true, swerve);
@@ -303,7 +303,7 @@ public class RobotContainer {
         // driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'p')
         // .whileTrue(Commands.none());
 
-        simCOntroller.cross().whileTrue(
+        simController.cross().whileTrue(
             CommandFactory.getFoundAlgae(elevator, algae, wrist, swerve, objDetect, state));
     }
 

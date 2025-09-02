@@ -359,7 +359,7 @@ public class CommandFactory {
             .waitUntil(() -> elevator.getHeight().in(Inches) == Constants.Elevator.HOME.in(Inches))
             .deadlineFor(elevator.home())
             .alongWith(new MoveAndAvoidReef(swerve,
-                () -> state.getGlobalPoseEstimate().transformBy(piece.targetTransform),
+                () -> state.getGlobalPoseEstimate().transformBy(piece.targetTransform()),
                 () -> Constants.Swerve.AUTO_MAX_SPEED, false, 0, 0))
             .alongWith(wirst.groundAngle().andThen(algae.algaeIntakeCommand()))
             .until(algae.hasAlgae).asProxy().andThen(wirst.homeAngle())
