@@ -277,7 +277,7 @@ public final class Constants {
             public static final double wheelCoeffFriction = 1.2;
             public static final MomentOfInertia angleMomentOfInertia =
                 KilogramSquareMeters.of(0.02);
-            public static final Distance wheelRadius = Inches.of(3.87 / 2);
+            public static final Distance wheelRadius = Inches.of(2.764);
             public static final Current slipCurrent = Amps.of(120.0);
 
             public static final Current driveCurrentLimit = Amps.of(35.0);
@@ -294,8 +294,8 @@ public final class Constants {
             public static final LinearAcceleration maxDriveRate = MetersPerSecondPerSecond.of(50.0);
 
 
-            public static final double ffkS = 1.0;
-            public static final double ffkV = 1.51;
+            public static final double ffkS = .194;
+            public static final double ffkV = 1.001;
             public static final double ffkT = 1.0 / driveMotor.KtNMPerAmp;
             public static final double ffkA = 0.27;
             public static final double drivekP = 0.12;
@@ -444,7 +444,7 @@ public final class Constants {
      * MoveToPos constants.
      */
     public static class SwerveTransformPID {
-        public static final double PID_XKP = 1.0;
+        public static final double PID_XKP = 4.2;
         public static final double PID_XKI = 0.0;
         public static final double PID_XKD = 0.0;
         public static final double PID_TKP = 2.5;

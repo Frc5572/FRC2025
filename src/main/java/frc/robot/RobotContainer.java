@@ -1,6 +1,8 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,6 +15,7 @@ import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -32,6 +35,7 @@ import frc.lib.util.WebController;
 import frc.lib.util.viz.FieldViz;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Robot.RobotRunType;
+import frc.robot.commands.MoveToPose;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.algaewrist.AlgaeWrist;
 import frc.robot.subsystems.algaewrist.AlgaeWristIO;
@@ -337,6 +341,10 @@ public class RobotContainer {
             .onFalse(swerve.stop());
         pitController.povUp().whileTrue(swerve.wheelRadiusCharacterization())
             .onFalse(swerve.stop());
+        pitController.povLeft().whileTrue(new MoveToPose(swerve, () -> {
+            return swerve.getPose()
+                .plus(new Transform2d(Inches.of(24), Meters.of(0), Rotation2d.kZero));
+        }, () -> 200.0, false, 0, 0)).onFalse(swerve.stop());
     }
 
     private void configureTriggerBindings() {
