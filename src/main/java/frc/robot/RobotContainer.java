@@ -333,8 +333,10 @@ public class RobotContainer {
         // driver.a().whileTrue(
         // elevator.moveTo(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
 
-        pitController.povDown().whileTrue(swerve.feedforwardCharacterization());
-        pitController.povUp().whileTrue(swerve.wheelRadiusCharacterization());
+        pitController.povDown().whileTrue(swerve.feedforwardCharacterization())
+            .onFalse(swerve.stop());
+        pitController.povUp().whileTrue(swerve.wheelRadiusCharacterization())
+            .onFalse(swerve.stop());
     }
 
     private void configureTriggerBindings() {
