@@ -162,7 +162,7 @@ public class RobotState {
             for (var target : result.targets) {
                 double dist =
                     target.getBestCameraToTarget().getTranslation().toTranslation2d().getNorm();
-                if (dist > Units.inchesToMeters(48)) {
+                if (dist > Units.feetToMeters(6)) {
                     continue;
                 }
                 localCircle[whichCamera]
@@ -177,12 +177,14 @@ public class RobotState {
                 } else {
                     continue;
                 }
-                Rotation2d yaw = Rotation2d.fromDegrees(robotYaw.getDegrees() - target.getYaw()
-                // * Math.cos(Constants.Vision.cameras[whichCamera].robotToCamera().getX())
-                    + 180
-                    // - Constants.Vision.cameras[whichCamera].robotToCamera().getX() * 180.0 /
-                    // Math.PI
-                    + Units.radiansToDegrees(robotToCamera.getRotation().getZ()));
+                Rotation2d yaw;
+                if (whichCamera == 0) {
+                    yaw = Rotation2d.fromDegrees(robotYaw.getDegrees() + target.getYaw()
+                        + Units.radiansToDegrees(robotToCamera.getRotation().getZ()) + 180);
+                } else {
+                    yaw = Rotation2d.fromDegrees(robotYaw.getDegrees() - target.getYaw()
+                        + Units.radiansToDegrees(robotToCamera.getRotation().getZ()) + 180);
+                }
                 xCircle[whichCamera].setCenter(localCircle[whichCamera].getVertex(yaw));
                 xCircle[whichCamera].draw();
                 Pose2d robotPose2d = new Pose2d(
@@ -192,8 +194,11 @@ public class RobotState {
                 Pose3d robotPose = new Pose3d(robotPose2d);
                 Pose3d cameraPose = robotPose.plus(robotToCamera);
                 addVisionObservation(cameraPose, robotPose, result.getTimestampSeconds(),
-                    VecBuilder.fill(Constants.StateEstimator.localVisionTrust.getAsDouble(),
-                        Constants.StateEstimator.localVisionTrust.getAsDouble(),
+                    VecBuilder.fill(
+                        Constants.StateEstimator.localVisionTrust.getAsDouble()
+                            * Math.max(dist, 0.5),
+                        Constants.StateEstimator.localVisionTrust.getAsDouble()
+                            * Math.max(dist, 0.5),
                         Double.POSITIVE_INFINITY),
                     result.getTargets(), "Local", false, stdDevLocalCircle[whichCamera]);
             }
