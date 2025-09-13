@@ -56,7 +56,6 @@ import frc.robot.subsystems.quest.Quest;
 import frc.robot.subsystems.quest.QuestIO;
 import frc.robot.subsystems.quest.QuestReal;
 import frc.robot.subsystems.quest.QuestSim;
-import frc.robot.subsystems.quest.QuestUtils;
 import frc.robot.subsystems.swerve.GyroCanandGyro;
 import frc.robot.subsystems.swerve.GyroIO;
 import frc.robot.subsystems.swerve.GyroSim;
@@ -116,7 +115,6 @@ public class RobotContainer {
     private Climber climb;
     private AlgaeWrist wrist;
     private final Quest quest;
-    private final QuestUtils qu = new QuestUtils();
 
     Pose2d blueStart = new Pose2d(7.247, 1.126, new Rotation2d(2.276));
     Pose2d redStart = new Pose2d(10.025, 3.476, new Rotation2d(0));
@@ -140,7 +138,7 @@ public class RobotContainer {
                 algae = new ElevatorAlgae(new ElevatorAlgaeReal(), vis);
                 climb = new Climber(new ClimberReal(), vis);
                 wrist = new AlgaeWrist(vis, new AlgaeWristReal());
-                quest = new Quest(new QuestReal(), vis);
+                quest = new Quest(new QuestReal(), state);
                 break;
 
             case kSimulation:
@@ -155,7 +153,7 @@ public class RobotContainer {
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
                 climb = new Climber(new ClimberSim(), vis);
                 wrist = new AlgaeWrist(vis, new AlgaeWristSim());
-                quest = new Quest(new QuestSim(), vis);
+                quest = new Quest(new QuestSim(), state);
                 break;
             default:
                 elevator = new Elevator(new ElevatorIO.Empty(), vis);
@@ -165,7 +163,7 @@ public class RobotContainer {
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
                 climb = new Climber(new ClimberIO.Empty(), vis);
                 wrist = new AlgaeWrist(vis, new AlgaeWristIO.Empty());
-                quest = new Quest(new QuestIO.Empty(), vis);
+                quest = new Quest(new QuestIO.Empty(), state);
         }
         autoFactory = new AutoFactory(swerve::getPose, swerve::resetOdometry,
             swerve::followTrajectory, true, swerve);
@@ -302,6 +300,7 @@ public class RobotContainer {
         // CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)));
         // driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'p')
         // .whileTrue(Commands.none());
+        driver.rightStick().whileTrue(quest.setPos());
     }
 
     private void setupAltOperatorController() {

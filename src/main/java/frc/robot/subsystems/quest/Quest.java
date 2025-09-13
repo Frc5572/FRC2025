@@ -2,23 +2,24 @@ package frc.robot.subsystems.quest;
 
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.util.viz.Viz2025;
 import frc.robot.RobotState;
 
 public class Quest extends SubsystemBase {
     private QuestIO io;
     private QuestInputsAutoLogged inputs = new QuestInputsAutoLogged();
-    private Viz2025 viz;
-    private RobotState state;
     private Pose2d posInit;
-    private QuestUtils qu = new QuestUtils();
+    private RobotState state;
 
-    public Quest(QuestIO io, Viz2025 viz) {
+    public Quest(QuestIO io, RobotState state) {
         this.io = io;
-        this.viz = viz;
-        state = new frc.robot.RobotState(viz);
+        this.state = state;
         io.updateInputs(inputs);
+        posInit = state.getGlobalPoseEstimate();
+        io.setPose(posInit);
+        Logger.recordOutput("Quest/PosInit", posInit);
     }
 
     @Override
@@ -29,11 +30,15 @@ public class Quest extends SubsystemBase {
             posInit = state.getGlobalPoseEstimate();
             io.setPose(posInit);
         }
-        qu.update(inputs.questPose);
-        Logger.recordOutput("Quest/QuestPoseWithTags", qu.getPose());
+        Logger.recordOutput("Quest/PosInit", posInit);
+        Logger.recordOutput("Quest/getPose", getPose());
     }
 
     public Pose2d getPose() {
         return inputs.questPose;
+    }
+
+    public Command setPos() {
+        return Commands.runOnce(() -> io.setPose(state.getGlobalPoseEstimate()));
     }
 }

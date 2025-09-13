@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.targeting.PhotonPipelineResult;
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,12 +19,10 @@ import frc.lib.util.LoggedTracer;
 import frc.lib.util.Tuples.Tuple3;
 import frc.robot.Constants;
 import frc.robot.RobotState;
-import frc.robot.subsystems.quest.QuestUtils;
 import frc.robot.subsystems.vision.VisionIO.CameraInputs;
 
 /** Vision Subsystem */
 public class Vision extends SubsystemBase {
-    private final QuestUtils qu = new QuestUtils();
     private final VisionIO io;
     private final CameraInputs[] cameraInputs;
 
@@ -78,8 +75,6 @@ public class Vision extends SubsystemBase {
             } else if (result._0() == 0) {
                 seesMultitag = false;
             }
-            qu.update(new Pose2d(result._1().getX(), result._1().getY(),
-                result._1().getRotation().toRotation2d()));
             state.addVisionObservation(result._2(), result._1(), result._0());
         }
         // Viz
