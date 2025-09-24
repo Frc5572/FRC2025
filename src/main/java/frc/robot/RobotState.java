@@ -36,7 +36,8 @@ public class RobotState {
 
     private final Viz2025 vis;
     private boolean isInitialized = false;
-
+    public Rotation2d yawObject = Rotation2d.kZero;
+    public double lastSeenObject;
     private final TimeInterpolatableBuffer<Rotation2d> rotationBuffer =
         TimeInterpolatableBuffer.createBuffer(1.5);
 
@@ -193,6 +194,17 @@ public class RobotState {
                     result.getTargets(), "Local", false, stdDevLocalCircle);
             }
         }
+        if (whichCamera == 2) {
+            if (!result.hasTargets()) {
+                return;
+            }
+            yawObject = Rotation2d.fromDegrees(result.getBestTarget().yaw);
+            lastSeenObject = Timer.getFPGATimestamp();
+        }
+    }
+
+    public Rotation2d getObjectYaw() {
+        return yawObject;
     }
 
     private final Circle localCircle =
@@ -204,6 +216,7 @@ public class RobotState {
      * Add information from swerve drive.
      */
     public void addSwerveObservation(SwerveModulePosition[] positions, Rotation2d gyroYaw) {
+        double currentYaw = this.getGlobalPoseEstimate().getRotation().getRadians();
         swerveOdometry.update(gyroYaw, positions);
         constrain(positions, gyroYaw);
         rotationBuffer.addSample(MathSharedStore.getTimestamp(),
@@ -214,6 +227,9 @@ public class RobotState {
         stdDevGlobalCircle.setRadius(stdDevGlobalCircle.getRadius() + 0.01);
         stdDevLocalCircle.setCenter(new Translation2d());
         stdDevLocalCircle.setRadius(0.0);
+        double newYaw = this.getGlobalPoseEstimate().getRotation().getRadians();
+        double diffYaw = newYaw - currentYaw;
+        yawObject = yawObject.plus(Rotation2d.fromRadians(diffYaw));
     }
 
     private Rotation2d[] swerveRotations = new Rotation2d[4];

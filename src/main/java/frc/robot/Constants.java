@@ -403,7 +403,7 @@ public final class Constants {
                         Units.inchesToMeters(10)),
                     new Rotation3d(0, 0, -Units.degreesToRadians(45))),
                 Units.inchesToMeters(0.0)),
-            new CameraConstants("camObj", 800, 1280, Rotation2d.fromDegrees(1000000), Hertz.of(240),
+            new CameraConstants("camObj", 800, 1280, Rotation2d.fromDegrees(60), Hertz.of(80),
                 Seconds.of(0.3), Seconds.of(0.02), 0.0, 0.0,
                 new Transform3d(0.0, 0.0, 0.0, new Rotation3d(Math.PI, 0, 0)),
                 Units.inchesToMeters(1000000))};

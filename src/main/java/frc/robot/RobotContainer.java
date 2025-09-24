@@ -64,9 +64,6 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionReal;
 import frc.robot.subsystems.vision.VisionSimPhoton;
-import frc.robot.subsystems.visionObject.VisionObject;
-import frc.robot.subsystems.visionObject.VisionObjectIO;
-import frc.robot.subsystems.visionObject.VisionObjectReal;
 
 
 
@@ -109,7 +106,6 @@ public class RobotContainer {
     private LEDs ledsLeftFrontSide = new LEDs(buffer, 80, 119);
     private LEDs ledsLeftBackSide = new LEDs(buffer, 120, 159);
 
-    private VisionObject objDetect;
     private Elevator elevator;
     private final Swerve swerve;
     private final Vision vision;
@@ -140,7 +136,6 @@ public class RobotContainer {
                 algae = new ElevatorAlgae(new ElevatorAlgaeReal(), vis);
                 climb = new Climber(new ClimberReal(), vis);
                 wrist = new AlgaeWrist(vis, new AlgaeWristReal());
-                objDetect = new VisionObject(VisionObjectReal::new);
                 break;
 
             case kSimulation:
@@ -165,7 +160,6 @@ public class RobotContainer {
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
                 climb = new Climber(new ClimberIO.Empty(), vis);
                 wrist = new AlgaeWrist(vis, new AlgaeWristIO.Empty());
-                objDetect = new VisionObject(VisionObjectIO::empty);
         }
         autoFactory = new AutoFactory(swerve::getPose, swerve::resetOdometry,
             swerve::followTrajectory, true, swerve);
@@ -291,7 +285,8 @@ public class RobotContainer {
             .onFalse(elevator.home().deadlineFor(wrist.homeAngle()));
         driver.back().onTrue(elevator.stop());
         driver.leftTrigger().whileTrue(algae.algaeOuttakeCommand());
-        driver.leftBumper().whileTrue(wrist.groundAngle().alongWith(algae.algaeIntakeCommand()))
+        driver.leftBumper()
+            .whileTrue(CommandFactory.getFoundAlgae(elevator, algae, wrist, swerve, driver, state))
             .onFalse(wrist.homeAngle().withTimeout(0.5));
         driver.rightBumper().whileTrue(wrist.groundAngle())
             .onFalse(wrist.homeAngle().withTimeout(0.5));
@@ -303,8 +298,6 @@ public class RobotContainer {
         // driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'p')
         // .whileTrue(Commands.none());
 
-        simController.cross().whileTrue(
-            CommandFactory.getFoundAlgae(elevator, algae, wrist, swerve, objDetect, state));
     }
 
     private void setupAltOperatorController() {

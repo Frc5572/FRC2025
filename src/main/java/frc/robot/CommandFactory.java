@@ -6,15 +6,19 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.AllianceFlipUtil;
 import frc.lib.util.ScoringLocation;
 import frc.robot.commands.MoveAndAvoidReef;
@@ -24,7 +28,6 @@ import frc.robot.subsystems.coral.CoralScoring;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator_algae.ElevatorAlgae;
 import frc.robot.subsystems.swerve.Swerve;
-import frc.robot.subsystems.visionObject.VisionObject;
 
 /**
  * Factory for Composed Commands
@@ -354,15 +357,28 @@ public class CommandFactory {
 
 
     public static Command getFoundAlgae(Elevator elevator, ElevatorAlgae algae, AlgaeWrist wirst,
-        Swerve swerve, VisionObject piece, RobotState state) {
-        return Commands
-            .waitUntil(() -> elevator.getHeight().in(Inches) == Constants.Elevator.HOME.in(Inches))
-            .deadlineFor(elevator.home())
-            .alongWith(new MoveAndAvoidReef(swerve,
-                () -> state.getGlobalPoseEstimate().transformBy(piece.targetTransform()),
-                () -> Constants.Swerve.AUTO_MAX_SPEED, false, 0, 0))
-            .alongWith(wirst.groundAngle().andThen(algae.algaeIntakeCommand()))
-            .until(algae.hasAlgae).asProxy().andThen(wirst.homeAngle())
+        Swerve swerve, CommandXboxController controller, RobotState state) {
+        final PIDController pidController = new PIDController(0.3, 0, 0);
+        // pidController.enableContinuousInput(-Math.PI, Math.PI);
+        return
+        // .waitUntil(() -> elevator.getHeight().in(Inches) == Constants.Elevator.HOME.in(Inches))
+        // .deadlineFor(elevator.home())
+        swerve.teleOpDrive(() -> -controller.getLeftX(), () -> -controller.getLeftY(), () -> {
+            if (Timer.getFPGATimestamp() - state.lastSeenObject > 2.0) {
+                return -controller.getRightX();
+            } else {
+                Logger.recordOutput("objectYaw",
+                    MathUtil.angleModulus(-state.getObjectYaw().getRadians()));
+                double output = pidController.calculate(
+                    state.getGlobalPoseEstimate().getRotation().getRadians(),
+                    MathUtil.angleModulus(-state.getObjectYaw().getRadians()));
+                Logger.recordOutput("objectYawOutput", output);
+                return output;
+
+            }
+        }, true, false)
+            // .alongWith(wirst.groundAngle().alongWith(algae.algaeIntakeCommand()))
+            // .until(algae.hasAlgae).asProxy().andThen(wirst.homeAngle())
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
     }
 }

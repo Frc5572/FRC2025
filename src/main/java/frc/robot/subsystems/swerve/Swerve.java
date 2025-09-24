@@ -3,6 +3,7 @@ package frc.robot.subsystems.swerve;
 
 import static edu.wpi.first.units.Units.Rotation;
 import java.util.Optional;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import choreo.trajectory.SwerveSample;
@@ -325,7 +326,24 @@ public class Swerve extends SubsystemBase {
         });
     }
 
-
+    public Command teleOpDrive(DoubleSupplier x, DoubleSupplier y, DoubleSupplier rot,
+        boolean fieldRelative, boolean openLoop) {
+        return this.run(() -> {
+            double yaxis = y.getAsDouble();
+            double xaxis = x.getAsDouble();
+            double raxis = rot.getAsDouble();
+            /* Deadbands */
+            yaxis = MathUtil.applyDeadband(yaxis, 0.1);
+            xaxis = MathUtil.applyDeadband(xaxis, 0.1);
+            xaxis *= xaxis * Math.signum(xaxis);
+            yaxis *= yaxis * Math.signum(yaxis);
+            raxis = (Math.abs(raxis) < Constants.STICK_DEADBAND) ? 0 : raxis;
+            Translation2d translation = new Translation2d(yaxis, xaxis)
+                .times(Constants.Swerve.maxSpeed).times(setSpeedMultiplier);
+            double rotation = raxis * Constants.Swerve.maxAngularVelocity * setSpeedMultiplier;
+            this.drive(translation, rotation, fieldRelative, openLoop);
+        });
+    }
 
     public Command stop() {
         return this.runOnce(this::setMotorsZero);
