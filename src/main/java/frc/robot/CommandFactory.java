@@ -359,7 +359,7 @@ public class CommandFactory {
     public static Command getFoundAlgae(Elevator elevator, ElevatorAlgae algae, AlgaeWrist wirst,
         Swerve swerve, CommandXboxController controller, RobotState state) {
         final PIDController pidController = new PIDController(0.3, 0, 0);
-        // pidController.enableContinuousInput(-Math.PI, Math.PI);
+        pidController.enableContinuousInput(-Math.PI, Math.PI);
         return
         // .waitUntil(() -> elevator.getHeight().in(Inches) == Constants.Elevator.HOME.in(Inches))
         // .deadlineFor(elevator.home())
@@ -370,7 +370,7 @@ public class CommandFactory {
                 Logger.recordOutput("objectYaw",
                     MathUtil.angleModulus(-state.getObjectYaw().getRadians()));
                 double output = pidController.calculate(
-                    state.getGlobalPoseEstimate().getRotation().getRadians(),
+                    MathUtil.angleModulus(state.getGlobalPoseEstimate().getRotation().getRadians()),
                     MathUtil.angleModulus(-state.getObjectYaw().getRadians()));
                 Logger.recordOutput("objectYawOutput", output);
                 return output;
