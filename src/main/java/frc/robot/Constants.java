@@ -135,7 +135,7 @@ public final class Constants {
     public static final class Climb {
         public static final int RIGHT_TALON_FX_ID = 12;
         public static final int TOUCH_SENSOR_CHANNEL = 2;
-        public static final Angle CLIMB_ANGLE = Radians.of(675);
+        public static final Angle CLIMB_ANGLE = Radians.of(650);
         public static final Angle MAX_ANGLE = Radians.of(703);
         public static final Angle CLIMBER_OUT_ANGLE = Radians.of(300);
         public static final Angle CLIMBER_START_ANGLE = Radians.of(146);
@@ -232,7 +232,7 @@ public final class Constants {
             public static final int driveMotorID = 9;
             public static final int angleMotorID = 8;
             public static final int canCoderID = 2; // duplicate?
-            public static final Rotation2d angleOffset = Rotation2d.fromRotations(0.205322);
+            public static final Rotation2d angleOffset = Rotation2d.fromRotations(-0.301758 );
 
         }
 
@@ -352,8 +352,8 @@ public final class Constants {
 
         // positions
         public static final Distance HOME = Inches.of(2);
-        public static final Distance P0 = Inches.of(20.5); // Algae 1
-        public static final Distance P1 = Inches.of(27.45); // Coral l1
+        public static final Distance P0 = Inches.of(21.5); // Algae 1
+        public static final Distance P1 = Inches.of(26.45); // Coral l1
         public static final Distance P2 = Inches.of(36.2); // Algae 2
         public static final Distance P3 = Inches.of(43.6); // Coral L3
         public static final Distance P4 = Inches.of(68.9); // Coral L4
@@ -388,6 +388,7 @@ public final class Constants {
             }
         }
 
+
         public static final CameraConstants[] cameras = new CameraConstants[] {
             new CameraConstants("cam0", 800, 1280, Rotation2d.fromDegrees(80), Hertz.of(20),
                 Seconds.of(0.3), Seconds.of(0.02), 0.8, 0.08,
@@ -401,7 +402,12 @@ public final class Constants {
                     new Translation3d(Units.inchesToMeters(9.2), Units.inchesToMeters(13.5),
                         Units.inchesToMeters(10)),
                     new Rotation3d(0, 0, -Units.degreesToRadians(45))),
-                Units.inchesToMeters(0.0))};
+                Units.inchesToMeters(0.0)),
+            new CameraConstants("camObj", 800, 1280, Rotation2d.fromDegrees(60), Hertz.of(80),
+                Seconds.of(0.3), Seconds.of(0.02), 0.0, 0.0,
+                new Transform3d(0.0, 0.0, 0.0, new Rotation3d(Math.PI, 0, 0)),
+                Units.inchesToMeters(1000000))};
+
 
         public static final double zMargin = 0.75;
         public static final double fieldBorderMargin = 0.5;
@@ -410,7 +416,7 @@ public final class Constants {
 
     /** State Estimator Constants */
     public static class StateEstimator {
-        public static final boolean keepInField = true;
+        public static final boolean keepInField = false;
         public static final boolean keepOutOfReefs = true;
         public static final LoggedTunableNumber globalVisionTrust =
             new LoggedTunableNumber("globalVisionTrust", 0.2);
@@ -468,6 +474,13 @@ public final class Constants {
         public static final String haveCoral = "Dashboard/Main Driver/Have Coral";
         public static final String haveAlgae = "Dashboard/Main Driver/Have Algae";
 
+    }
+
+    public static class Gamepieces {
+        public static final Distance NOTE_INNER_RADIUS = Meters.of(0.127);
+        public static final Distance NOTE_OUTER_RADIUS = Meters.of(0.1778);
+        public static final Distance NOTE_TOLERANCE = Inches.of(20.0);
+        public static final double NOTE_PERSISTENCE = 0.5;
     }
 }
 
