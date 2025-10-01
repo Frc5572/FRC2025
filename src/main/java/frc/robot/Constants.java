@@ -232,7 +232,7 @@ public final class Constants {
             public static final int driveMotorID = 9;
             public static final int angleMotorID = 8;
             public static final int canCoderID = 2; // duplicate?
-            public static final Rotation2d angleOffset = Rotation2d.fromRotations(-0.301758 );
+            public static final Rotation2d angleOffset = Rotation2d.fromRotations(-0.301758);
 
         }
 
