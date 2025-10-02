@@ -101,6 +101,7 @@ public class Vision extends SubsystemBase {
         }
         LoggedTracer.record("Vision");
         SmartDashboard.putBoolean(Constants.DashboardValues.seeMultiTag, seesMultitag);
+        Logger.recordOutput("Object/Yaw", state.getObjectYaw().getRadians());
     }
 
     public boolean twoAprilTags() {
