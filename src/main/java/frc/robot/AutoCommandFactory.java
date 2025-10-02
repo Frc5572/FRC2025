@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.lib.util.AllianceFlipUtil;
 import frc.lib.util.ScoringLocation;
 import frc.lib.util.ScoringLocation.CoralLocation;
 import frc.lib.util.ScoringLocation.Height;
@@ -87,16 +88,13 @@ public class AutoCommandFactory {
         return routine;
     }
 
-    private static final Pose2d middleStart =
-        new Pose2d(7.578684329986572, 3.9847824573516846, Rotation2d.k180deg);
-
     /**
      * Left L4 Auto
      *
      * @return Auto Routine
      */
     public AutoRoutine l4left() {
-        return scoreCoral("l4left", true, CoralLocation.I, CoralLocation.K, CoralLocation.A,
+        return scoreCoral("l4left", true, CoralLocation.J, CoralLocation.K, CoralLocation.A,
             CoralLocation.L);
     }
 
@@ -264,15 +262,21 @@ public class AutoCommandFactory {
         }
     }
 
-    private static final Pose2d bargePose = new Pose2d(7.558475971221924 + Units.inchesToMeters(0),
+    private static final Pose2d bargePose = new Pose2d(7.558475971221924 + Units.inchesToMeters(-3),
         6.258963108062744, Rotation2d.kZero);
+
+    private static final Pose2d middleStartLocation = new Pose2d(
+        FieldConstants.startingLineX.in(Meters) - Constants.Swerve.bumperFront.in(Meters),
+        FieldConstants.fieldWidth.in(Meters) / 2, Rotation2d.k180deg);
 
     private AutoRoutine coralThenBarge(String name,
         ScoringLocation.CoralLocation coralScoreLocation, AlgaeLocation... algaeScoreLocations) {
         AutoRoutine routine = autoFactory.newRoutine(name);
 
-        Command run = CommandFactory.maybeScoreCoral(swerve, elevator, coral, algae, wrist,
-            () -> coralScoreLocation, () -> ScoringLocation.Height.KP4);
+        Command run =
+            swerve.runOnce(() -> swerve.resetOdometry(AllianceFlipUtil.apply(middleStartLocation)))
+                .andThen(CommandFactory.scoreCoralAutoStart(swerve, elevator, coral, algae, wrist,
+                    () -> coralScoreLocation, () -> ScoringLocation.Height.KP4));
 
         for (var algaeLoc : algaeScoreLocations) {
             run = run.andThen(

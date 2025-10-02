@@ -9,6 +9,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.viz.Viz2025;
 import frc.robot.Constants;
 
@@ -18,6 +19,8 @@ public class AlgaeWrist extends SubsystemBase {
     private final Viz2025 viz;
     private final AlgaeWristIO io;
     private final AlgaeWristInputsAutoLogged inputs = new AlgaeWristInputsAutoLogged();
+    public Trigger algaeGroundIntaking = new Trigger(() -> inputs.wristAngle
+        .in(Rotations) < Constants.Algae.GROUND_ANGLE.in(Rotations) + Degrees.of(10).in(Rotations));
 
     /** Algae Wrist */
     public AlgaeWrist(Viz2025 viz, AlgaeWristIO io) {
