@@ -385,20 +385,16 @@ public class CommandFactory {
 
     public static Command getFoundAlgae(Elevator elevator, ElevatorAlgae algae, AlgaeWrist wirst,
         Swerve swerve, CommandXboxController controller, RobotState state) {
-        final PIDController pidController = new PIDController(0.7, 0, 0);
+        final PIDController pidController = new PIDController(0.52, 0, 0);
+        pidController.enableContinuousInput(-Math.PI, Math.PI);
         return
         // .waitUntil(() -> elevator.getHeight().in(Inches) == Constants.Elevator.HOME.in(Inches))
         // .deadlineFor(elevator.home())
         swerve.teleOpDrive(() -> -controller.getLeftX(), () -> -controller.getLeftY(), () -> {
-            if (Timer.getFPGATimestamp() - state.lastSeenObject > 2.0) {
+            if (Timer.getFPGATimestamp() - state.lastSeenObject > 0.1) {
                 return -controller.getRightX();
             } else {
-
-
-                // double targetYaw = state.getGlobalPoseEstimate().getRotation().getRadians()
-                // + -state.getObjectYaw().getRadians();
                 double output = pidController.calculate(-state.getObjectYaw().getRadians());
-
                 // double turn = MathUtil.clamp(output, -Constants.Swerve.maxAngularVelocity,
                 // Constants.Swerve.maxAngularVelocity);
 

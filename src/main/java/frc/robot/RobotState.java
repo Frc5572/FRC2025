@@ -37,6 +37,7 @@ public class RobotState {
     private final Viz2025 vis;
     private boolean isInitialized = false;
     public Rotation2d yawObject = Rotation2d.kZero;
+    public boolean seesAlgae = false;
     public double lastSeenObject;
     private final TimeInterpolatableBuffer<Rotation2d> rotationBuffer =
         TimeInterpolatableBuffer.createBuffer(1.5);
@@ -200,6 +201,7 @@ public class RobotState {
             }
             yawObject = Rotation2d.fromDegrees(result.getBestTarget().yaw);
             lastSeenObject = Timer.getFPGATimestamp();
+            seesAlgae = result.hasTargets();
         }
     }
 
