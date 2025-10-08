@@ -4,8 +4,10 @@ import org.littletonrobotics.junction.AutoLog;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
+/** questIO layer */
 public interface QuestIO {
 
+    /** quest input logger */
     @AutoLog
     public class QuestInputs {
         Pose2d questPose = new Pose2d();

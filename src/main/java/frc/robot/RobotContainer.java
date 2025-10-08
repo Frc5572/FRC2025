@@ -300,7 +300,7 @@ public class RobotContainer {
         // CommandFactory.selectFeeder(swerve, elevator, coralScoring, operator::feeder)));
         // driver.leftTrigger().and(() -> operator.whatToDoWithAlgae() == 'p')
         // .whileTrue(Commands.none());
-        driver.rightStick().whileTrue(quest.setPos());
+        // driver.rightStick().whileTrue(quest.setPose());
     }
 
     private void setupAltOperatorController() {

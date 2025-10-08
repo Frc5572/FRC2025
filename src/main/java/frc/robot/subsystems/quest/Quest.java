@@ -18,6 +18,7 @@ public class Quest extends SubsystemBase {
     Transform2d robotToQuest = new Transform2d(new Translation2d(Inches.of(-11.2), Inches.of(9.75)),
         Rotation2d.fromDegrees(-90)); // TRANSFORM INCORRECT NEEDS FIXING
     private RobotState state;
+    private boolean hasSet = false;
 
     public Quest(QuestIO io, RobotState state) {
         this.io = io;
@@ -32,19 +33,31 @@ public class Quest extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Quest", inputs);
-        if (posInit == null) {
-            posInit = state.getGlobalPoseEstimate();
-            io.setPose(posInit);
-        }
         Logger.recordOutput("Quest/PosInit", posInit);
-        Logger.recordOutput("Quest/getPose", getPose());
+        Logger.recordOutput("Quest/ProcessedPose", getPose());
+
+        if (state.isInitialized() && (hasSet == false)) {
+            setPose();
+            hasSet = true;
+        }
     }
 
+    /**
+     * Method for retreaving curret processed questPose
+     *
+     * @return Current processed questPose
+     */
     public Pose2d getPose() {
         return inputs.questPose.transformBy(robotToQuest);
     }
 
-    public Command setPos() {
+
+    /**
+     * Sets the pose to the current location in robotStates gobal estmate
+     *
+     * @return sets quest pose
+     */
+    public Command setPose() {
         return Commands.runOnce(() -> io.setPose(state.getGlobalPoseEstimate()));
     }
 }
