@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotState;
 
+/** quest subsystem */
 public class Quest extends SubsystemBase {
     private QuestIO io;
     private QuestInputsAutoLogged inputs = new QuestInputsAutoLogged();
@@ -20,6 +21,12 @@ public class Quest extends SubsystemBase {
     private RobotState state;
     private boolean hasSet = false;
 
+    /**
+     * Quest Constructer and initlizer
+     *
+     * @param io
+     * @param state
+     */
     public Quest(QuestIO io, RobotState state) {
         this.io = io;
         this.state = state;

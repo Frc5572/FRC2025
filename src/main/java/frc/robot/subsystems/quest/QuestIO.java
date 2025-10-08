@@ -23,6 +23,7 @@ public interface QuestIO {
 
     public void setPose(Pose2d pose);
 
+    /** empty class for replay */
     public class Empty implements QuestIO {
         @Override
         public void updateInputs(QuestInputs inputs) {}
