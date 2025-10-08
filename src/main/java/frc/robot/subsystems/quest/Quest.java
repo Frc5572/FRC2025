@@ -45,7 +45,7 @@ public class Quest extends SubsystemBase {
     }
 
     /**
-     * Method for retreaving curret processed questPose
+     * Method for retreaving current processed questPose
      *
      * @return Current processed questPose
      */
