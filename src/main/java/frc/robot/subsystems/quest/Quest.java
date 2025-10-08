@@ -54,7 +54,6 @@ public class Quest extends SubsystemBase {
         return inputs.questPose.transformBy(robotToQuest);
     }
 
-
     /**
      * Sets the pose to the current location in robotStates global estmate
      *
