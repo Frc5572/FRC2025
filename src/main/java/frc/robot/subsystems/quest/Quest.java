@@ -27,6 +27,7 @@ public class Quest extends SubsystemBase {
      * @param io
      * @param state
      */
+
     public Quest(QuestIO io, RobotState state) {
         this.io = io;
         this.state = state;
@@ -54,6 +55,7 @@ public class Quest extends SubsystemBase {
      *
      * @return Current processed questPose
      */
+
     public Pose2d getPose() {
         return inputs.questPose.transformBy(robotToQuest);
     }
@@ -64,6 +66,7 @@ public class Quest extends SubsystemBase {
      *
      * @return sets quest pose
      */
+
     public Command setPose() {
         return Commands.runOnce(() -> io.setPose(state.getGlobalPoseEstimate()));
     }
