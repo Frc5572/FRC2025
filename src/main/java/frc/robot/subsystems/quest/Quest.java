@@ -21,7 +21,7 @@ public class Quest extends SubsystemBase {
     private RobotState state;
     private boolean hasSet = false;
 
-    /** Quest Constructer and initlizer */
+    /** Quest Constructor and initlizer */
     public Quest(QuestIO io, RobotState state) {
         this.io = io;
         this.state = state;
