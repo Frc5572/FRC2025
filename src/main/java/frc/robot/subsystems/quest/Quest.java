@@ -60,7 +60,7 @@ public class Quest extends SubsystemBase {
 
 
     /**
-     * Sets the pose to the current location in robotStates gobal estmate
+     * Sets the pose to the current location in robotStates global estmate
      *
      * @return sets quest pose
      */
