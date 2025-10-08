@@ -38,7 +38,7 @@ public class Quest extends SubsystemBase {
         Logger.recordOutput("Quest/PosInit", posInit);
         Logger.recordOutput("Quest/ProcessedPose", getPose());
 
-        if (state.isInitialized() && (hasSet == false)) {
+        if (state.isInitialized() && !hasSet) {
             setPose();
             hasSet = true;
         }
