@@ -350,7 +350,7 @@ public class RobotContainer {
         coralScoring.coralAtOuttake.whileTrue(ledsLeftBackSide.setLEDsSolid(Color.kCyan))
             .whileTrue(ledsLeftFrontSide.setLEDsSolid(Color.kCyan));
         vision.seesTwoAprilTags.whileTrue(ledsRightSide.setRainbow());
-
+        vision.seesTwoAprilTags.onTrue(quest.setPose());
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
         // Algae

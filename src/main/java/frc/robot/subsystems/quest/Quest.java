@@ -37,11 +37,6 @@ public class Quest extends SubsystemBase {
         Logger.processInputs("Quest", inputs);
         Logger.recordOutput("Quest/PosInit", posInit);
         Logger.recordOutput("Quest/ProcessedPose", getPose());
-
-        if (state.isInitialized() && !hasSet) {
-            setPose();
-            hasSet = true;
-        }
     }
 
     /**
@@ -61,6 +56,9 @@ public class Quest extends SubsystemBase {
      */
 
     public Command setPose() {
-        return Commands.runOnce(() -> io.setPose(state.getGlobalPoseEstimate()));
+        return Commands.either(Commands.runOnce(() -> {
+            io.setPose(state.getGlobalPoseEstimate());
+            hasSet = true;
+        }), Commands.none(), () -> !hasSet).ignoringDisable(true);
     }
 }
