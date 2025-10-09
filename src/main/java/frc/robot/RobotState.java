@@ -422,4 +422,7 @@ public class RobotState {
     private final Rectangle robotTest = new Rectangle("RobotTest", new Pose2d(),
         Constants.Swerve.bumperFront.in(Meters) * 2, Constants.Swerve.bumperRight.in(Meters) * 2);
 
+    public boolean isInitialized() {
+        return isInitialized;
+    }
 }

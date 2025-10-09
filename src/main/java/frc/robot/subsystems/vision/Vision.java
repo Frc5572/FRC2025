@@ -23,7 +23,6 @@ import frc.robot.subsystems.vision.VisionIO.CameraInputs;
 
 /** Vision Subsystem */
 public class Vision extends SubsystemBase {
-
     private final VisionIO io;
     private final CameraInputs[] cameraInputs;
 
