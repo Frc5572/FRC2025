@@ -117,7 +117,7 @@ public class MoveToPose extends Command {
 
     @Override
     public void execute() {
-        swerve.moveToPose(pose2d, maxSpeedSupplier.getAsDouble());
+        swerve.moveToPose22(pose2d, maxSpeedSupplier.getAsDouble());
     }
 
     @Override

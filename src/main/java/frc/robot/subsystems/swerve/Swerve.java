@@ -391,4 +391,56 @@ public class Swerve extends SubsystemBase {
             Constants.SwerveTransformPID.MAX_ACCELERATION);
     }
 
+    private double calculateSpeed(Distance distance, double maxSpeed) {
+        Distance slowdownDistance = Meters.of(1.0);
+        double minSpeedRatio = 0.15;
+        
+        if(distance > slowdownDistance) {
+            return maxSpeed;
+        }
+
+        double scale = distance / slowdownDistance;
+        double minSpeed = maxSpeed * minSpeedRatio;
+        return Math.max(minSpeed, maxSpeed * scale);
+    }
+
+        /**
+     * Move to a Pose2d
+     *
+     * @param pose Desired Pose2d
+     */
+    public void moveToPose2(Pose2d pose, double maxSpeed, double maxAcceleration) {
+        if (Constants.shouldDrawStuff) {
+            Logger.recordOutput("Swerve/moveToPoseTarget", pose);
+        }
+
+        double distanceTOTarget= state.getGlobalPoseEstimate().getTranslation().getDistance(pose.getTranslation());
+        double speedScaled = calculateSpeed(distanceTOTarget, maxSpeed);
+        ChassisSpeeds ctrlEffort = holonomicDriveController.calculate(
+            state.getGlobalPoseEstimate(), pose, 0, pose.getRotation());
+        double speed = Math.hypot(ctrlEffort.vxMetersPerSecond,
+            ctrlEffort.vyMetersPerSecond);
+        if (speed > scaledMaxSpeed) {
+            double mul = speedScaled / speed;
+            ctrlEffort.vxMetersPerSecond *= mul;
+            ctrlEffort.vyMetersPerSecond *= mul;
+        }
+
+        if (Constants.shouldDrawStuff) {
+        Logger.recordOutput("Swerve/distanceToTarget", distanceToTarget);
+        Logger.recordOutput("Swerve/scaledMaxSpeed", scaledMaxSpeed);
+        }
+    
+        setModuleStates(ctrlEffort);
+    }
+
+        /**
+     * Move to a Pose2d
+     *
+     * @param pose Desired Pose2d
+     */
+    public void moveToPose22(Pose2d pose, double maxVelocity) {
+        moveToPose2(pose, maxVelocity, Constants.SwerveTransformPID.MAX_ACCELERATION);
+    }
+
 }
