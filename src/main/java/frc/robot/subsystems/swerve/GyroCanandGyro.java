@@ -10,5 +10,7 @@ public class GyroCanandGyro implements GyroIO {
     @Override
     public void updateInputs(GyroInputs inputs) {
         inputs.yaw = Rotation.of(gyro.getYaw());
+        inputs.pitch = Rotation.of(gyro.getRoll());
+        inputs.roll = Rotation.of(gyro.getRoll());
     }
 }

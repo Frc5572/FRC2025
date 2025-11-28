@@ -11,5 +11,7 @@ public class GyroNavX implements GyroIO {
     @Override
     public void updateInputs(GyroInputs inputs) {
         inputs.yaw = Degrees.of(-gyro.getYaw());
+        inputs.pitch = Degrees.of(-gyro.getPitch());
+        inputs.roll = Degrees.of(-gyro.getRoll());
     }
 }

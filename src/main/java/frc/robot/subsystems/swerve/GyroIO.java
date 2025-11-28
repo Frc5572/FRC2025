@@ -10,6 +10,8 @@ public interface GyroIO {
     @AutoLog
     public class GyroInputs {
         Angle yaw = Rotation.of(0);
+        Angle pitch = Rotation.of(0);
+        Angle roll = Rotation.of(0);
     }
 
     public void updateInputs(GyroInputs inputs);

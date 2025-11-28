@@ -132,7 +132,7 @@ public class RobotContainer {
         switch (runtimeType) {
             case kReal:
                 elevator = new Elevator(new ElevatorReal(), vis);
-                swerve = new Swerve(state, new SwerveReal(), new GyroCanandGyro());
+                swerve = new Swerve(state, new SwerveReal(), new GyroCanandGyro(), elevator);
                 vision = new Vision(state, VisionReal::new);
                 coralScoring = new CoralScoring(new CoralScoringReal(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeReal(), vis);
@@ -145,8 +145,8 @@ public class RobotContainer {
                 driveSimulation =
                     new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(), redStart);
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
-                swerve =
-                    new Swerve(state, new SwerveSim(driveSimulation), new GyroSim(driveSimulation));
+                swerve = new Swerve(state, new SwerveSim(driveSimulation),
+                    new GyroSim(driveSimulation), elevator);
                 vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
                 elevator = new Elevator(new ElevatorSim(), vis);
                 coralScoring = new CoralScoring(new CoralScoringSim(), vis);
@@ -157,7 +157,7 @@ public class RobotContainer {
                 break;
             default:
                 elevator = new Elevator(new ElevatorIO.Empty(), vis);
-                swerve = new Swerve(state, new SwerveIO.Empty(), new GyroIO.Empty());
+                swerve = new Swerve(state, new SwerveIO.Empty(), new GyroIO.Empty(), elevator);
                 vision = new Vision(state, VisionIO::empty);
                 coralScoring = new CoralScoring(new CoralScoringIO.Empty(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
@@ -341,6 +341,8 @@ public class RobotContainer {
             .onFalse(wrist.runVolts(() -> 0.0));
         // driver.a().whileTrue(
         // elevator.moveTo(() -> Inches.of(SmartDashboard.getNumber("elevatorTargetHeight", 20))));
+        swerve.setDefaultCommand(swerve.teleOpDrive2(testController,
+            Constants.Swerve.isFieldRelative, Constants.Swerve.isOpenLoop));
     }
 
     private void configureTriggerBindings() {

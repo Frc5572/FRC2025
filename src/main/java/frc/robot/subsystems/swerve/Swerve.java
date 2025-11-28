@@ -32,6 +32,7 @@ import frc.robot.Constants;
 import frc.robot.Robot.RobotRunType;
 import frc.robot.RobotContainer;
 import frc.robot.RobotState;
+import frc.robot.subsystems.elevator.Elevator;
 
 /**
  * Swerve Subsystem
@@ -44,6 +45,7 @@ public class Swerve extends SubsystemBase {
     private SwerveIO swerveIO;
     private GyroIO gyroIO;
     private GyroInputsAutoLogged inputsGyro = new GyroInputsAutoLogged();
+    private Elevator elevator;
 
     public final RobotState state;
     private double setSpeedMultiplier = 1.0;
@@ -63,11 +65,12 @@ public class Swerve extends SubsystemBase {
     /**
      * Swerve Subsystem
      */
-    public Swerve(RobotState state, SwerveIO swerveIO, GyroIO gyroIO) {
+    public Swerve(RobotState state, SwerveIO swerveIO, GyroIO gyroIO, Elevator elevator) {
         super("Swerve");
         this.state = state;
         this.swerveIO = swerveIO;
         this.gyroIO = gyroIO;
+        this.elevator = elevator;
         swerveMods = swerveIO.createModules();
         fieldOffset = getGyroYaw().getDegrees();
 
@@ -389,6 +392,38 @@ public class Swerve extends SubsystemBase {
     public void moveToPose(Pose2d pose) {
         moveToPose(pose, Constants.SwerveTransformPID.MAX_VELOCITY,
             Constants.SwerveTransformPID.MAX_ACCELERATION);
+    }
+
+    public void drive2(Translation2d translation, double rotation, boolean fieldRelative,
+        boolean isOpenLoop) {
+        ChassisSpeeds chassisSpeeds = fieldRelative
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(),
+                rotation, getFieldRelativeHeading())
+            : new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
+
+        // Apply anti-tip correction before setting module states
+        ChassisSpeeds safeSpeeds = AntiTilt.getSafeSpeeds(chassisSpeeds, elevator.getHeight(),
+            inputsGyro.pitch, inputsGyro.roll);
+        setModuleStates(safeSpeeds);
+    }
+
+    public Command teleOpDrive2(CommandXboxController controller, boolean fieldRelative,
+        boolean openLoop) {
+        return this.run(() -> {
+            double yaxis = -controller.getLeftY();
+            double xaxis = -controller.getLeftX();
+            double raxis = -controller.getRightX();
+            /* Deadbands */
+            yaxis = MathUtil.applyDeadband(yaxis, 0.1);
+            xaxis = MathUtil.applyDeadband(xaxis, 0.1);
+            xaxis *= xaxis * Math.signum(xaxis);
+            yaxis *= yaxis * Math.signum(yaxis);
+            raxis = (Math.abs(raxis) < Constants.STICK_DEADBAND) ? 0 : raxis;
+            Translation2d translation = new Translation2d(yaxis, xaxis)
+                .times(Constants.Swerve.maxSpeed).times(setSpeedMultiplier);
+            double rotation = raxis * Constants.Swerve.maxAngularVelocity * setSpeedMultiplier;
+            this.drive2(translation, rotation, fieldRelative, openLoop);
+        });
     }
 
 }
