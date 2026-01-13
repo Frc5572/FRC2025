@@ -86,7 +86,6 @@ public class RobotContainer {
         new CommandXboxController(Constants.ALT_OPERATOR_ID);
     public final CommandXboxController testController = new CommandXboxController(5);
 
-    /** Simulation */
     /** Visualization */
     private final FieldViz fieldVis;
     private final Viz2025 vis;
