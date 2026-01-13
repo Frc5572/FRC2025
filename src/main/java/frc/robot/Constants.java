@@ -13,9 +13,6 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
-import org.ironmaple.simulation.drivesims.COTS;
-import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
-import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -300,17 +297,7 @@ public final class Constants {
         public static final Distance bumperFront = Inches.of(17.5);
         public static final Distance bumperRight = Inches.of(17.5);
 
-        /** Get config for Maple-Sim. */
-        public static DriveTrainSimulationConfig getMapleConfig() {
-            return DriveTrainSimulationConfig.Default().withRobotMass(robotMass)
-                .withGyro(COTS.ofNav2X()).withCustomModuleTranslations(moduleTranslations)
-                .withBumperSize(bumperFront.times(2), bumperRight.times(2))
-                .withSwerveModule(new SwerveModuleSimulationConfig(ModuleConstants.driveMotor,
-                    ModuleConstants.angleMotor, ModuleConstants.driveReduction,
-                    ModuleConstants.angleReduction, ModuleConstants.driveFrictionVoltage,
-                    ModuleConstants.angleFrictionVoltage, ModuleConstants.wheelRadius,
-                    ModuleConstants.angleMomentOfInertia, ModuleConstants.wheelCoeffFriction));
-        }
+
 
         private enum Mk4iReductions {
             L1(8.14), L2(6.75), L3(6.12), TURN((150.0 / 7.0));
