@@ -6,9 +6,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.littletonrobotics.junction.Logger;
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -58,15 +55,12 @@ import frc.robot.subsystems.quest.QuestReal;
 import frc.robot.subsystems.quest.QuestSim;
 import frc.robot.subsystems.swerve.GyroCanandGyro;
 import frc.robot.subsystems.swerve.GyroIO;
-import frc.robot.subsystems.swerve.GyroSim;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
 import frc.robot.subsystems.swerve.SwerveReal;
-import frc.robot.subsystems.swerve.SwerveSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionReal;
-import frc.robot.subsystems.vision.VisionSimPhoton;
 
 
 
@@ -93,7 +87,6 @@ public class RobotContainer {
     public final CommandXboxController testController = new CommandXboxController(5);
 
     /** Simulation */
-    private SwerveDriveSimulation driveSimulation;
     /** Visualization */
     private final FieldViz fieldVis;
     private final Viz2025 vis;
@@ -142,12 +135,9 @@ public class RobotContainer {
                 break;
 
             case kSimulation:
-                driveSimulation =
-                    new SwerveDriveSimulation(Constants.Swerve.getMapleConfig(), redStart);
-                SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
-                swerve =
-                    new Swerve(state, new SwerveSim(driveSimulation), new GyroSim(driveSimulation));
-                vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
+
+                swerve = new Swerve(state, new SwerveIO.Empty(), new GyroIO.Empty());
+                vision = new Vision(state, VisionIO::empty);
                 elevator = new Elevator(new ElevatorSim(), vis);
                 coralScoring = new CoralScoring(new CoralScoringSim(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
@@ -383,28 +373,6 @@ public class RobotContainer {
      */
     public void updateViz() {
         vis.drawImpl();
-    }
-
-    /** Start simulation */
-    public void startSimulation() {
-        if (driveSimulation != null) {
-            SimulatedArena.getInstance().resetFieldForAuto();
-        }
-    }
-
-    /**
-     * Update simulation
-     */
-    public void updateSimulation() {
-        if (driveSimulation != null) {
-            SimulatedArena.getInstance().simulationPeriodic();
-            Logger.recordOutput("FieldSimulation/Algae",
-                SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
-            Logger.recordOutput("FieldSimulation/Coral",
-                SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
-            vis.setActualPose(driveSimulation.getSimulatedDriveTrainPose());
-
-        }
     }
 
     public void periodic() {

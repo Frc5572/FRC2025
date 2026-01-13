@@ -132,7 +132,6 @@ public class Robot extends LoggedRobot {
         LoggedTracer.reset();
         robotContainer.queryControllers();
         CommandScheduler.getInstance().run();
-        robotContainer.updateSimulation();
         robotContainer.updateViz();
         robotContainer.periodic();
     }
@@ -177,9 +176,7 @@ public class Robot extends LoggedRobot {
     public void testPeriodic() {}
 
     @Override
-    public void simulationInit() {
-        robotContainer.startSimulation();
-    }
+    public void simulationInit() {}
 
     @Override
     public void simulationPeriodic() {}
