@@ -63,10 +63,6 @@ import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
 import frc.robot.subsystems.swerve.SwerveReal;
 import frc.robot.subsystems.swerve.SwerveSim;
-import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionIO;
-import frc.robot.subsystems.vision.VisionReal;
-import frc.robot.subsystems.vision.VisionSimPhoton;
 
 
 
@@ -110,7 +106,7 @@ public class RobotContainer {
 
     private Elevator elevator;
     private final Swerve swerve;
-    private final Vision vision;
+    // private final Vision vision;
     private CoralScoring coralScoring;
     private Climber climb;
     private AlgaeWrist wrist;
@@ -133,7 +129,7 @@ public class RobotContainer {
             case kReal:
                 elevator = new Elevator(new ElevatorReal(), vis);
                 swerve = new Swerve(state, new SwerveReal(), new GyroNavX());
-                vision = new Vision(state, VisionReal::new);
+                // vision = new Vision(state, VisionReal::new);
                 coralScoring = new CoralScoring(new CoralScoringReal(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeReal(), vis);
                 climb = new Climber(new ClimberReal(), vis);
@@ -147,7 +143,7 @@ public class RobotContainer {
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
                 swerve =
                     new Swerve(state, new SwerveSim(driveSimulation), new GyroSim(driveSimulation));
-                vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
+                // vision = new Vision(state, VisionSimPhoton.partial(driveSimulation));
                 elevator = new Elevator(new ElevatorSim(), vis);
                 coralScoring = new CoralScoring(new CoralScoringSim(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
@@ -158,7 +154,7 @@ public class RobotContainer {
             default:
                 elevator = new Elevator(new ElevatorIO.Empty(), vis);
                 swerve = new Swerve(state, new SwerveIO.Empty(), new GyroIO.Empty());
-                vision = new Vision(state, VisionIO::empty);
+                // vision = new Vision(state, VisionIO::empty);
                 coralScoring = new CoralScoring(new CoralScoringIO.Empty(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeIO.Empty(), vis);
                 climb = new Climber(new ClimberIO.Empty(), vis);
@@ -349,8 +345,8 @@ public class RobotContainer {
             .whileTrue(ledsLeftFrontSide.setLEDsSolid(Color.kOrange));
         coralScoring.coralAtOuttake.whileTrue(ledsLeftBackSide.setLEDsSolid(Color.kCyan))
             .whileTrue(ledsLeftFrontSide.setLEDsSolid(Color.kCyan));
-        vision.seesTwoAprilTags.whileTrue(ledsRightSide.setRainbow());
-        vision.seesTwoAprilTags.onTrue(quest.setPose());
+        // vision.seesTwoAprilTags.whileTrue(ledsRightSide.setRainbow());
+        // vision.seesTwoAprilTags.onTrue(quest.setPose());
         coralScoring.coralAtOuttake.negate().debounce(1.0).whileTrue(coralScoring.runCoralIntake());
         RobotModeTriggers.disabled().whileFalse(coralScoring.runCoralIntake());
         // Algae
@@ -363,8 +359,8 @@ public class RobotContainer {
         wrist.algaeGroundIntaking
             .onTrue(Commands.runOnce(() -> swerve.setSpeedMultiplier(0.75)).ignoringDisable(true))
             .onFalse(Commands.runOnce(() -> swerve.setSpeedMultiplier(1.0)).ignoringDisable(true));
-        RobotModeTriggers.disabled().and(vision.seesTwoAprilTags).whileTrue(
-            Commands.run(() -> swerve.resetFieldRelativeOffsetBasedOnPose()).ignoringDisable(true));
+        // RobotModeTriggers.disabled().and(vision.seesTwoAprilTags).whileTrue(
+        // Commands.run(() -> swerve.resetFieldRelativeOffsetBasedOnPose()).ignoringDisable(true));
         elevator.heightAboveHome.onFalse(algae.setSpeedMultiplier(.25))
             .onTrue(algae.setSpeedMultiplier(1.0));
     }
