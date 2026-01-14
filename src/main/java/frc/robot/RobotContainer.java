@@ -56,8 +56,8 @@ import frc.robot.subsystems.quest.Quest;
 import frc.robot.subsystems.quest.QuestIO;
 import frc.robot.subsystems.quest.QuestReal;
 import frc.robot.subsystems.quest.QuestSim;
-import frc.robot.subsystems.swerve.GyroCanandGyro;
 import frc.robot.subsystems.swerve.GyroIO;
+import frc.robot.subsystems.swerve.GyroNavX;
 import frc.robot.subsystems.swerve.GyroSim;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveIO;
@@ -132,7 +132,7 @@ public class RobotContainer {
         switch (runtimeType) {
             case kReal:
                 elevator = new Elevator(new ElevatorReal(), vis);
-                swerve = new Swerve(state, new SwerveReal(), new GyroCanandGyro());
+                swerve = new Swerve(state, new SwerveReal(), new GyroNavX());
                 vision = new Vision(state, VisionReal::new);
                 coralScoring = new CoralScoring(new CoralScoringReal(), vis);
                 algae = new ElevatorAlgae(new ElevatorAlgaeReal(), vis);
