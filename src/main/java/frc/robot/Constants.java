@@ -64,7 +64,7 @@ public final class Constants {
 
     public static final boolean tuningMode = false;
 
-    public static CANBus canivore = CANBus("*");
+    public static CANBus canivore = new CANBus("*");
     public static CANBus rio = CANBus.roboRIO();
 
     /**

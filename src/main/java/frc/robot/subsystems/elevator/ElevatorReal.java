@@ -10,6 +10,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -30,8 +31,9 @@ public class ElevatorReal implements ElevatorIO {
     private StatusSignal<AngularVelocity> elevatorVelocity = rightElevatorMotor.getVelocity();
     private StatusSignal<Current> motorCurrent = rightElevatorMotor.getStatorCurrent();
     private final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
-    private final DynamicMotionMagicVoltage m_requestFast = new DynamicMotionMagicVoltage(0,
-        Constants.Elevator.FastVelocity, Constants.Elevator.Acceleration, Constants.Elevator.Jerk);
+    private final DynamicMotionMagicVoltage m_requestFast =
+        new DynamicMotionMagicVoltage(0, Constants.Elevator.FastVelocity,
+            Constants.Elevator.Acceleration).withJerk(Constants.Elevator.Jerk);
 
     /** Real Elevator Initializer */
     public ElevatorReal() {
@@ -43,7 +45,8 @@ public class ElevatorReal implements ElevatorIO {
     private void configMotors() {
         // left conf
 
-        leftElevatorMotor.setControl(new Follower(rightElevatorMotor.getDeviceID(), true));
+        leftElevatorMotor.setControl(
+            new Follower(rightElevatorMotor.getDeviceID(), MotorAlignmentValue.Opposed));
 
         // right conf
         elevatorConf.MotorOutput.NeutralMode = Constants.Elevator.BREAK;
