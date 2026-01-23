@@ -49,10 +49,9 @@ public class SwerveModuleReal implements SwerveModuleIO {
         Rotation2d cancoderOffset) {
 
         this.angleOffset = cancoderOffset;
-
-        angleEncoder = new CANcoder(cancoderID, "canivore");
-        mDriveMotor = new TalonFX(driveMotorID, "canivore");
-        mAngleMotor = new TalonFX(angleMotorID, "canivore");
+        angleEncoder = new CANcoder(cancoderID, Constants.canivore);
+        mDriveMotor = new TalonFX(driveMotorID, Constants.canivore);
+        mAngleMotor = new TalonFX(angleMotorID, Constants.canivore);
 
         configAngleEncoder();
         configAngleMotor();
