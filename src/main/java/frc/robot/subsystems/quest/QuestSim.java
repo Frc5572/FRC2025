@@ -1,6 +1,6 @@
 package frc.robot.subsystems.quest;
 
-import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 
 /** quest simulator */
 public class QuestSim implements QuestIO {
@@ -12,6 +12,6 @@ public class QuestSim implements QuestIO {
     public void commandPeriodic() {}
 
     @Override
-    public void setPose(Pose2d pose) {}
+    public void setPose(Pose3d pose) {}
 
 }

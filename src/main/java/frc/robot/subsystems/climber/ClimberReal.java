@@ -11,7 +11,9 @@ import frc.robot.Constants;
 
 /*** Class */
 public class ClimberReal implements ClimberIO {
-    private final TalonFX climberMotorRight = new TalonFX(Constants.Climb.RIGHT_TALON_FX_ID, "rio");
+
+    private final TalonFX climberMotorRight =
+        new TalonFX(Constants.Climb.RIGHT_TALON_FX_ID, Constants.rio);
     private final TalonFXConfiguration rightConfig = new TalonFXConfiguration();
     private StatusSignal<Angle> climbMotorPosition = climberMotorRight.getPosition();
 

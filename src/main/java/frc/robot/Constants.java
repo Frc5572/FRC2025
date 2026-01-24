@@ -16,6 +16,7 @@ import static edu.wpi.first.units.Units.Volts;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -62,6 +63,9 @@ public final class Constants {
     public static final int operatorId = 1;
 
     public static final boolean tuningMode = false;
+
+    public static CANBus canivore = new CANBus("*");
+    public static CANBus rio = CANBus.roboRIO();
 
     /**
      * Algae misc values
