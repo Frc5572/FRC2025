@@ -1,6 +1,8 @@
 package frc.lib.util.swerve;
 
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -108,5 +110,21 @@ public class SwerveModule {
             Conversions.rotationsToMeters(inputs.driveMotorSelectedPosition,
                 Constants.Swerve.wheelCircumference),
             Rotation2d.fromRotations(inputs.angleMotorSelectedPosition.in(Rotations)));
+    }
+
+    /** Run motor at given voltage with angle motor pointing forward */
+    public void runCharacterization(double output) {
+        io.setDriveMotorPower(output);
+        io.setAngleMotor(0.0);
+    }
+
+    /** Returns the module position in radians. */
+    public double getWheelRadiusCharacterizationPosition() {
+        return inputs.driveMotorSelectedPosition.in(Radians);
+    }
+
+    /** Returns the module velocity in rotations/sec (Phoenix native units). */
+    public double getFFCharacterizationVelocity() {
+        return inputs.driveMotorSelectedSensorVelocity.in(RotationsPerSecond);
     }
 }

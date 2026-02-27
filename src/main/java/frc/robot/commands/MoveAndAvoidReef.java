@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -124,13 +125,32 @@ public class MoveAndAvoidReef extends Command implements Drawable {
         if (flipForRed) {
             pose2d = AllianceFlipUtil.apply(pose2d);
         }
+        prev = pose2d;
     }
+
+    private final TrapezoidProfile profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(
+        Constants.SwerveTransformPID.MAX_VELOCITY, Constants.SwerveTransformPID.MAX_ACCELERATION));
+
+    private Pose2d prev;
 
     @Override
     public void execute() {
-        // draw();
+        double speed = pose2d.minus(prev).getTranslation().getNorm();
+        double dist = swerve.state.getGlobalPoseEstimate().getTranslation()
+            .minus(pose2d.getTranslation()).getNorm();
+        double maxSpeed = Math.abs(profile.calculate(0.02, new TrapezoidProfile.State(dist, speed),
+            new TrapezoidProfile.State(0, 0)).velocity);
+        double nominalSpeed = maxSpeedSupplier.getAsDouble();
+        if (maxSpeed > speed) {
+            maxSpeed = nominalSpeed;
+        }
+        Logger.recordOutput("MoveAndAvoidReef/speed", speed);
+        Logger.recordOutput("MoveAndAvoidReef/dist", dist);
+        Logger.recordOutput("MoveAndAvoidReef/maxSpeed", maxSpeed);
+        Logger.recordOutput("MoveAndAvoidReef/nominalSpeed", nominalSpeed);
+
         swerve.moveToPose(getNextIntermediateTarget(swerve.state.getGlobalPoseEstimate(), pose2d),
-            maxSpeedSupplier.getAsDouble());
+            Math.min(nominalSpeed, maxSpeed));
     }
 
     @Override

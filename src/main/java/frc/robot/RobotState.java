@@ -96,8 +96,9 @@ public class RobotState {
 
     private final Circle stdDevGlobalCircle =
         new Circle("State/GlobalEstimateStdDev", new Translation2d(), 0);
-    private final Circle stdDevLocalCircle =
-        new Circle("State/LocalEstimateStdDev", new Translation2d(), 0);
+    private final Circle[] stdDevLocalCircle =
+        new Circle[] {new Circle("State/LocalEstimateStdDev0", new Translation2d(), 0),
+            new Circle("State/LocalEstimateStdDev1", new Translation2d(), 0)};
 
     private void addVisionObservation(Pose3d cameraPose, Pose3d robotPose, double timestamp,
         Vector<N3> baseUncertainty, List<PhotonTrackedTarget> targets, String prefix,
@@ -157,18 +158,18 @@ public class RobotState {
                     Constants.StateEstimator.globalVisionTrust.getAsDouble(),
                     Constants.StateEstimator.globalVisionTrustRotation.getAsDouble()),
                 result.getTargets(), "Global", true, stdDevGlobalCircle);
-        }
-        if (whichCamera == 1) {
+        } else {
             for (var target : result.targets) {
                 double dist =
                     target.getBestCameraToTarget().getTranslation().toTranslation2d().getNorm();
-                if (dist > Units.inchesToMeters(36)) {
+                if (dist > Units.feetToMeters(6)) {
                     continue;
                 }
-                localCircle.setRadius(dist - Constants.Vision.cameras[whichCamera].offset());
-                localCircle.setCenter(Constants.Vision.fieldLayout.getTagPose(target.fiducialId)
-                    .get().getTranslation().toTranslation2d());
-                localCircle.draw();
+                localCircle[whichCamera]
+                    .setRadius(dist - Constants.Vision.cameras[whichCamera].offset());
+                localCircle[whichCamera].setCenter(Constants.Vision.fieldLayout
+                    .getTagPose(target.fiducialId).get().getTranslation().toTranslation2d());
+                localCircle[whichCamera].draw();
                 Optional<Rotation2d> maybeRobotYaw = sampleRotationAt(result.getTimestampSeconds());
                 Rotation2d robotYaw;
                 if (maybeRobotYaw.isPresent()) {
@@ -176,29 +177,40 @@ public class RobotState {
                 } else {
                     continue;
                 }
-                Rotation2d yaw = Rotation2d.fromDegrees(robotYaw.getDegrees() - target.getYaw()
-                    + 180 + Units.radiansToDegrees(robotToCamera.getRotation().getZ()));
-                xCircle.setCenter(localCircle.getVertex(yaw));
-                xCircle.draw();
+                Rotation2d yaw;
+                if (whichCamera == 0) {
+                    yaw = Rotation2d.fromDegrees(robotYaw.getDegrees() + target.getYaw()
+                        + Units.radiansToDegrees(robotToCamera.getRotation().getZ()) + 180);
+                } else {
+                    yaw = Rotation2d.fromDegrees(robotYaw.getDegrees() - target.getYaw()
+                        + Units.radiansToDegrees(robotToCamera.getRotation().getZ()) + 180);
+                }
+                xCircle[whichCamera].setCenter(localCircle[whichCamera].getVertex(yaw));
+                xCircle[whichCamera].draw();
                 Pose2d robotPose2d = new Pose2d(
-                    xCircle.getCenter()
+                    xCircle[whichCamera].getCenter()
                         .minus(robotToCamera.getTranslation().toTranslation2d().rotateBy(robotYaw)),
                     robotYaw);
                 Pose3d robotPose = new Pose3d(robotPose2d);
                 Pose3d cameraPose = robotPose.plus(robotToCamera);
                 addVisionObservation(cameraPose, robotPose, result.getTimestampSeconds(),
-                    VecBuilder.fill(Constants.StateEstimator.localVisionTrust.getAsDouble(),
-                        Constants.StateEstimator.localVisionTrust.getAsDouble(),
+                    VecBuilder.fill(
+                        Constants.StateEstimator.localVisionTrust.getAsDouble()
+                            * Math.max(dist, 0.5),
+                        Constants.StateEstimator.localVisionTrust.getAsDouble()
+                            * Math.max(dist, 0.5),
                         Double.POSITIVE_INFINITY),
-                    result.getTargets(), "Local", false, stdDevLocalCircle);
+                    result.getTargets(), "Local", false, stdDevLocalCircle[whichCamera]);
             }
         }
     }
 
-    private final Circle localCircle =
-        new Circle("State/LocalEstimationDistance", new Translation2d(), 0);
-    private final Circle xCircle =
-        new Circle("State/LocalEstimationPose", new Translation2d(), Units.inchesToMeters(2));
+    private final Circle[] localCircle =
+        new Circle[] {new Circle("State/LocalEstimationDistance0", new Translation2d(), 0),
+            new Circle("State/LocalEstimationDistance1", new Translation2d(), 0)};
+    private final Circle[] xCircle = new Circle[] {
+        new Circle("State/LocalEstimationPose0", new Translation2d(), Units.inchesToMeters(2)),
+        new Circle("State/LocalEstimationPose1", new Translation2d(), Units.inchesToMeters(2))};
 
     /**
      * Add information from swerve drive.
@@ -212,8 +224,10 @@ public class RobotState {
             Stream.of(positions).map(x -> x.angle).toArray(this::swerveRotationsArray));
         stdDevGlobalCircle.setCenter(getGlobalPoseEstimate().getTranslation());
         stdDevGlobalCircle.setRadius(stdDevGlobalCircle.getRadius() + 0.01);
-        stdDevLocalCircle.setCenter(new Translation2d());
-        stdDevLocalCircle.setRadius(0.0);
+        stdDevLocalCircle[0].setCenter(new Translation2d());
+        stdDevLocalCircle[0].setRadius(0.0);
+        stdDevLocalCircle[1].setCenter(new Translation2d());
+        stdDevLocalCircle[1].setRadius(0.0);
     }
 
     private Rotation2d[] swerveRotations = new Rotation2d[4];

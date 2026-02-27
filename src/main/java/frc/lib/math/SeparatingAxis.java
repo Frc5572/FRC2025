@@ -93,6 +93,9 @@ public final class SeparatingAxis {
         Translation2d c1 = shape1.getCenter();
         Translation2d c2 = shape2.getCenter();
         Translation2d cToc = c1.minus(c2);
+        if (n == null) {
+            return false;
+        }
         if (n.dot(cToc) < 0) {
             n = n.unaryMinus();
         }
